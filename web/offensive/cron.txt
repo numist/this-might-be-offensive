@@ -1,0 +1,19 @@
+*/2 * * * * ~/themaxx.com/offensive/makeThumbnails.sh
+##### */1 * * * * ~/themaxx.com/offensive/map/map.pl
+*/5 * * * * ~/themaxx.com/offensive/updateIndexList.pl
+*/3 * * * * ~/themaxx.com/offensive/updateDiscussionList.pl
+##### */5 * * * * ~/themaxx.com/offensive/employee_of_the_month.pl
+1 0 * * * ~/themaxx.com/offensive/deleteOldFiles.pl 3 images/picpile
+6 0 * * * ~/themaxx.com/offensive/deleteOldFiles.pl 30 images/thumbs
+1 0 * * * ~/themaxx.com/offensive/deleteOldFiles.pl 10 images/audio
+1 0 * * * ~/themaxx.com/offensive/deleteOldFiles.pl 3 pages/nav
+9 0 * * * ~/themaxx.com/offensive/deleteOldFiles.pl 7 zips
+#### 7 0 * * * ~/themaxx.com/offensive/zipOldFiles.pl 1 images/picpile/ zips
+7 0 * * * ~/themaxx.com/offensive/zipYesterday.pl zips
+4 0 * * * ~/themaxx.com/offensive/zipOldFiles.pl 1 images/audio/ zips/audio
+12 0 * * * ~/themaxx.com/offensive/updateStats.pl
+15 0 * * * rsync -t --rsh=ssh ~/themaxx.com/offensive/zips/2*.* ray@zips.thismight.be:httpdocs/zips/
+*/20 * * * * ~/themaxx.com/offensive/hallOfFame.pl
+37 * * * * curl http://zips.thismight.be/ziplist.php > ~/themaxx.com/offensive/ziplist.txt
+#### 2 0 * * * ~/themaxx.com/offensive/updatePublicPages.pl
+@weekly ~/php_update

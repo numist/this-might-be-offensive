@@ -1,0 +1,12 @@
+<?xml version="1.0"?> 
+<rsd version="1.0" xmlns="http://archipelago.phrasewise.com/rsd">
+  <service>
+    <engineName>Movable Type 2.65</engineName> 
+    <engineLink>http://www.movabletype.org/</engineLink>
+    <homePageLink>http://themaxx.com/</homePageLink>
+    <apis>
+      <api name="MetaWeblog" preferred="true" apiLink="http://tmbo.org/mt/mt-xmlrpc.cgi" blogID="3" />
+      <api name="Blogger" preferred="false" apiLink="http://tmbo.org/mt/mt-xmlrpc.cgi" blogID="3" />
+    </apis>
+  </service>
+</rsd>

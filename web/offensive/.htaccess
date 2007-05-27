@@ -1,0 +1,19 @@
+IndexIgnore *
+DirectoryIndex index.php index.cgi index.shtml index.html index.htm /goAway.html
+ErrorDocument 404 /offensive/404.php
+
+#AddHandler cgi-script .php .php3 .php4
+#SetEnv REDIRECT_STATUS 200
+
+# AddHandler php-cgi .php
+# Action php-cgi /cgi-bin/php.cgi
+
+Order Allow,Deny
+Allow from All
+Deny from primedius.com	216.227.149.245 81.158.135.58 65.34.123.103 151.203.66.152 68.69.84.151 70.49.11.117 193.166.235.103 69.243.18.143 84.130.100.148 67.184.216.236
+ErrorDocument 403 /fuckoff.php
+
+RewriteEngine on 
+RewriteCond %{HTTP_REFERER} !^$ 
+RewriteCond %{HTTP_REFERER} !^http://[w\.]*(.*netvibes\.com|tmbo\.org|thismight\.be|rocketsheep\.com|mysocalled\.com|.*filepile\.org).*$ [NC] 
+RewriteRule .*(jpg|JPG|jpeg|JPEG|gif|GIF)$ http://tmbo.org/tmbologo.gif

@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+        "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>Untitled</title>
+	<meta name="generator" content="BBEdit 8.2">
+	
+	<script type="text/javascript">
+	
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// makeRequest-- submits an asynchronous http request to the specified url and invokes callbackFunc
+// upon completion
+//  @param url - the url of the request
+//  @param callbackFunc the function to be called upon completion of the request. The function will
+//        receive the XmlHttpRequest object as an argument.
+////////////////////////////////////////////////////////////////////////////////////////////////////
+function makeRequest(url, callbackFunc) {
+	http_request = false;
+	if (window.XMLHttpRequest) { // Mozilla, Safari,...
+		http_request = new XMLHttpRequest();
+		if (http_request.overrideMimeType) {
+			http_request.overrideMimeType('text/xml');
+		}
+	}
+	else if (window.ActiveXObject) { // IE
+		try {
+			http_request = new ActiveXObject("Msxml2.XMLHTTP");
+		} catch (e) {
+			try {
+				http_request = new ActiveXObject("Microsoft.XMLHTTP");
+			} catch (e) {}
+		}
+	}
+	if (!http_request) {
+		alert('Cannot create XMLHTTP instance');
+		return false;
+	}
+	http_request.onreadystatechange = function() { 
+		if( http_request.readyState == 4 ) {
+			callbackFunc( http_request );
+		}
+	};
+	http_request.open('GET', url, true);
+	http_request.send(null);
+}
+
+
+function updateUnreadComments() {
+
+	var callback = function whee( httpReq ) {
+		if( httpReq.status != 200 ) {
+			alert( "request returned error " + httpReq.status );
+			return;
+		}
+		var xml = httpReq.responseXML;
+		if( xml ) {
+			var doc = xml.documentElement;
+			var html = asHtml( doc );
+			document.body.appendChild( html );
+		}
+	}
+
+	makeRequest( "http://tmbo.org/offensive/unreadComments.php", callback );
+	
+}
+
+function asHtml( xmlRoot ) {
+	var html;
+	switch( xmlRoot.nodeType ) {
+		case ELEMENT_NODE:
+			html = document.createElement( xmlRoot.tagName );
+			copyAttrs( xmlRoot, html );
+			for( var i = 0; i < xmlRoot.childNodes.length; i++ ) {
+				html.appendChild( asHtml( xmlRoot.childNodes[i] ) );
+			}
+		break;
+		
+		case TEXT_NODE:
+			html = document.createTextNode( xmlRoot.nodeValue );
+		break
+	}
+	return html;
+}
+
+function copyAttrs( srcElem, destElem ) {
+	var attrs = srcElem.attributes;
+	for( var i = 0; i < attrs.length; i++ ) {
+		destElem.setAttribute( attrs[i].name, attrs[i].value );
+	}
+	return destElem;
+}
+
+updateUnreadComments();
+
+ELEMENT_NODE = 1;
+TEXT_NODE = 3;
+
+	</script>
+	
+</head>
+<body>
+
+	
+
+</body>
+</html>

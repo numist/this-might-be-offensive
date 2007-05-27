@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
+  xmlns:admin="http://webns.net/mvcb/"
+  xmlns:cc="http://web.resource.org/cc/"
+  xmlns="http://purl.org/rss/1.0/">
+
+<channel rdf:about="http://themaxx.com/">
+<title>changeblog</title>
+<link>http://themaxx.com/</link>
+<description></description>
+<dc:language>en-us</dc:language>
+<dc:creator></dc:creator>
+<dc:date>2007-05-03T00:08:13-06:00</dc:date>
+<admin:generatorAgent rdf:resource="http://www.movabletype.org/?v=2.65" />
+
+
+<items>
+<rdf:Seq><rdf:li rdf:resource="http://themaxx.com/offensive/changeblog/002396.html" />
+<rdf:li rdf:resource="http://themaxx.com/offensive/changeblog/002395.html" />
+<rdf:li rdf:resource="http://themaxx.com/offensive/changeblog/002394.html" />
+<rdf:li rdf:resource="http://themaxx.com/offensive/changeblog/002393.html" />
+<rdf:li rdf:resource="http://themaxx.com/offensive/changeblog/002392.html" />
+<rdf:li rdf:resource="http://themaxx.com/offensive/changeblog/002391.html" />
+<rdf:li rdf:resource="http://themaxx.com/offensive/changeblog/002390.html" />
+<rdf:li rdf:resource="http://themaxx.com/offensive/changeblog/002389.html" />
+<rdf:li rdf:resource="http://themaxx.com/offensive/changeblog/002388.html" />
+<rdf:li rdf:resource="http://themaxx.com/offensive/changeblog/002387.html" />
+<rdf:li rdf:resource="http://themaxx.com/offensive/changeblog/002386.html" />
+<rdf:li rdf:resource="http://themaxx.com/offensive/changeblog/002385.html" />
+<rdf:li rdf:resource="http://themaxx.com/offensive/changeblog/002384.html" />
+<rdf:li rdf:resource="http://themaxx.com/offensive/changeblog/002383.html" />
+<rdf:li rdf:resource="http://themaxx.com/offensive/changeblog/002382.html" />
+</rdf:Seq>
+</items>
+
+</channel>
+
+<item rdf:about="http://themaxx.com/offensive/changeblog/002396.html">
+<title></title>
+<link>http://themaxx.com/offensive/changeblog/002396.html</link>
+<description>caching the discussions list page, as it seems to be slow/kaboomy to get it from the db every time....</description>
+<dc:subject></dc:subject>
+<dc:creator>ray</dc:creator>
+<dc:date>2007-05-03T00:08:13-06:00</dc:date>
+</item>
+<item rdf:about="http://themaxx.com/offensive/changeblog/002395.html">
+<title></title>
+<link>http://themaxx.com/offensive/changeblog/002395.html</link>
+<description>temporarily removed upload limit because the query required to compute it is slow....</description>
+<dc:subject></dc:subject>
+<dc:creator>ray</dc:creator>
+<dc:date>2007-03-22T23:46:37-06:00</dc:date>
+</item>
+<item rdf:about="http://themaxx.com/offensive/changeblog/002394.html">
+<title></title>
+<link>http://themaxx.com/offensive/changeblog/002394.html</link>
+<description>back to storing files by name instead of id, because chev wouldn&apos;t stop crying....</description>
+<dc:subject></dc:subject>
+<dc:creator>ray</dc:creator>
+<dc:date>2007-02-19T15:46:52-06:00</dc:date>
+</item>
+<item rdf:about="http://themaxx.com/offensive/changeblog/002393.html">
+<title></title>
+<link>http://themaxx.com/offensive/changeblog/002393.html</link>
+<description>uploads are now stored in a new location, with files named according to their database id. we seem to have enough disk space to stop expiring files and with that in mind files are stored in a directory hierarchy according...</description>
+<dc:subject></dc:subject>
+<dc:creator>ray</dc:creator>
+<dc:date>2007-02-17T21:45:56-06:00</dc:date>
+</item>
+<item rdf:about="http://themaxx.com/offensive/changeblog/002392.html">
+<title></title>
+<link>http://themaxx.com/offensive/changeblog/002392.html</link>
+<description>started caching vote and comment counts in a separate database table to relieve some of the database pressure without sacrificing site features....</description>
+<dc:subject></dc:subject>
+<dc:creator>ray</dc:creator>
+<dc:date>2007-02-11T04:15:54-06:00</dc:date>
+</item>
+<item rdf:about="http://themaxx.com/offensive/changeblog/002391.html">
+<title></title>
+<link>http://themaxx.com/offensive/changeblog/002391.html</link>
+<description>added css classes to hall of fame rows according to number of weeks on the chart. (weeks_0, weeks_1, etc) to allow new items to be highlighted....</description>
+<dc:subject></dc:subject>
+<dc:creator>ray</dc:creator>
+<dc:date>2007-01-29T13:37:27-06:00</dc:date>
+</item>
+<item rdf:about="http://themaxx.com/offensive/changeblog/002390.html">
+<title></title>
+<link>http://themaxx.com/offensive/changeblog/002390.html</link>
+<description>first pass at using google maps api for the maxxer world map....</description>
+<dc:subject></dc:subject>
+<dc:creator>ray</dc:creator>
+<dc:date>2006-10-19T01:58:34-06:00</dc:date>
+</item>
+<item rdf:about="http://themaxx.com/offensive/changeblog/002389.html">
+<title></title>
+<link>http://themaxx.com/offensive/changeblog/002389.html</link>
+<description>nsfw filter now applies to the thumbnails page...</description>
+<dc:subject></dc:subject>
+<dc:creator>ray</dc:creator>
+<dc:date>2006-09-22T12:36:18-06:00</dc:date>
+</item>
+<item rdf:about="http://themaxx.com/offensive/changeblog/002388.html">
+<title></title>
+<link>http://themaxx.com/offensive/changeblog/002388.html</link>
+<description>changed &quot;pick up where i left off&quot; cookie to distinguish between different users using the same browser....</description>
+<dc:subject></dc:subject>
+<dc:creator>ray</dc:creator>
+<dc:date>2006-09-15T00:49:23-06:00</dc:date>
+</item>
+<item rdf:about="http://themaxx.com/offensive/changeblog/002387.html">
+<title></title>
+<link>http://themaxx.com/offensive/changeblog/002387.html</link>
+<description>added &quot;jump to oldest unexpired image&quot; link to expired picture page....</description>
+<dc:subject></dc:subject>
+<dc:creator>ray</dc:creator>
+<dc:date>2006-08-03T03:46:27-06:00</dc:date>
+</item>
+<item rdf:about="http://themaxx.com/offensive/changeblog/002386.html">
+<title></title>
+<link>http://themaxx.com/offensive/changeblog/002386.html</link>
+<description>added the &quot;posse&quot; page, which lists the users invited by a particular user....</description>
+<dc:subject></dc:subject>
+<dc:creator>ray</dc:creator>
+<dc:date>2006-07-22T12:58:41-06:00</dc:date>
+</item>
+<item rdf:about="http://themaxx.com/offensive/changeblog/002385.html">
+<title></title>
+<link>http://themaxx.com/offensive/changeblog/002385.html</link>
+<description>added javascript to the yearbook upload form on the user page to prevent submission before an image is selected. hopefully this will reduce the incidence of accidentally uploading yearbook pictures to the image pile....</description>
+<dc:subject></dc:subject>
+<dc:creator>ray</dc:creator>
+<dc:date>2006-06-22T02:33:43-06:00</dc:date>
+</item>
+<item rdf:about="http://themaxx.com/offensive/changeblog/002384.html">
+<title></title>
+<link>http://themaxx.com/offensive/changeblog/002384.html</link>
+<description>reject files with .php in their names until i figure out why php is trying to execute them. upped file size limit to allow bigger audio uploads, up to 20Mb....</description>
+<dc:subject></dc:subject>
+<dc:creator>ray</dc:creator>
+<dc:date>2006-06-19T18:43:49-06:00</dc:date>
+</item>
+<item rdf:about="http://themaxx.com/offensive/changeblog/002383.html">
+<title></title>
+<link>http://themaxx.com/offensive/changeblog/002383.html</link>
+<description>added search for discussion topics...</description>
+<dc:subject></dc:subject>
+<dc:creator>ray</dc:creator>
+<dc:date>2006-03-28T10:23:04-06:00</dc:date>
+</item>
+<item rdf:about="http://themaxx.com/offensive/changeblog/002382.html">
+<title></title>
+<link>http://themaxx.com/offensive/changeblog/002382.html</link>
+<description>new keyboard shortcut on main page: &apos;p&apos; = pick up where i left off...</description>
+<dc:subject></dc:subject>
+<dc:creator>ray</dc:creator>
+<dc:date>2006-03-27T01:28:48-06:00</dc:date>
+</item>
+
+
+</rdf:RDF>

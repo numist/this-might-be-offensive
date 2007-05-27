@@ -1,0 +1,42 @@
+body {
+	margin:20px;
+	font-family: verdana, helvetica, sans-serif; 
+	font-size: 9px; 
+	color:#000000}
+
+.loggedin {font-family: verdana, helvetica, sans-serif; font-size: 12px; color:#888888}
+.loggedinlink {color:#000099; font-weight:bold;text-decoration:none;}
+
+.menulink {text-decoration:none;font-family: verdana, helvetica, sans-serif; font-size: 10px; color:#ff6600}
+
+.piletitle {color:#000033; font-weight:bold; font-size:12px; text-decoration:underline}
+
+.evenfile {color:#666699; line-height:18px; font-size:10px;text-decoration:none;}
+.oddfile {color:#000000; line-height:18px; font-size:10px;text-decoration:none;}
+
+.piletool {font-family: verdana, helvetica, sans-serif; font-size: 11px; color:#ff6600;text-decoration:none;}
+
+.fileheader {font-family: verdana, helvetica, sans-serif; font-size: 13px; color:#888888; font-weight:bold}
+.fileheaderlink {font-family:verdana, helvetica, sans-serif; font-size:13px; color:#ff6600; font-weight:bold;text-decoration:none;}
+.fileheaderdesc {font-family:verdana, helvetica, sans-serif; font-size:11px; color:#474646; line-height:20px}
+.fileheaderuser {font-family:verdana, helvetica, sans-serif; font-size:11px; color:#000099;text-decoration:none;}
+
+
+.commentbody{font-family:verdana, helvetica, sans-serif; font-size:11px; color:#474646;}
+.commentdate{font-family:verdana, helvetica, sans-serif; font-size:10px; color:#888888;}
+.ratingtext{font-family:verdana, helvetica, sans-serif; font-size:11px; color:#474646; font-weight:bold}
+.commentuser{font-family:verdana, helvetica, sans-serif; font-size:11px; color:#000099;font-weight:bold;text-decoration:none;}
+
+.commenttext {font-family: verdana, helvetica, sans-serif; font-size: 11px;}
+.commentsubmitbutton {font-family: verdana, helvetica, sans-serif; font-size: 9px; background: #FF8400}
+
+.subtitle1{font-family: verdana, helvetica, sans-serif; font-size: 13px; color:#ff6600;font-weight:bold}
+
+.archivelink{font-family: verdana, helvetica, sans-serif; font-size:11px; color:#474646;font-weight:bold}
+.archivelinkcomments{font-size:11px; color:#474646;}
+.archivelinkcommentsgood{font-size:11px; color:#009933;}
+
+.usertext{font-family:verdana, helvetica, sans-serif; font-size:11px; color:#474646;}
+
+.faqtitle{font-family:verdana, helvetica, sans-serif; font-size:11px; color:#474646; font-weight:bold;}
+

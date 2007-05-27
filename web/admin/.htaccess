@@ -1,0 +1,4 @@
+AuthType Basic
+AuthUserFile /home/fleece/themaxx.com/admin/.htpasswd
+AuthName "custom"
+require valid-user

@@ -1,0 +1,1 @@
+<div class="orange">employee of the month: <a class="orange" href="./?c=user&userid=2763">latecomer</a> (8232 good votes)</div>

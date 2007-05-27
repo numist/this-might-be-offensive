@@ -1,0 +1,254 @@
+
+	<table width="100%" cellspacing="0" cellpadding="4">
+		<tr><td colspan="3" class="heading">haters (bad votes cast)</td></tr>
+	
+		<tr class="odd_row">
+			<td style="text-align:right">1</td>
+			<td><a href="./?c=user&userid=301">HAP</a></td>
+			<td style="text-align:right">5241</td>
+		</tr>
+		<tr class="even_row">
+			<td style="text-align:right">2</td>
+			<td><a href="./?c=user&userid=421">punching_judy</a></td>
+			<td style="text-align:right">1300</td>
+		</tr>
+		<tr class="odd_row">
+			<td style="text-align:right">3</td>
+			<td><a href="./?c=user&userid=96">phredgreen</a></td>
+			<td style="text-align:right">1077</td>
+		</tr>
+		<tr class="even_row">
+			<td style="text-align:right">4</td>
+			<td><a href="./?c=user&userid=589">jerry</a></td>
+			<td style="text-align:right">1067</td>
+		</tr>
+		<tr class="odd_row">
+			<td style="text-align:right">5</td>
+			<td><a href="./?c=user&userid=88">lobbyguy</a></td>
+			<td style="text-align:right">819</td>
+		</tr>
+		<tr class="even_row">
+			<td style="text-align:right">6</td>
+			<td><a href="./?c=user&userid=522">cubus</a></td>
+			<td style="text-align:right">737</td>
+		</tr>
+		<tr class="odd_row">
+			<td style="text-align:right">7</td>
+			<td><a href="./?c=user&userid=125">FATASS|Cartman</a></td>
+			<td style="text-align:right">728</td>
+		</tr>
+		<tr class="even_row">
+			<td style="text-align:right">8</td>
+			<td><a href="./?c=user&userid=944">bgt</a></td>
+			<td style="text-align:right">673</td>
+		</tr>
+		<tr class="odd_row">
+			<td style="text-align:right">9</td>
+			<td><a href="./?c=user&userid=94">Danelope</a></td>
+			<td style="text-align:right">666</td>
+		</tr>
+		<tr class="even_row">
+			<td style="text-align:right">10</td>
+			<td><a href="./?c=user&userid=950">BoCo</a></td>
+			<td style="text-align:right">485</td>
+		</tr>
+		<tr class="odd_row">
+			<td style="text-align:right">11</td>
+			<td><a href="./?c=user&userid=200">MeatFarley</a></td>
+			<td style="text-align:right">469</td>
+		</tr>
+		<tr class="even_row">
+			<td style="text-align:right">12</td>
+			<td><a href="./?c=user&userid=350">Xymox007</a></td>
+			<td style="text-align:right">461</td>
+		</tr>
+		<tr class="odd_row">
+			<td style="text-align:right">13</td>
+			<td><a href="./?c=user&userid=271">Adobe Hacienda</a></td>
+			<td style="text-align:right">420</td>
+		</tr>
+		<tr class="even_row">
+			<td style="text-align:right">14</td>
+			<td><a href="./?c=user&userid=1106">ichiban2677</a></td>
+			<td style="text-align:right">353</td>
+		</tr>
+		<tr class="odd_row">
+			<td style="text-align:right">15</td>
+			<td><a href="./?c=user&userid=597">grendel53</a></td>
+			<td style="text-align:right">305</td>
+		</tr>
+		<tr class="even_row">
+			<td style="text-align:right">16</td>
+			<td><a href="./?c=user&userid=87">jerrywilborn</a></td>
+			<td style="text-align:right">293</td>
+		</tr>
+		<tr class="odd_row">
+			<td style="text-align:right">17</td>
+			<td><a href="./?c=user&userid=694">superdude</a></td>
+			<td style="text-align:right">248</td>
+		</tr>
+		<tr class="even_row">
+			<td style="text-align:right">18</td>
+			<td><a href="./?c=user&userid=204">Sher</a></td>
+			<td style="text-align:right">248</td>
+		</tr>
+		<tr class="odd_row">
+			<td style="text-align:right">19</td>
+			<td><a href="./?c=user&userid=679">Linnwood</a></td>
+			<td style="text-align:right">243</td>
+		</tr>
+		<tr class="even_row">
+			<td style="text-align:right">20</td>
+			<td><a href="./?c=user&userid=299">elkabong</a></td>
+			<td style="text-align:right">243</td>
+		</tr>
+		<tr class="odd_row">
+			<td style="text-align:right">21</td>
+			<td><a href="./?c=user&userid=1023">ITO</a></td>
+			<td style="text-align:right">242</td>
+		</tr>
+		<tr class="even_row">
+			<td style="text-align:right">22</td>
+			<td><a href="./?c=user&userid=490">toolshed</a></td>
+			<td style="text-align:right">242</td>
+		</tr>
+		<tr class="odd_row">
+			<td style="text-align:right">23</td>
+			<td><a href="./?c=user&userid=961">Ignorance</a></td>
+			<td style="text-align:right">241</td>
+		</tr>
+		<tr class="even_row">
+			<td style="text-align:right">24</td>
+			<td><a href="./?c=user&userid=117">penny_lane086</a></td>
+			<td style="text-align:right">238</td>
+		</tr>
+		<tr class="odd_row">
+			<td style="text-align:right">25</td>
+			<td><a href="./?c=user&userid=128">crumbtrail</a></td>
+			<td style="text-align:right">215</td>
+		</tr>
+		<tr class="even_row">
+			<td style="text-align:right">26</td>
+			<td><a href="./?c=user&userid=106">kannan</a></td>
+			<td style="text-align:right">213</td>
+		</tr>
+		<tr class="odd_row">
+			<td style="text-align:right">27</td>
+			<td><a href="./?c=user&userid=518">Guccilvr</a></td>
+			<td style="text-align:right">210</td>
+		</tr>
+		<tr class="even_row">
+			<td style="text-align:right">28</td>
+			<td><a href="./?c=user&userid=737">komodod</a></td>
+			<td style="text-align:right">204</td>
+		</tr>
+		<tr class="odd_row">
+			<td style="text-align:right">29</td>
+			<td><a href="./?c=user&userid=219">Crazy88</a></td>
+			<td style="text-align:right">202</td>
+		</tr>
+		<tr class="even_row">
+			<td style="text-align:right">30</td>
+			<td><a href="./?c=user&userid=210">jupitre</a></td>
+			<td style="text-align:right">202</td>
+		</tr>
+		<tr class="odd_row">
+			<td style="text-align:right">31</td>
+			<td><a href="./?c=user&userid=218">hellboy</a></td>
+			<td style="text-align:right">196</td>
+		</tr>
+		<tr class="even_row">
+			<td style="text-align:right">32</td>
+			<td><a href="./?c=user&userid=532">secretmethod70</a></td>
+			<td style="text-align:right">185</td>
+		</tr>
+		<tr class="odd_row">
+			<td style="text-align:right">33</td>
+			<td><a href="./?c=user&userid=807">renton</a></td>
+			<td style="text-align:right">169</td>
+		</tr>
+		<tr class="even_row">
+			<td style="text-align:right">34</td>
+			<td><a href="./?c=user&userid=722">Balkie</a></td>
+			<td style="text-align:right">159</td>
+		</tr>
+		<tr class="odd_row">
+			<td style="text-align:right">35</td>
+			<td><a href="./?c=user&userid=261">vibratingtoad</a></td>
+			<td style="text-align:right">145</td>
+		</tr>
+		<tr class="even_row">
+			<td style="text-align:right">36</td>
+			<td><a href="./?c=user&userid=85">seattleforge</a></td>
+			<td style="text-align:right">143</td>
+		</tr>
+		<tr class="odd_row">
+			<td style="text-align:right">37</td>
+			<td><a href="./?c=user&userid=434">KaKaFace</a></td>
+			<td style="text-align:right">143</td>
+		</tr>
+		<tr class="even_row">
+			<td style="text-align:right">38</td>
+			<td><a href="./?c=user&userid=142">meowchow</a></td>
+			<td style="text-align:right">141</td>
+		</tr>
+		<tr class="odd_row">
+			<td style="text-align:right">39</td>
+			<td><a href="./?c=user&userid=1097">jebus68</a></td>
+			<td style="text-align:right">140</td>
+		</tr>
+		<tr class="even_row">
+			<td style="text-align:right">40</td>
+			<td><a href="./?c=user&userid=228">froggy</a></td>
+			<td style="text-align:right">139</td>
+		</tr>
+		<tr class="odd_row">
+			<td style="text-align:right">41</td>
+			<td><a href="./?c=user&userid=468">fargone</a></td>
+			<td style="text-align:right">136</td>
+		</tr>
+		<tr class="even_row">
+			<td style="text-align:right">42</td>
+			<td><a href="./?c=user&userid=135">Blackstar</a></td>
+			<td style="text-align:right">135</td>
+		</tr>
+		<tr class="odd_row">
+			<td style="text-align:right">43</td>
+			<td><a href="./?c=user&userid=314">SB666</a></td>
+			<td style="text-align:right">132</td>
+		</tr>
+		<tr class="even_row">
+			<td style="text-align:right">44</td>
+			<td><a href="./?c=user&userid=278">smnolz</a></td>
+			<td style="text-align:right">131</td>
+		</tr>
+		<tr class="odd_row">
+			<td style="text-align:right">45</td>
+			<td><a href="./?c=user&userid=572">Siadwel</a></td>
+			<td style="text-align:right">125</td>
+		</tr>
+		<tr class="even_row">
+			<td style="text-align:right">46</td>
+			<td><a href="./?c=user&userid=211">Jabberwock</a></td>
+			<td style="text-align:right">124</td>
+		</tr>
+		<tr class="odd_row">
+			<td style="text-align:right">47</td>
+			<td><a href="./?c=user&userid=1042">Franiblector</a></td>
+			<td style="text-align:right">113</td>
+		</tr>
+		<tr class="even_row">
+			<td style="text-align:right">48</td>
+			<td><a href="./?c=user&userid=684">synkrncty</a></td>
+			<td style="text-align:right">112</td>
+		</tr>
+		<tr class="odd_row">
+			<td style="text-align:right">49</td>
+			<td><a href="./?c=user&userid=227">optic</a></td>
+			<td style="text-align:right">110</td>
+		</tr>
+		<tr class="even_row">
+			<td style="text-align:right">50</td>
+			<td><a href="./?c=user&userid=649">Mehrdad1</a></td>
+			<td style="text-align:right">109</td>
+		</tr></table>
