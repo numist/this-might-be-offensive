@@ -1,0 +1,6 @@
+<div style="text-align:center">
+	<p>
+		<a href="/offensive/">[ this might be offensive ]</a> . 
+		<a href="/offensive/daily/">[ daily digest ]</a>
+	</p>
+</div>

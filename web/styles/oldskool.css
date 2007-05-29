@@ -1,0 +1,205 @@
+body {
+	background: #333366;
+	text-align: center;
+	margin: 0px;
+}
+
+A {
+	text-decoration:underline;
+	color:#000099;
+}
+
+A:visited {
+	color:#333366;
+}
+
+#content {
+	margin-left:auto;
+	margin-right:auto;
+	text-align:left;
+	line-height: 15px;
+	width:741px;
+}
+	
+#rightcol {
+	width:544px;
+	float:left;
+	margin-right: auto;
+	margin-left: 0px;
+}
+
+
+#leftcol {
+	width:175px;
+	float:left;
+	margin-right: 12px;
+}
+
+.bluebox,.entry {
+	background: #ccccff;
+	padding: 10px;
+	font-family: verdana;
+	font-size: 10px;
+}
+
+.entry {
+	padding: 10px;
+	font-size: 11px;
+	line-height:21px;
+}
+
+.squelched, a.squelched {
+	color:#9999cc;
+	font-size:10px;
+}
+
+.entry .squelched {
+	text-align:center;
+}
+
+.vote, label {
+	font-weight:bold;
+	font-size:9px;
+}
+
+label {
+	font-weight:bold;
+	font-size:11px;
+}
+
+.heading {
+	background: #000033;
+	padding: 5px;
+	font-family: verdana;
+	font-size: 10px;
+	font-weight: bold;
+	color: #ccccff;
+}
+
+a.heading {
+	color: #ccccff;
+}
+
+.blackbar {
+	background: #000000;
+	height: 11px;
+	border-top: 1px solid #666699;
+	border-left: 1px solid #333333;
+}
+
+
+.contentbox {
+	background: #9999cc;
+	border: 2px solid black;
+	font-family: verdana;
+	font-size: 10px;
+	color: #000033;
+	margin-bottom: 12px;
+}
+
+#titleimg {
+	text-align: right;
+}
+
+form {
+	margin: 0px;
+}
+
+input {
+	font-size: 11px;
+	font-family: verdana;
+}
+
+.permalink {
+	font-size: 8px;
+	padding: 0px;
+}
+
+.textlinks, .textlinks a {
+	color:#9999cc;
+	font-size:11px;
+}
+
+.orange, a.orange {
+	color:#ff6600;
+}
+
+table.thumbnails {
+	border-collapse: separate;
+	border-spacing: 8px;
+}
+
+table.thumbnails td {
+	background:none;
+	text-align:center;
+	vertical-align:bottom;
+	font-weight:bold;
+}
+
+.odd_row {
+	background:#bbbbee;
+}
+
+.even_row {
+	background: #ccccff;
+}
+
+.weeks_0, .weeks_1, .weeks_2 {
+	color:#660000;
+}
+
+table.thumbnails td a {
+
+}
+
+.taboff, .tabspacer {
+	border-bottom:2px solid black;
+	background:#000033;
+}
+
+.taboff, .tabon {
+	border-right:2px solid black;
+	float:left;
+	padding:0px 18px;
+	font-weight:bold;
+}
+.tabon, .tabon a {
+	background:#ccccff;
+	color:#000033;
+	border-bottom:2px solid #ccccff;
+	text-decoration:none;	
+}
+
+.taboff, .taboff a {
+	background:#7777aa;
+	color:#000033;
+	text-decoration:none;
+}
+
+.timestamp {
+	color:#9999cc;
+	font-size:10px;
+	padding-left:8px;
+	float:right;
+}
+
+.timestamp a {
+	color:#9999cc;
+	text-decoration:none;
+}
+
+.clipper {
+	white-space:nowrap;
+	overflow:hidden;
+	width:100%;
+}
+
+.adminControls {
+	background:#999999;
+	padding:1em;
+	margin:1em 0;
+}
+
+.nowrap {
+	white-space:nowrap;
+}

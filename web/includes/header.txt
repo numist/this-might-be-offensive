@@ -1,0 +1,8 @@
+<div align="center" class="toplinks">
+	<a href="/" title="a journal/blog type thing. updated often." onMouseOver='window.status="[ random thoughts and extra bits ]"; return true' onMouseOut='window.status=""'>blog</a> .
+	<a href="/art/" title="the results of my artistic endeavors" onMouseOver='window.status="[ the gallery ]"; return true' onMouseOut='window.status=""'>art</a> .
+	[ <a href="/offensive/" title="always-fresh images to distract you from work." onMouseOver='window.status="[ this might be offensive : the cure for productivity ]"; return true' onMouseOut='window.status=""'>this might be offensive</a> ] .
+	<a href="/bathroom/" title="the bathroom wall project: scribble something profound for all the world to see." onMouseOver='window.status="[ the bathroom wall project : a public journal ]"; return true' onMouseOut='window.status=""'>the bathroom wall</a> .
+	<a href="/contact/" title="reach out and touch someone." onMouseOver='window.status="[ contact me ]"; return true' onMouseOut='window.status=""'>contact</a>
+</div>
+<br>
