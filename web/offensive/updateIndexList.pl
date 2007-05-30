@@ -1,8 +1,10 @@
 #!/usr/bin/perl
 
-use Mysql;
 use DBI;
 use Image::Size;
+
+# utilities to escape for URIs and for HTML
+use CGI qw(escape escapeHTML);
 
 # don't execute from the web
 if( $ENV{'DOCUMENT_ROOT'} ){
@@ -23,9 +25,6 @@ if( $ENV{'DOCUMENT_ROOT'} ){
 chdir $pathToScript[0];
 
 
-$host = "mysql.rocketsheep.com";							#<-- Set host name
-$database = "themaxx";									#<-- Set database name
-
 my $dsn = 'DBI:mysql:themaxx:mysql.rocketsheep.com';
 my $db_user_name = 'db_themaxx';
 my $db_password = 'db_password_goes_here';
@@ -35,25 +34,6 @@ if (! $dbh) {										#<-- Make sure we got a valid connection
 	print "No database handle\n";
 	exit(0);
 }
-
-
-#my sql = "SELECT count( c.id ) , c.vote, up .id, up.filename 
-#FROM offensive_comments c, offensive_uploads up
-#WHERE c.fileid = up.id
-#AND vote
-#GROUP  BY fileid, vote
-#ORDER  BY up.timestamp DESC 
-#LIMIT 100";
-
-#my $sql = "SELECT up. * , users.username, comments.vote, count( comments.id ) 
-#			FROM offensive_uploads up, users
-#			LEFT  JOIN offensive_comments comments ON up.id = comments.fileid
-#			WHERE up.userid = users.userid
-#			AND type='image'
-#			AND users.account_status != 'locked'
-#			GROUP  BY up.id, vote
-#			ORDER  BY up.timestamp DESC 
-#			LIMIT 300";
 
 my $sql = "CREATE temporary TABLE recent_uploads (
 			id int(11) NOT NULL,
@@ -83,20 +63,10 @@ $sql = "insert into recent_uploads( id, filename, userid, timestamp, nsfw, tmbo,
 	$statement->execute();
 
 
-#$sql = "SELECT up.id, up.userid, up.filename, up.timestamp, up.nsfw, up.tmbo, 
-#		users.username, comments.vote, count( comments.id ) 
-#			FROM recent_uploads up, users
-#			LEFT JOIN offensive_comments comments ON up.id = comments.fileid
-#			WHERE up.userid = users.userid
-#			AND type='image'
-#			AND users.account_status != 'locked'
-#			GROUP  BY up.id, vote
-#			ORDER  BY up.timestamp DESC";
-
 $sql = "SELECT up.id, up.userid, up.filename, up.timestamp, up.nsfw, up.tmbo, 
 		users.username, counts.comments, counts.good, counts.bad
-			FROM recent_uploads up, users
-			LEFT JOIN offensive_count_cache counts ON up.id = counts.threadid
+			FROM (recent_uploads up, users)
+			LEFT JOIN offensive_count_cache counts ON (up.id = counts.threadid)
 			WHERE up.userid = users.userid
 			AND type='image'
 			AND users.account_status != 'locked'
@@ -118,7 +88,9 @@ $sql = "SELECT up.id, up.userid, up.filename, up.timestamp, up.nsfw, up.tmbo,
 
 		$css = ($css eq "odd_row") ? "even_row" : "odd_row";
 		$nsfwMarker = $nsfw == 1 ? "[nsfw]" : "";
-		my $newFilename = substr( $nsfwMarker . " " . $filename, 0, 80);
+
+		# HTML escape 
+		my $newFilename = escapeHTML(substr( $nsfwMarker . " " . $filename, 0, 80));
 		$comments = $comments == null ? 0 : $comments;
 		$good = $good == null ? 0 : $good;
 		$bad = $bad == null ? 0 : $bad;
@@ -128,7 +100,6 @@ $sql = "SELECT up.id, up.userid, up.filename, up.timestamp, up.nsfw, up.tmbo,
 			<td class="$css"><div class="clipper"><a href="pages/pic.php?id=$id" class="$css" title="uploaded by $username">$newFilename</a></div></td>
 			<td class="$css" style="text-align:right;white-space:nowrap"><a href="./?c=comments&fileid=$id" class="$css">$comments comments</a> (+$good -$bad)</td>
 		</tr>^;
-#			<td class="$css"><a href="./?c=user&userid=$previousUserid">$previousUsername</a></td>
 
 		if( $output % $THUMBS_PER_ROW == 0 ) {
 			print THUMB_FILE "<tr>";
@@ -159,6 +130,9 @@ sub emitThumbnailRow {
 	my $css = $nsfw == 1 ? "nsfw" : "";
 
 	my ($width, $height) = imgsize("images/thumbs/th-$filename");
+
+	# URI escape filename
+	$filename = escape($filename);
 
 	print THUMB_FILE qq^ 
 	<td>
