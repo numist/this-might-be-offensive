@@ -20,9 +20,7 @@
 
 	$fileuploaded = false;
 	$fileid = null;
-	# realpath suddenly stopped working 2005-05-27
-#	$filePath=dirname(realpath($_SERVER['SCRIPT_FILENAME']));
-	$filePath = "/home/.chippy/fleece/themaxx.com/offensive";
+	$filePath=dirname(realpath($_SERVER['SCRIPT_FILENAME']));
 	$imagePath = $filePath . "/images/picpile/";
 
 	if( $_FILES['image']['name'] != "" && $_FILES['image']['size'] > 0 && ! exceededUploadLimit() ) {
@@ -158,9 +156,8 @@
 	
 	function ensureDirExists( $path ) {
 	
-		$basePath = "/home/.chippy/fleece/themaxx.com/offensive";
-	
-		echo $filePath;
+		# $basePath = "/hsphere/local/home/thismightbe/thismight.be/offensive";
+		$basePath = dirname(realpath($_SERVER['SCRIPT_FILENAME']));	
 		$curPath = $basePath;
 		foreach( explode( '/', $path ) as $dir ) {
 			$curPath .= "/$dir";
