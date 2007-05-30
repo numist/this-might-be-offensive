@@ -53,7 +53,7 @@
 ?>
 			<tr class="<? echo $cssw ?>">
 				<td style="text-align:right"><? echo ++$count ?>.</td>
-				<td><a class="<? echo $cssw ?>" href="images/halloffame/<? echo $row['filename'] ?>"><? echo truncate( (($row['nsfw'] == 1) ? "[nsfw] " : "" ) . $row['filename'], 50 ) ?></a></td>
+				<td><a class="<? echo $cssw ?>" href="images/halloffame/<? echo $row['filename'] ?>"><? echo truncate( (($row['nsfw'] == 1) ? "[nsfw] " : "" ) . htmlentities($row['filename']), 50 ) ?></a></td>
 				<td><a class="<? echo $cssw ?>" href="./?c=user&userid=<? echo $row['userid'] ?>"><? echo $row['username'] ?></a></td>
 				<td><a class="<? echo $cssw ?>" href="./?c=comments&fileid=<?= $row['fileid'] ?>">comments</a></td>
 				<td>(+<? echo $row['votes'] ?>)</td>
