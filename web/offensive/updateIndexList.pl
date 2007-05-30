@@ -1,14 +1,18 @@
 #!/usr/bin/perl
 
-use lib qw(../../.perl/lib/perl5/5.8.8/mach);
+use Mysql;
 use DBI;
 use Image::Size;
+use CGI qw(escape escapeHTML);
 
 # don't execute from the web
 if( $ENV{'DOCUMENT_ROOT'} ){
 	print "Content-type:text/plain\n\nGo away.";
 	exit();
 }
+
+
+#DBI->trace(2);
 
 # set the current directory to the directory containing the script
 # so our relative path references (images, etc) work regardless of
@@ -22,9 +26,9 @@ if( $ENV{'DOCUMENT_ROOT'} ){
 # change to that directory.
 chdir $pathToScript[0];
 
-
-$host = "66.228.121.115";							#<-- Set host name
-$database = "thismig_themaxx";									#<-- Set database name
+# XXX RGH FIXME
+$host = "66.228.121.115";                                                       #<-- Set host name
+$database = "thismig_themaxx";                                                                  #<-- Set database name
 
 my $dsn = 'DBI:mysql:themaxx:mysql.themaxx.com';
 my $db_user_name = 'db_themaxx';
@@ -35,25 +39,6 @@ if (! $dbh) {										#<-- Make sure we got a valid connection
 	print "No database handle\n";
 	exit(0);
 }
-
-
-#my sql = "SELECT count( c.id ) , c.vote, up .id, up.filename 
-#FROM offensive_comments c, offensive_uploads up
-#WHERE c.fileid = up.id
-#AND vote
-#GROUP  BY fileid, vote
-#ORDER  BY up.timestamp DESC 
-#LIMIT 100";
-
-#my $sql = "SELECT up. * , users.username, comments.vote, count( comments.id ) 
-#			FROM offensive_uploads up, users
-#			LEFT  JOIN offensive_comments comments ON up.id = comments.fileid
-#			WHERE up.userid = users.userid
-#			AND type='image'
-#			AND users.account_status != 'locked'
-#			GROUP  BY up.id, vote
-#			ORDER  BY up.timestamp DESC 
-#			LIMIT 300";
 
 my $sql = "CREATE temporary TABLE recent_uploads (
 			id int(11) NOT NULL,
@@ -69,9 +54,11 @@ my $sql = "CREATE temporary TABLE recent_uploads (
 		KEY userid (userid),
 		KEY type (type)
 );";
-
-	my $statement = $dbh->prepare( $sql );
-	$statement->execute();
+	# XXX RGH FIXME
+	#my $statement = $dbh->prepare( $sql );
+	#$statement->execute();
+	$dbh->do($sql);
+        print "$DBI::errstr\n";
 
 
 $sql = "insert into recent_uploads( id, filename, userid, timestamp, nsfw, tmbo, type )
@@ -82,21 +69,11 @@ $sql = "insert into recent_uploads( id, filename, userid, timestamp, nsfw, tmbo,
 	$statement = $dbh->prepare( $sql );
 	$statement->execute();
 
-
-#$sql = "SELECT up.id, up.userid, up.filename, up.timestamp, up.nsfw, up.tmbo, 
-#		users.username, comments.vote, count( comments.id ) 
-#			FROM recent_uploads up, users
-#			LEFT JOIN offensive_comments comments ON up.id = comments.fileid
-#			WHERE up.userid = users.userid
-#			AND type='image'
-#			AND users.account_status != 'locked'
-#			GROUP  BY up.id, vote
-#			ORDER  BY up.timestamp DESC";
-
+# XXX FIXME RGH
 $sql = "SELECT up.id, up.userid, up.filename, up.timestamp, up.nsfw, up.tmbo, 
 		users.username, counts.comments, counts.good, counts.bad
-			FROM recent_uploads up, users
-			LEFT JOIN offensive_count_cache counts ON up.id = counts.threadid
+			FROM (recent_uploads up, users)
+			LEFT JOIN offensive_count_cache counts ON (up.id = counts.threadid)
 			WHERE up.userid = users.userid
 			AND type='image'
 			AND users.account_status != 'locked'
@@ -119,6 +96,8 @@ $sql = "SELECT up.id, up.userid, up.filename, up.timestamp, up.nsfw, up.tmbo,
 		$css = ($css eq "odd_row") ? "even_row" : "odd_row";
 		$nsfwMarker = $nsfw == 1 ? "[nsfw]" : "";
 		my $newFilename = substr( $nsfwMarker . " " . $filename, 0, 80);
+		# XXX RGH FIXME
+		$newFilename=escapeHTML($newFilename);
 		$comments = $comments == null ? 0 : $comments;
 		$good = $good == null ? 0 : $good;
 		$bad = $bad == null ? 0 : $bad;
@@ -159,7 +138,8 @@ sub emitThumbnailRow {
 	my $css = $nsfw == 1 ? "nsfw" : "";
 
 	my ($width, $height) = imgsize("images/thumbs/th-$filename");
-
+	# XXX RGH FIXME
+	$filename = escape($filename);
 	print THUMB_FILE qq^ 
 	<td>
 		<a href="pages/pic.php?id=$id"><span class="$css"><img src="images/thumbs/th-$filename" width="$width" height="$height" border="0"/></span></a><br/>
