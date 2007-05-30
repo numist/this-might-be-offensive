@@ -207,7 +207,7 @@
 				<div class="blackbar"></div>
 					<div class="heading">web hosting provided by:</div>
 					<div class="bluebox" style="text-align:center">
-						<a href="http://www.dreamhost.com/r.cgi?7279"><img src="/graphics/dreamhost.gif" alt="dreamhost" width="88" height="33" hspace="0" vspace="0"></a>
+						<a href="http://tengun.net">tengun.net</a>
 					</div>
 				<div class="blackbar"></div>
 			</div>
