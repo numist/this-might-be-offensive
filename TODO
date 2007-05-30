@@ -1,3 +1,23 @@
-== Features List
+observation: backslashes posted in comments vanish on the dev site.
+    ? NOTABUG -- due to the php config
+    
+gofast(er)
 
-* foo
+register_globals dependency
+
+php4 to php5 port (including reliance on hash())
+
+index update on upload, not on cron
+    the scott's got it :)
+
+thumbnail creation on load, then cached
+    Everyone-requested
+
+move to DBI layer
+    Paul-requested
+
+move to templates/mvc division
+    Paul-requested
+
+proper outpage on porkchop/repost upload
+    raveneyes && numist-requested
