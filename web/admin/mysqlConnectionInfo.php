@@ -15,12 +15,15 @@
 				or header( "Location: http://tmbo.org/offensive/index.outoforder.php" );
 //				or die( "<br><br><br>Unable to connect to database." );
 			
-			mysql_select_db("themaxx")
-				or die( "<br><br>Could not select database" );
-
+			if()!mysql_select_db("themaxx"))
+			{
+			    echo "<!--".mysql_error()."-->";
+			    die( "<br><br>Could not select database" );
+			}
+                    
 		}
 
-		return $link;		
+		return $link;
 	}
 	
 ?>
