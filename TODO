@@ -2,6 +2,9 @@ observation: backslashes posted in comments vanish on the dev site.
     ? NOTABUG -- due to the php config
     
 gofast(er)
+    1) find out how:
+        plot integration -- sc0tt
+        system monitoring -- h3h installed cacti
 
 register_globals dependency
 
