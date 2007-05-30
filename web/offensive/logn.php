@@ -56,7 +56,7 @@
 		$uname = mysql_real_escape_string( $_REQUEST['username'] );
 		$pw = mysql_real_escape_string( $_REQUEST['password'] );
 		$ip = $_SERVER['REMOTE_ADDR'];
-		$sql = "insert into failed_logins (username,password,ip) VALUES ( '$uname', '$pw', '$ip' )";
+		$sql = "insert into failed_logins (username,ip) VALUES ( '$uname', '$ip' )";
 		@mysql_query( $sql );
 		
 		$sql = "select count(id) as thecount from failed_logins where ip='$ip' and timestamp > date_sub( now(), interval 1 day )";
@@ -65,7 +65,7 @@
 		$row = mysql_fetch_assoc( $result );
 		$count = $row['thecount'];
 		if( $count > 3 ) {
-			mail( "ray@sneakymeans.com,jerrywilborn@gmail.com", "[" . $_SERVER["REMOTE_ADDR"] . "] - $count FAILED LOGIN ATTEMPTS TODAY!!! ", requestDetail(), "From: offensive@themaxx.com (this might be offensive)\r\nPriority: urgent" );
+			mail( "ray@sneakymeans.com", "[" . $_SERVER["REMOTE_ADDR"] . "] - $count FAILED LOGIN ATTEMPTS TODAY!!! ", requestDetail(), "From: offensive@themaxx.com (this might be offensive)\r\nPriority: urgent" );
 			$login_message = '<a href="./pwreset.php">forgot your password?</a>';
 		}	
 
