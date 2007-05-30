@@ -499,7 +499,7 @@ function uploadForm() {
 function repostForm( $message, $hash ) {
 	global $fileid;
 
-	$rehash = hash( $fileid, $hash );
+	$rehash = tmbohash( $fileid, $hash );
 ?>
 
 	<div class="heading">poster child:</div>
@@ -538,7 +538,7 @@ function killRepost() {
 		$row = mysql_fetch_assoc( $result );
 		$dbHash = $row['hash'];
 
-		$rehash = hash( $repostId, $dbHash );
+		$rehash = tmbohash( $repostId, $dbHash );
 
 		if( $rehash == $_REQUEST['repost'] ) {
 
@@ -578,7 +578,7 @@ function postAnyway() {
 		$row = mysql_fetch_assoc( $result );
 		$dbHash = $row['hash'];
 
-		$rehash = hash( $repostId, $dbHash );
+		$rehash = tmbohash( $repostId, $dbHash );
 
 		if( $rehash == $_REQUEST['repost'] ) {
 			updateStatus( $repostId, 'normal' );

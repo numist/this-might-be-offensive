@@ -24,10 +24,10 @@ if( $ENV{'DOCUMENT_ROOT'} ){
 chdir $pathToScript[0];
 
 
-$host = "mysql.rocketsheep.com";							#<-- Set host name
-$database = "themaxx";									#<-- Set database name
+$host = "mysql.themaxx.com";							#<-- Set host name
+$database = "db_themaxx";									#<-- Set database name
 
-my $dsn = 'DBI:mysql:themaxx:mysql.rocketsheep.com';
+my $dsn = 'DBI:mysql:themaxx:mysql.themaxx.com';
 my $db_user_name = 'db_themaxx';
 my $db_password = 'db_password_goes_here';
 $dbh = DBI->connect($dsn, $db_user_name, $db_password);

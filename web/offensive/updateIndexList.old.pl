@@ -24,7 +24,7 @@ chdir $pathToScript[0];
 
 
 $host = "mysql.themaxx.com";							#<-- Set host name
-$database = "themaxx";									#<-- Set database name
+$database = "db_themaxx";									#<-- Set database name
 
 my $dsn = 'DBI:mysql:themaxx:mysql.themaxx.com';
 my $db_user_name = 'db_themaxx';

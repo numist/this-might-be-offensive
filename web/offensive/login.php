@@ -17,7 +17,7 @@
 	if( $_REQUEST['password'] ) {
 		$success = login( $_REQUEST['username'], $_REQUEST['password'] );
 		if( $success === true && $_REQUEST['rememberme'] ) {
-			setcookie( "remember", hash( $_SESSION['userid'], $_SESSION['username'] . $_SERVER['REMOTE_ADDR'] . $salt ), time()+60*60*24*365*5, "/" );
+			setcookie( "remember", tmbohash( $_SESSION['userid'], $_SESSION['username'] . $_SERVER['REMOTE_ADDR'] . $salt ), time()+60*60*24*365*5, "/" );
 		}
 		header( "Location: ./" );
 	}
@@ -44,7 +44,7 @@
 			$result = mysql_query( $sql );
 			if( mysql_num_rows( $result ) == 1 ) {
 				$row = mysql_fetch_assoc( $result );
-				$cookiehash = hash( $row['userid'], $row['username'] . $_SERVER['REMOTE_ADDR'] . $salt );
+				$cookiehash = tmbohash( $row['userid'], $row['username'] . $_SERVER['REMOTE_ADDR'] . $salt );
 				if( $cookiehash == $cookieValue ) {
 					$sql = "SELECT userid, username, account_status FROM users WHERE userid=$uid";
 					$result = mysql_query( $sql );
@@ -96,9 +96,7 @@
 
 		$link = openDbConnection();
 	
-		# this is encrypting with the literal string '$name $pw', not the values of those variables.
-		# this isn't ideal, but by the time i realized it i already had values in the db encrypted this way.			
-		$encrypted_pw = crypt( $pw, '$name $pw' );
+		$encrypted_pw = crypt( $pw, $name.$pw );
 		
 		$query = "SELECT userid, username, account_status FROM users WHERE username = '" . $name . "' AND password = '" . $encrypted_pw . "'";
 

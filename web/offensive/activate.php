@@ -20,7 +20,7 @@
 		$email = $row['email'];
 		$username = $row['username'];		
 		
-		$rehash = hash( $id + 0, $email . $salt );
+		$rehash = tmbohash( $id + 0, $email . $salt );
 		
 		if( $rehash == $_REQUEST[ $hash_param_key ] ) {
 			$sql = "update users set account_status='normal' where userid=$id AND account_status='awaiting activation' limit 1";

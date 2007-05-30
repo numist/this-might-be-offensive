@@ -30,7 +30,7 @@ if( $db_update lt $img_update ) {
 	exit;
 }
 
-my $dsn = 'DBI:mysql:themaxx:mysql.rocketsheep.com';
+my $dsn = 'DBI:mysql:themaxx:mysql.themaxx.com';
 my $db_user_name = 'db_themaxx';
 my $db_password = 'db_password_goes_here';
 $dbh = DBI->connect($dsn, $db_user_name, $db_password);

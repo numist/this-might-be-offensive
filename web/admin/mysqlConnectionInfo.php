@@ -1,8 +1,8 @@
 <?php
 
-	$db_url = "mysql.rocketsheep.com";
-	$db_user = "db_themaxx";
-	$db_pw = "db_password_goes_here";
+	$db_url = "66.228.121.115";
+	$db_user = "thismig_tmbo";
+	$db_pw = "1A2B3C!D";
 
 	$link = null;
 
@@ -12,18 +12,15 @@
 
 		if( $link == null ) {
 			$link = @mysql_pconnect( $db_url, $db_user, $db_pw )
-				or header( "Location: http://tmbo.org/offensive/index.outoforder.php" );
+				or header( "Location: http://thismight.be/offensive/index.outoforder.php" );
 //				or die( "<br><br><br>Unable to connect to database." );
 			
-			if()!mysql_select_db("themaxx"))
-			{
-			    echo "<!--".mysql_error()."-->";
-			    die( "<br><br>Could not select database" );
-			}
-                    
+			mysql_select_db("thismig_themaxx")
+				or die("<br><br>Could not select database" );
+
 		}
 
-		return $link;
+		return $link;		
 	}
 	
 ?>

@@ -11,9 +11,7 @@
 			
 			$uid = $row['userid'];
 
-			# this is encrypting with the literal string '$name $pw', not the values of those variables.
-			# this isn't ideal, but by the time i realized it i already had values in the db encrypted this way.
-			$encrypted_pw = crypt( $pw, '$name $pw' );
+			$encrypted_pw = crypt( $pw, $name.$pw );
 
 			$sql = "update users set password='$encrypted_pw' WHERE userid = $uid LIMIT 1";
 			
@@ -37,7 +35,7 @@
 			$code = hashFromUserRow( $row );
 			$message = "Someone (hopefully you) wants to reset your [this might be offensive] password. To reset your password, please visit the following link:
 
-http://tmbo.org/offensive/pwreset.php?x=$code
+http://thismight.be/offensive/pwreset.php?x=$code
 
 			";
 			
@@ -59,7 +57,7 @@ http://tmbo.org/offensive/pwreset.php?x=$code
 	function hashFromUserRow( $row ) {
 		$id = $row[ 'userid' ];
 		$input = $row['username'] . $row['password'] . ":wakka";
-		$code = hash( $id, $input );
+		$code = tmbohash( $id, $input );
 		return $code;
 	}
 

@@ -22,7 +22,7 @@
 	$link = @mysql_connect( "mysql.themaxx.com", "fleece", "db_password_goes_here" )
 		or die( "<br><br><br>Unable to connect to database." );
 	
-	mysql_select_db("themaxx")
+	mysql_select_db("thismig_themaxx")
 		or die( "<br><br>Could not select database" );
 
 	$result = mysql_query($query) or die("Query failed");

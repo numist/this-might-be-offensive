@@ -8,7 +8,7 @@
 	// generates a string used in the link
 	// to identify the account to be activated
 	// without being completely obvious.
-	function hash( $id, $input ) {
+	function tmbohash( $id, $input ) {
 		global $id_offset, $pad_length;
 		$padded_id = str_pad( $id + $id_offset, $pad_length, "0", STR_PAD_LEFT );
 		$crypted_input = crypt( $input, $id );
@@ -27,7 +27,7 @@
 	function activationMessageFor( $id, $email ) {
 		global $hash_param_key, $salt;
 
-		$hash = hash( $id, $email . $salt );
+		$hash = tmbohash( $id, $email . $salt );
 		$message = "  Thanks for registering at [ this might be offensive ].
   Please visit this link to activate your account:
   http://thismight.be/offensive/activate.php?$hash_param_key=$hash

@@ -1,5 +1,6 @@
 #!/usr/bin/perl
 
+use lib qw(../.perl/lib);
 use Mysql;
 use DBI;
 
@@ -22,8 +23,8 @@ if( $ENV{'DOCUMENT_ROOT'} ){
 chdir $pathToScript[0];
 
 
-$host = "mysql.themaxx.com";							#<-- Set host name
-$database = "themaxx";									#<-- Set database name
+$host = "66.228.121.115";							#<-- Set host name
+$database = "thismig_themaxx";									#<-- Set database name
 
 my $dsn = 'DBI:mysql:themaxx:mysql.themaxx.com';
 my $db_user_name = 'db_themaxx';
