@@ -9,6 +9,7 @@ php4 to php5 port (including reliance on hash())
 
 index update on upload, not on cron
     the scotts' got it :)
+    -- note that the cron also updates the comment counts
 
 thumbnail creation on load, then cached
     Everyone-requested
