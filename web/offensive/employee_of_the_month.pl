@@ -1,6 +1,5 @@
 #!/usr/bin/perl
 
-use lib qw(../.perl/lib);
 use Mysql;
 use DBI;
 
