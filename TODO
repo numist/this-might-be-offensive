@@ -8,7 +8,7 @@ register_globals dependency
 php4 to php5 port (including reliance on hash())
 
 index update on upload, not on cron
-    the scott's got it :)
+    the scotts' got it :)
 
 thumbnail creation on load, then cached
     Everyone-requested

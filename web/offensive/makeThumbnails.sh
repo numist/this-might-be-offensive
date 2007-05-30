@@ -16,7 +16,7 @@ for ext in $extset ; do
 		if [ "$img" != "images/picpile/*.$ext" ] ; then
 			thumb=$(echo $img | sed -e "s/images\/picpile\///")
 			if [ ! -e "images/thumbs/th-${thumb}" ] ; then
-				touch images/thumbs/th-${thumb}
+				touch "images/thumbs/th-${thumb}"
 #				echo "$img -> $thumb"
 				convert -resize 100x100 "${img}" "images/thumbs/th-${thumb}"
 			fi
