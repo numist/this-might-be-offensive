@@ -358,7 +358,7 @@ CREATE TABLE `failed_logins` (
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `userid` int(11) NOT NULL auto_increment,
-  `password` varchar(20) default NULL,
+  `password` char(40) default NULL,
   `email` varchar(60) default NULL,
   `username` varchar(50) default NULL,
   `created` datetime NOT NULL default '0000-00-00 00:00:00',
