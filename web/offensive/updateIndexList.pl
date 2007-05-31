@@ -1,6 +1,5 @@
 #!/usr/bin/perl
 
-use Mysql;
 use DBI;
 use Image::Size;
 use CGI qw(escape escapeHTML);
