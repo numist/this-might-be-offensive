@@ -24,14 +24,14 @@
 			$uid = $_SESSION['userid'];
 			
 			if( isValidPassword( $new ) ) {
-				$encrypted_pw = crypt( $old, '$name $pw' );
+				$encrypted_pw = sha1( $old );
 				$query = "SELECT userid FROM users
 							WHERE userid = $uid
 							AND password = '$encrypted_pw'";
 	
 				$result = mysql_query( $query );
 				if( mysql_num_rows( $result ) == 1 ) {
-					$encrypted_pw = crypt( $new, '$name $pw' );
+					$encrypted_pw = sha1( $new );
 					$sql = "UPDATE users SET password='$encrypted_pw' WHERE userid=$uid LIMIT 1";
 					$result = mysql_query( $sql );
 					?>done.<br/><br/><?

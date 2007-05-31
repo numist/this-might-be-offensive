@@ -162,9 +162,7 @@
 			exit;
 		}
 
-		# this is encrypting with the literal string '$name $pw', not the values of those variables.
-        # this isn't ideal, but by the time i realized it i already had values in the db encrypted this way.
-        $encrypted_pw = crypt( $pw, '$name $pw' );
+        $encrypted_pw = sha1( $pw );
 		
 		$query = "SELECT userid, username, account_status FROM users WHERE username = '" . $name . "' AND password = '" . $encrypted_pw . "'";
 

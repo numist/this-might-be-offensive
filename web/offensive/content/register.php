@@ -114,9 +114,7 @@
 			$row = mysql_fetch_assoc( $result );
 			$referrer = $row['userid'];
 
-			# this is encrypting with the literal string '$name $pw', not the values of those variables.
-			# this isn't ideal, but by the time i realized it i already had values in the db encrypted this way.
-			$encrypted_pw = crypt( $pw, '$name $pw' );
+			$encrypted_pw = sha1( $pw );
 		
 			$query = "INSERT INTO users (username,password,email,referred_by,created,ip) VALUES ( '$uName','$encrypted_pw', '$email', $referrer, now(), '" . $_SERVER['REMOTE_ADDR']. "' )";
 			$result = mysql_query($query) or die("Query failed"); 

@@ -11,7 +11,7 @@
 	function tmbohash( $id, $input ) {
 		global $id_offset, $pad_length;
 		$padded_id = str_pad( $id + $id_offset, $pad_length, "0", STR_PAD_LEFT );
-		$crypted_input = crypt( $input, $id );
+		$crypted_input = sha1( $input.$id );
 		return base64_encode( $padded_id . $crypted_input );
 	}
 	
