@@ -389,7 +389,7 @@ function setStatusForm( $id, $status, $email ) {
 				?>
 				</select>
 				<input type="text" name="set_email" value="<?= $email ?>"/>
-				<input type="submit" value="set account status"/>
+				<input type="submit" value="update account"/>
 			</form>
 		</div>
 	<?
