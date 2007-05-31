@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
-use strict;
-use warnings;
+#use strict;
+#use warnings;
 use DBI;
 use Image::Size;
 use CGI qw(escape escapeHTML);
