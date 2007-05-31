@@ -145,7 +145,7 @@
 <html>
 	<head>
 		<META NAME="ROBOTS" CONTENT="NOARCHIVE" />
-		<title>[ this might be offensive ] : <? echo htmlentites($filename) ?> </title>
+		<title>[ this might be offensive ] : <? echo htmlentities($filename) ?> </title>
 		<link rel="stylesheet" type="text/css" href="styles.php"/>
 		<script type="text/javascript">
 			self.file_id = "";
