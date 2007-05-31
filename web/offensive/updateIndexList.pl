@@ -113,7 +113,7 @@ $sql = "SELECT up.id, up.userid, up.filename, up.timestamp, up.nsfw, up.tmbo,
 		if( $output % $THUMBS_PER_ROW == 0 ) {
 			print THUMB_FILE "<tr>";
 		}
-		emitThumbnailRow( $id, $filename, $comments, $good||0, $bad||0, $nsfw||0 );
+		emitThumbnailRow( $id, $filename, $comments||0, $good||0, $bad||0, $nsfw||0 );
 		if( $output % $THUMBS_PER_ROW == $THUMBS_PER_ROW - 1  ) {
 			print THUMB_FILE "</tr>";
 		}
