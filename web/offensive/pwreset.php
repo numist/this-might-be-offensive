@@ -41,7 +41,7 @@ http://".$_SERVER['SERVER_NAME']."/offensive/pwreset.php?x=$code
 			
 			if( isValidEmail( $row['email'] ) ) {
 
-				mail( $row['email'], "resetting your [this might be offensive] password", $message, "From: offensive@thismight.be (this might be offensive)\r\nbcc:ray@mysocalled.com");
+				mail( $row['email'], "resetting your [this might be offensive] password", $message, "From: offensive@thismight.be (this might be offensive)\r\n"/*bcc:ray@mysocalled.com"*/);
 
 				echo "An email has been sent containing instructions for resetting your password.";
 			}
