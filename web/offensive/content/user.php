@@ -138,7 +138,7 @@
 							if( isAdmin() ) {
 								?>
 								<div class="adminControls"><?
-									setStatusForm( $usrid, $status );
+									setStatusForm( $usrid, $status, $email );
 								?>
 									<a href="mailto:<?= $email ?>"><?= $email ?></a>
 								</div>
@@ -356,14 +356,17 @@ function recentComments( $uid ) {
 function handleSetStatusSubmission() {
 	$usrid =  mysql_real_escape_string( $_POST['userid'] );
 	$status =  mysql_real_escape_string( $_POST['set_account_status'] );
+	$email =  mysql_real_escape_string( $_POST['set_email'] );
 	if( is_numeric($usrid ) && $status !== "" ) {
+		$isEmailValid = preg_match( '/[a-zA-Z0-9-_\.]+\@[a-zA-Z0-9-_\.]+\.[a-zA-Z0-9-_\.]+/', $email ) > 0 );
+		$emailClause = $isemailValid ? ", email = '$email' " : "";
 		$link = openDbConnection();
-		$sql = "update users set account_status ='$status' where userid = $usrid limit 1";
+		$sql = "update users set account_status ='$status' $emailClause where userid = $usrid limit 1";
 		$result = mysql_query( $sql );
 	}
 }
 
-function setStatusForm( $id, $status ) {
+function setStatusForm( $id, $status, $email ) {
 
 	$sql = "SHOW COLUMNS FROM users LIKE 'account_status'";
 	$result = mysql_query( $sql );
@@ -384,7 +387,9 @@ function setStatusForm( $id, $status ) {
 					<?
 				}
 				?>
-				</select><input type="submit" value="set account status"/>
+				</select>
+				<input type="text" name="set_email" value="$email"/>
+				<input type="submit" value="set account status"/>
 			</form>
 		</div>
 	<?
