@@ -59,7 +59,6 @@ my $sql = "CREATE temporary TABLE recent_uploads (
 	#my $statement = $dbh->prepare( $sql );
 	#$statement->execute();
 	$dbh->do($sql);
-        print "$DBI::errstr\n";
 
 
 $sql = "insert into recent_uploads( id, filename, userid, timestamp, nsfw, tmbo, type )
@@ -114,7 +113,7 @@ $sql = "SELECT up.id, up.userid, up.filename, up.timestamp, up.nsfw, up.tmbo,
 		if( $output % $THUMBS_PER_ROW == 0 ) {
 			print THUMB_FILE "<tr>";
 		}
-		emitThumbnailRow( $id, $filename, $comments, $good, $bad, $nsfw );
+		emitThumbnailRow( $id, $filename, $comments, $good||0, $bad||0, $nsfw||0 );
 		if( $output % $THUMBS_PER_ROW == $THUMBS_PER_ROW - 1  ) {
 			print THUMB_FILE "</tr>";
 		}
