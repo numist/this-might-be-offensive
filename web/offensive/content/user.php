@@ -359,7 +359,7 @@ function handleSetStatusSubmission() {
 	$email =  mysql_real_escape_string( $_POST['set_email'] );
 	if( is_numeric($usrid ) && $status !== "" ) {
 		$isEmailValid = preg_match( '/[a-zA-Z0-9-_\.]+\@[a-zA-Z0-9-_\.]+\.[a-zA-Z0-9-_\.]+/', $email ) > 0;
-		$emailClause = $isemailValid ? ", email = '$email' " : "";
+		$emailClause = $isEmailValid ? ", email = '$email' " : "";
 		$link = openDbConnection();
 		$sql = "update users set account_status ='$status' $emailClause where userid = $usrid limit 1";
 		$result = mysql_query( $sql );
