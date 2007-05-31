@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 
+use strict;
+use warnings;
 use DBI;
 use Image::Size;
 use CGI qw(escape escapeHTML);
@@ -20,19 +22,19 @@ if( $ENV{'DOCUMENT_ROOT'} ){
 # to the script.
 
 # grab everything up to the last slash.
-@pathToScript = $0 =~ /.*\//gi;
+my @pathToScript = $0 =~ /.*\//gi;
 
 # change to that directory.
 chdir $pathToScript[0];
 
 # XXX RGH FIXME
-$host = "66.228.121.115";                                                       #<-- Set host name
-$database = "thismig_themaxx";                                                                  #<-- Set database name
+my $host = "66.228.121.115";                                                       #<-- Set host name
+my $database = "thismig_themaxx";                                                                  #<-- Set database name
 
 my $dsn = 'DBI:mysql:themaxx:mysql.themaxx.com';
 my $db_user_name = 'db_themaxx';
 my $db_password = 'db_password_goes_here';
-$dbh = DBI->connect($dsn, $db_user_name, $db_password);
+my $dbh = DBI->connect($dsn, $db_user_name, $db_password);
 
 if (! $dbh) {										#<-- Make sure we got a valid connection
 	print "No database handle\n";
@@ -65,7 +67,7 @@ $sql = "insert into recent_uploads( id, filename, userid, timestamp, nsfw, tmbo,
 				from offensive_uploads where type='image' AND status='normal'
 			order by timestamp desc limit 100;";
 
-	$statement = $dbh->prepare( $sql );
+	my $statement = $dbh->prepare( $sql );
 	$statement->execute();
 
 # XXX FIXME RGH
@@ -81,7 +83,7 @@ $sql = "SELECT up.id, up.userid, up.filename, up.timestamp, up.nsfw, up.tmbo,
 	$statement = $dbh->prepare( $sql );
 	$statement->execute();
 
-	$THUMBS_PER_ROW = 4;
+	my $THUMBS_PER_ROW = 4;
 	
 	open( LIST_FILE, ">indexList.txt" ) or die("couldn't create indexList.txt file.\n");
 	open( THUMB_FILE, ">indexListThumbnails.txt" ) or die("couldn't create indexListThumbnails.txt file.\n");
@@ -93,13 +95,13 @@ $sql = "SELECT up.id, up.userid, up.filename, up.timestamp, up.nsfw, up.tmbo,
 	while( (my( $id, $userid, $filename, $timestamp, $nsfw, $tmbo, $username, $comments, $good, $bad ) = $statement->fetchrow_array()) && $output < 101) {
 
 		$css = ($css eq "odd_row") ? "even_row" : "odd_row";
-		$nsfwMarker = $nsfw == 1 ? "[nsfw]" : "";
+		my $nsfwMarker = $nsfw == 1 ? "[nsfw]" : "";
 		my $newFilename = substr( $nsfwMarker . " " . $filename, 0, 80);
 		# XXX RGH FIXME
 		$newFilename=escapeHTML($newFilename);
-		$comments = $comments == null ? 0 : $comments;
-		$good = $good == null ? 0 : $good;
-		$bad = $bad == null ? 0 : $bad;
+		$comments = $comments eq undef() ? 0 : $comments;
+		$good = $good eq undef() ? 0 : $good;
+		$bad = $bad eq undef() ? 0 : $bad;
 		
 		print LIST_FILE qq ^
 		<tr class="$css">
