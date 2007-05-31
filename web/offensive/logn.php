@@ -190,6 +190,8 @@
 		<tr>
 			<td valign="center" height="100%" align="center">
 	
+				<p>if you haven't <a href="pwreset.php">reset your password</a> yet, you won't be able to log in.</p>
+	
 				<p>
 
 				<span class="small">
