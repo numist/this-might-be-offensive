@@ -99,9 +99,10 @@ $sql = "SELECT up.id, up.userid, up.filename, up.timestamp, up.nsfw, up.tmbo,
 		my $newFilename = substr( $nsfwMarker . " " . $filename, 0, 80);
 		# XXX RGH FIXME
 		$newFilename=escapeHTML($newFilename);
-		$comments = $comments eq undef() ? 0 : $comments;
-		$good = $good eq undef() ? 0 : $good;
-		$bad = $bad eq undef() ? 0 : $bad;
+
+		$comments = defined($comments) ? 0 : $comments;
+		$good = defined($good) ? 0 : $good;
+		$bad = defined($bad) ? 0 : $bad;
 		
 		print LIST_FILE qq ^
 		<tr class="$css">
