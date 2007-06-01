@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
-#use strict;
-#use warnings;
+use strict;
+use warnings;
 use DBI;
 use Image::Size;
 use CGI qw(escape escapeHTML);
@@ -136,14 +136,19 @@ $sql = "SELECT up.id, up.userid, up.filename, up.timestamp, up.nsfw, up.tmbo,
 
 sub emitThumbnailRow {
 	my( $id, $filename, $comments, $good, $bad, $nsfw ) = @_;	
-	my $css = $nsfw == 1 ? "nsfw" : "";
+	my $css = $nsfw == 1 ? ' class="nsfw"' : "";
 
 	my ($width, $height) = imgsize("images/thumbs/th-$filename");
-	# XXX RGH FIXME
+
+	# defaults, incase imagesize() returned nothing
+	$width=$width||100;
+	$height=$height||100;
+
 	$filename = escape($filename);
+
 	print THUMB_FILE qq^ 
 	<td>
-		<a href="pages/pic.php?id=$id"><span class="$css"><img src="images/thumbs/th-$filename" width="$width" height="$height" border="0"/></span></a><br/>
+		<a href="pages/pic.php?id=$id"><span$nsfw><img src="images/thumbs/th-$filename" $width $height border="0"/></span></a><br/>
 		<a href="?c=comments&fileid=$id">$comments comments (+$good -$bad)</a>
 	</td>^;
 
