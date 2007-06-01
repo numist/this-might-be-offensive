@@ -22,7 +22,7 @@ A:visited {
 }
 	
 #rightcol {
-	width:544px;
+	width:580px;
 	float:left;
 	margin-right: auto;
 	margin-left: 0px;
@@ -160,7 +160,7 @@ table.thumbnails td a {
 .taboff, .tabon {
 	border-right:2px solid black;
 	float:left;
-	padding:0px 18px;
+	padding:0px 15px;
 	font-weight:bold;
 }
 .tabon, .tabon a {
