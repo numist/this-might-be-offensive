@@ -93,8 +93,8 @@ $sql = "insert into recent_discussions( id, filename, userid, timestamp, type )
 
 $sql = "SELECT up.id, up.userid, up.filename, up.timestamp, 
 		users.username, counts.comments
-			FROM recent_discussions up, users
-			LEFT JOIN offensive_count_cache counts ON up.id = counts.threadid
+			FROM (recent_discussions up, users)
+			LEFT JOIN offensive_count_cache counts ON (up.id = counts.threadid)
 			WHERE up.userid = users.userid
 			AND type='topic'
 			AND users.account_status != 'locked'
