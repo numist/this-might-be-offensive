@@ -148,7 +148,7 @@ sub emitThumbnailRow {
 
 	print THUMB_FILE qq^ 
 	<td>
-		<a href="pages/pic.php?id=$id"><span$nsfw><img src="images/thumbs/th-$filename" $width $height border="0"/></span></a><br/>
+		<a href="pages/pic.php?id=$id"><span$css><img src="images/thumbs/th-$filename" $width $height border="0"/></span></a><br/>
 		<a href="?c=comments&fileid=$id">$comments comments (+$good -$bad)</a>
 	</td>^;
 
