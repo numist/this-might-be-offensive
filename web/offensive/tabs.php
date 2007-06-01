@@ -20,6 +20,7 @@
 		<div class="<?= cssFor('referral') ?>"><a href="./?c=referral">invite</a></div>	
 -->		
 		<div class="<?= cssFor('search') ?>"><a href="./?c=search">search</a></div>	
+		<div class="<?= cssFor('stats') ?>"><a href="./?c=stats">stats</a></div>	
 
 	<div class="tabspacer">&nbsp;</div>
 </div>
