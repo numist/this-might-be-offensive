@@ -5,6 +5,7 @@ use warnings;
 use DBI;
 use Image::Size;
 use CGI qw(escape escapeHTML);
+use ConfigReader::Simple;
 
 # don't execute from the web
 if( $ENV{'DOCUMENT_ROOT'} ){
@@ -27,14 +28,17 @@ my @pathToScript = $0 =~ /.*\//gi;
 # change to that directory.
 chdir $pathToScript[0];
 
-# XXX RGH FIXME
-my $host = "66.228.121.115";                                                       #<-- Set host name
-my $database = "thismig_themaxx";                                                                  #<-- Set database name
+# Grab the configuration options, and then set some variables to use
+# throughout the script.
+my $config = ConfigReader::Simple->new("../admin/.config", [qw(database_host database_user database_pass database_name)]);
+my $database_host = $config->get("database_host");
+my $database_user = $config->get("database_user");
+my $database_pass = $config->get("database_pass");
+my $database_name = $config->get("database_name");
 
-my $dsn = 'DBI:mysql:themaxx:mysql.themaxx.com';
-my $db_user_name = 'db_themaxx';
-my $db_password = 'db_password_goes_here';
-my $dbh = DBI->connect($dsn, $db_user_name, $db_password);
+# Connect to the database
+my $dsn = "DBI:mysql:".$database_name.":".$database_host;
+my $dbh = DBI->connect($dsn, $database_user, $database_pass);
 
 if (! $dbh) {										#<-- Make sure we got a valid connection
 	print "No database handle\n";
