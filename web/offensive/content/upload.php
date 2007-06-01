@@ -64,7 +64,8 @@
 
 		$imagePath = pathFor( $fileinfo["fileformat"] );
 
-		$link = openDbConnection();
+		// Include, and check we've got a connection to the database.
+		include_once( '../admin/mysqlConnectionInfo.php' ); $link = openDbConnection();
 
 		$filename = strlen( $_REQUEST['filename'] ) > 0 ? $_REQUEST['filename'] : $_FILES['image']['name'];
 

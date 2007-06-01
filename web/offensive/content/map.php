@@ -63,7 +63,8 @@
 	
 		$usrid = $_SESSION['userid'];
 
-		$link = openDbConnection();
+		// Include, and check we've got a connection to the database.
+		include_once( '../admin/mysqlConnectionInfo.php' ); $link = openDbConnection();
 		
 		$sql = "select *, count( maxxer_locations.id ) from maxxer_locations, users
 				where users.userid=maxxer_locations.userid

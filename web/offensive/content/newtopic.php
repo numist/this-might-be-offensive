@@ -1,7 +1,8 @@
 <?
 
 	session_start();
-	require_once( '../admin/mysqlConnectionInfo.php' );
+	// Include, and check we've got a connection to the database.
+	include_once( '../admin/mysqlConnectionInfo.php' ); $link = openDbConnection();
 
 	function start() {
 		if( ! isset( $_SESSION['userid'] ) ){

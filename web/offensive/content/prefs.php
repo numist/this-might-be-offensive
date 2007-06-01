@@ -73,7 +73,10 @@
 	function keyBindingsForm( $uid ) {
 		
 		$sql = "SELECT * FROM preference_names_values WHERE value like '%_KEY' ORDER BY id";
-		$link = openDbConnection();
+		
+		// Include, and check we've got a connection to the database.
+		include_once( '../admin/mysqlConnectionInfo.php' ); $link = openDbConnection();
+
 		$result = mysql_query( $sql );
 		while( $row = mysql_fetch_assoc( $result ) ) {
 			?>

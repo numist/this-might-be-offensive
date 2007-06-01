@@ -21,8 +21,8 @@
 
 		$usrid = $_REQUEST['userid'];
 
-		$link = openDbConnection();
-
+		// Include, and check we've got a connection to the database.
+		include_once( '../admin/mysqlConnectionInfo.php' ); $link = openDbConnection();
 				
 		$sql = "SELECT username
 					FROM users WHERE userid={$usrid}";

@@ -22,7 +22,8 @@
 
 	function voteDetail( $uid ) {
 	
-		$link = openDbConnection();
+		// Include, and check we've got a connection to the database.
+		include_once( '../admin/mysqlConnectionInfo.php' ); $link = openDbConnection();
 	
 		$sql = "SELECT count( offensive_comments.id ) AS thecount,
 						users.username,

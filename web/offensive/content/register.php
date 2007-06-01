@@ -97,7 +97,8 @@
 	
 		$returnMessage = "OK";
 		
-	    $link = openDbConnection();
+	    // Include, and check we've got a connection to the database.
+		include_once( '../admin/mysqlConnectionInfo.php' ); $link = openDbConnection();
 		
 	    $query = "SELECT count(*) AS theCount FROM users WHERE username = '" . $uName . "'";
 
