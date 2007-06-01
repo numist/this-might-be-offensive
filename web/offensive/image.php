@@ -1,7 +1,6 @@
 <?
-	require_once( "../admin/mysqlConnectionInfo.php" );
-	
-	$link = openDbConnection();
+	// Include, and check we've got a connection to the database.
+	include_once( '../admin/mysqlConnectionInfo.php' ); $link = openDbConnection();
 
 	$sql = "SELECT id, filename
 			FROM offensive_uploads

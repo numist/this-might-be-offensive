@@ -1,26 +1,26 @@
 <?php
+// PHP5 has a super little function called parse_ini_file() which will do most of the work here, so
+// we'll grab the contents of the settings file, located in this directory and .config into an array
+$config = parse_ini_file(".config");
 
-	$db_url = "66.228.121.115";
-	$db_user = "thismig_tmbo";
-	$db_pw = "1A2B3C!D";
+// Set $link null
+$link = null;
 
-	$link = null;
+// Generic database connection function
+function openDbConnection() {
+		// Globalise $config and $link
+		global $config, $link;
 
-	function openDbConnection() {
-
-		global $db_url, $db_user, $db_pw, $link;
-
+		// If there isn't $link currently, then open up the connection, if it fails then forward the user
+		// to the out of order URL.
 		if( $link == null ) {
-			$link = @mysql_pconnect( $db_url, $db_user, $db_pw )
-				or header( "Location: http://thismight.be/offensive/index.outoforder.php" );
-//				or die( "<br><br><br>Unable to connect to database." );
+			$link = mysql_pconnect($config["database_host"],$config["database_user"],$config["database_pass"])
+				or header( "Location: http://thismight.be/offensive/index.outoforder.php");
 			
-			mysql_select_db("thismig_themaxx")
-				or die("<br><br>Could not select database" );
-
+			// We got a connection, so now select our database, or again forward to the out of order URL.
+			mysql_select_db($config["database_name"],$link)
+				or header( "Location: http://thismight.be/offensive/index.outoforder.php");
 		}
-
 		return $link;		
-	}
-	
+}
 ?>

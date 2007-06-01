@@ -9,9 +9,7 @@
 		<lastBuildDate><? echo date("r"); ?></lastBuildDate>
 
 <?
-	require_once( '../admin/mysqlConnectionInfo.php' );
-	
-	$link = openDbConnection();
+	require_once( '../admin/mysqlConnectionInfo.php' ); $link = openDbConnection();
 	
 	$sql = "select offensive_uploads.*, users.username
 			FROM offensive_uploads

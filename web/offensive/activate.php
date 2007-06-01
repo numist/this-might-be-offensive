@@ -1,11 +1,9 @@
 <?
 	session_start();
 	require_once( "activationFunctions.php" );
-	require_once( '../admin/mysqlConnectionInfo.php' );
+	require_once( '../admin/mysqlConnectionInfo.php' ); $link = openDbConnection();
 	
-	$message = "There was a problem with your request.";
-	
-	$link = openDbConnection();
+	$message = "There was a problem with your request.";	
 	
 	$id = id_from_hash( $_REQUEST[ $hash_param_key ] );
 	

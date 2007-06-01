@@ -1,15 +1,7 @@
 <?php
 function getPreferences( $userid ) {
-
-	// values defined in mysqlConnectionInfo.php
-	global $db_url, $db_user, $db_pw;
-
-
-	$link = @mysql_connect( $db_url, $db_user, $db_pw )
-			or die( "<br><br><br>Unable to connect to database." );
-
-	mysql_select_db("thismig_themaxx")
-		or die( "<br><br>Could not select database");
+	// Include, and check we've got a connection to the database.
+	include_once( '../admin/mysqlConnectionInfo.php' ); $link = openDbConnection();
 		
 	$sql = "SELECT names.value AS prefname, val.value AS prefvalue FROM user_preferences, preference_names_values names, preference_names_values val WHERE userid=$userid AND nameid=names.id AND val.id=valueid";
 

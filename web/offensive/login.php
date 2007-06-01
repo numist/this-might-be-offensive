@@ -2,7 +2,8 @@
 	session_start();
 
 # assume this will be included by the page that includes login.php
-	require_once( '../admin/mysqlConnectionInfo.php' );
+	// Include, and check we've got a connection to the database.
+	include_once( '../admin/mysqlConnectionInfo.php' ); $link = openDbConnection();
 
 	require_once( 'getPrefs.php' );
 	require_once( 'activationFunctions.php' );

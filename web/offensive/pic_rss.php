@@ -7,9 +7,8 @@
 		<lastBuildDate><? echo date("r"); ?></lastBuildDate>
 
 <?
-	require_once( '../admin/mysqlConnectionInfo.php' );
-	
-	$link = openDbConnection();
+	// Include, and check we've got a connection to the database.
+	include_once( '../admin/mysqlConnectionInfo.php' ); $link = openDbConnection();
 	
 	$sql = "select offensive_uploads.*, users.username
 			FROM offensive_uploads

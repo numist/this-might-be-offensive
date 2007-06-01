@@ -1,8 +1,7 @@
 <?php 
 	session_start();
-	require_once '../admin/mysqlConnectionInfo.php';
-
-	$link = openDbConnection();
+	// Include, and check we've got a connection to the database.
+	include_once( '../admin/mysqlConnectionInfo.php' ); $link = openDbConnection();
 	
 	$sql = "select userid from users where username like '" . $_REQUEST['finduser'] . "'";
 

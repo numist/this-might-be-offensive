@@ -9,7 +9,9 @@
 			return new statusMessage( false, "The email address provided is invalid, either because it contains structural errors or is from an unsupported provider (mailinator, etc)." );
 		}
 	
-		$link = openDbConnection();
+		// Include, and check we've got a connection to the database.
+		include_once( '../admin/mysqlConnectionInfo.php' ); $link = openDbConnection();
+
 		$sql = "SELECT count(*) AS theCount FROM users WHERE email = '" . $email . "'";
 		$row = mysql_fetch_assoc( mysql_query( $sql ) );
 		if( $row['theCount'] > 0 ) {
