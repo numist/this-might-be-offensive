@@ -17,7 +17,7 @@ use LWP::UserAgent;
 use HTTP::Cookies;
 use File::stat;
 use CGI qw/escape unescape/; #for decoding url-encoded strings
-use Mysql;
+#use Mysql;
 use DBI;
 
 $host = "mysql.themaxx.com";							#<-- Set host name

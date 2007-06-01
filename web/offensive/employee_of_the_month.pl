@@ -1,6 +1,5 @@
 #!/usr/bin/perl
 
-use Mysql;
 use DBI;
 
 # don't execute from the web

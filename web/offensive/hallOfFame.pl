@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 
-use Mysql;
+#use Mysql;
 use DBI;
 use File::Copy;
 
