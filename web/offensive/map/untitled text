@@ -1,8 +1,0 @@
-<?
-	
-	$sql = "SELECT userid, floor(x/100) as xCell, floor(y/100) as yCell
-	FROM maxxer_locations
-	order by xCell, yCell";
-
-
-?>
