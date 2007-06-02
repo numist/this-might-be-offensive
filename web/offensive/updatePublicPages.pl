@@ -1,8 +1,13 @@
 #!/usr/bin/perl
 
-#use Mysql;
-use DBI;
-use File::Copy;
+# runtime-detection of missing perl modules
+my (@missing_modules);
+BEGIN {
+        eval qq{use DBI; }; push @missing_modules,"DBI" if ($@);
+        eval qq{use File::Copy; }; push @missing_modules,"File::Copy" if ($@);
+}
+
+die "There are missing required modules: ",join(", ",@missing_modules) if (@missing_modules);
 
 # don't execute from the web
 if( $ENV{'DOCUMENT_ROOT'} ){

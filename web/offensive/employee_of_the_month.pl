@@ -1,6 +1,13 @@
 #!/usr/bin/perl
 
-use DBI;
+# runtime-detection of missing perl modules
+my (@missing_modules);
+BEGIN {
+    eval qq{ use DBI; };
+       push @missing_modules,"DBI" if ($@);
+}
+
+die "There are missing required modules: ",join(", ",@missing_modules) if (@missing_modules);
 
 # don't execute from the web
 if( $ENV{'DOCUMENT_ROOT'} ){

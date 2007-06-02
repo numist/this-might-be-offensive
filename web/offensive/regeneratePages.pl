@@ -6,19 +6,29 @@
 # http://themaxx.com/
 #################################
 
+# runtime-detection of missing perl modules
+my (@missing_modules);
+BEGIN {
+        eval qq{use Archive::Zip; }; push @missing_modules,"Archive::Zip" if ($@);
+	eval qq{use LWP::Simple; }; push @missing_modules,"LWP::Simple" if ($@);
+	eval qq{use LWP::UserAgent; }; push @missing_modules,"LWP::UserAgent" if ($@);
+	eval qq{use HTTP::Cookies; }; push @missing_modules,"HTTP::Cookies" if ($@);
+	eval qq{use File::stat; }; push @missing_modules,"File::stat" if ($@);
+
+	#for decoding url-encoded strings
+	eval qq{use CGI qw/escape unescape/; }; push @missing_modules,"CGI" if ($@);
+	eval qq{use DBI; }; push @missing_modules,"DBI" if ($@);
+}
+
+die "There are missing required modules: ",join(", ",@missing_modules) if (@missing_modules);
+
+
 # don't execute from the web
 if( $ENV{'DOCUMENT_ROOT'} ){
 	print "Content-type:text/plain\n\nGo away.";
 	exit();
 }
 
-use LWP::Simple;
-use LWP::UserAgent;
-use HTTP::Cookies;
-use File::stat;
-use CGI qw/escape unescape/; #for decoding url-encoded strings
-#use Mysql;
-use DBI;
 
 $host = "mysql.themaxx.com";							#<-- Set host name
 $database = "themaxx";									#<-- Set database name

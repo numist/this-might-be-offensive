@@ -2,10 +2,25 @@
 
 use strict;
 use warnings;
-use DBI;
-use Image::Size;
-use CGI qw(escape escapeHTML);
-use ConfigReader::Simple;
+
+
+# runtime-detection of missing perl modules
+my (@missing_modules);
+BEGIN {
+    eval qq{ use DBI; };
+	push @missing_modules,"DBI" if ($@);
+
+    eval qq{ use Image::Size; };
+	push @missing_modules,"Image::Size" if ($@);
+
+    eval qq{ use ConfigReader::Simple; };
+	push @missing_modules,"ConfigReader::Simple" if ($@);
+
+    eval qq{ use CGI qw(escape escapeHTML); };
+	push @missing_modules,"CGI" if ($@);
+}
+
+die "There are missing required modules: ",join(", ",@missing_modules) if (@missing_modules);
 
 # don't execute from the web
 if( $ENV{'DOCUMENT_ROOT'} ){

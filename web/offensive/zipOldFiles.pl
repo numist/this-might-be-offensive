@@ -2,7 +2,14 @@
 
 # moves files older than x days from srcDir to destDir
 
-use Archive::Zip;
+# runtime-detection of missing perl modules
+my (@missing_modules);
+BEGIN {
+	eval qq{use Archive::Zip; }; push @missing_modules,"Archive::Zip" if ($@);
+}
+
+die "There are missing required modules: ",join(", ",@missing_modules) if (@missing_modules);
+
 
 if( $#ARGV lt 2 ) {
 	print "zipOldFiles.pl\nZips files last modified x days ago.\n";
