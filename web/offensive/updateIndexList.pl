@@ -28,14 +28,13 @@ if( $ENV{'DOCUMENT_ROOT'} ){
 	exit();
 }
 
+# Tunable paramaters here:
+# ===
 
-#DBI->trace(2);
+my $THUMBS_PER_ROW = 4;
 
-# set the current directory to the directory containing the script
-# so our relative path references (images, etc) work regardless of
-# where the script was invoked. (the primary reason for this is that
-# we intend to run it periodically via crontab.) $0 gives us the path
-# to the script.
+# ===
+
 
 # grab everything up to the last slash.
 my @pathToScript = $0 =~ /.*\//gi;
@@ -60,7 +59,7 @@ if (! $dbh) {										#<-- Make sure we got a valid connection
 	exit(0);
 }
 
-my $sql = "CREATE temporary TABLE recent_uploads (
+my $recent_uploads_SQL = "CREATE temporary TABLE recent_uploads (
 			id int(11) NOT NULL,
 			userid int(11) NOT NULL default '0',
 			filename varchar(255) NOT NULL default '',
@@ -74,22 +73,18 @@ my $sql = "CREATE temporary TABLE recent_uploads (
 		KEY userid (userid),
 		KEY type (type)
 );";
-	# XXX RGH FIXME
-	#my $statement = $dbh->prepare( $sql );
-	#$statement->execute();
-	$dbh->do($sql);
+$dbh->do($recent_uploads_SQL);
 
 
-$sql = "insert into recent_uploads( id, filename, userid, timestamp, nsfw, tmbo, type )
-			select id, filename, userid, timestamp, nsfw, tmbo, type
-				from offensive_uploads where type='image' AND status='normal'
-			order by timestamp desc limit 100;";
+my $populate_recent_uploads_SQL = "INSERT INTO recent_uploads( id, filename, userid, timestamp, nsfw, tmbo, type )
+			SELECT id, filename, userid, timestamp, nsfw, tmbo, type
+				FROM offensive_uploads WHERE type='image' AND status='normal'
+			ORDER BY timestamp DESC LIMIT 100;";
 
-	my $statement = $dbh->prepare( $sql );
-	$statement->execute();
+my $populate_recent_uploads = $dbh->prepare( $populate_recent_uploads_SQL );
+$populate_recent_uploads->execute();
 
-# XXX FIXME RGH
-$sql = "SELECT up.id, up.userid, up.filename, up.timestamp, up.nsfw, up.tmbo, 
+my $uploads_sql = "SELECT up.id, up.userid, up.filename, up.timestamp, up.nsfw, up.tmbo, 
 		users.username, counts.comments, counts.good, counts.bad
 			FROM (recent_uploads up, users)
 			LEFT JOIN offensive_count_cache counts ON (up.id = counts.threadid)
@@ -98,59 +93,57 @@ $sql = "SELECT up.id, up.userid, up.filename, up.timestamp, up.nsfw, up.tmbo,
 			AND users.account_status != 'locked'
 			ORDER BY up.timestamp DESC";
 
-	$statement = $dbh->prepare( $sql );
-	$statement->execute();
+my $uploads_sth = $dbh->prepare( $uploads_sql );
+$uploads_sth->execute();
 
-	my $THUMBS_PER_ROW = 4;
 	
-	open( LIST_FILE, ">indexList.txt" ) or die("couldn't create indexList.txt file.\n");
-	open( THUMB_FILE, ">indexListThumbnails.txt" ) or die("couldn't create indexListThumbnails.txt file.\n");
-	print LIST_FILE qq ^<table width="100%">\n^;
-	print THUMB_FILE qq ^<table width="100%" class="thumbnails">\n^;
+open( LIST_FILE, ">indexList.txt" ) or die("couldn't create indexList.txt file ($!)");
+open( THUMB_FILE, ">indexListThumbnails.txt" ) or die("couldn't create indexListThumbnails.txt file ($!)");
+print LIST_FILE qq ^<table width="100%">\n^;
+print THUMB_FILE qq ^<table width="100%" class="thumbnails">\n^;
 
-	my $css = "evenfile";
-	my $output = 0;
-	while( (my( $id, $userid, $filename, $timestamp, $nsfw, $tmbo, $username, $comments, $good, $bad ) = $statement->fetchrow_array()) && $output < 101) {
+my $css = "evenfile";
+my $output = 0;
+while( (my( $id, $userid, $filename, $timestamp, $nsfw, $tmbo, $username, $comments, $good, $bad ) = $uploads_sth->fetchrow_array()) && $output < 101) {
 
-		$css = ($css eq "odd_row") ? "even_row" : "odd_row";
-		my $nsfwMarker = $nsfw == 1 ? "[nsfw]" : "";
-		my $newFilename = substr( $nsfwMarker . " " . $filename, 0, 80);
-		# XXX RGH FIXME
-		$newFilename=escapeHTML($newFilename);
+	$css = ($css eq "odd_row") ? "even_row" : "odd_row";
+	my $nsfwMarker = $nsfw == 1 ? "[nsfw]" : "";
+	my $newFilename = substr( $nsfwMarker . " " . $filename, 0, 80);
+	$newFilename=escapeHTML($newFilename);
 
-		$comments = defined($comments) ? $comments : 0;
-		$good = defined($good) ? $good : 0;
-		$bad = defined($bad) ?  $bad : 0;
+	# the database can contain NULL values for comments/good/bad
+	# NULL values come back as undefined here in perl.
+	$comments = defined($comments) ? $comments : 0;
+	$good = defined($good) ? $good : 0;
+	$bad = defined($bad) ?  $bad : 0;
 		
-		print LIST_FILE qq ^
-		<tr class="$css">
-			<td class="$css"><div class="clipper"><a href="pages/pic.php?id=$id" class="$css" title="uploaded by $username">$newFilename</a></div></td>
-			<td class="$css" style="text-align:right;white-space:nowrap"><a href="./?c=comments&fileid=$id" class="$css">$comments comments</a> (+$good -$bad)</td>
-		</tr>^;
-#			<td class="$css"><a href="./?c=user&userid=$previousUserid">$previousUsername</a></td>
+	print LIST_FILE qq ^
+\t\t\t	<tr class="$css">
+\t\t\t		<td class="$css"><div class="clipper"><a href="pages/pic.php?id=$id" class="$css" title="uploaded by $username">$newFilename</a></div></td>
+\t\t\t		<td class="$css" style="text-align:right;white-space:nowrap"><a href="./?c=comments&fileid=$id" class="$css">$comments comments</a> (+$good -$bad)</td>
+\t\t\t	</tr>^;
 
-		if( $output % $THUMBS_PER_ROW == 0 ) {
-			print THUMB_FILE "<tr>";
-		}
-		emitThumbnailRow( $id, $filename, $comments, $good, $bad, $nsfw );
-		if( $output % $THUMBS_PER_ROW == $THUMBS_PER_ROW - 1  ) {
-			print THUMB_FILE "</tr>";
-		}
-
-		$output++;
-
-
+	if( $output % $THUMBS_PER_ROW == 0 ) {
+		print THUMB_FILE "<tr>";
 	}
 
-	print LIST_FILE qq ^</table>\n^;
-	close( LIST_FILE );
-	
-	if( $output % $THUMBS_PER_ROW != $THUMBS_PER_ROW - 1 ) {
+	emitThumbnailRow( $id, $filename, $comments, $good, $bad, $nsfw );
+
+	if( $output % $THUMBS_PER_ROW == $THUMBS_PER_ROW - 1  ) {
 		print THUMB_FILE "</tr>";
 	}
+	$output++;
+}
 
-	print THUMB_FILE qq ^</table>\n^;
-	close( THUMB_FILE );	
+print LIST_FILE qq ^</table>\n^;
+close( LIST_FILE );
+	
+if( $output % $THUMBS_PER_ROW != $THUMBS_PER_ROW - 1 ) {
+	print THUMB_FILE "</tr>";
+}
+
+print THUMB_FILE qq ^</table>\n^;
+close( THUMB_FILE );	
 
 
 sub emitThumbnailRow {
@@ -163,12 +156,13 @@ sub emitThumbnailRow {
 	$width=$width||100;
 	$height=$height||100;
 
+	# this escapes for URI encoding (/ = %2F)
 	$filename = escape($filename);
 
 	print THUMB_FILE qq^ 
 	<td>
-		<a href="pages/pic.php?id=$id"><span$css><img src="images/thumbs/th-$filename" $width $height border="0"/></span></a><br/>
-		<a href="?c=comments&fileid=$id">$comments comments (+$good -$bad)</a>
+\t	<a heef="pages/pic.php?id=$id"><span$css><img src="images/thumbs/th-$filename" width="$width" height="$height" border="0"/></span></a><br/>
+\t	<a href="?c=comments&fileid=$id">$comments comments (+$good -$bad)</a>
 	</td>^;
 
 }
