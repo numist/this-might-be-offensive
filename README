@@ -22,10 +22,12 @@ database_name = "name_of_the_database_to_use"
 
 There are a few dependencies for the site, the only
 program is should depend on now is Imagemagik. The site
-also has perl scripts which require the following non
-standard modules:
+also has perl scripts which require the following modules:
 
-Image/Size
+DBI
+File::Copy
+Archive::Zip
+Image::Size
 ConfigReader::Simple
 
 That should be all, if you get stuck or have any
