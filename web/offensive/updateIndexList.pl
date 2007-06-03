@@ -3,7 +3,6 @@
 use strict;
 use warnings;
 
-
 # runtime-detection of missing perl modules
 my (@missing_modules);
 BEGIN {
@@ -161,7 +160,7 @@ sub emitThumbnailRow {
 
 	print THUMB_FILE qq^ 
 	<td>
-\t	<a heef="pages/pic.php?id=$id"><span$css><img src="images/thumbs/th-$filename" width="$width" height="$height" border="0"/></span></a><br/>
+\t	<a href="pages/pic.php?id=$id"><span$css><img src="images/thumbs/th-$filename" width="$width" height="$height" border="0"/></span></a><br/>
 \t	<a href="?c=comments&fileid=$id">$comments comments (+$good -$bad)</a>
 	</td>^;
 
