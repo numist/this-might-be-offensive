@@ -6,6 +6,20 @@ gofast(er)
         plot integration -- sc0tt
         system monitoring -- h3h installed cacti
 
+    2) sql query optimization
+
+	EXPLAIN EXTENDED SELECT blah blah blah;
+	show warnings;
+	alter table FOO add index this_to_that (this, that);
+	optimize table FOO;
+	lather, rinse, repeat
+
+bring back old features:
+
+	stats (cached daily update instead of offensive/content/stats.php)
+	comment searching
+	
+
 register_globals dependency
 
 php4 to php5 port (including reliance on hash())
