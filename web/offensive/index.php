@@ -172,7 +172,8 @@
 						<p><a href="./map/gmap.php">maxxer world map</a></p>
 						<p><a href="<? echo $_SERVER['PHP_SELF'] ?>?c=referral">invite a friend</a></p>						
 						<p><a href="<? echo $_SERVER['PHP_SELF'] ?>?c=faq">FAQ, rules, etc.</a></p>
-						<p><a href="http://tmboradio.com">tmboradio.com</a></p>						
+						<p><a href="http://tmboradio.com">tmboradio.com</a></p>
+						<p><a href="./?c=stats">stats</a></p>						
 					</div>
 				<div class="blackbar"></div>
 			</div>

@@ -15,12 +15,7 @@
 	<div class="<?= cssFor('audio') ?>"><a href="./?c=audio">audio</a></div>	
 	<div class="<?= cssFor('hof') ?>"><a href="./?c=hof">hall of fame</a></div>	
 	<div class="<?= cssFor('yearbook') ?>"><a href="./?c=yearbook">yearbook</a></div>	
-<!-- 
-		<div class="<?= cssFor('map') ?>"><a href="./?c=map">map</a></div>
-		<div class="<?= cssFor('referral') ?>"><a href="./?c=referral">invite</a></div>	
--->		
-		<div class="<?= cssFor('search') ?>"><a href="./?c=search">search</a></div>	
-		<div class="<?= cssFor('stats') ?>"><a href="./?c=stats">stats</a></div>	
+	<div class="<?= cssFor('search') ?>"><a href="./?c=search">search</a></div>	
 
 	<div class="tabspacer">&nbsp;</div>
 </div>
