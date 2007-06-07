@@ -21,7 +21,7 @@
 		$link = openDbConnection();
 		$sql = "SELECT *, offensive_comments.timestamp AS comment_timestamp, offensive_comments.id as commentid
 					FROM offensive_comments, offensive_uploads, users
-					WHERE comment LIKE '%{$find}%'
+					WHERE MATCH(comment) AGAINST('$find')
 					AND offensive_comments.fileid = offensive_uploads.id
 					AND offensive_comments.userid = users.userid
 					ORDER BY offensive_comments.timestamp DESC

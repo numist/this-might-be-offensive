@@ -20,7 +20,7 @@
 		$link = openDbConnection();
 		$sql = "SELECT *, offensive_comments.timestamp AS comment_timestamp, offensive_comments.id as commentid
 					FROM offensive_comments, offensive_uploads, users
-					WHERE comment LIKE '%{$find}%'
+					WHERE MATCH(comment) AGAINST('$find')
 					AND offensive_comments.fileid = offensive_uploads.id
 					AND offensive_comments.userid = users.userid
 					ORDER BY offensive_comments.timestamp DESC
@@ -35,7 +35,6 @@
 
 
 	function searchForm( $value ) {
-				return;
 		?>
 			<form action="./">
 				<input type="hidden" name="c" value="search"/>
@@ -91,7 +90,6 @@
 		$find = trim( mysql_real_escape_string( $_REQUEST['find'] ) );
 
 		?><div class="entry" style="background:#bbbbee">
-			Comment searching is temporarily disabled until i figure out a way to make it less kaboomy, but you can still search for a files/topics or users. Please be gentle.
 		<?
 			searchForm( $find );
 		?>
