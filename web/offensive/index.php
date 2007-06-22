@@ -59,8 +59,6 @@
 	<link rel="stylesheet" type="text/css" href="filepilestyle.css" />
 	<link rel="stylesheet" type="text/css" href="/styles/oldskool.css"/>
 	<link rel="stylesheet" type="text/css" href="nsfw.css.php"/>
-
-	<script type="text/javascript" language="javascript" src="/bitsUtils.js"></script>
 	
 <style type="text/css">
 
