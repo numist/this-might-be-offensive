@@ -60,7 +60,8 @@
 			?>
 		
 			<div class="entry" style="<?php echo nextStyle()?>">
-				<a href="./?c=comments&fileid=<?= $row['fileid'] ?>"><?= $row['filename'] ?></a>
+				<a href="subscribe.php?un=1&fileid=<?= $row['fileid'] ?>" style="float:right" title="take this thread off my 'unread comments' watch list.">unsubscribe</a>
+				<a href="./?c=comments&fileid=<?= $row['fileid'] ?>"><?= $row['filename'] ?></a>				
 			</div>
 		
 			<? 		
