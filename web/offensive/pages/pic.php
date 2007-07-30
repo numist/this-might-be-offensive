@@ -178,7 +178,7 @@
 						</span>
 
 						<span style="margin-left:48px;">
-							<a href="/offensive/subscribe.php&fileid=<? echo $id ?>">subscribe</a> 
+							<a href="/offensive/subscribe.php?fileid=<? echo $id ?>">subscribe</a> 
 						</span>
 
 						<span style="margin-left:48px;">nsfw filter: <?php
