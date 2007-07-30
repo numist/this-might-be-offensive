@@ -177,6 +177,10 @@
 									<a id="bad" href="/offensive/?c=comments&submit=submit&fileid=<? echo $id ?>&vote=this%20is%20bad&redirect=true">[ this is bad ]</a>
 						</span>
 
+						<span style="margin-left:48px;">
+							vote: <a id="good"  href="/offensive/subscribe.php&fileid=<? echo $id ?>">subscribe</a> 
+						</span>
+
 						<span style="margin-left:48px;">nsfw filter: <?php
 							if( $_SESSION['prefs']['hide nsfw'] == 1 ) {
 								?>
