@@ -6,6 +6,7 @@ my (@missing_modules);
 BEGIN {
         eval qq{use DBI; }; push @missing_modules,"DBI" if ($@);
         eval qq{use File::Copy; }; push @missing_modules,"File::Copy" if ($@);
+	eval qq{use ConfigReader::Simple; }; push @missing_modules,"ConfigReader::Simple" if ($@);
 }
 
 die "There are missing required modules: ",join(", ",@missing_modules) if (@missing_modules);
@@ -28,10 +29,17 @@ if( $ENV{'DOCUMENT_ROOT'} ){
 # change to that directory.
 chdir $pathToScript[0];
 
-my $dsn = 'DBI:mysql:themaxx:mysql.themaxx.com';
-my $db_user_name = 'db_themaxx';
-my $db_password = 'db_password_goes_here';
-$dbh = DBI->connect($dsn, $db_user_name, $db_password);
+# Grab the configuration options, and then set some variables to use
+# throughout the script.
+my $config = ConfigReader::Simple->new("../admin/.config", [qw(database_host database_user database_pass database_name)]);
+my $database_host = $config->get("database_host");
+my $db_user_name = $config->get("database_user");
+my $db_password = $config->get("database_pass");
+my $database_name = $config->get("database_name");
+
+# Connect to the database
+my $dsn = "DBI:mysql:".$database_name.":".$database_host;
+my $dbh = DBI->connect($dsn, $db_user_name, $db_password);
 
 if (! $dbh) {										#<-- Make sure we got a valid connection
 	print "No database handle\n";

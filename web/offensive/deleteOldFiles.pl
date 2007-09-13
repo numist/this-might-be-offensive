@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 
+use lib qw(../.perl/lib);
+
 # don't run if invoked from a browser.
 if( $ENV{'DOCUMENT_ROOT'} ){
 	print "Content-type:text/plain\n\nGo away.";

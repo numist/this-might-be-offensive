@@ -5,7 +5,10 @@
 
 ## wooha, yehp. -jerry Sun Jan 30 12:49:03 CST 2005
 
-cd ~fleece/themaxx.com/offensive/
+PATH=/usr/local/bin:$PATH
+export PATH
+
+cd /hsphere/local/home/thismightbe/thismight.be/offensive
 
 extset="jpg JPG jpeg JPEG gif GIF png PNG"
 

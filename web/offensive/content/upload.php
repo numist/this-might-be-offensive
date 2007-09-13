@@ -21,6 +21,8 @@
 	$fileuploaded = false;
 	$fileid = null;
 	$filePath=dirname(realpath($_SERVER['SCRIPT_FILENAME']));
+	# realpath suddenly stopped working at dreamhost 2005-05-27
+#	$filePath = "/hsphere/local/home/thismightbe/thismight.be/offensive";
 	$imagePath = $filePath . "/images/picpile/";
 
 	if( $_FILES['image']['name'] != "" && $_FILES['image']['size'] > 0 && ! exceededUploadLimit() ) {

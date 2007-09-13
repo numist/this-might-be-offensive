@@ -45,13 +45,13 @@ chdir $pathToScript[0];
 # throughout the script.
 my $config = ConfigReader::Simple->new("../admin/.config", [qw(database_host database_user database_pass database_name)]);
 my $database_host = $config->get("database_host");
-my $database_user = $config->get("database_user");
-my $database_pass = $config->get("database_pass");
+my $db_user_name = $config->get("database_user");
+my $db_password = $config->get("database_pass");
 my $database_name = $config->get("database_name");
 
 # Connect to the database
 my $dsn = "DBI:mysql:".$database_name.":".$database_host;
-my $dbh = DBI->connect($dsn, $database_user, $database_pass);
+my $dbh = DBI->connect($dsn, $db_user_name, $db_password);
 
 if (! $dbh) {										#<-- Make sure we got a valid connection
 	print "No database handle\n";

@@ -1,8 +1,8 @@
 #!/usr/bin/perl -w
 
-use Mysql;
 use DBI;
 use Image::Magick;
+use ConfigReader::Simple;
 
 # don't execute from the web
 if( $ENV{'DOCUMENT_ROOT'} ){
@@ -30,10 +30,17 @@ if( $db_update lt $img_update ) {
 	exit;
 }
 
-my $dsn = 'DBI:mysql:themaxx:mysql.themaxx.com';
-my $db_user_name = 'db_themaxx';
-my $db_password = 'db_password_goes_here';
-$dbh = DBI->connect($dsn, $db_user_name, $db_password);
+# Grab the configuration options, and then set some variables to use
+# throughout the script.
+my $config = ConfigReader::Simple->new("../../admin/.config", [qw(database_host database_user database_pass database_name)]);
+my $database_host = $config->get("database_host");
+my $db_user_name = $config->get("database_user");
+my $db_password = $config->get("database_pass");
+my $database_name = $config->get("database_name");
+
+# Connect to the database
+my $dsn = "DBI:mysql:".$database_name.":".$database_host;
+my $dbh = DBI->connect($dsn, $db_user_name, $db_password);
 
 if (! $dbh) {										#<-- Make sure we got a valid connection
 	print "No database handle\n";
