@@ -3,13 +3,9 @@
 # runtime-detection of missing perl modules
 my (@missing_modules);
 
-BEGIN {
-        eval qq{use DBI; }; push @missing_modules,"DBI" if ($@);
-        eval qq{use File::Copy; }; push @missing_modules,"File::Copy" if ($@);
-	eval qq{use ConfigReader::Simple; }; push @missing_modules,"ConfigReader::Simple" if ($@);
-}
-
-die "There are missing required modules: ",join(", ",@missing_modules) if (@missing_modules);
+use DBI;
+use File::Copy;
+use ConfigReader::Simple;
 
 # don't execute from the web
 if( $ENV{'DOCUMENT_ROOT'} ){
