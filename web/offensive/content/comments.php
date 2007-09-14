@@ -65,7 +65,7 @@
 	
 	function title() {
 		global $filename;
-		return "[ tmbo ] : " . htmlentities( $filename );
+		return "[ tmbo ] : " . $filename;
 	}
 	
 	function updateCommentCount( $threadid, $good, $bad, $repost, $tmbo, $comment ) {
@@ -263,15 +263,15 @@
 	if( $type == 'topic' ) {
 		$prefix = $uploader == "themaxx" ? "" : "don't blame me.";
 ?>
-		<?php echo htmlentities($filename) ?><br/><span style="color:#666699"><?= $prefix ?> <a href="./?c=user&userid=<?echo $uploaderid ?>" style="color:#666699"><?php echo $uploader?></a> started it.</span><br/>
+		<?php echo str_replace(array("<", ">"), array("&lt;", "&gt;"), $filename) ?><br/><span style="color:#666699"><?= $prefix ?> <a href="./?c=user&userid=<?echo $uploaderid ?>" style="color:#666699"><?php echo $uploader?></a> started it.</span><br/>
 <?
 	}
 	else if( $type == 'audio' ) {
-		?><a class="heading" id="pic" href="images/audio/<?= htmlentities( $filename ) ?>"><?php echo htmlentities($filename) ?></a><br/><span style="color:#666699">uploaded by <a href="./?c=user&userid=<?echo $uploaderid ?>" style="color:#666699"><?php echo $uploader?></a></span><br/><?
+		?><a class="heading" id="pic" href="images/audio/<?= str_replace(array("<", ">"), array("&lt;", "&gt;"),  $filename ) ?>"><?php echo str_replace(array("<", ">"), array("&lt;", "&gt;"), $filename) ?></a><br/><span style="color:#666699">uploaded by <a href="./?c=user&userid=<?echo $uploaderid ?>" style="color:#666699"><?php echo $uploader?></a></span><br/><?
 	}
 	else {
 ?>
-		<a class="heading" id="pic" href="<?= $href ?>"><?php echo htmlentities($filename)?></a><br/><span style="color:#666699">uploaded by <a href="./?c=user&userid=<?echo $uploaderid ?>" style="color:#666699"><?php echo $uploader?></a></span><br/>
+		<a class="heading" id="pic" href="<?= $href ?>"><?php echo str_replace(array("<", ">"), array("&lt;", "&gt;"), $filename)?></a><br/><span style="color:#666699">uploaded by <a href="./?c=user&userid=<?echo $uploaderid ?>" style="color:#666699"><?php echo $uploader?></a></span><br/>
 <?
 	}	
 ?>
@@ -301,7 +301,7 @@
 
 			<?php
 			
-				$comment = str_replace( array( "&", "<", ">" ), array("&amp;","&lt;","&gt;"), $row['comment'] );
+				$comment = str_replace( array("<", ">" ), array("&lt;","&gt;"), $row['comment'] );
 
 /*				
 				// darkstalker and zetsumei drama queen gag
@@ -403,7 +403,7 @@
 
 					<div>
 					<? if ( $type == 'image' ) { ?>
-						<a class="heading" id="pic" href="pages/pic.php?id=<?php echo $_REQUEST['fileid']?>"><?php echo htmlentities($filename) ?></a><br/>
+						<a class="heading" id="pic" href="pages/pic.php?id=<?php echo $_REQUEST['fileid']?>"><?php echo str_replace(array("<", ">"), array("&lt;", "&gt;"), $filename) ?></a><br/>
 					<? }
 						else {
 						 ?>&nbsp;<?
