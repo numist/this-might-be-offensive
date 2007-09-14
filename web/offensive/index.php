@@ -335,7 +335,7 @@
 		while( $row = mysql_fetch_assoc( $result ) ) {
 			$css = $css == "evenfile" ? "oddfile" : "evenfile";
 	?>
-			<div class="clipper"><a class="<?= $css ?>" href="?c=comments&fileid=<?= $row['fileid'] ?>#<?= $row['commentid']?>"><?= $row['filename'] ?></a></div>
+			<div class="clipper"><a class="<?= $css ?>" href="?c=comments&fileid=<?= $row['fileid'] ?>#<?= $row['commentid']?>"><?= htmlentities($row['filename']) ?></a></div>
 	<?
 	
 		}

@@ -39,3 +39,7 @@ expire reset tokens
 
 map
     multiply requested, but probably needs to be (re)implemented from scratch
+    
+multiple encoding errors across the site
+    ΙΧΘΥΣ.jpg (currently shows as &#921;&#935;&#920;&#933;&#931;.jpg in some places, accurately in others)
+    the places where it shows up accurately are where we are taking measures to prevent html injection, so that fix needs to be re-thought, re-implemented and then properly rolled out to all parts of the code that use the filename variable
