@@ -319,11 +319,8 @@
 				else {
 					echo "<div class='squelched'>[ squelched ]</div>";
 				}
-				
-				// save room on comments that have no content
-				if(strlen($comment) > 0) {
-				    ?><br/><?
-			    }?>
+				?>
+                <br/>
 					 
  	 			<div class="timestamp"><a href="#<?= $row['commentid'] ?>"><?= $row['comment_timestamp'] ?></a></div>
 				&raquo; 

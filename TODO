@@ -15,18 +15,12 @@ gofast(er)
 	lather, rinse, repeat
 
 bring back old features:
-
 	stats (cached daily update instead of offensive/content/stats.php)
-	comment searching
 	
-
 register_globals dependency
 
-php4 to php5 port (including reliance on hash())
-
-index update on upload, not on cron
-    the scotts' got it :)
-    -- note that the cron also updates the comment counts
+dynamic index generation (no more cron)
+    numist's on it, and wants pagination too
 
 thumbnail creation on load, then cached
     Everyone-requested
@@ -42,3 +36,6 @@ proper outpage on porkchop/repost upload
 
 expire reset tokens
     tarkheena-requested
+
+map
+    multiply requested, but probably needs to be (re)implemented from scratch
