@@ -457,7 +457,7 @@
 
 <?php 
 
-	if( $already_voted || $expired || $type == 'topic' ) {
+	if( $already_voted || $expired || $type != 'topic' ) {
 	
 	?>	<div style="text-align:left;margin-left:10%">
 			<input type="radio" name="vote" value="" checked="checked" id="novote"/>
