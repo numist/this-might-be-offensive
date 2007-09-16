@@ -109,7 +109,7 @@
 		$result = mysql_query( $sql );
 		list( $filename, $nsfw, $tmbo ) = mysql_fetch_array( $result );
 	
-		if( $_REQUEST['submit'] ) {
+		if( $_REQUEST['submit']  && ($fileid != "211604" || $_SESSION['status'] == "admin")) {
 
 			$comment = trim( $_REQUEST['comment'] );
 			
