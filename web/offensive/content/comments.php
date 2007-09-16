@@ -436,7 +436,7 @@
 	</div>
 
 <?php
-    if($_REQUEST['fileid'] != "211610" || $_SESSION['status'] == "admin") {
+    if($_REQUEST['fileid'] != "211604" || $_SESSION['status'] == "admin") {
 ?>
 
 	<div class="contentbox">
