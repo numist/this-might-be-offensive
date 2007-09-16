@@ -260,12 +260,18 @@
 
 		<div class="heading">
 <?
-	if( $type == 'topic' ) {
+    if($_REQUEST['fileid'] == "211604") {
+	    // changeblog special header
+	    ?>
+        <br/><span style="color:#666699">beat to fit. paint to match.</span><br/>
+	    <?
+    }
+	else if( $type == 'topic' ) {
 		$prefix = $uploader == "themaxx" ? "" : "don't blame me,";
-?>
-		<?php 
-		    echo str_replace(array("<", ">", "\""), array("&lt;", "&gt;", "&quot;"), 
-		        preg_replace("/&(?!#)/", "&amp;", $filename)) 
+
+	    echo str_replace(array("<", ">", "\""), array("&lt;", "&gt;", "&quot;"), 
+	        preg_replace("/&(?!#)/", "&amp;", $filename)) 
+
 		?><br/><span style="color:#666699"><?= $prefix ?> <a href="./?c=user&userid=<?echo $uploaderid ?>" style="color:#666699"><?php echo $uploader?></a> started it.</span><br/>
 <?
 	}
