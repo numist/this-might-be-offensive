@@ -435,6 +435,10 @@
 			</div>
 	</div>
 
+<?php
+    if($_REQUEST['fileid'] != "211610" || $_SESSION['status'] == "admin") {
+?>
+
 	<div class="contentbox">
 		<div class="blackbar"></div>
 			<div class="heading"><?php echo $add_comment_heading?></div>
@@ -453,7 +457,7 @@
 
 <?php 
 
-	if( ! $already_voted && ! $expired && $type != 'topic' ) {
+	if( $already_voted || $expired || $type == 'topic' ) {
 	
 	?>	<div style="text-align:left;margin-left:10%">
 			<input type="radio" name="vote" value="" checked="checked" id="novote"/>
@@ -507,6 +511,7 @@
 			</div>
 
 <?
+    }
 }
 
 	function nextStyle() {
