@@ -335,7 +335,10 @@
 		while( $row = mysql_fetch_assoc( $result ) ) {
 			$css = $css == "evenfile" ? "oddfile" : "evenfile";
 	?>
-			<div class="clipper"><a class="<?= $css ?>" href="?c=comments&fileid=<?= $row['fileid'] ?>#<?= $row['commentid']?>"><?= str_replace(array("<", ">"), array("&lt;", "&gt;"), $row['filename']) ?></a></div>
+			<div class="clipper"><a class="<?= $css ?>" href="?c=comments&fileid=<?= $row['fileid'] ?>#<?= $row['commentid']?>"><?= 
+			    str_replace(array("<", ">", "\""), array("&lt;", "&gt;", "&quot;"), 
+			        preg_replace("/&(?!#)/", "&amp;", $row['filename'])) 
+			?></a></div>
 	<?
 	
 		}
