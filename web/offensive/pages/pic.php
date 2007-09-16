@@ -145,7 +145,7 @@
 <html>
 	<head>
 		<META NAME="ROBOTS" CONTENT="NOARCHIVE" />
-		<title>[ this might be offensive ] : <? echo htmlentities($filename) ?> </title>
+		<title>[ this might be offensive ] : <? echo $filename ?> </title>
 		<link rel="stylesheet" type="text/css" href="styles.php"/>
 		<script type="text/javascript">
 			self.file_id = "";
@@ -228,7 +228,8 @@
 			<br /><br />
 			<? echo $nsfw == 1 ? "<span style=\"color:#990000\">[NSFW]</span>" : "" ?></span>
 			<? echo $tmbo == 1 ? "<span style=\"color:#990000\">[TMBO]</span>" : "" ?></span>
-			<? echo htmlentities($filename) ?> <span style="color:#999999"><?= getFileSize( $filepath ) ?></span>
+			<? echo str_replace(array("<", ">", "\""), array("&lt;", "&gt;", "&quot;"), 
+                preg_replace("/&(?!#)/", "&amp;", $filename)) ?> <span style="color:#999999"><?= getFileSize( $filepath ) ?></span>
 			<br/>
 			<span style="color:#999999">
 				uploaded by <a href="../?c=user&userid=<? echo $uploaderid ?>"><? echo $uploader ?></a> @ <?= $timestamp ?>

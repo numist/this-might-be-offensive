@@ -51,7 +51,8 @@
 			?>
 			<div class="entry" style="<?= $css ?>">
 			<?
-				$comment = str_replace( array( "&", "<", ">" ), array("&amp;","&lt;","&gt;"), $row['comment'] );
+				$comment = str_replace(array("<", ">", "\""), array("&lt;", "&gt;", "&quot;"), 
+                    preg_replace("/&(?!#)/", "&amp;", $row['comment'] ));
 
 				 echo nl2br( linkUrls( $comment ) ); ?><br/>
 				 
