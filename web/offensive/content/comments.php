@@ -262,6 +262,8 @@
 <?
     if($_REQUEST['fileid'] == "211604") {
 	    // changeblog special header
+            echo str_replace(array("<", ">", "\""), array("&lt;", "&gt;", "&quot;"), 
+	        preg_replace("/&(?!#)/", "&amp;", $filename)) 
 	    ?>
         <br/><span style="color:#666699">beat to fit. paint to match.</span><br/>
 	    <?
