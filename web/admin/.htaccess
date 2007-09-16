@@ -1,4 +1,5 @@
-AuthType Basic
-AuthUserFile /home/fleece/themaxx.com/admin/.htpasswd
-AuthName "custom"
-require valid-user
+AuthType	Basic
+AuthName	"custom"
+AuthUserFile	/hsphere/local/home/thismightbe/home/fleece/themaxx.com/admin/.htpasswd
+Require	valid-user
+
