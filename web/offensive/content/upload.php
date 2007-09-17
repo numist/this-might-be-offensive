@@ -275,8 +275,6 @@
 
 	function numAllowedUploads( $uid ) {
 	
-		return 40;
-	
 		$link = openDbConnection();
 
 		$sql = "SELECT count( vote ) AS thecount, vote
@@ -437,7 +435,7 @@ function uploadForm() {
 					
 				?>
 		
-						<!-- <p>You have <? echo $uploadsRemaining ?> upload<? echo $uploadsRemaining == 1 ? "" : "s"?> left.</p> -->
+						<p>You have <? echo $uploadsRemaining ?> upload<? echo $uploadsRemaining == 1 ? "" : "s"?> left.</p>
 		
 						<p>If you haven't already, please take a look at <a href="./?c=faq">the rules</a> before uploading.</p>
 		
@@ -564,6 +562,9 @@ function postAnyway() {
 	if( ! is_numeric( $repostId ) ) {
 		return;	
 	}
+
+    global $fileuploaded;
+    $fileuploaded = true;
 	
 	$sql = "SELECT hash
 				FROM offensive_uploads
@@ -585,7 +586,6 @@ function postAnyway() {
 		}
 
 	}
-
 }
 
 

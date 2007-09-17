@@ -29,7 +29,7 @@ function body() {
 	
 	<div class="bluebox">
 	
-			We all agree that tsunamis, war, car crashes and mariah carey are bad. It's a question of whether you want to see the pics. Vote [this is good] to praise the uploader. vote [this is bad] to discourage.
+			We all agree that tsunamis, war, car crashes and mariah carey are bad. It's a question of whether you want to see the pics. Vote [this is good] to praise the uploader. Vote [this is bad] to discourage.
 	</div>
 
 	<a href="#uploading" name="uploading"></a>
@@ -39,7 +39,7 @@ function body() {
 	
 	
 	<div class="bluebox">
-		<p>We like your cat. Really we do. But we just can't take all 74 pictures of cuddly at once; Warm and fuzzy in such a high dosage quickly becomes hot and hairy, and then spontaneous human combustion. We don't want that. So there's a limit on how much you can upload.</p>
+		<p>We like your cat. Really we do. But we just can't take all 74 pictures of cuddly at once; warm and fuzzy in such a high dosage quickly becomes hot and hairy, and then spontaneous human combustion. We don't want that. So there's a limit on how much you can upload.</p>
 		
 		<p>The upload limit is based on the number of good and bad votes you've received. The higher your good:bad ratio, the more files you're allowed to upload in a 24 hour period. (Just because you can doesn't mean you should.)</p>
 
