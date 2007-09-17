@@ -2,7 +2,6 @@
 <hr width="300" />
 <font face="geneva,monaco,veranda,arial,sans-serif" size="2">
 	<div style="font-size:10px;font-family:verdana,geneva,monaco,arial,sans-serif">
-	[ <a href="/art/" class="textlinks" onmouseover='window.status="[ the gallery ]"; return true' onmouseout='window.status=""'>art</a> ]
 	[ <a href="/offensive/" class="textlinks" title="this might be offensive : always-fresh images to distract you from work." onMouseOver='window.status="[ this might be offensive : the cure for productivity ]"; return true' onMouseOut='window.status=""'>this might be offensive</a> ]
 	[ <a href="/contact/" class="textlinks" onmouseover='window.status="[ contact me ]"; return true' onmouseout='window.status=""'>contact</a> ]<br />
 	</div>

@@ -48,7 +48,7 @@
 			$_SESSION['prefs']['sortorder'] = $order;
 		}
 
-		$numPerPage = 200;
+		$numPerPage = 100;
 		$page = $_REQUEST['p'];
 		if( ! is_numeric( $page ) ) {
 			$page = 0;

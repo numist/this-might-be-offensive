@@ -109,6 +109,8 @@
 		$result = mysql_query( $sql );
 		list( $filename, $nsfw, $tmbo ) = mysql_fetch_array( $result );
 	
+	    // check to see if someone's posting.  
+	    // also quietly snub them if they are not an admin and they are trying to post to the changeblog
 		if( $_REQUEST['submit']  && ($fileid != "211604" || $_SESSION['status'] == "admin")) {
 
 			$comment = trim( $_REQUEST['comment'] );
@@ -260,8 +262,8 @@
 
 		<div class="heading">
 <?
+    // changeblog special header
     if($_REQUEST['fileid'] == "211604") {
-	    // changeblog special header
             echo str_replace(array("<", ">", "\""), array("&lt;", "&gt;", "&quot;"), 
 	        preg_replace("/&(?!#)/", "&amp;", $filename)) 
 	    ?>
@@ -436,6 +438,7 @@
 	</div>
 
 <?php
+    // changeblog shouldn't tease the users with a comment field
     if($_REQUEST['fileid'] != "211604" || $_SESSION['status'] == "admin") {
 ?>
 
