@@ -305,12 +305,13 @@
 	
 		<div class="bluebox" style="text-align:left">	
 
-<?php if( $comments_exist ) { ?>
-		
-			
-		<b><?php echo $comments_heading?></b>
-<?php
+<?php if( $comments_exist ) { 
+        // changeblog doesn't say anything demeaning about the people who posted.
+        if($_REQUEST['fileid'] != "211604") { ?>		
 
+		    <b><?php echo $comments_heading?></b>
+<?php
+        }
 
 	
 	while( $row = mysql_fetch_assoc( $result ) ) {

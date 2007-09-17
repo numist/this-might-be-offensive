@@ -1,35 +1,18 @@
-observation: backslashes posted in comments vanish on the dev site.
-    ? NOTABUG -- due to the php config
-    
-gofast(er)
-    1) find out how:
-        plot integration -- sc0tt
-        system monitoring -- h3h installed cacti
-
-    2) sql query optimization
-
+gofast(er) - jonxp
+  sql query optimization
 	EXPLAIN EXTENDED SELECT blah blah blah;
 	show warnings;
 	alter table FOO add index this_to_that (this, that);
 	optimize table FOO;
 	lather, rinse, repeat
 
-bring back old features:
+bring back stats
 	stats (cached daily update instead of offensive/content/stats.php)
 	
 register_globals dependency
 
-dynamic index generation (no more cron)
-    numist's on it, and wants pagination too
-
 thumbnail creation on load, then cached
     Everyone-requested
-
-move to DBI layer
-    Paul-requested
-
-move to templates/mvc division
-    Paul-requested
 
 proper outpage on porkchop/repost upload
     raveneyes && numist-requested
@@ -37,9 +20,12 @@ proper outpage on porkchop/repost upload
 expire reset tokens
     tarkheena-requested
 
-map
+map - numist?
     multiply requested, but probably needs to be (re)implemented from scratch
     
-multiple encoding errors across the site
-    ΙΧΘΥΣ.jpg (currently shows as &#921;&#935;&#920;&#933;&#931;.jpg in some places, accurately in others)
-    the places where it shows up accurately are where we are taking measures to prevent html injection, so that fix needs to be re-thought, re-implemented and then properly rolled out to all parts of the code that use the filename variable
+paginated index - numist
+    removing cron job reliance
+    dynamic index data
+    
+comment thread changes - numist
+    marker where you left off (grab it from #xxxx in $_GET)
