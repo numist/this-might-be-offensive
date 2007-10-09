@@ -31,7 +31,7 @@
 		// would get executed when the image was requested. 
 		$f_name = $_FILES['image']['name'];
 		if( strstr( $f_name, ".php" ) !== false ) {
-			?>Accepted file types: jpg, gif, png, mp3, ogg, mov, wmv, mp4, mpg.<?php
+			?>Accepted file types: jpg, gif, png.<?php
 			mail( "ray@mysocalled.com", "[" . $_SERVER["REMOTE_ADDR"] . "] - SUSPICIOUS UPLOAD!!! " . $_SESSION['username'], requestDetail(), "From: offensive@themaxx.com (this might be offensive)\r\nPriority: urgent" );
 			exit;			
 		}
@@ -41,13 +41,14 @@
 		$getID3 = new getID3;
 		$fileinfo = $getID3->analyze( $_FILES['image']['tmp_name'] );
 	
-		if( ! preg_match( "/(jpg|jpeg|gif|png|mp3|ogg|mov|wmv|mpg|quicktime|mp4)/i", $fileinfo["fileformat"] ) ) {
+//		if( ! preg_match( "/(jpg|jpeg|gif|png|mp3|ogg|mov|wmv|mpg|quicktime|mp4)/i", $fileinfo["fileformat"] ) ) {
+		if( ! preg_match( "/(jpg|jpeg|gif|png)/i", $fileinfo["fileformat"] ) ) {
 			$quarantine = $filePath . "/quarantine/";		
 			$filename = $_FILES['image']['name'];
 			$filename = uniqueFilename( $quarantine, stripslashes( $filename ) );
 			$destination = $quarantine . $filename;
 			move_uploaded_file( $_FILES['image']['tmp_name'], $destination );
-			echo "Unaccepted file type. Accepted file types are: jpg, gif, png, mp3, ogg, wmv, mp4, mpg.";
+			echo "Unaccepted file type. Accepted file types are: jpg, gif, png.";
 			mail( "ray@mysocalled.com", "[" . $_SERVER["REMOTE_ADDR"] . "] - SUSPICIOUS UPLOAD!!! " . $_SESSION['username'], requestDetail(), "From: offensive@themaxx.com (this might be offensive)\r\nPriority: urgent" );
 			exit;
 		}
@@ -56,8 +57,8 @@
 
 		if( is_array( $matches ) ) {
 			$file_extension = $matches[0];
-			if( ! preg_match( "/(jpg|jpeg|gif|png|mp3|ogg|mov|wmv|mpg|mp4)/i", $file_extension ) ) {
-				?>Accepted file types: jpg, gif, png, mp3, ogg, mov, wmv, mp4, mpg.<?php
+			if( ! preg_match( "/(jpg|jpeg|gif|png)/i", $file_extension ) ) {
+				?>Accepted file types: jpg, gif, png.<?php
 				exit;
 			}
 		}
