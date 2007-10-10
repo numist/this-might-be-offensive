@@ -21,8 +21,9 @@ database_name = "name_of_the_database_to_use"
 -[End Above]---------------------------------------
 
 There are a few dependencies for the site, the only
-program is should depend on now is Imagemagik. The site
-also has perl scripts which require the following modules:
+packages it should depend on now are ImageMagik, perl 
+and php. The site has perl scripts which require the 
+following modules:
 
 DBI
 File::Copy

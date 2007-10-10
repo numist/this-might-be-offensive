@@ -1,31 +1,4 @@
-gofast(er) - jonxp
-  sql query optimization
-	EXPLAIN EXTENDED SELECT blah blah blah;
-	show warnings;
-	alter table FOO add index this_to_that (this, that);
-	optimize table FOO;
-	lather, rinse, repeat
-
-bring back stats
-	stats (cached daily update instead of offensive/content/stats.php)
-	
-register_globals dependency
-
-thumbnail creation on load, then cached
-    Everyone-requested
-
-proper outpage on porkchop/repost upload
-    raveneyes && numist-requested
-
-expire reset tokens
-    tarkheena-requested
-
-map - numist?
-    multiply requested, but probably needs to be (re)implemented from scratch
-    
-paginated index - numist
-    removing cron job reliance
-    dynamic index data
-    
 comment thread changes - numist
     marker where you left off (grab it from #xxxx in $_GET)
+
+analytics on site - numist
