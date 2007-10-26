@@ -314,6 +314,8 @@
         }
 
 	
+	$numgood = 0;
+	$numbad = 0;
 	while( $row = mysql_fetch_assoc( $result ) ) {
 	?>
 	<a name="<?= $row['commentid'] ?>"></a>
@@ -351,7 +353,20 @@
 			echo "<a href=\"./?c=user&userid=" . $row['userid'] . "\">" . $row['username'] . "</a>";
 						
 			if( $row['vote'] ) {
-				echo "<span class='vote" . additionalCssFor( $row['vote'] ) . "'> [ " . $row['vote'] . " ]</span>";
+				$thevote = $row['vote'];
+
+				echo "<span class='vote" . additionalCssFor( $thevote ) . "'> [ " . $thevote . " ]</span>";
+				if( $row['vote'] ) {
+					if( $thevote == 'this is good' ) {
+						$numgood++;
+						echo "<span class='votecount'><span class='good'>+$numgood</span></span>";
+					}
+					else if( $thevote == 'this is bad' ) {
+						$numbad++;
+						echo "<span class='votecount'><span class='bad'>-$numbad</span></span>";
+					}
+				}
+				
 				if( $row['userid'] == $_SESSION['userid'] ) {
 					$already_voted = true;
 				}		

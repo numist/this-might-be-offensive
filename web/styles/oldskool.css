@@ -57,7 +57,7 @@ A:visited {
 	text-align:center;
 }
 
-.vote, label {
+.vote, label, .votecount {
 	font-weight:bold;
 	font-size:9px;
 }
@@ -176,8 +176,12 @@ table.thumbnails td a {
 	text-decoration:none;
 }
 
-.timestamp {
+
+.timestamp, .votecount {
 	color:#9999cc;
+}
+
+.timestamp {
 	font-size:10px;
 	padding-left:8px;
 	float:right;
@@ -202,4 +206,12 @@ table.thumbnails td a {
 
 .nowrap {
 	white-space:nowrap;
+}
+
+.votecount {
+	font-weight:normal;
+}
+
+.votecount .good, .votecount .bad {
+	padding-left:5px;
 }
