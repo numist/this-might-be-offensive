@@ -355,17 +355,10 @@
 			if( $row['vote'] ) {
 				$thevote = $row['vote'];
 
-				echo "<span class='vote" . additionalCssFor( $thevote ) . "'> [ " . $thevote . " ]</span>";
-				if( $row['vote'] ) {
-					if( $thevote == 'this is good' ) {
-						$numgood++;
-						echo "<span class='votecount'><span class='good'>+$numgood</span></span>";
-					}
-					else if( $thevote == 'this is bad' ) {
-						$numbad++;
-						echo "<span class='votecount'><span class='bad'>-$numbad</span></span>";
-					}
-				}
+				$numgood += ($thevote == 'this is good') ? 1 : 0;
+				$numbad += ($thevote == 'this is bad') ? 1 : 0;
+
+				echo "<span title=\"+$numgood -$numbad\" class='vote" . additionalCssFor( $thevote ) . "'> [ " . $thevote . " ]</span>";
 				
 				if( $row['userid'] == $_SESSION['userid'] ) {
 					$already_voted = true;
