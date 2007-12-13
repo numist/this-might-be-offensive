@@ -66,6 +66,8 @@
 
 		while( $row = mysql_fetch_assoc( $result ) ) {
 			$css = ($css == "even_row") ? "odd_row" : "even_row";
+			$row['filename'] = str_replace(array("<", ">", "\""), array("&lt;", "&gt;", "&quot;"),
+					           preg_replace("/&(?!#)/", "&amp;", $row['filename'] ));
 			?>
 				<tr class="<?= $css ?>">
 					<td><a href="./?c=comments&fileid=<?= $row['fileid'] ?>"><?= $row['filename'] ?></a></td>
