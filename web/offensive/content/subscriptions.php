@@ -57,6 +57,8 @@
 		<div class="bluebox" style="text-align:left">	
 <?
 		while( $row = mysql_fetch_assoc( $result ) ) {
+		  $row['filename'] = str_replace(array("<", ">", "\""), array("&lt;", "&gt;", "&quot;"),
+					           preg_replace("/&(?!#)/", "&amp;", $row['filename'] ));
 			?>
 		
 			<div class="entry" style="<?php echo nextStyle()?>">
