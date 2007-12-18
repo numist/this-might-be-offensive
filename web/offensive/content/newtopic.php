@@ -32,7 +32,7 @@
 		$link = openDbConnection();
 		$comment = mysql_real_escape_string( stripslashes( $comment ) );
 		$sql = "insert into offensive_comments( userid, fileid, comment, user_ip )
-				values( $uid, $topicid, '$comment', '" . $_SERVER['REMOTE_ADDR'] . "' )";
+				values( $uid, $topicid, '".mysql_real_escape_string($comment)."', '" . $_SERVER['REMOTE_ADDR'] . "' )";
 		mysql_query( $sql, $link );
 		
 		$commentid = mysql_insert_id( $link );
@@ -50,7 +50,7 @@
 		$link = openDbConnection();
 		$topic = mysql_real_escape_string( stripslashes($topic) );
 		$sql = "insert into offensive_uploads ( userid, filename, ip, type )
-					VALUES ( $uid, '$topic', '" . $_SERVER['REMOTE_ADDR'] . "', 'topic' )";
+					VALUES ( $uid, '".mysql_real_escape_string($topic)."', '" . $_SERVER['REMOTE_ADDR'] . "', 'topic' )";
 					
 		mysql_query( $sql, $link );
 

@@ -9,7 +9,7 @@
 	
 		$sql = "SELECT id, filename, offensive_uploads.timestamp, users.userid, username, offensive_uploads.type
 					FROM offensive_uploads, users
-					WHERE filename LIKE '%$find%'
+					WHERE filename LIKE '%".mysql_real_escape_string($find)."%'
 					AND offensive_uploads.userid = users.userid
 					ORDER BY offensive_uploads.timestamp DESC
 					LIMIT 100;

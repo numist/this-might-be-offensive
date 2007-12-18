@@ -91,7 +91,7 @@
 
 <body bgcolor="#333366" link="#000066" vlink="#000033">
 
- <?php include( $DOCUMENT_ROOT . "/includes/headerbuttons.txt" );?>
+ <?php include( "includes/headerbuttons.txt" );?>
 <br>
 
 	<div id="content">

@@ -130,7 +130,7 @@
 			$repost = $_REQUEST['repost'] != "" ? 1 : 0;
 			$subscribe = $_REQUEST['subscribe'] != "" ? 1 : 0;
 			$sql = "INSERT INTO offensive_comments ( userid, fileid, comment, vote, offensive, repost, user_ip )";
-			$sql .= " VALUES ( $usrid, $fileid, '$comment', '$vote', $offensive, $repost, '" . $_SERVER['REMOTE_ADDR'] . "')";
+			$sql .= " VALUES ( $usrid, $fileid, '".mysql_real_escape_string($comment)."', '$vote', $offensive, $repost, '" . mysql_real_escape_string($_SERVER['REMOTE_ADDR']) . "')";
 		
 			if( ! ($comment == "" && $vote == null && $offensive == 0 && $repost == 0) ) {
 				$result = mysql_query( $sql );

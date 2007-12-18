@@ -66,7 +66,7 @@ Enjoy.
 		$email = mysql_real_escape_string( $email );
 
 		$sql = "insert into referrals ( userid, referral_code, email )
-					values( $uid, '$referral_code', '$email' );
+					values( $uid, '$referral_code', '".mysql_real_escape_string($email)."' );
 		";
 		
 		mysql_query( $sql );

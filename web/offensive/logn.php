@@ -58,7 +58,7 @@
 		$uname = mysql_real_escape_string( $_REQUEST['username'] );
 		$pw = mysql_real_escape_string( $_REQUEST['password'] );
 		$ip = $_SERVER['REMOTE_ADDR'];
-		$sql = "insert into failed_logins (username,ip) VALUES ( '$uname', '$ip' )";
+		$sql = "insert into failed_logins (username,ip) VALUES ( '".mysql_real_escape_string($uname)."', '$ip' )";
 		@mysql_query( $sql );
 		
 		$sql = "select count(id) as thecount from failed_logins where ip='$ip' and timestamp > date_sub( now(), interval 1 day )";
@@ -166,7 +166,7 @@
 
         $encrypted_pw = sha1( $pw );
 		
-		$query = "SELECT userid, username, account_status FROM users WHERE username = '" . $name . "' AND password = '" . $encrypted_pw . "'";
+		$query = "SELECT userid, username, account_status FROM users WHERE username = '" . mysql_real_escape_string($name) . "' AND password = '" . $encrypted_pw . "'";
 
 		$result = mysql_query($query) or die("Login query failed." );
 	

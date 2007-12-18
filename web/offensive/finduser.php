@@ -3,7 +3,7 @@
 	// Include, and check we've got a connection to the database.
 	include_once( '../admin/mysqlConnectionInfo.php' ); $link = openDbConnection();
 	
-	$sql = "select userid from users where username like '" . $_REQUEST['finduser'] . "'";
+	$sql = "select userid from users where username like '" . mysql_real_escape_string($_REQUEST['finduser']) . "'";
 
 	$result = mysql_query($sql);
 

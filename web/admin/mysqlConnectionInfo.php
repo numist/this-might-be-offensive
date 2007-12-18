@@ -114,7 +114,7 @@ if (!function_exists('file_put_contents')) {
     }
 }
 
-
+ini_set("include_path", ini_get("include_path").":/hsphere/local/home/thismightbe/thismight.be");
 
 
 
