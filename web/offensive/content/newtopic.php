@@ -30,7 +30,6 @@
 
 	function addComment( $topicid, $comment, $uid ) {
 		$link = openDbConnection();
-		$comment = mysql_real_escape_string( stripslashes( $comment ) );
 		$sql = "insert into offensive_comments( userid, fileid, comment, user_ip )
 				values( $uid, $topicid, '".mysql_real_escape_string($comment)."', '" . $_SERVER['REMOTE_ADDR'] . "' )";
 		mysql_query( $sql, $link );
