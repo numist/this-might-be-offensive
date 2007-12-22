@@ -127,8 +127,8 @@
 		
 		$destination = $imagePath . $filename;
 
-		move_uploaded_file( $_FILES['image']['tmp_name'], $destination );
-		
+		move_uploaded_file( $_FILES['image']['tmp_name'], $destination ) or die("bam, dead");
+
 		chmod($destination, 0644);
 		
 		$curdate = time();
@@ -143,7 +143,8 @@
 		ensureDirExists( $destDir );
 
 #		copy( $destination, "$filePath/$destDir/$entry_id$file_extension" );
-		copy( $destination, "$filePath/$destDir/$filename" );
+
+		copy( $destination, "$filePath/$destDir/$filename" ) or die("bam, dead");
 
 		if( $typeName == "image" ) {
 			ensureDirExists( "$destDir/thumbs" );

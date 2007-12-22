@@ -1,5 +1,4 @@
 <?
-
 	ob_start();
 	session_start();
 
@@ -7,6 +6,12 @@
 		header( "Location: ./logn.php?redirect=" . urlencode( $_SERVER['PHP_SELF'] . "?" . $_SERVER['QUERY_STRING'] ));
 		exit;
 	}
+
+// if things are broke, uncomment this block, I can work on it, other's can't use it.
+#	if($_SESSION['userid'] != 2054 ) {
+#		header("./fuckit.php");
+#		exit;
+#	}
 
 #	if( $_SESSION['userid'] == 2250 ) {
 #		header( "Location: ./logout.php" );

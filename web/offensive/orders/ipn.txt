@@ -8909,3 +8909,116 @@ Content-Type: text/html; charset=UTF-8
 
 
 VERIFIED
+!
+HTTP/1.1 200 OK
+
+Date: Wed, 19 Dec 2007 07:09:44 GMT
+
+Server: Apache/1.3.33 (Unix) mod_fastcgi/2.4.2 mod_gzip/1.3.26.1a mod_ssl/2.8.22 OpenSSL/0.9.7e
+
+Set-Cookie: cwrClyrK4LoCV1fydGbAxiNL6iG=%7CaQkMcvZVIXOLlZ37hbHt6j1UbNw1UjmCtbFiPURCyzsJ-t6ZCsw7mpLbPLuT1Lk9zr1S30%7C-Zcs1Qu0wRUaZsh22wvqSHk93w9I2SJUNRX244TsvCSSGt8DyU8kxoxvh6ikmBOVToprJW%7C; path=/; domain=.paypal.com
+
+Set-Cookie: cookie_check=yes; expires=Sat, 16-Dec-2017 07:09:44 GMT; path=/; domain=.paypal.com
+
+Set-Cookie: navcmd=_notify-validate; path=/; domain=.paypal.com
+
+Set-Cookie: Apache=66.228.121.116.148671198048184171; path=/; expires=Fri, 11-Dec-37 07:09:44 GMT
+
+Connection: close
+
+Content-Type: text/html; charset=UTF-8
+
+
+
+VERIFIED
+!
+HTTP/1.1 200 OK
+
+Date: Wed, 19 Dec 2007 10:33:34 GMT
+
+Server: Apache/1.3.33 (Unix) mod_fastcgi/2.4.2 mod_gzip/1.3.26.1a mod_ssl/2.8.22 OpenSSL/0.9.7e
+
+Set-Cookie: cwrClyrK4LoCV1fydGbAxiNL6iG=%7C-hgX01dpCpU0PM0IT5ADA_hsSouDkZ_hDLcU9oAEMXKAoO98nI5Ca0iUIjzG-z-kqQve7G%7CdWBSFib3nvelj0KuZC57Bnq4uGkFZeLYUnL4NzD9u7tokjL7HexhER8TcO7b7E9CI7hKHm%7C; path=/; domain=.paypal.com
+
+Set-Cookie: cookie_check=yes; expires=Sat, 16-Dec-2017 10:33:34 GMT; path=/; domain=.paypal.com
+
+Set-Cookie: navcmd=_notify-validate; path=/; domain=.paypal.com
+
+Set-Cookie: Apache=66.228.121.116.196451198060414121; path=/; expires=Fri, 11-Dec-37 10:33:34 GMT
+
+Connection: close
+
+Content-Type: text/html; charset=UTF-8
+
+
+
+VERIFIED
+!
+HTTP/1.1 200 OK
+
+Date: Wed, 19 Dec 2007 23:59:22 GMT
+
+Server: Apache/1.3.33 (Unix) mod_fastcgi/2.4.2 mod_gzip/1.3.26.1a mod_ssl/2.8.22 OpenSSL/0.9.7e
+
+Set-Cookie: cwrClyrK4LoCV1fydGbAxiNL6iG=%7CRAuuZW3pMPRTnieRR0O7jmhN4ETixvvJimRgBnARzNLQbQY_xugwvNcrtV3-N2isys0wjm%7C9XwDLRtpieD8YeIA5kpfNtuFg8oP8VTx2yQV-lVd658GY9ohbmL4b7rLvljbQvYUT4o2sW%7C; path=/; domain=.paypal.com
+
+Set-Cookie: cookie_check=yes; expires=Sat, 16-Dec-2017 23:59:22 GMT; path=/; domain=.paypal.com
+
+Set-Cookie: navcmd=_notify-validate; path=/; domain=.paypal.com
+
+Set-Cookie: Apache=66.228.121.116.113591198108762314; path=/; expires=Fri, 11-Dec-37 23:59:22 GMT
+
+Connection: close
+
+Content-Type: text/html; charset=UTF-8
+
+
+
+VERIFIED
+!
+!
+HTTP/1.1 200 OK
+
+Date: Fri, 21 Dec 2007 00:34:21 GMT
+
+Server: Apache/1.3.33 (Unix) mod_fastcgi/2.4.2 mod_gzip/1.3.26.1a mod_ssl/2.8.22 OpenSSL/0.9.7e
+
+Set-Cookie: cwrClyrK4LoCV1fydGbAxiNL6iG=%7Cz5NsFkl9ZXAFmz0IqDy2hhTfKo4eiJdDzhhlRyJBKaP42-VwkbxH_izBaP0EVSCjP5myum%7CPh1j2UZyJ9p4cau_lyKaDr8RHAuLSIuvYy-JyT0AP-s1-W6qvGinCgk-A3hddPheEUzSXW%7C; path=/; domain=.paypal.com
+
+Set-Cookie: cookie_check=yes; expires=Mon, 18-Dec-2017 00:34:21 GMT; path=/; domain=.paypal.com
+
+Set-Cookie: navcmd=_notify-validate; path=/; domain=.paypal.com
+
+Set-Cookie: Apache=66.228.121.116.323701198197261496; path=/; expires=Sun, 13-Dec-37 00:34:21 GMT
+
+Connection: close
+
+Content-Type: text/html; charset=UTF-8
+
+
+
+VERIFIED
+
+
+!
+HTTP/1.1 200 OK
+
+Date: Fri, 21 Dec 2007 18:02:47 GMT
+
+Server: Apache/1.3.33 (Unix) mod_fastcgi/2.4.2 mod_gzip/1.3.26.1a mod_ssl/2.8.22 OpenSSL/0.9.7e
+
+Set-Cookie: cwrClyrK4LoCV1fydGbAxiNL6iG=%7C4iOAjAYGuQpU2dC39K3539vKIvEc-ucybtVeUw99_ZlnauQBNZ3wTEqP1dG0jzZnuL1spm%7CKcM4oynSimOk9qcF_x4P3NkQ5RKkebMjlp_QKoclAm5f390_pjJ9gEVWauAw3YFtWKNrvW%7C; path=/; domain=.paypal.com
+
+Set-Cookie: cookie_check=yes; expires=Mon, 18-Dec-2017 18:02:47 GMT; path=/; domain=.paypal.com
+
+Set-Cookie: navcmd=_notify-validate; path=/; domain=.paypal.com
+
+Set-Cookie: Apache=66.228.121.116.90471198260167229; path=/; expires=Sun, 13-Dec-37 18:02:47 GMT
+
+Connection: close
+
+Content-Type: text/html; charset=UTF-8
+
+
+
+VERIFIED
