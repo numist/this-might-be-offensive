@@ -47,7 +47,6 @@
 	function createTopic( $topic, $uid ) {
 		
 		$link = openDbConnection();
-		$topic = mysql_real_escape_string( stripslashes($topic) );
 		$sql = "insert into offensive_uploads ( userid, filename, ip, type )
 					VALUES ( $uid, '".mysql_real_escape_string($topic)."', '" . $_SERVER['REMOTE_ADDR'] . "', 'topic' )";
 					
