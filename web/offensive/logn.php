@@ -67,7 +67,7 @@
 		$row = mysql_fetch_assoc( $result );
 		$count = $row['thecount'];
 		if( $count > 3 ) {
-			mail( "ray@sneakymeans.com,jerrywilborn@gmail.com", "[" . $_SERVER["REMOTE_ADDR"] . "] - $count FAILED LOGIN ATTEMPTS TODAY!!! ", requestDetail(), "From: offensive@themaxx.com (this might be offensive)\r\nPriority: urgent" );
+			mail( "ray@sneakymeans.com", "[" . $_SERVER["REMOTE_ADDR"] . "] - $count FAILED LOGIN ATTEMPTS TODAY!!! ", requestDetail(), "From: offensive@themaxx.com (this might be offensive)\r\nPriority: urgent" );
 			$login_message = '<a href="./pwreset.php">forgot your password?</a>';
 		}	
 

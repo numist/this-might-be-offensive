@@ -1,9 +1,26 @@
 <?
+	/* if tmbo is going down for an upgrade, set this to true and get to work.
+	 * this will redirect users to an upgrading page, and will put a notice
+	 * at the top of all index pages notifying admins that the site is being
+	 * worked on.
+	 */
+	$upgrading = false;
+
+/*****************************************************************************/
+
 	ob_start();
 	session_start();
 
 	if( ! is_numeric( $_SESSION['userid'] ) ) {
 		header( "Location: ./logn.php?redirect=" . urlencode( $_SERVER['PHP_SELF'] . "?" . $_SERVER['QUERY_STRING'] ));
+		exit;
+	}
+
+	// in an emergency, break glass:
+	if( $upgrading &&
+	    (!array_key_exists("status", $_SESSION) ||
+	    $_SESSION['status'] != "admin") ) {
+		header("Location: ./index.upgrade.php");
 		exit;
 	}
 
@@ -96,7 +113,12 @@
 
 <body bgcolor="#333366" link="#000066" vlink="#000033">
 
- <?php include( "includes/headerbuttons.txt" );?>
+ <?php 
+	if($upgrading) {
+		echo "upgrade in progress.  if you're not doing it, don't touch anything.\n";
+	}
+	include( "includes/headerbuttons.txt" );
+?>
 <br>
 
 	<div id="content">
