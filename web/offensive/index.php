@@ -263,7 +263,7 @@ if(ini_get("magic_quotes_gpc") == true)
 				<div class="blackbar"></div>
 				<div class="heading">archives:</div>
 				<div class="bluebox">
-					<?php require( 'offensive/ziplist.inc' ); ?>
+					<?php require( 'offensive/ziplist.txt' ); ?>
 				</div>
 
 				<div class="heading" style="text-align:center">
