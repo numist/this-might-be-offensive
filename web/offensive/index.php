@@ -263,7 +263,7 @@ if(ini_get("magic_quotes_gpc") == true)
 				<div class="blackbar"></div>
 				<div class="heading">archives:</div>
 				<div class="bluebox">
-					<?php require( 'offensive/ziplist.txt' ); ?>
+					<?php require( 'offensive/ziplist.inc' ); ?>
 				</div>
 
 				<div class="heading" style="text-align:center">
@@ -382,7 +382,7 @@ if(ini_get("magic_quotes_gpc") == true)
 	<?
 	
 		while( $row = mysql_fetch_assoc( $result ) ) {
-			$css = $css == "evenfile" ? "oddfile" : "evenfile";
+			$css = isset($css) && $css == "evenfile" ? "oddfile" : "evenfile";
 	?>
 			<div class="clipper"><a class="<?= $css ?>" href="?c=comments&fileid=<?= $row['fileid'] ?>#<?= $row['commentid']?>"><?= 
 			    htmlEscape($row['filename']);
