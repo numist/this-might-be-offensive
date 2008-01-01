@@ -70,7 +70,7 @@
 		
 		
 			if( (($count++) % $THUMBS_PER_ROW) == 0 ) {
-				$css = ($css == "even_row") ? "odd_row" : "even_row";
+				$css = (isset($css) && $css == "even_row") ? "odd_row" : "even_row";
 				?><tr class="<?= $css ?>"><?
 			}
 		

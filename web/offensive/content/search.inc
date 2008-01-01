@@ -49,7 +49,7 @@
 
 	function renderResults( $result ) {
 		while( $row = mysql_fetch_assoc( $result ) ) {
-			$css = ($css == "background:#bbbbee;") ? "" : "background:#bbbbee;";
+			$css = (isset($css) && $css == "") ? "background:#bbbbee;" : "";
 			?>
 			<div class="entry" style="<?= $css ?>">
 			<?

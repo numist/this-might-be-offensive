@@ -120,6 +120,14 @@
 			$filesize = round($filesize/1024);
 		}
 		
+		$sql = "INSERT INTO offensive_uploads ( userid,filename,ip,nsfw,tmbo,hash,type,status )
+		                VALUES ( " . $_SESSION['userid'] . ", '" . sqlEscape( $filename ) . "', '" . $_SERVER['REMOTE_ADDR'] . "', $nsfw, $tmbo, '$hash', '" . typeFor( $fileinfo["fileformat"] ) . "', 'pending' ) ";
+
+
+		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+
+		$entry_id = mysql_insert_id();
+
 		$destination = $imagePath . $filename;
 
 		move_uploaded_file( $_FILES['image']['tmp_name'], $destination ) or
@@ -148,14 +156,6 @@
 #			shell_exec( "convert -resize 100x100 \"$destDir/$entry_id$file_extension\" \"$destDir/thumbs/th$entry_id$file_extension\"" );
 			shell_exec( "convert -resize 100x100 \"$destDir/$filename\" \"$destDir/thumbs/th$entry_id$file_extension\"" );
 		}
-
-		$sql = "INSERT INTO offensive_uploads ( userid,filename,ip,nsfw,tmbo,hash,type,status )
-		                VALUES ( " . $_SESSION['userid'] . ", '" . sqlEscape( $filename ) . "', '" . $_SERVER['REMOTE_ADDR'] . "', $nsfw, $tmbo, '$hash', '" . typeFor( $fileinfo["fileformat"] ) . "', 'pending' ) ";
-
-
-		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
-
-		$entry_id = mysql_insert_id();
 
 		$sql = "insert into offensive_subscriptions (userid, fileid )
 		                values ( " . $_SESSION['userid'] . ", $entry_id ) ";
@@ -227,7 +227,7 @@
 	function pathFor( $format ) {
 		global $filePath;
 		
-		if( isAvatarUpload( $_REQUEST['avatar'] ) ) {
+		if( isAvatarUpload() ) {
 			return $filePath . "/images/users/";
 		}
 		

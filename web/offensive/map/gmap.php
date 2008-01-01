@@ -8,8 +8,8 @@
 
 	require_once( 'admin/mysqlConnectionInfo.inc' );
 
-	$x = $_REQUEST['x'];
-	$y = $_REQUEST['y'];
+	$x = array_key_exists("x", $_REQUEST) ? $_REQUEST['x'] : "";
+	$y = array_key_exists("y", $_REQUEST) ? $_REQUEST['y'] : "";
 
 	if( is_numeric( $x ) ) {
 		setMaxxerLoc( $_SESSION['userid'], $x, $y );

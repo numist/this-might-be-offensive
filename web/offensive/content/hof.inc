@@ -46,7 +46,7 @@
 		$count = 0;
 
 		while( $row = mysql_fetch_assoc( $result ) ) {
-			$css = $css == "evenfile" ? "oddfile" : "evenfile";
+			$css = isset($css) && $css == "evenfile" ? "oddfile" : "evenfile";
 			if( $row['userid'] == $_SESSION['userid'] ) {
 				$css = "odd_row";
 			}
