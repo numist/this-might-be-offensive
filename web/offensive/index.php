@@ -294,16 +294,11 @@ if(ini_get("magic_quotes_gpc") == true)
 					</div>
 				<div class="blackbar"></div>
 			</div>
-<!--			<div class="contentbox">
+			<div class="contentbox">
 				<div class="blackbar"></div>
-				<div class="heading">who's on:</div>
-				<div class="bluebox">
-					<table style="width:100%">
 					<? whosOn(); ?>
-					</table>
-				</div>
 				<div class="blackbar"></div>
-			</div> -->
+			</div>
 			
 		</div> <!-- end left column -->
 		
@@ -418,15 +413,41 @@ if(ini_get("magic_quotes_gpc") == true)
 
 	function whosOn() {
 		global $link;
+
+		// how many users to display in the online list
+		$userlimit = 20;
+		// how long before a user is considered not online anymore
+		$timelimit = 10;
+
 		if(!isset($link) || !$link) $link = openDbConnection();
-		$sql = "SELECT userid, username
-		FROM users
-		WHERE timestamp > DATE_SUB( now( ) , INTERVAL 5 MINUTE)";
+
+		// get the total number of users online
+		$sql = "SELECT COUNT(*) FROM users WHERE timestamp > DATE_SUB( now( ) , INTERVAL $timelimit MINUTE)";
+		$result = mysql_query($sql) or trigger_error(mysql_error(), E_USER_ERROR);
+		list($nonline) = mysql_fetch_array($result);
+
+		// start us off.
+		echo "<div class=\"heading\">who's on($nonline):</div>
+					<div class=\"bluebox\">
+						<table style=\"width:100%\">\n";
+		
+		// list out the latest people to do something
+		$sql = "SELECT userid, username FROM users WHERE timestamp > DATE_SUB( now( ) , INTERVAL $timelimit MINUTE) && userid != ".$_SESSION['userid']." ORDER BY timestamp DESC LIMIT $userlimit";
 		$result = mysql_query($sql) or trigger_error(mysql_error(), E_USER_ERROR);
 		while(false !== (list($userid, $username) = mysql_fetch_array($result))) {
 			$css = (!isset($css) || $css == "odd") ? "even" : "odd";
-			echo "<tr class=\"".$css."_row\"><td class=\"".$css."file\"><a href=\"./?c=user&userid=$userid\">$username</a></td></tr>";
+			echo "<tr class=\"".$css."_row\"><td class=\"".$css."file\"><a href=\"./?c=user&userid=$userid\">$username</a></td></tr>\n";
 		}
+
+		$css = (!isset($css) || $css == "odd") ? "even" : "odd";
+		// obviously, we're online.
+		if($nonline < $userlimit) {
+			echo "<tr class=\"".$css."_row\"><td class=\"".$css."file\"><a href=\"./?c=user&userid=".$_SESSION['userid']."\">".$_SESSION['username']."</a></td></tr>\n";
+		} else if($nonline > $userlimit) {
+			echo "<tr class=\"".$css."_row\"><td class=\"".$css."file\">and ".($nonline - $userlimit)." more</td></tr>\n";
+		}
+
+		echo "\t\t\t\t\t\t</table>\n\t\t\t\t\t</div>\n";
 	}
 
 	
