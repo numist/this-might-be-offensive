@@ -251,8 +251,8 @@
 function emitFileRow( $css, $id, $filename, $comments, $good, $bad, $offensive, $timestamp ) {
 ?>
 	<tr>
-		<td style="width:100%" class="<?php echo $class?>"><div class="clipper"><a href="pages/pic.php?id=<?php echo $id ?>" class="<?php echo $css?>"><?= maxString(htmlEscape($filename),45) ?></div></td>
-		<td class="<?php echo $class?>" style="text-align:right;white-space:nowrap;width:100%"><a href="./?c=comments&fileid=<?php echo $id ?>" class="<?php echo $css?>"><? echo "$comments comments (+$good -$bad x$offensive)" ?></a></td>
+		<td style="width:100%" class="<?php echo $css?>"><div class="clipper"><a href="pages/pic.php?id=<?php echo $id ?>" class="<?php echo $css?>"><?= maxString(htmlEscape($filename),45) ?></div></td>
+		<td class="<?php echo $css?>" style="text-align:right;white-space:nowrap;width:100%"><a href="./?c=comments&fileid=<?php echo $id ?>" class="<?php echo $css?>"><? echo "$comments comments (+$good -$bad x$offensive)" ?></a></td>
 		<td style="text-align:right;white-space:nowrap;width:100%" class="<?php echo $css?>"><?php echo $timestamp?></td>
 	</tr>
 <?

@@ -294,6 +294,16 @@ if(ini_get("magic_quotes_gpc") == true)
 					</div>
 				<div class="blackbar"></div>
 			</div>
+<!--			<div class="contentbox">
+				<div class="blackbar"></div>
+				<div class="heading">who's on:</div>
+				<div class="bluebox">
+					<table style="width:100%">
+					<? whosOn(); ?>
+					</table>
+				</div>
+				<div class="blackbar"></div>
+			</div> -->
 			
 		</div> <!-- end left column -->
 		
@@ -406,7 +416,18 @@ if(ini_get("magic_quotes_gpc") == true)
 	
 	}
 
-
+	function whosOn() {
+		global $link;
+		if(!isset($link) || !$link) $link = openDbConnection();
+		$sql = "SELECT userid, username
+		FROM users
+		WHERE timestamp > DATE_SUB( now( ) , INTERVAL 5 MINUTE)";
+		$result = mysql_query($sql) or trigger_error(mysql_error(), E_USER_ERROR);
+		while(false !== (list($userid, $username) = mysql_fetch_array($result))) {
+			$css = (!isset($css) || $css == "odd") ? "even" : "odd";
+			echo "<tr class=\"".$css."_row\"><td class=\"".$css."file\"><a href=\"./?c=user&userid=$userid\">$username</a></td></tr>";
+		}
+	}
 
 	
 ?>

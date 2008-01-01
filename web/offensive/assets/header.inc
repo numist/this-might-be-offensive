@@ -1,5 +1,7 @@
 <?php
 
+/* all pages require an active session eventually */
+
 session_start();
 
 /*  _                   _
@@ -61,6 +63,18 @@ function tmbo_error_handler($errno, $errstr, $errfile, $errline, $errcontext) {
 }
 set_error_handler("tmbo_error_handler");
 
+/* timezone error fix applies to all pages */
 date_default_timezone_set("America/Chicago");
+
+if(array_key_exists("userid", $_SESSION)) {
+	global $link;
+
+	if(!isset($link) || !$link) {
+		require_once("admin/mysqlConnectionInfo.inc");
+		$link = openDbConnection();
+	}
+	
+	mysql_query("UPDATE users SET timestamp=now() WHERE userid=".$_SESSION['userid']." LIMIT 1") or trigger_error(mysql_error(), E_USER_ERROR);
+}
 
 ?>

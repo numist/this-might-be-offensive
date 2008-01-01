@@ -13,17 +13,17 @@
 
 	function body() {
 ?>
-	<div class="heading">noobs.</div>
+	<div class="heading">newbies.</div>
 <?
 		tabs();
 ?>
 		<div class="bluebox">
-			<? noobs(); ?>
+			<? newbs(); ?>
 		</div>
 <?
 	}
 
-	function noobs() {
+	function newbs() {
 
 ?>
 
@@ -48,7 +48,7 @@
 
 ?>
 				<tr style="background:#bbbbee;">
-					<td><div class="clipper">noob</div></td>
+					<td><div class="clipper">newb</div></td>
 					<td>joined</td>
 					<td style="text-align:right;white-space:nowrap">thanks to</td>
 				</tr>
