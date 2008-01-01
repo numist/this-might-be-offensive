@@ -400,7 +400,15 @@
 					<div style="float:right"><? toggleThumbnailLink() ?></div>
 					<?
 						if( showThumbnails() ) {
-							if( ( isSquelched( $uploaderid ) ) || ($nsfw == 1 && $_SESSION['prefs']['hide nsfw'] == 1) || ($tmbo == 1 && $_SESSION['prefs']['hide tmbo'] == 1) ) {
+							if( ( isSquelched( $uploaderid ) ) || 
+							    array_key_exists("prefs", $_SESSION) &&
+							    is_array($_SESSION['prefs']) &&
+							    ($nsfw == 1 && 
+							    array_key_exists("hide nsfw", $_SESSION['prefs']) &&
+							    $_SESSION['prefs']['hide nsfw'] == 1) || 
+							    ($tmbo == 1 && 
+							    array_key_exists("hide tmbo", $_SESSION['prefs']) &&
+							    $_SESSION['prefs']['hide tmbo'] == 1) ) {
 								?><div style="padding:40px;">[ thumbnail filtered ]</div><?
 							}
 							else {
