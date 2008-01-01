@@ -1,11 +1,16 @@
-<?php 
+<?php
+	set_include_path("..");
 	session_start();
-	// Include, and check we've got a connection to the database.
-	include_once( '../admin/mysqlConnectionInfo.php' ); $link = openDbConnection();
-	
-	$sql = "select userid from users where username like '" . mysql_real_escape_string($_REQUEST['finduser']) . "'";
+	require_once( 'offensive/assets/header.inc' );
 
-	$result = mysql_query($sql);
+	// Include, and check we've got a connection to the database.
+	require_once( 'admin/mysqlConnectionInfo.inc' );
+	if(!isset($link) || !$link) $link = openDbConnection();
+	require_once('offensive/functions.inc');
+	
+	$sql = "select userid from users where username like '" . sqlEscape($_REQUEST['finduser']) . "'";
+
+	$result = mysql_query($sql) or trigger_error(mysql_error(), E_USER_ERROR);
 
 	echo mysql_error();
 
@@ -19,13 +24,3 @@
 	}
 
 ?>
-
-<html>
-<body>
-
-not found.<br/>
-<?
-	include( 'finduserform.php' );
-?>
-</body>
-</html>

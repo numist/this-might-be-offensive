@@ -1,11 +1,12 @@
 <?
-		ob_start();
-		session_start();
+		set_include_path("..");
+		require_once("offensive/assets/header.inc");
 
 		header('Content-type: text/xml');
 
 		// Include, and check we've got a connection to the database.
-		include_once( '../admin/mysqlConnectionInfo.php' ); $link = openDbConnection();
+		include_once( 'admin/mysqlConnectionInfo.inc' );
+		if(!isset($link) || !$link) $link = openDbConnection();
 
 		$uid = $_SESSION['userid'];
 
@@ -21,7 +22,7 @@
 
 		$link = openDbConnection();
 
-		$result = mysql_query( $sql );
+		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
 		
 		if( mysql_num_rows( $result ) == 0 ) {
 			?><div>none</div><?

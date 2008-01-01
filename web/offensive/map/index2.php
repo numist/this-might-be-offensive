@@ -1,18 +1,20 @@
 <?
-	session_start();	
+	set_include_path("../..");
+	require_once( 'offensive/assets/header.inc' );
+
 	$usrid = $_SESSION['userid'];
 	if( ! is_numeric( $usrid ) ) {
 		session_unset();
-		header( "Location: ../?c=mustLogIn" );
+		header( "Location: ../" );
 	}
 
-	require_once( '../../admin/mysqlConnectionInfo.php' );
+	require_once( 'admin/mysqlConnectionInfo.inc' );
 	
 	$cells = array();
 	$cellSize = 100;
 	
 	function emitCellDetails() {
-		global $cells, $cellSize;
+		global $cells, $cellSize, $link;
 		$sql = "SELECT maxxer_locations.userid,
 						floor(x/$cellSize) as xCell,
 						floor(y/$cellSize) as yCell,
@@ -21,9 +23,9 @@
 		WHERE users.userid = maxxer_locations.userid
 		order by xCell, yCell, username";
 	
-		$link = openDbConnection();
+		if(!isset($link) || !$link) $link = openDbConnection();
 	
-		$result = mysql_query( $sql );
+		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
 		
 		$xCell = -1;
 		$yCell = -1;

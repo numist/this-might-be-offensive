@@ -1,9 +1,12 @@
 <?
-	// Include, and check we've got a connection to the database.
-	include_once( '../admin/mysqlConnectionInfo.php' ); $link = openDbConnection();
+	set_include_path("..");
+	require_once( 'offensive/assets/header.inc' );
 
-	require_once( 'activationFunctions.php' );
-	require_once( "validationFunctions.php" );
+	require_once( 'admin/mysqlConnectionInfo.inc' );
+	if(!isset($link) || !$link) $link = openDbConnection();
+	require_once( 'offensive/activationFunctions.inc' );
+	require_once( "offensive/validationFunctions.inc" );
+	require_once( 'offensive/functions.inc' );
 
 	if( $_REQUEST['x2'] ) {
 		$code = $_REQUEST['x2'];
@@ -18,7 +21,7 @@
 			$sql = "update users set password='$encrypted_pw' WHERE userid = $uid LIMIT 1";
 			
 			$link = openDbConnection();
-			@mysql_query( $sql );
+			@mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
 			header( "Location: ./logn.php" );
 		}	
 		else {
@@ -29,9 +32,9 @@
 	function sendResetEmail( $username ) {
 		
 		$link = openDbConnection();
-		$username = mysql_real_escape_string( $username );
+		$username = sqlEscape( $username );
 		$sql = "SELECT * FROM users WHERE username='$username'";
-		$result = mysql_query( $sql );
+		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
 		if( mysql_num_rows( $result ) == 1 ) {
 			$row = mysql_fetch_assoc( $result );
 			$code = hashFromUserRow( $row );
@@ -124,7 +127,7 @@ http://".$_SERVER['SERVER_NAME']."/offensive/pwreset.php?x=$code
 		if( is_numeric( $id ) && $id > 1 ) {
 			$link = openDbConnection();
 			$sql = "SELECT * FROM users WHERE userid = $id";
-			$result = mysql_query( $sql );
+			$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
 			if( mysql_num_rows( $result ) == 1 ) {
 				$row = mysql_fetch_assoc( $result );
 				$hash = hashFromUserRow( $row );

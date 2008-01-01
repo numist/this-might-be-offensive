@@ -9,7 +9,7 @@
 		<lastBuildDate><? echo date("r"); ?></lastBuildDate>
 
 <?
-	require_once( '../admin/mysqlConnectionInfo.php' ); $link = openDbConnection();
+	require_once( '../admin/mysqlConnectionInfo.inc' ); $link = openDbConnection();
 	
 	$sql = "select offensive_uploads.*, users.username
 			FROM offensive_uploads
@@ -18,7 +18,7 @@
 			ORDER BY timestamp DESC
 			LIMIT 200";
 
-	$result = mysql_query( $sql );
+	$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
 
 	while( $row = mysql_fetch_assoc( $result ) ) {
 		if( file_exists( "images/audio/" . $row['filename'] ) ) {

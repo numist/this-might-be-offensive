@@ -1,8 +1,10 @@
 <?
-	// Include, and check we've got a connection to the database.
-	include_once( '../admin/mysqlConnectionInfo.php' ); $link = openDbConnection();
+	set_include_path("..");
+	require_once("offensive/assets/header.inc");
 
-	session_start();
+	// Include, and check we've got a connection to the database.
+	require_once( 'admin/mysqlConnectionInfo.inc' );
+	if(!isset($link) || !$link) $link = openDbConnection();
 
 	$uid = $_SESSION['userid'];
 	$fileid = $_REQUEST['fileid'];
@@ -24,13 +26,13 @@
 	function subscribe( $uid, $fid ) {
 		$link = openDbConnection();
 		$sql = "insert into offensive_subscriptions (userid, fileid) values ( $uid, $fid )";
-		mysql_query( $sql );
+		mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
 	}
 
 	function unsubscribe( $uid, $fid ) {
 		$link = openDbConnection();
 		$sql = "delete from offensive_subscriptions where userid=$uid and fileid=$fid";
-		mysql_query( $sql );
+		mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
 	}
 
 ?>

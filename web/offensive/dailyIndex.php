@@ -1,6 +1,12 @@
 <?
+	header("Location: ./");
+	exit;
+
+	set_include_path("..");
+
 	session_start();
-	require_once( 'public.php' );
+	require_once( 'offensive/public.php' );
+	require_once( 'offensive/functions.php' );
 	
 	
 	$index = isset( $_REQUEST['id'] ) ? $_REQUEST['id'] : 0;

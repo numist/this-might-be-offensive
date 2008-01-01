@@ -1,4 +1,14 @@
 <?
+	/* if tmbo is down, and you're working on it,
+	 *          set this variable to true.
+	 * this will send non-admins to index.fixing.php,
+	 * helping to  prevent any further possible damage.
+	 */
+	$fixing = false;
+	// now, stay calm, let's do this thing.
+
+/*****************************************************************************/
+
 	/* if tmbo is going down for an upgrade, set this to true and get to work.
 	 * this will redirect users to an upgrading page, and will put a notice
 	 * at the top of all index pages notifying admins that the site is being
@@ -8,15 +18,15 @@
 
 /*****************************************************************************/
 
-	ob_start();
-	session_start();
+	set_include_path("..");
+	require_once("offensive/assets/header.inc");
 
 	if( ! is_numeric( $_SESSION['userid'] ) ) {
-		header( "Location: ./logn.php?redirect=" . urlencode( $_SERVER['PHP_SELF'] . "?" . $_SERVER['QUERY_STRING'] ));
+		header( "Location: ./logn.php?redirect=" . urlencode( $_SERVER['HTTP_REFERER']));
 		exit;
 	}
 
-	// in an emergency, break glass:
+	// in an upgrade, break glass:
 	if( $upgrading &&
 	    (!array_key_exists("status", $_SESSION) ||
 	    $_SESSION['status'] != "admin") ) {
@@ -24,32 +34,39 @@
 		exit;
 	}
 
-// if things are broke, uncomment this block, I can work on it, other's can't use it.
-#	if($_SESSION['userid'] != 2054 ) {
-#		header("./fuckit.php");
-#		exit;
-#	}
-
-#	if( $_SESSION['userid'] == 2250 ) {
-#		header( "Location: ./logout.php" );
-#		exit;
-#	}
+	// in an emergency, break glass:
+	if( $fixing && 
+	    (!array_key_exists("status", $_SESSION) ||
+	    $_SESSION['status'] != "admin") ) {
+		header("Location: ./index.fixing.php");
+		exit;
+	}
 
 	// Include, and check we've got a connection to the database.
-	include_once( '../admin/mysqlConnectionInfo.php' ); $link = openDbConnection();
+	require_once('admin/mysqlConnectionInfo.inc');
+	if(!isset($link) || !$link) $link = openDbConnection();
+	require_once('offensive/functions.inc');
 
 	if( isset( $_REQUEST['c'] ) ) {
 		$c = $_REQUEST['c'];
 	}
 	else {
-		$c = ($_COOKIE["thumbnails"] == "yes") ? "thumbs" : "images";
+		$c = (array_key_exists("thumbnails", $_COOKIE) && 
+		      $_COOKIE["thumbnails"] == "yes") ? 
+		      "thumbs" : "main";
+		header("Location: ./?c=$c");
+		exit;
 	}
 
-	if( ! file_exists( "content/{$c}.php" ) ) {
-		$c = "images";
+	if( ! file_exists( "content/{$c}.inc" ) ) {
+		header("Location: ./?c=".(
+		       array_key_exists("thumbnails", $_COOKIE) && 
+		       $_COOKIE["thumbnails"] == "yes" ? 
+		       "thumbs" : "main"));
+		exit;
 	}
 
-	include( "content/{$c}.php" );
+	require( "offensive/content/{$c}.inc" );
 
 	if( function_exists( 'start' ) ) {
 		start();
@@ -75,7 +92,6 @@
 	?>
 	</title>
 	<META NAME="ROBOTS" CONTENT="NOARCHIVE">
-	<meta name="generator" content="BBEdit 6.0.2">
 	<link rel="icon" href="/favicon.ico" />
 	<link rel="shortcut icon" href="/favicon.ico" />
 	<link rel="stylesheet" type="text/css" href="filepilestyle.css" />
@@ -113,11 +129,17 @@
 
 <body bgcolor="#333366" link="#000066" vlink="#000033">
 
- <?php 
+<?php 
+if(ini_get("magic_quotes_gpc") == true)
+	trigger_error("magic_quotes_gpc is enabled", E_USER_NOTICE); 
 	if($upgrading) {
 		echo "upgrade in progress.  if you're not doing it, don't touch anything.\n";
 	}
-	include( "includes/headerbuttons.txt" );
+	if($fixing) {
+		echo "someone's trying to fix the site.  if it's not you, try not to break anything.\n";
+	}
+
+	require( "includes/headerbuttons.txt" );
 ?>
 <br>
 
@@ -241,7 +263,7 @@
 				<div class="blackbar"></div>
 				<div class="heading">archives:</div>
 				<div class="bluebox">
-					<?php include( 'ziplist.txt' ); ?>
+					<?php require( 'offensive/ziplist.inc' ); ?>
 				</div>
 
 				<div class="heading" style="text-align:center">
@@ -295,7 +317,7 @@
 <div class="textlinks" style="text-align:center">
 	<hr width="300" />
 
-	<? include '../includes/footer.txt' ?>
+	<? require('includes/footer.txt'); ?>
 
 	<div class="textlinks">contents copyright &copy; 1997-<?= date("Y") ?> <a href="/contact/" class="textlinks" onmouseover='window.status="[ connect ]"; return true' onmouseout='window.status=""'>Ray Hatfield</a>. All rights reserved.</div>
 </div>
@@ -344,7 +366,7 @@
 
 		$link = openDbConnection();
 
-		$result = mysql_query( $sql );
+		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
 		
 		if( mysql_num_rows( $result ) == 0 ) {
 			return;
@@ -363,8 +385,7 @@
 			$css = $css == "evenfile" ? "oddfile" : "evenfile";
 	?>
 			<div class="clipper"><a class="<?= $css ?>" href="?c=comments&fileid=<?= $row['fileid'] ?>#<?= $row['commentid']?>"><?= 
-			    str_replace(array("<", ">", "\""), array("&lt;", "&gt;", "&quot;"), 
-			        preg_replace("/&(?!#)/", "&amp;", $row['filename'])) 
+			    htmlEscape($row['filename']);
 			?></a></div>
 	<?
 	

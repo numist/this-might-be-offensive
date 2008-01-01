@@ -1,21 +1,19 @@
 <?php
+	set_include_path("..");
+	require_once( 'offensive/assets/header.inc' );
 
-//	header( "Location: ./" );
-//	exit;	
-
-	session_start();
-
-	if( isset( $_SESSION['userid'] ) ) {
+	if( isset( $_SESSION['userid'] )) {
 		header( "Location: ./" );
 		exit;	
 	}
 
 	// Include, and check we've got a connection to the database.
-	include_once( '../admin/mysqlConnectionInfo.php' ); $link = openDbConnection();
+	require_once( 'admin/mysqlConnectionInfo.inc' );
+	if(!isset($link) || !$link) $link = openDbConnection();
 	
-	require_once( "activationFunctions.php" );
-	require_once( "validationFunctions.php" );	
-	require_once( "classes/statusMessage.php" );
+	require_once( "offensive/activationFunctions.inc" );
+	require_once( "offensive/validationFunctions.inc" );	
+	require_once( "offensive/classes/statusMessage.inc" );
 
 	$message;
 
@@ -66,7 +64,7 @@
 	function getReferrerId( $refcode ) {
 
 		$sql = "SELECT * FROM referrals WHERE referral_code = '$refcode' LIMIT 1";
-		$result = mysql_query( $sql );
+		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
 		if( mysql_num_rows( $result ) == 1 ) {
 			$row = mysql_fetch_assoc( $result );
 			return $row['userid'];
@@ -91,7 +89,7 @@
 
 	    $query = "SELECT count(*) AS theCount FROM users WHERE username = '" . $uName . "'";
 
-	    $result = mysql_query($query) or die("Query failed");
+	    $result = mysql_query($query) or trigger_error(mysql_error(), E_USER_ERROR);
 
 		// get the results of the query as an associative array, indexed by column name
 		$row = mysql_fetch_array( $result, MYSQL_ASSOC );
@@ -101,8 +99,8 @@
             $encrypted_pw = sha1( $pw );
 		
 			$query = "INSERT INTO users (username,password,email,created,ip,referred_by) VALUES ( '" . $uName . "','" . $encrypted_pw . "', '" . $_POST['email'] . "', now(), '" . $_SERVER['REMOTE_ADDR']. "', $referrerId )";
-			$result = mysql_query($query) or die("Query failed"); 
-			$result = mysql_query("SELECT userid,account_status from users where username = '$uName'") or die("Query failed"); 
+			$result = mysql_query($query) or trigger_error(mysql_error(), E_USER_ERROR); 
+			$result = mysql_query("SELECT userid,account_status from users where username = '$uName'") or trigger_error(mysql_error(), E_USER_ERROR); 
 			$row = mysql_fetch_array( $result, MYSQL_ASSOC );
 			if( $row['account_status'] == 'normal' ) {
 				$_SESSION['userid'] = $row['userid'];
@@ -113,7 +111,7 @@
 			
 			mail( $_POST['email'], "[ this might be offensive ] account activation", "$activationMessage", "From: offensive@thismight.be (this might be offensive)");
 			
-			@mysql_query( "DELETE FROM referrals WHERE referral_code = '$referral' AND userid=$referrerId LIMIT 1" );
+			@mysql_query( "DELETE FROM referrals WHERE referral_code = '$referral' AND userid=$referrerId LIMIT 1" ) or trigger_error(mysql_error(), E_USER_WARNING);
 #			mail( "ray@mysocalled.com", "[" . $_SERVER["REMOTE_ADDR"] . "] - [ this might be offensive ] account created: $uName", $_POST['email'], "From: offensive@thismight.be (this might be offensive)");
 		} else {
 		 	$returnMessage = "The username you've chosen, \"" . $uName . "\", is not available.";

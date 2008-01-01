@@ -1,4 +1,8 @@
-<? header( "Content-type: text/xml" ); ?>
+<? 
+header( "Content-type: text/xml" ); 
+set_include_path("..");
+require_once("offensive/assets/header.inc");
+?>
 <rss version="2.0">
 	<channel>
 		<title>themaxx.com : [ this might be offensive ]</title>
@@ -8,7 +12,8 @@
 
 <?
 	// Include, and check we've got a connection to the database.
-	include_once( '../admin/mysqlConnectionInfo.php' ); $link = openDbConnection();
+	require_once( 'admin/mysqlConnectionInfo.inc' );
+	$link = openDbConnection();
 	
 	$sql = "select offensive_uploads.*, users.username
 			FROM offensive_uploads
@@ -17,7 +22,7 @@
 			ORDER BY timestamp DESC
 			LIMIT 200";
 
-	$result = mysql_query( $sql );
+	$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
 
 	while( $row = mysql_fetch_assoc( $result ) ) {
 	

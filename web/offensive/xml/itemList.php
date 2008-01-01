@@ -1,8 +1,12 @@
-<? header( "Content-type: text/xml" ); ?>
+<? 
+set_include_path("../..");
+require_once( 'offensive/assets/header.inc' );
+
+header( "Content-type: text/xml" ); ?>
 <itemList version="1.0">
 
 <?
-	require_once( '../../admin/mysqlConnectionInfo.php' );
+	require_once( 'admin/mysqlConnectionInfo.inc' );
 	
 	
 	function getFileSize( $fpath ) {
@@ -15,7 +19,7 @@
 	}
 
 	
-	$link = openDbConnection();
+	if(!isset($link) || !$link) $link = openDbConnection();
 	
 	$startNum = is_numeric( $_REQUEST['start'] ) ? $_REQUEST['start'] : 0;
 	$numItems = is_numeric( $_REQUEST['num'] ) ? $_REQUEST['num'] : 100;	

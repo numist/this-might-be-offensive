@@ -1,7 +1,10 @@
 <?
-	session_start();
-	require_once( "activationFunctions.php" );
-	require_once( '../admin/mysqlConnectionInfo.php' ); $link = openDbConnection();
+	set_include_path("..");
+	require_once( 'offensive/assets/header.inc' );
+
+	require_once( "offensive/activationFunctions.inc" );
+	require_once( 'admin/mysqlConnectionInfo.inc' );
+	if(!isset($link) || !$link) $link = openDbConnection();
 	
 	$message = "There was a problem with your request.";	
 	
@@ -9,7 +12,7 @@
 	
 	$sql = "SELECT username,email,account_status from users where userid=$id";
 	
-	$result = mysql_query( $sql );
+	$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
 	
 	if( mysql_num_rows( $result ) == 1 ) {
 		
@@ -22,7 +25,7 @@
 		
 		if( $rehash == $_REQUEST[ $hash_param_key ] ) {
 			$sql = "update users set account_status='normal' where userid=$id AND account_status='awaiting activation' limit 1";
-			mysql_query( $sql );
+			mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
 			if( mysql_affected_rows() == 1 ) {
 				$message = "Your account is now active. <a href=\"./\">Click here</a> to return to the list.";
 			}

@@ -1,9 +1,11 @@
 <?php header( "Content-type: text/css" );
 session_start();
 ?>
-
-	<?php
-		if( $_SESSION['prefs']['hide nsfw'] == 1 ) {
+<?php
+	if( array_key_exists("prefs", $_SESSION) &&
+	    is_array($_SESSION['prefs']) &&
+	    array_key_exists("hide nsfw", $_SESSION["prefs"]) &&
+	    $_SESSION['prefs']['hide nsfw'] == 1 ) {
 	?>		
 
 	.nsfw {

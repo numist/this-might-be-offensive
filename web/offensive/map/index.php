@@ -1,7 +1,9 @@
 <?
-	session_start();
+	set_include_path("../..");
+	require_once( 'offensive/assets/header.inc' );
+	
 	if( ! is_numeric( $_SESSION['userid'] ) ) {
-		header( "Location: ../?c=mustLogIn" );
+		header( "Location: ../" );
 	}
 
 ?>
@@ -19,7 +21,7 @@
 <body bgcolor="#ffffff">
 	
 	<?
-		if( $_REQUEST['p'] ) {
+		if( array_key_exists("p", $_REQUEST) ) {
 	?>
 			<div style="margin:18px;">Thanks. Your location will be reflected in the next update. (Under 2 minutes.)</div>
 	<?

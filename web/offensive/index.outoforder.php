@@ -2,7 +2,7 @@
         "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
 <html>
 <head>
-	<title>themaxx.com : this page intentionally left blank.</title>
+	<title>themaxx.com : kaboom.</title>
 	<meta name="generator" content="BBEdit 7.0.3">
 	
 	<style type="text/css">

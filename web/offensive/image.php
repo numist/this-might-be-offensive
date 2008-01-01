@@ -1,12 +1,16 @@
 <?
+	set_include_path("..");
+	require_once( 'offensive/assets/header.inc');
+
 	// Include, and check we've got a connection to the database.
-	include_once( '../admin/mysqlConnectionInfo.php' ); $link = openDbConnection();
+	include_once( 'admin/mysqlConnectionInfo.inc' );
+	if(!isset($link) || !$link) $link = openDbConnection();
 
 	$sql = "SELECT id, filename
 			FROM offensive_uploads
 			ORDER BY id DESC
 			LIMIT 1";
-	$result = mysql_query( $sql );
+	$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
 	$row = mysql_fetch_assoc( $result );
 	$filename = $row['filename'];
 	

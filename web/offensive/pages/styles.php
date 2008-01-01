@@ -1,5 +1,8 @@
-<?php header( "Content-type: text/css" );
-session_start();
+<?php 
+set_include_path("../..");
+require_once( 'offensive/assets/header.inc' );
+
+header( "Content-type: text/css" );
 ?>
 
 #comments_link {
@@ -21,7 +24,10 @@ body {
 .nsfw {
 
 	<?php
-		if( $_SESSION['prefs']['hide nsfw'] == 1 ) {
+		if( array_key_exists("prefs", $_SESSION) &&
+		    is_array($_SESSION['prefs']) &&
+		    array_key_exists("hide nsfw", $_SESSION["prefs"]) &&
+		    $_SESSION['prefs']['hide nsfw'] == 1 ) {
 	?>		display:none; <?php
 		}
 	?>

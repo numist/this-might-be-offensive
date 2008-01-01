@@ -1,11 +1,12 @@
 <?
-	session_start();
+	set_include_path("../..");
+	require_once( 'offensive/assets/header.inc' );
 
 	if( ! is_numeric( $_SESSION['userid'] ) ) {
-		header( "Location: ../?c=mustLogIn" );
+		header( "Location: ../" );
 	}
 
-	require_once( '../../admin/mysqlConnectionInfo.php' );
+	require_once( 'admin/mysqlConnectionInfo.inc' );
 
 	$x = $_REQUEST['x'];
 	$y = $_REQUEST['y'];
@@ -17,14 +18,15 @@
 	}
 
 	function setMaxxerLoc( $maxxerid, $x, $y ) {
+		global $link;
 
 		if( ! is_numeric( $maxxerid ) ) {
 			return;
 		}
 
-		$link = openDbConnection();
+		if(!isset($link) || !$link) $link = openDbConnection();
 		$sql = "replace into maxxer_locations (userid, x, y, mapversion) values ( $maxxerid, $x, $y, 'google' )";
-		$result = mysql_query( $sql );
+		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
 		
 	}
 ?>
@@ -81,7 +83,7 @@
 		<?
 			$link = openDbConnection();
 			$sql = "select *, username from maxxer_locations, users where mapversion = 'google' AND maxxer_locations.userid = users.userid";
-			$result = mysql_query( $sql );
+			$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
 			
 			while( $row = mysql_fetch_array( $result ) ) {
 				?>

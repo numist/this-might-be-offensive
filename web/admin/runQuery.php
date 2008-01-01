@@ -20,7 +20,7 @@
 
 <?php if( $query ) {
 	// Include, and check we've got a connection to the database.
-	include_once( '../admin/mysqlConnectionInfo.php' ); $link = openDbConnection();
+	include_once( '../admin/mysqlConnectionInfo.inc' ); $link = openDbConnection();
 
 	$result = mysql_query($query) or die("Query failed");
 

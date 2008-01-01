@@ -1,7 +1,9 @@
 <?php
-	session_start();
+	set_include_path("..");
+	require_once( 'offensive/assets/header.inc');
 
-	$redirect = $_REQUEST['redirect'];
+	$redirect = array_key_exists("redirect", $_REQUEST) ? 
+	    $_REQUEST['redirect'] : null;
 	if( $redirect == null ) {
 		$redirect = './';
 	}
@@ -12,20 +14,28 @@
 	}
 
 	// Include, and check we've got a connection to the database.
-	include_once( '../admin/mysqlConnectionInfo.php' ); $link = openDbConnection();
+	require_once( 'admin/mysqlConnectionInfo.inc' );
+	if(!isset($link) || !$link) $link = openDbConnection();
 
-	require_once( 'getPrefs.php' );
-	require_once( 'activationFunctions.php' );
+	require_once( 'offensive/getPrefs.inc' );
+	require_once( 'offensive/activationFunctions.inc' );
+	require_once( 'offensive/functions.inc' );
 
 	$login_message = "";
 
 
 	if( $_REQUEST['password'] ) {
 		$success = login( $_REQUEST['username'], $_REQUEST['password'] );
-		if( $success === true && $_REQUEST['rememberme'] ) {
-			setcookie( "remember", tmbohash( $_SESSION['userid'], $_SESSION['username'] . $_SERVER['REMOTE_ADDR'] . $salt ), time()+60*60*24*365*5, "/" );
-		}
 		if( $success === true ) {
+			if( array_key_exists("rememberme", $_REQUEST) && 
+			    $_REQUEST['rememberme'] ) {
+				setcookie( "remember", tmbohash(
+				    $_SESSION['userid'], 
+				    $_SESSION['username'] . 
+				    $_SERVER['REMOTE_ADDR'] . $salt ), 
+				    time()+60*60*24*365*5, "/" );
+			}
+
 			header( "Location: " . $redirect );
 			exit;
 		}
@@ -48,21 +58,21 @@
 		$link = openDbConnection();
 		$ip = $_SERVER['REMOTE_ADDR'];
 		$sql = "INSERT INTO ip_history (userid, ip) VALUES ( $uid, '$ip' )";
-		$result = mysql_query( $sql, $link );
+		$result = mysql_query( $sql, $link ) or trigger_error(mysql_error(), E_USER_ERROR);
 
 	}
 
 	function logAttempt() {
 		global $login_message;
 	
-		$uname = mysql_real_escape_string( $_REQUEST['username'] );
-		$pw = mysql_real_escape_string( $_REQUEST['password'] );
+		$uname = sqlEscape( $_REQUEST['username'] );
+		$pw = sqlEscape( $_REQUEST['password'] );
 		$ip = $_SERVER['REMOTE_ADDR'];
-		$sql = "insert into failed_logins (username,ip) VALUES ( '".mysql_real_escape_string($uname)."', '$ip' )";
-		@mysql_query( $sql );
+		$sql = "insert into failed_logins (username,ip) VALUES ( '".sqlEscape($uname)."', '$ip' )";
+		@mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
 		
 		$sql = "select count(id) as thecount from failed_logins where ip='$ip' and timestamp > date_sub( now(), interval 1 day )";
-		$result = mysql_query( $sql );
+		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
 		echo mysql_error();
 		$row = mysql_fetch_assoc( $result );
 		$count = $row['thecount'];
@@ -96,13 +106,13 @@
 
 			$link = openDbConnection();
 			$sql = "SELECT * from users where userid=$uid LIMIT 1";
-			$result = mysql_query( $sql );
+			$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
 			if( mysql_num_rows( $result ) == 1 ) {
 				$row = mysql_fetch_assoc( $result );
 				$cookiehash = tmbohash( $row['userid'], $row['username'] . $_SERVER['REMOTE_ADDR'] . $salt );
 				if( $cookiehash == $cookieValue ) {
 					$sql = "SELECT userid, username, account_status FROM users WHERE userid=$uid";
-					$result = mysql_query( $sql );
+					$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
 					return loginFromQueryResult( $result );
 				}
 			}
@@ -122,7 +132,7 @@
 
 			if( is_numeric( $uid ) ) {
 				$sql = "UPDATE users SET last_login_ip='" . $_SERVER['REMOTE_ADDR'] . "', timestamp=now() WHERE userid=$uid LIMIT 1";
-				mysql_query( $sql );
+				mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
 			}
 
 			if( $status == 'normal' || $status == 'admin' ) {
@@ -148,14 +158,14 @@
 
 	function logIn( $name, $pw ) {
 		
-		// values defined in mysqlConnectionInfo.php
+		// values defined in mysqlConnectionInfo.inc
 		global $db_url, $db_user, $db_pw;
 
 		$link = openDbConnection();
 		
 		$ip = $_SERVER['REMOTE_ADDR'];
 		$sql = "SELECT count( id ) as numFailed from failed_logins WHERE ip='$ip' AND timestamp > date_sub( now(), interval 30 minute )";
-		$result = @mysql_query( $sql );
+		$result = @mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
 	
 		$row = @mysql_fetch_assoc( $result );
 		
@@ -166,9 +176,9 @@
 
         $encrypted_pw = sha1( $pw );
 		
-		$query = "SELECT userid, username, account_status FROM users WHERE username = '" . mysql_real_escape_string($name) . "' AND password = '" . $encrypted_pw . "'";
+		$query = "SELECT userid, username, account_status FROM users WHERE username = '" . sqlEscape($name) . "' AND password = '" . $encrypted_pw . "'";
 
-		$result = mysql_query($query) or die("Login query failed." );
+		$result = mysql_query($query) or trigger_error(mysql_error(), E_USER_ERROR);
 	
 		return loginFromQueryResult( $result );
 
@@ -231,7 +241,7 @@
 		</tr>
 	</table>
 	
-<? include '../includes/footer.txt' ?>
+<? include 'includes/footer.txt' ?>
 
 </body>
 </html>

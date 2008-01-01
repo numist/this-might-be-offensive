@@ -1,6 +1,7 @@
-<?php session_start();
+<?php 
 
-# header( "Location: ../" );
+	set_include_path("../..");
+	require_once("offensive/assets/header.inc");
 
 	if( ! is_numeric( $_SESSION['userid'] ) ) {
 		header( "Location: ../logn.php?redirect=" . urlencode( $_SERVER['PHP_SELF'] . "?" . $_SERVER['QUERY_STRING'] ));
@@ -14,18 +15,18 @@
 
 	$cookiename = $_SESSION['userid'] . "lastpic";
 
-	$lastpic = $_COOKIE[ $cookiename ];
+	$lastpic = array_key_exists($cookiename, $_COOKIE) ? $_COOKIE[ $cookiename ] : "";
 	
 	if( ! is_numeric( $lastpic ) || $id > $lastpic ) {
 		setcookie( $cookiename, "$id", time()+3600 * 24 * 365, "/offensive/" );
 	}
 
-	// Include, and check we've got a connection to the database.
-	include_once( '../../admin/mysqlConnectionInfo.php' ); $link = openDbConnection();
-	require_once( '../getPrefs.php' );	
+	require_once( 'admin/mysqlConnectionInfo.inc' );
+	if(!isset($link) || !$link) $link = openDbConnection();
+	require_once('offensive/getPrefs.inc');
+	require_once('offensive/functions.inc');
 	
 	$id = $_REQUEST['id'];
-	$uid = $_REQUEST['uid'];
 
 	function thisOrZero( $value ) {
 		return (is_numeric( $value ) ? $value : 0);
@@ -36,42 +37,32 @@
 	
 		global $filename, $nsfw, $tmbo, $uploader, $uploaderid, $timestamp, $year, $month, $day;
 		
-		if( file_exists( "nav/$id.php" ) ) {
-			include( "nav/$id.php" );
-		}
-
-		if( ! is_numeric( $nextid ) ) {
-			$sql = "SELECT offensive_uploads.*, users.username, users.userid,
-						(select min( id ) from offensive_uploads where id > $id AND type='image' and status='normal') as nextid,
-						(select max( id ) from offensive_uploads where id < $id AND type='image' and status='normal') as previd
-					FROM offensive_uploads, users
-					WHERE id = $id 
-						AND offensive_uploads.userid = users.userid
-						AND type='image'
-					LIMIT 1";
-
-#						AND type='image' AND users.account_status != 'locked'
+		$sql = "SELECT offensive_uploads.*, users.username, users.userid,
+					(select min( id ) from offensive_uploads where id > $id AND type='image' and status='normal') as nextid,
+					(select max( id ) from offensive_uploads where id < $id AND type='image' and status='normal') as previd
+				FROM offensive_uploads, users
+				WHERE id = $id 
+					AND offensive_uploads.userid = users.userid
+					AND type='image'
+				LIMIT 1";
+#					AND type='image' AND users.account_status != 'locked'
 					
-			$result = mysql_query( $sql );
-			$row = mysql_fetch_assoc( $result );
+		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$row = mysql_fetch_assoc( $result );
 			
-			$filename = $row['filename'];
-			$nextid = $row['nextid'];
-			$nsfw = ( $row['nsfw'] == 1 || strpos( $filename, "nsfw" ) || strpos( $filename, "NSFW" ) );
-			$previd = $row['previd'];		
-			$tmbo = $row['tmbo'];
-			$uploader = $row['username'];
-			$uploaderid = $row['userid'];
-			$time = strtotime( $row['timestamp'] );
-			$year = date( "Y", $time );
-			$month = date( "m", $time );			
-			$day = date( "d", $time );
-			$timestamp = date( "Y-m-d h:i:s a", strtotime( $row['timestamp'] ) );
+		$filename = $row['filename'];
+		$nextid = $row['nextid'];
+		$nsfw = ( $row['nsfw'] == 1 || strpos( $filename, "nsfw" ) || strpos( $filename, "NSFW" ) );
+		$previd = $row['previd'];		
+		$tmbo = $row['tmbo'];
+		$uploader = $row['username'];
+		$uploaderid = $row['userid'];
+		$time = strtotime( $row['timestamp'] );
+		$year = date( "Y", $time );
+		$month = date( "m", $time );			
+		$day = date( "d", $time );
+		$timestamp = date( "Y-m-d h:i:s a", strtotime( $row['timestamp'] ) );
 			
-			if( is_numeric( $nextid ) ) {
-				writeNavFile( "nav/$id.php", $filename, $nextid, $previd, $nsfw, $tmbo, $uploader, $uploaderid, $timestamp, $year, $month, $day );
-			}
-		}
 
 		filenav( $nextid, $previd, $uploaderid, $uploader );
 	}
@@ -88,31 +79,6 @@
 		 <? if( isset( $previousid ) ) { ?>
 			<a id="previous" href="<? echo $_SERVER['PHP_SELF']?>?id=<?= $previousid ?>">older</a>
 		<? } 
-	}
-
-
-	function writeNavFile( $navfile, $filename, $nextid, $previd, $nsfw, $tmbo, $uploader, $uploaderid, $timestamp, $year, $month, $day ) {
-		$escaped_fname = addslashes( $filename );
-		$file = fopen( $navfile, 'w' );
-		$data = '
-
-			<?
-				$filename = \'' .  $escaped_fname . '\';
-				$nextid = "' . $nextid . '";
-				$previd = "' . $previd . '";
-				$nsfw = "' . $nsfw . '";
-				$tmbo = "' . $tmbo . '";
-				$uploader = "' . $uploader . '";
-				$uploaderid = "' . $uploaderid . '";
-				$timestamp = "' . $timestamp . '";
-				$year = "' . $year . '";
-				$month = "' . $month . '";
-				$day = "' . $day . '";
-			?>
-
-		';
-		fwrite( $file, $data );
-		fclose( $file );
 	}
 
 	function getFileSize( $fpath ) {
@@ -133,9 +99,10 @@
 	$sql = "SELECT good, bad, tmbo, repost, comments from offensive_count_cache c
 			WHERE threadid=$id";
 	
-	$result = mysql_query( $sql );
+	$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
 	if( mysql_num_rows( $result ) > 0 ) {
-		list( $good, $bad, $tmbo, $repost, $comments  ) = mysql_fetch_array( mysql_query( $sql ) );
+		$res = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		list( $good, $bad, $tmbo, $repost, $comments  ) = mysql_fetch_array( $res );
 	}
 
 ?>
@@ -159,14 +126,20 @@
 
 	</head>
 	<body onload="doOnloadStuff()" onkeydown="return handleKeyDown( event );">
-	<?php include "../message.php" ?>
+	<!-- message -->
+	<div style="white-space:nowrap;overflow:hidden;padding:3px;margin-bottom:0px;background:#000033;color:#ff6600;font-size:10px;font-weight:bold;padding-left:4px;">
+		<div style="float:right;"><a href="#" style="color:#ff6600" onclick="toggleVisibility( document.getElementById( 'instructions' ) ); return false">?</a></div>
+		<div>consciousness doesn't really exist. it's just another one of our ideas.</div>
+	</div>
+	<div id="instructions" style="display:none;white-space:nowrap;overflow:hidden;padding:3px;margin-bottom:6px;background:#cccccc;color:#333333">left arrow = newer . up arrow = index . right arrow = older . down arrow = comments . plus key = [ this is good ] . minus key = [ this is bad ] . (because clicking is too hard.)</div>
+
 	<div id="content">
 		<div id="heading">
 
 			&nbsp;&nbsp;
 
 				<? writeNav( $id ); ?>
-				 <a style="margin-left:48px;" id="comments" href="/offensive/?c=comments&fileid=<? echo $id?>">comments</a> (<?php echo "{$comments}c +$good -$bad"; if( $offensive > 0 ) { echo " <span style=\"color:#990000\">x$offensive</span>"; }?>)	
+				 <a style="margin-left:48px;" id="comments" href="/offensive/?c=comments&fileid=<? echo $id?>">comments</a> (<?php echo "{$comments}c +$good -$bad"; if( $tmbo > 0 ) { echo " <span style=\"color:#990000\">x$tmbo</span>"; }?>)	
 
 				<?php
 					if( $_SESSION['userid'] ) {
@@ -182,7 +155,10 @@
 						</span>
 
 						<span style="margin-left:48px;">nsfw filter: <?php
-							if( $_SESSION['prefs']['hide nsfw'] == 1 ) {
+							if( array_key_exists("prefs", $_SESSION) &&
+							    is_array($_SESSION['prefs']) &&
+							    array_key_exists("hide nsfw", $_SESSION['prefs']) &&
+							    $_SESSION['prefs']['hide nsfw'] == 1 ) {
 								?>
 									<a href="/offensive/setPref.php?p=1&v=">off</a> on
 								<?php
@@ -195,7 +171,10 @@
 						?></span>
 						
 						<span style="margin-left:48px;">tmbo filter: <?php
-							if( $_SESSION['prefs']['hide tmbo'] == 1 ) {
+							if( array_key_exists("prefs", $_SESSION) &&
+							    is_array($_SESSION['prefs']) &&
+							    array_key_exists("hide tmbo", $_SESSION) &&
+							    $_SESSION['prefs']['hide tmbo'] == 1 ) {
 								?>
 									<a href="/offensive/setPref.php?p=3&v=">off</a> on
 								<?php
@@ -228,11 +207,10 @@
 			<br /><br />
 			<? echo $nsfw == 1 ? "<span style=\"color:#990000\">[NSFW]</span>" : "" ?></span>
 			<? echo $tmbo == 1 ? "<span style=\"color:#990000\">[TMBO]</span>" : "" ?></span>
-			<? echo str_replace(array("<", ">", "\""), array("&lt;", "&gt;", "&quot;"), 
-                preg_replace("/&(?!#)/", "&amp;", $filename)) ?> <span style="color:#999999"><?= getFileSize( $filepath ) ?></span>
+			<? echo htmlEscape($filename); ?> <span style="color:#999999"><?= getFileSize( $filepath ) ?></span>
 			<br/>
 			<span style="color:#999999">
-				uploaded by <a href="../?c=user&userid=<? echo $uploaderid ?>"><? echo $uploader ?></a> @ <?= $timestamp ?>
+				uploaded by <a href="../?c=user&userid=<? echo $uploaderid ?>"><? echo htmlEscape($uploader); ?></a> @ <?= $timestamp ?>
 			</span>	
 			<span style="margin-left:48px">
 				<?
@@ -259,8 +237,12 @@
 				}
 				else {
 			
-					if( $_SESSION['prefs']['hide nsfw'] == 1 && $nsfw == 1
-						|| ($_SESSION['prefs']['hide tmbo'] == 1 && $tmbo == 1) 
+					if( array_key_exists("prefs", $_SESSION) &&
+					    is_array($_SESSION['prefs']) &&
+					    (array_key_exists("hide nsfw", $_SESSION['prefs']) && 
+					    $_SESSION['prefs']['hide nsfw'] == 1 && $nsfw == 1) || 
+					    (array_key_exists("hide tmbo", $_SESSION['prefs']) &&
+					    $_SESSION['prefs']['hide tmbo'] == 1 && $tmbo == 1) 
 						|| ( in_array( $uploaderid, explode( ',', $_SESSION['prefs']['squelched'] ) ) ) ) {
 						?><div style="padding:128px;">[ filtered ] <!-- <?= $uploaderid ?> --></div><?
 					}
@@ -280,44 +262,6 @@
 			
 			<?
 	
-/*	
-	function getOldestExistingFileId() {
-		$files = loadFiles('../images/picpile/');
-		SortByDate($files);
-		$oldest = $files[0];
-		$oldestName = mysql_escape_string( $oldest[0] );
-		
-		$sql = "SELECT max(id)
-					FROM offensive_uploads
-					WHERE type='image'
-					AND filename = '$oldestName'
-					AND timestamp > DATE_SUB( now(), INTERVAL 4 day )";
-
-		list( $oldestId ) = mysql_fetch_array( mysql_query( $sql ) );
-		return is_numeric( $oldestId ) ? $oldestId : -1;
-
-	}
-	
-	
-	function loadFiles($dir) {
-		$files = array();
-		$It =  opendir($dir);
-		if (! $It) {
-			die('Cannot list files for ' . $dir);
-		}
-		
-		while ($filename = readdir($It))
-		{
-			if( $filename == '.' || $filename == '..') {
-				continue;
-			}
-			$lastModified = filemtime($dir . $filename);
-			$files[] = array($filename, $lastModified);
-		}
-		return $files;
-	}
-*/
-
 	function DateCmp($a, $b) {
 		return ($a[1] < $b[1]) ? -1 : 1;
 	}

@@ -1,4 +1,6 @@
 <?php
+set_include_path("..");
+require_once("offensive/assets/header.inc");
 
 // Attempt to defend against header injections:
 $badStrings = array("Content-Type:",
@@ -31,13 +33,15 @@ function logBadRequest() {
 
 
 	if( $body <> "" ) {
+
+		if(ini_get("magic_quotes_gpc")) {
+			// replace \' with '
+			$body = str_replace( "\\'", "'", $body );
 	
-		// replace \' with '
-		$body = str_replace( "\\'", "'", $body );
-	
-		// replace \" with "
-		$body = str_replace( "\\\"", "\"", $body );
-		
+			// replace \" with "
+			$body = str_replace( "\\\"", "\"", $body );
+		}
+
 		// email a copy of the new post to myself.
 		mail( "ray@mysocalled.com", "$head", "$body\n\n--\n\n[$REMOTE_ADDR] - $from\n\n$email\n", "From: $email ($from via themaxx.com contact form)\nReply-To: $email");
 	}
@@ -69,7 +73,7 @@ function logBadRequest() {
 
 <div align="center">
 
-<?php include( $DOCUMENT_ROOT . "/includes/headerbuttons.txt" ); ?>
+<?php require( "includes/headerbuttons.txt" ); ?>
 
 <table border="0" cellpadding="0" cellspacing="12">
 	<tr>
@@ -243,7 +247,7 @@ will be stapled to a pigeon and flown directly to me.
 
 
 <div align="center">
-	<?php include( $DOCUMENT_ROOT . "/includes/textlinks.txt" ); ?>
+	<?php require( "includes/textlinks.txt" ); ?>
 </div>
 
 <br>
