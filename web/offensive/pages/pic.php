@@ -35,7 +35,7 @@
 
 	function writeNav( $id ) {
 	
-		global $filename, $nsfw, $tmbo, $uploader, $uploaderid, $timestamp, $year, $month, $day;
+		global $filename, $is_nsfw, $is_tmbo, $uploader, $uploaderid, $timestamp, $year, $month, $day;
 		
 		$sql = "SELECT offensive_uploads.*, users.username, users.userid,
 					(select min( id ) from offensive_uploads where id > $id AND type='image' and status='normal') as nextid,
@@ -52,9 +52,9 @@
 			
 		$filename = $row['filename'];
 		$nextid = $row['nextid'];
-		$nsfw = ( $row['nsfw'] == 1 || strpos( $filename, "nsfw" ) || strpos( $filename, "NSFW" ) );
+		$is_nsfw = ( $row['nsfw'] == 1 || strpos( $filename, "nsfw" ) || strpos( $filename, "NSFW" ) );
 		$previd = $row['previd'];		
-		$tmbo = $row['tmbo'];
+		$is_tmbo = $row['tmbo'];
 		$uploader = $row['username'];
 		$uploaderid = $row['userid'];
 		$time = strtotime( $row['timestamp'] );
@@ -101,8 +101,7 @@
 	
 	$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
 	if( mysql_num_rows( $result ) > 0 ) {
-		$res = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
-		list( $good, $bad, $tmbo, $repost, $comments  ) = mysql_fetch_array( $res );
+		list( $good, $bad, $tmbo, $repost, $comments  ) = mysql_fetch_array( $result );
 	}
 
 ?>
@@ -205,8 +204,8 @@
 			?>
 
 			<br /><br />
-			<? echo $nsfw == 1 ? "<span style=\"color:#990000\">[NSFW]</span>" : "" ?></span>
-			<? echo $tmbo == 1 ? "<span style=\"color:#990000\">[TMBO]</span>" : "" ?></span>
+			<? echo $is_nsfw == 1 ? "<span style=\"color:#990000\">[NSFW]</span>" : "" ?></span>
+			<? echo $is_tmbo == 1 ? "<span style=\"color:#990000\">[TMBO]</span>" : "" ?></span>
 			<? echo htmlEscape($filename); ?> <span style="color:#999999"><?= getFileSize( $filepath ) ?></span>
 			<br/>
 			<span style="color:#999999">
@@ -240,15 +239,15 @@
 					if( array_key_exists("prefs", $_SESSION) &&
 					    is_array($_SESSION['prefs']) &&
 					    (array_key_exists("hide nsfw", $_SESSION['prefs']) && 
-					    $_SESSION['prefs']['hide nsfw'] == 1 && $nsfw == 1) || 
+					    $_SESSION['prefs']['hide nsfw'] == 1 && $is_nsfw == 1) || 
 					    (array_key_exists("hide tmbo", $_SESSION['prefs']) &&
-					    $_SESSION['prefs']['hide tmbo'] == 1 && $tmbo == 1) 
+					    $_SESSION['prefs']['hide tmbo'] == 1 && $is_tmbo == 1) 
 						|| ( in_array( $uploaderid, explode( ',', $_SESSION['prefs']['squelched'] ) ) ) ) {
 						?><div style="padding:128px;">[ filtered ] <!-- <?= $uploaderid ?> --></div><?
 					}
 					else {
 						?>
-						<div class="<?php echo $nsfw == 1 ? 'nsfw' : 'image' ?> u<?= $uploaderid ?>">
+						<div class="<?php echo $is_nsfw == 1 ? 'nsfw' : 'image' ?> u<?= $uploaderid ?>">
 <? /*							<!-- 							<a href="<?= $filepath ?>" target="_blank"><img src="http://images.thismight.be/offensive/<?= "uploads/$year/$month/$day/image/" . rawurlencode( $imgfilename ) ?>" style="border:none"/></a>-->  */ ?>
 <a href="<?= $filepath ?>" target="_blank"><img src="<?= "../uploads/$year/$month/$day/image/" . rawurlencode( $imgfilename ) ?>" style="border:none"/></a> 
 						</div>

@@ -6,21 +6,21 @@
 	require_once( 'admin/mysqlConnectionInfo.inc' );
 	if(!isset($link) || !$link) $link = openDbConnection();
 
-	$uid = $_SESSION['userid'];
-	$fileid = $_REQUEST['fileid'];
+	$uid = array_key_exists("userid", $_SESSION) ? $_SESSION['userid'] : "";
+	$fileid = array_key_exists("fileid", $_REQUEST) ? $_REQUEST['fileid'] : "";
 	
 	if( ! is_numeric( $uid ) || ! is_numeric( $fileid ) ) {
 		header( "Location: ./" );
 	}
 
-	if( $_REQUEST['un'] == 1 ) {
+	if( array_key_exists("un", $_REQUEST) && $_REQUEST['un'] == 1 ) {
 		unsubscribe( $uid, $fileid );
 	}
 	else {
 		subscribe( $uid, $fileid );
 	}
 
-	header( "Location: " . $_SERVER['HTTP_REFERER'] );
+	header( "Location: " . (array_key_exists("HTTP_REFERER", $_SERVER) ? $_SERVER['HTTP_REFERER'] : "./"));
 	exit;
 
 	function subscribe( $uid, $fid ) {
