@@ -287,7 +287,7 @@ if(ini_get("magic_quotes_gpc") == true)
 	$fileList = array_reverse( $fileList );
 
 	foreach( $fileList as $file ) {
-		?><a href="/offensive/<?php echo $file; ?>"><?php echo $file; ?></a> (<?php echo number_format(filesize($path . "/" . $file)/1048576, 1)?> MB)<br/><?php
+		?><a href="/offensive/<?=$path?>/<?php echo $file; ?>"><?php echo $file; ?></a> (<?php echo number_format(filesize($path . "/" . $file)/1048576, 1)?> MB)<br/><?php
 	}
 					?>
 				</div>
@@ -353,7 +353,7 @@ if(ini_get("magic_quotes_gpc") == true)
 	<? require('includes/footer.txt'); ?>
 
 	<div class="textlinks">contents copyright &copy; 1997-<?= date("Y") ?> <a href="/contact/" class="textlinks" onmouseover='window.status="[ connect ]"; return true' onmouseout='window.status=""'>Ray Hatfield</a>. All rights reserved.</div>
-	<div class="textlinks"><?= number_format(time_end($ptime) - $querytime, 3)."s php, ".number_format($querytime, 3)."s sql, $queries queries"; ?></div>
+	<div class="textlinks"><?= number_format(time_end($ptime), 3)."s php, ".number_format($querytime, 3)."s sql, $queries queries"; ?></div>
 </div>
 <br />
 

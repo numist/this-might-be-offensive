@@ -16,9 +16,15 @@
 
 	function body() {
 		global $timelimit;
+
+		// get the total number of users online
+		$sql = "SELECT COUNT(*) FROM users WHERE timestamp > DATE_SUB( now( ) , INTERVAL $timelimit MINUTE)";
+		$result = tmbo_query($sql);
+		list($nonline) = mysql_fetch_array($result);
+
 ?>
 
-	<div class="heading">other folks online in the last <?= $timelimit ?> minutes.</div>
+	<div class="heading"><?= $nonline ?> folks online in the last <?= $timelimit ?> minutes.</div>
 	<? tabs(); ?>
 	<div class="bluebox">
 
@@ -29,16 +35,17 @@
 		<td><b><a href="./?c=discussions&order=thecount">comment count</a></b></td>
 		<td><b><a href="./?c=discussions&order=latest">latest comment</a></b></td>
 	</tr> -->
+	<tr class="even_row">
+		<td>you</td>
+		<td style="text-align:right">now</td>
+	</tr>
 	<?
-		$css = "odd";
+		$css = "even";
 		$sql = "SELECT userid, username, timestamp FROM users WHERE timestamp > DATE_SUB( now( ) , INTERVAL $timelimit MINUTE) && userid != ".$_SESSION['userid']." ORDER BY timestamp DESC";
 		$result = tmbo_query( $sql );
-		$number = 0;
 		while(false !== ($row = mysql_fetch_assoc( $result ) )) {
-			$number++;
 			$css = $css == "odd" ? "even" : "odd"; ?>
 				<tr class="<?= $css ?>_row">
-					<td width="5%"><?= $number ?>.</td>
 					<td><a href="./?c=user&userid=<?= $row['userid']?>"><?= $row['username'] ?></a></td>
 					<td style="text-align:right"><?
 		$timeago = time() - strtotime($row['timestamp']);

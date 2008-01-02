@@ -24,8 +24,6 @@
 	$fileuploaded = false;
 	$fileid = null;
 	$filePath=dirname(realpath($_SERVER['SCRIPT_FILENAME']));
-	# realpath suddenly stopped working at dreamhost 2005-05-27
-#	$filePath = "/hsphere/local/home/thismightbe/thismight.be/offensive";
 	$imagePath = $filePath . "/images/picpile/";
 
 	if( array_key_exists("image", $_FILES) && 
@@ -166,7 +164,6 @@
 		
 		$fileuploaded = true;
 		$fileid = $entry_id;
-
 	}
 	
 	function ensureDirExists( $path ) {
@@ -374,7 +371,8 @@
 		else {
 
 			if( $fileuploaded ) {
-				updateStatus( $fileid, 'normal' );
+				if($fileid == 0) trigger_error("gahhh no fileid", E_USER_WARNING);
+				else updateStatus( $fileid, 'normal' );
 				thanks();		
 			}
 
@@ -419,16 +417,6 @@ function thanks() {
 	<div class="blackbar"></div>
 
 <?
-}
-
-function brb() {
-
-	?>
-	<div class="bluebox">
-		no uploads right now. be back in a bit. (hopefully not more than 15 minutes).
-	</div>
-	<?
-
 }
 
 function uploadForm() {
