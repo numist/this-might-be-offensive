@@ -447,9 +447,10 @@ if(ini_get("magic_quotes_gpc") == true)
 		list($nonline) = mysql_fetch_array($result);
 
 		// start us off.
-		echo "<div class=\"heading\">who's on:</div>
-					<div class=\"bluebox\">
-						<table style=\"width:100%\">\n";
+?>		<div class="heading">who's on:</div>
+					<div class="bluebox">
+						<table style="width:100%">
+<?
 		
 		// list out the latest people to do something
 		$sql = "SELECT userid, username FROM users WHERE timestamp > DATE_SUB( now( ) , INTERVAL $timelimit MINUTE) && userid != ".$_SESSION['userid']." ORDER BY timestamp DESC LIMIT $userlimit";
@@ -462,9 +463,9 @@ if(ini_get("magic_quotes_gpc") == true)
 		$css = (!isset($css) || $css == "odd") ? "even" : "odd";
 		// obviously, we're online.
 		if($nonline < $userlimit) {
-			echo "<tr class=\"".$css."_row\"><td class=\"".$css."file\">you.</td></tr>\n";
+			?><tr class="<?= $css ?>_row"><td class="<?= $css ?>file">you.</td></tr><?
 		} else if($nonline > $userlimit) {
-			echo "<tr class=\"".$css."_row\"><td class=\"".$css."file\">and ".($nonline - $userlimit)." more</td></tr>\n";
+			?><tr><td><a href="./?c=online">and <?= ($nonline - $userlimit) ?> more</a></td></tr><?
 		}
 
 		echo "\t\t\t\t\t\t</table>\n\t\t\t\t\t</div>\n";
