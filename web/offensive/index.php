@@ -351,8 +351,6 @@ if(ini_get("magic_quotes_gpc") == true)
 </body>
 </html>
 <?
-	ob_end_flush();
-
 	function requestDetail() {
 		ob_start();
 		var_dump( $_SERVER );

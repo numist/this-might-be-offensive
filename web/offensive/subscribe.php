@@ -20,10 +20,10 @@
 		subscribe( $uid, $fileid );
 	}
 
-	if(array_key_exists("HTTP_REFERER", $_SERVER) {
+	if(array_key_exists("HTTP_REFERER", $_SERVER)) {
 		header( "Location: " . $_SERVER['HTTP_REFERER']);
 	} else {
-		echo "<html><head><script type="text/javascript">history.go(-1);</script></head><body /></html>";
+		echo "<html><head><script type=\"text/javascript\">history.go(-1);</script></head><body /></html>";
 	}
 	exit;
 
