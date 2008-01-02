@@ -225,7 +225,7 @@
 			<?
 				if( ! file_exists( $filepath ) ) {
 #					$oldId = getOldestExistingFileId();
-					if( $oldId > 0 ) {
+					if( isset($oldId) && $oldId > 0 ) {
 						?>
 							<div style="padding:128px;">
 								<p>This image is unavailable and has probably expired.</p>

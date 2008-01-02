@@ -432,7 +432,7 @@ if(ini_get("magic_quotes_gpc") == true)
 	}
 
 	function whosOn() {
-		global $link;
+		global $link, $userlimit, $timelimit;
 
 		// how many users to display in the online list
 		$userlimit = 20;
