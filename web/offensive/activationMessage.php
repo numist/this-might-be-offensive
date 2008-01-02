@@ -13,7 +13,7 @@
 <body>
 
 <? 
-	require_once( "activationFunctions.inc" );
+	require_once( "assets/activationFunctions.inc" );
 	echo activationMessageFor( $_REQUEST['userid'], $_REQUEST['email'] );
 ?>
 

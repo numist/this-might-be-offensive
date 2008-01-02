@@ -45,7 +45,7 @@
 	// Include, and check we've got a connection to the database.
 	require_once('admin/mysqlConnectionInfo.inc');
 	if(!isset($link) || !$link) $link = openDbConnection();
-	require_once('offensive/functions.inc');
+	require_once('offensive/assets/functions.inc');
 
 	if( isset( $_REQUEST['c'] ) ) {
 		$c = $_REQUEST['c'];
@@ -263,7 +263,24 @@ if(ini_get("magic_quotes_gpc") == true)
 				<div class="blackbar"></div>
 				<div class="heading">archives:</div>
 				<div class="bluebox">
-					<?php require( 'offensive/ziplist.inc' ); ?>
+					<?php 
+	/* zips */
+	$fileList = array();
+	$path = "zips";
+	$dir = opendir( $path );
+	while( ($file = readdir($dir) ) !== false) {
+		if( strpos( $file, ".zip" ) !== false ) {
+			$fileList[] = $file;
+		}
+	}
+
+	sort( $fileList );
+	$fileList = array_reverse( $fileList );
+
+	foreach( $fileList as $file ) {
+		?><a href="/offensive/<?php echo $file; ?>"><?php echo $file; ?></a> (<?php echo number_format(filesize($path . "/" . $file)/1048576, 1)?> MB)<br/><?php
+	}
+					?>
 				</div>
 
 				<div class="heading" style="text-align:center">
@@ -427,7 +444,7 @@ if(ini_get("magic_quotes_gpc") == true)
 		list($nonline) = mysql_fetch_array($result);
 
 		// start us off.
-		echo "<div class=\"heading\">who's on($nonline):</div>
+		echo "<div class=\"heading\">who's on:</div>
 					<div class=\"bluebox\">
 						<table style=\"width:100%\">\n";
 		
@@ -442,7 +459,7 @@ if(ini_get("magic_quotes_gpc") == true)
 		$css = (!isset($css) || $css == "odd") ? "even" : "odd";
 		// obviously, we're online.
 		if($nonline < $userlimit) {
-			echo "<tr class=\"".$css."_row\"><td class=\"".$css."file\"><a href=\"./?c=user&userid=".$_SESSION['userid']."\">".$_SESSION['username']."</a></td></tr>\n";
+			echo "<tr class=\"".$css."_row\"><td class=\"".$css."file\">you.</td></tr>\n";
 		} else if($nonline > $userlimit) {
 			echo "<tr class=\"".$css."_row\"><td class=\"".$css."file\">and ".($nonline - $userlimit)." more</td></tr>\n";
 		}

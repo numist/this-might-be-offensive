@@ -2,7 +2,7 @@
 	set_include_path("..");
 	require_once( 'offensive/assets/header.inc' );
 
-	require_once( "offensive/activationFunctions.inc" );
+	require_once( "offensive/assets/activationFunctions.inc" );
 	require_once( 'admin/mysqlConnectionInfo.inc' );
 	if(!isset($link) || !$link) $link = openDbConnection();
 	

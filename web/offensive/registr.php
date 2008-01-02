@@ -11,8 +11,8 @@
 	require_once( 'admin/mysqlConnectionInfo.inc' );
 	if(!isset($link) || !$link) $link = openDbConnection();
 	
-	require_once( "offensive/activationFunctions.inc" );
-	require_once( "offensive/validationFunctions.inc" );	
+	require_once( "offensive/assets/activationFunctions.inc" );
+	require_once( "offensive/assets/validationFunctions.inc" );	
 	require_once( "offensive/classes/statusMessage.inc" );
 
 	$message;

@@ -2,7 +2,7 @@
 	// Include, and check we've got a connection to the database.
 	require_once( 'admin/mysqlConnectionInfo.inc' );
 	if(!isset($link) || !$link) $link = openDbConnection();
-	require_once( 'offensive/functions.inc' );
+	require_once( 'offensive/assets/functions.inc' );
 
 	function start() {
 		if( ! isset( $_SESSION['userid'] ) ){
@@ -71,7 +71,7 @@
 
 	}
 
-	require_once( 'offensive/tabs.inc' );
+	require_once( 'offensive/assets/tabs.inc' );
 
 	function body() {
 ?>

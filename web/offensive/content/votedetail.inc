@@ -1,6 +1,6 @@
 <?
 
-	require_once( "offensive/tabs.inc" );
+	require_once( "offensive/assets/tabs.inc" );
 
 	function start() {
 		if( ! is_numeric( $_SESSION['userid'] ) ||

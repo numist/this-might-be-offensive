@@ -3,7 +3,7 @@
 	require_once( 'admin/mysqlConnectionInfo.inc' );
 	if(!isset($link) || !$link) $link = openDbConnection();
 
-	require_once( 'offensive/tabs.inc' );
+	require_once( 'offensive/assets/tabs.inc' );
 	
 	function start() {
 		if( ! is_numeric( $_SESSION['userid'] ) ) {

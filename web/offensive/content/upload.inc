@@ -1,9 +1,9 @@
 <?
 
-	require_once( 'offensive/activationFunctions.inc' );
+	require_once( 'offensive/assets/activationFunctions.inc' );
 	require_once( "offensive/getid3/getid3.php" );
-	require_once( "offensive/tabs.inc" );
-	require_once( "offensive/functions.inc" );
+	require_once( "offensive/assets/tabs.inc" );
+	require_once( "offensive/assets/functions.inc" );
 	
 	function start() {
 		if( ! isset( $_SESSION['userid'] ) ){

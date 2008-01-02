@@ -1,6 +1,6 @@
 <?
 
-	require_once( 'offensive/tabs.inc' );
+	require_once( 'offensive/assets/tabs.inc' );
 	
 	function start() {
 		setcookie( 'thumbnails', "no", time()-3600, "/offensive/" );
@@ -37,7 +37,7 @@
 	<table width="100%" border="0" cellpadding="0" cellspacing="0">
 		<tr>
 			<td valign="top">
-				<? require( 'offensive/pickupLink.inc' ) ?>
+				<? require( 'offensive/assets/pickupLink.inc' ) ?>
 			</td>
 			<td valign="top">
 				<div style="text-align:right"><b><a href="./?c=thumbs">thumbnail view</a></b></div>

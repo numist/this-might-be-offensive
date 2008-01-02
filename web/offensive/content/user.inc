@@ -1,8 +1,8 @@
 <?
 
-	require_once( 'offensive/tabs.inc' );
-	require_once( 'offensive/getPrefs.inc' );
-	require_once( 'offensive/functions.inc' );
+	require_once( 'offensive/assets/tabs.inc' );
+	require_once( 'offensive/assets/getPrefs.inc' );
+	require_once( 'offensive/assets/functions.inc' );
 
 	function start() {
 		if( !array_key_exists("userid", $_REQUEST) ||

@@ -1,6 +1,6 @@
 <?
 
-	require_once( "offensive/activationFunctions.inc" );
+	require_once( "offensive/assets/activationFunctions.inc" );
 	require_once( "offensive/classes/statusMessage.inc" );
 
 	$message;
