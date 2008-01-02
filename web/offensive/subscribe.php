@@ -26,13 +26,13 @@
 	function subscribe( $uid, $fid ) {
 		$link = openDbConnection();
 		$sql = "insert into offensive_subscriptions (userid, fileid) values ( $uid, $fid )";
-		mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		tmbo_query( $sql );
 	}
 
 	function unsubscribe( $uid, $fid ) {
 		$link = openDbConnection();
 		$sql = "delete from offensive_subscriptions where userid=$uid and fileid=$fid";
-		mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		tmbo_query( $sql );
 	}
 
 ?>

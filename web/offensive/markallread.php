@@ -10,7 +10,7 @@
 		
 		if(!isset($link) || !$link) $link = openDbConnection();
 		$sql = "DELETE FROM offensive_bookmarks WHERE userid=$uid";
-		mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		tmbo_query( $sql );
 	}
 
 	header( "Location: ./" );

@@ -22,7 +22,7 @@
 
 		$link = openDbConnection();
 
-		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query( $sql );
 		
 		if( mysql_num_rows( $result ) == 0 ) {
 			?><div>none</div><?

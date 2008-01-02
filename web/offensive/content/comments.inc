@@ -16,7 +16,7 @@
 					FROM offensive_subscriptions
 					WHERE fileid = $fileid";
 					
-		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query( $sql );
 
 	}
 
@@ -42,12 +42,12 @@
 		}
 		if(!isset($link) || !$link) $link = openDbConnection();
 		$sql = "insert into offensive_subscriptions (userid, fileid) VALUES ($uid, $fileid)";
-		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query( $sql );
 	}
 
 	function alreadyVoted( $uid, $fid ) {
 		$sql = "SELECT count( vote ) AS thecount FROM offensive_comments WHERE fileid=$fid AND userid=$uid AND vote LIKE 'this%'";
-		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query( $sql );
 		$row = mysql_fetch_assoc( $result );
 		
 		$voted = ( $row[ 'thecount' ] > 0 );
@@ -61,7 +61,8 @@
 		}
 		if(!isset($link) || !$link) $link = openDbConnection();
 		$sql = "DELETE FROM offensive_bookmarks WHERE userid=$userid and fileid=$fileid";
-		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query( $sql );
+
 	}
 	
 	function title() {
@@ -83,7 +84,7 @@
 							comments = comments + $comment";
 		
 		if(!isset($link) || !$link) $link = openDbConnection();
-		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query( $sql );
 
 	}
 
@@ -109,7 +110,7 @@
 		if(!isset($link) || !$link) $link = openDbConnection();
 
 		$sql = "select filename, nsfw, tmbo from offensive_uploads where id=$fileid";
-		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query( $sql );
 		list( $filename, $nsfw, $tmbo ) = mysql_fetch_array( $result );
 	
 	    // check to see if someone's posting.  
@@ -121,7 +122,7 @@
 			$already_voted = alreadyVoted( $_SESSION['userid'], $_REQUEST['fileid'] );
 						
 			$sql = "SELECT userid FROM offensive_uploads WHERE id=" . $_REQUEST['fileid'];
-			$res = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+			$res = tmbo_query( $sql );
 			$row = mysql_fetch_assoc( $res );
 			if( $already_voted || $row['userid'] == $_SESSION['userid'] || (isset($expired) && $expired) ) {
 				$vote = null;
@@ -137,7 +138,7 @@
 			$sql .= " VALUES ( $usrid, $fileid, '".sqlEscape($comment)."', '$vote', $offensive, $repost, '" . sqlEscape($_SERVER['REMOTE_ADDR']) . "')";
 		
 			if( ! ($comment == "" && $vote == null && $offensive == 0 && $repost == 0) ) {
-				$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+				$result = tmbo_query( $sql );
 			}
 
 			if( strlen( $comment ) > 0 || $vote == 'this is bad' || $subscribe ) {
@@ -228,7 +229,7 @@
 
 	$fid = $_REQUEST['fileid'];
 	$sql = "select id from offensive_subscriptions where userid=" . $_SESSION['userid'] . " and fileid=$fid limit 1";
-	$res = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+	$res = tmbo_query( $sql );
 	$subscribed = mysql_num_rows( $res ) > 0 ? true : false;
 
 	$sql = "SELECT (DATE_ADD( offensive_uploads.timestamp, INTERVAL 4 DAY ) < now() ) AS expired,
@@ -236,7 +237,7 @@
 				FROM users, offensive_uploads
 				WHERE users.userid = offensive_uploads.userid
 				AND offensive_uploads.id = " . $_REQUEST['fileid'];
-	$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+	$result = tmbo_query( $sql );
 	$row = mysql_fetch_assoc( $result );
 	$uploader = $row['username'];
 	$filename = $row['filename'];
@@ -255,7 +256,7 @@
 				AND offensive_uploads.id=fileid AND fileid = " . $_REQUEST['fileid'] . " 
 				ORDER BY offensive_comments.timestamp";
 	
-	$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+	$result = tmbo_query( $sql );
 	
 	$comments_exist = mysql_num_rows( $result ) > 0;
 	
@@ -488,7 +489,7 @@
 		// show vote options	
 		
 		$sql = "SHOW COLUMNS FROM offensive_comments LIKE 'vote'";
-		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query( $sql );
 		$row = mysql_fetch_row($result);
 		$options = explode("','",preg_replace("/(enum|set)\('(.+?)'\)/","\\2",$row[1]));
 		

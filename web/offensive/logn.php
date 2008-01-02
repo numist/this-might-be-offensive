@@ -58,7 +58,7 @@
 		$link = openDbConnection();
 		$ip = $_SERVER['REMOTE_ADDR'];
 		$sql = "INSERT INTO ip_history (userid, ip) VALUES ( $uid, '$ip' )";
-		$result = mysql_query( $sql, $link ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query( $sql );
 
 	}
 
@@ -69,10 +69,10 @@
 		$pw = sqlEscape( $_REQUEST['password'] );
 		$ip = $_SERVER['REMOTE_ADDR'];
 		$sql = "insert into failed_logins (username,ip) VALUES ( '".sqlEscape($uname)."', '$ip' )";
-		@mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		tmbo_query( $sql );
 		
 		$sql = "select count(id) as thecount from failed_logins where ip='$ip' and timestamp > date_sub( now(), interval 1 day )";
-		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query( $sql );
 		echo mysql_error();
 		$row = mysql_fetch_assoc( $result );
 		$count = $row['thecount'];
@@ -106,13 +106,13 @@
 
 			$link = openDbConnection();
 			$sql = "SELECT * from users where userid=$uid LIMIT 1";
-			$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+			$result = tmbo_query( $sql );
 			if( mysql_num_rows( $result ) == 1 ) {
 				$row = mysql_fetch_assoc( $result );
 				$cookiehash = tmbohash( $row['userid'], $row['username'] . $_SERVER['REMOTE_ADDR'] . $salt );
 				if( $cookiehash == $cookieValue ) {
 					$sql = "SELECT userid, username, account_status FROM users WHERE userid=$uid";
-					$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+					$result = tmbo_query( $sql );
 					return loginFromQueryResult( $result );
 				}
 			}
@@ -132,7 +132,7 @@
 
 			if( is_numeric( $uid ) ) {
 				$sql = "UPDATE users SET last_login_ip='" . $_SERVER['REMOTE_ADDR'] . "', timestamp=now() WHERE userid=$uid LIMIT 1";
-				mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+				tmbo_query( $sql );
 			}
 
 			if( $status == 'normal' || $status == 'admin' ) {
@@ -165,7 +165,7 @@
 		
 		$ip = $_SERVER['REMOTE_ADDR'];
 		$sql = "SELECT count( id ) as numFailed from failed_logins WHERE ip='$ip' AND timestamp > date_sub( now(), interval 30 minute )";
-		$result = @mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query( $sql );
 	
 		$row = @mysql_fetch_assoc( $result );
 		
@@ -178,7 +178,7 @@
 		
 		$query = "SELECT userid, username, account_status FROM users WHERE username = '" . sqlEscape($name) . "' AND password = '" . $encrypted_pw . "'";
 
-		$result = mysql_query($query) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query($query);
 	
 		return loginFromQueryResult( $result );
 

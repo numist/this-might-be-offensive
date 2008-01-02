@@ -66,6 +66,33 @@ set_error_handler("tmbo_error_handler");
 /* timezone error fix applies to all pages */
 date_default_timezone_set("America/Chicago");
 
+/* debugging information gathering */
+$queries = 0;
+$querytime = 0;
+
+function time_start(&$time) {
+	$time = microtime(true);
+}
+
+function time_break($time) {
+	return microtime(true) - $time;
+}
+function time_end($time) {
+	return time_break($time);
+}
+
+function tmbo_query($sql) {
+	global $link, $queries, $querytime;
+
+	time_start($time);
+	$result = mysql_query($sql, $link) or 
+		trigger_error(mysql_error(), E_USER_ERROR);
+	$querytime += time_end($time);
+	$queries++;
+	return $result;
+}
+
+/* accurate timekeeping */
 if(array_key_exists("userid", $_SESSION)) {
 	global $link;
 
@@ -74,7 +101,8 @@ if(array_key_exists("userid", $_SESSION)) {
 		$link = openDbConnection();
 	}
 	
-	mysql_query("UPDATE users SET timestamp=now() WHERE userid=".$_SESSION['userid']." LIMIT 1") or trigger_error(mysql_error(), E_USER_ERROR);
+	tmbo_query("UPDATE users SET timestamp=now() WHERE userid=".$_SESSION['userid']." LIMIT 1");
 }
+
 
 ?>

@@ -19,7 +19,7 @@
 	
 		$sql = "SELECT user_preferences.id FROM user_preferences WHERE nameid=$prefid AND userid = " . $_SESSION['userid'];	
 		
-		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query( $sql );
 		
 		if( mysql_num_rows( $result ) > 0 ) {
 			$row = mysql_fetch_array( $result );
@@ -38,7 +38,7 @@
 			$sql = "INSERT INTO user_preferences (userid, nameid, valueid) VALUES ( " . $_SESSION['userid'] . ", $prefid, $valueid )";
 		}
 		
-		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query( $sql );
 		
 		$_SESSION['prefs'] = getPreferences( $_SESSION['userid'] );
 	
@@ -47,7 +47,7 @@
 	if( is_numeric( $_REQUEST['sq'] ) ) {
 		$squelch = sqlEscape( $_REQUEST['sq'] );
 		$sql = "insert into offensive_squelch (userid, squelched) VALUES ( " . $_SESSION['userid'] . ", $squelch )";
-		mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		tmbo_query( $sql );
 		$prefs = getPreferences( $_SESSION['userid'] );
 		$_SESSION['prefs'] = $prefs;
 	}
@@ -56,7 +56,7 @@
 		$squelch = sqlEscape( $_REQUEST['unsq'] );
 		$userid = $_SESSION['userid'];
 		$sql = "delete from offensive_squelch where userid=$userid AND squelched=$squelch";
-		mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		tmbo_query( $sql );
 		$prefs = getPreferences( $_SESSION['userid'] );
 		$_SESSION['prefs'] = $prefs;
 	}

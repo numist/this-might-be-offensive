@@ -31,7 +31,7 @@
 				GROUP  BY users.userid, vote
 				ORDER BY username, vote";
 
-		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query( $sql );
 		
 		?>
 		

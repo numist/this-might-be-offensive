@@ -22,7 +22,7 @@ require_once("offensive/assets/header.inc");
 			ORDER BY timestamp DESC
 			LIMIT 200";
 
-	$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+	$result = tmbo_query( $sql );
 
 	while( $row = mysql_fetch_assoc( $result ) ) {
 	

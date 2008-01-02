@@ -6,7 +6,7 @@ function getPreferences( $userid ) {
 		
 	$sql = "SELECT names.value AS prefname, val.value AS prefvalue FROM user_preferences, preference_names_values names, preference_names_values val WHERE userid=$userid AND nameid=names.id AND val.id=valueid";
 
-	$result = mysql_query($sql) or trigger_error(mysql_error(), E_USER_ERROR);
+	$result = tmbo_query($sql);
 
 	// get the results of the query as an associative array, indexed by column name
 	while( $row = mysql_fetch_array( $result, MYSQL_ASSOC ) ) {
@@ -17,7 +17,7 @@ function getPreferences( $userid ) {
 	$squelched = array();
 
 	$sql = "SELECT squelched FROM offensive_squelch WHERE userid=$userid";
-	$result = mysql_query($sql) or trigger_error(mysql_error(), E_USER_ERROR);
+	$result = tmbo_query($sql);
 
 	// get the results of the query as an associative array, indexed by column name
 	while( $row = mysql_fetch_array( $result ) ) {

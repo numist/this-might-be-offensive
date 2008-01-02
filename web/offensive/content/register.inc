@@ -63,7 +63,7 @@
 
 	function isValidReferral( $code ) {
 		$sql = "select * from referrals where referral_code = '$code'";
-		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query( $sql );
 		return (mysql_num_rows( $result ) > 0);
 	}
 
@@ -81,7 +81,7 @@
 	
 	    if(!isset($link) || !$link) $link = openDbConnection();
 	    $sql = "SELECT count(*) AS theCount FROM users WHERE email = '" . $email . "'";
-	    $res = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+	    $res = tmbo_query( $sql );
 	    $row = mysql_fetch_assoc( $res );
 	    if( $row['theCount'] > 0 ) {
 	    	return new statusMessage( false, "An account with that email address already exists." );
@@ -109,7 +109,7 @@
 		
 	    $query = "SELECT count(*) AS theCount FROM users WHERE username = '" . $uName . "'";
 
-	    $result = mysql_query($query) or trigger_error(mysql_error(), E_USER_ERROR);
+	    $result = tmbo_query($query);
 
 		// get the results of the query as an associative array, indexed by column name
 		$row = mysql_fetch_array( $result, MYSQL_ASSOC );
@@ -118,15 +118,16 @@
 
 			$sql = "select * from referrals where referral_code = '$referral'";
 
-			$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+			$result = tmbo_query( $sql );
 			$row = mysql_fetch_assoc( $result );
 			$referrer = $row['userid'];
 
 			$encrypted_pw = sha1( $pw );
 		
 			$query = "INSERT INTO users (username,password,email,referred_by,created,ip) VALUES ( '$uName','$encrypted_pw', '$email', $referrer, now(), '" . $_SERVER['REMOTE_ADDR']. "' )";
-			$result = mysql_query($query) or trigger_error(mysql_error(), E_USER_ERROR); 
-			$result = mysql_query("SELECT userid,account_status from users where username = '$uName'") or trigger_error(mysql_error(), E_USER_ERROR); 
+			$result = tmbo_query($query);
+
+			$result = tmbo_query("SELECT userid,account_status from users where username = '$uName'"); 
 			$row = mysql_fetch_array( $result, MYSQL_ASSOC );
 			if( $row['account_status'] == 'normal' ) {
 				$_SESSION['userid'] = $row['userid'];

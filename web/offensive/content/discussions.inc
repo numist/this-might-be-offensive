@@ -63,7 +63,7 @@
 					ORDER BY $order DESC
 					LIMIT $start, $numPerPage";
 
-		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query( $sql );
 
 		while( $row = mysql_fetch_assoc( $result ) ) {
 			$css = (isset($css) && $css == "even_row") ? "odd_row" : "even_row";

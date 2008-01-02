@@ -90,7 +90,7 @@
 #
 #		if( $puntme == 1 ) {
 #			$sql = "update users set account_status = 'locked' where userid=" .  $_SESSION['userid'] . " limit 1";
-#			mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+#			tmbo_query( $sql );
 #		}
 
 		if( ! isAvatarUpload() ) {
@@ -103,7 +103,7 @@
 						WHERE hash = '$hash'
 						ORDER by timestamp DESC
 						LIMIT 1";
-				$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+				$result = tmbo_query( $sql );
 				if( mysql_num_rows( $result ) > 0 ) {
 					$repost_row = mysql_fetch_assoc( $result );
 				}
@@ -124,7 +124,7 @@
 		                VALUES ( " . $_SESSION['userid'] . ", '" . sqlEscape( $filename ) . "', '" . $_SERVER['REMOTE_ADDR'] . "', $nsfw, $tmbo, '$hash', '" . typeFor( $fileinfo["fileformat"] ) . "', 'pending' ) ";
 
 
-		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query( $sql );
 
 		$entry_id = mysql_insert_id();
 
@@ -160,7 +160,7 @@
 		$sql = "insert into offensive_subscriptions (userid, fileid )
 		                values ( " . $_SESSION['userid'] . ", $entry_id ) ";
 
-		mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		tmbo_query( $sql );
 
 #		mail( "ray@mysocalled.com", "[" . $_SERVER["REMOTE_ADDR"] . "] - file uploaded. " . $_SESSION['username'], $filename . "\n\nhttp://themaxx.com/offensive/pages/pic.php?id=" . $entry_id, "From: offensive@themaxx.com (this might be offensive)" );
 		
@@ -277,7 +277,7 @@
 		if(!isset($link) || !$link) $link = openDbConnection();
 	
 		$sql = "SELECT count( id ) as thecount FROM offensive_uploads WHERE userid = " . $_SESSION['userid'] . " AND timestamp > DATE_SUB( NOW(), INTERVAL 1 DAY ) AND type='image'";
-		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query( $sql );
 
 		$row = mysql_fetch_assoc( $result );
 
@@ -299,7 +299,7 @@
 						AND type='image'
 					GROUP  BY vote";
 
-		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query( $sql );
 		$good = 0;
 		$bad = 0;
 
@@ -352,7 +352,7 @@
 		global $link;
 		if(!isset($link) || !$link) $link = openDbConnection();
 		$sql = "update offensive_uploads set status='$newstatus' where id=$fileid limit 1";
-		mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		tmbo_query( $sql );
 	}
 
 	function body() {
@@ -545,7 +545,7 @@ function killRepost() {
 				LIMIT 1";
 
 	if(!isset($link) || !$link) $link = openDbConnection();
-	$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+	$result = tmbo_query( $sql );
 	if( mysql_num_rows( $result ) > 0 ) {
 		
 		$row = mysql_fetch_assoc( $result );
@@ -561,7 +561,7 @@ function killRepost() {
 						AND userid=" . $_SESSION['userid'] . "
 						LIMIT 1";
 
-			mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+			tmbo_query( $sql );
 
 		}
 
@@ -589,7 +589,7 @@ function postAnyway() {
 				LIMIT 1";
 
 	if(!isset($link) || !$link) $link = openDbConnection();
-	$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+	$result = tmbo_query( $sql );
 	if( mysql_num_rows( $result ) > 0 ) {
 
 		$row = mysql_fetch_assoc( $result );

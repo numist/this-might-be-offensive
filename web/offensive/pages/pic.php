@@ -47,7 +47,7 @@
 				LIMIT 1";
 #					AND type='image' AND users.account_status != 'locked'
 					
-		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query( $sql );
 		$row = mysql_fetch_assoc( $result );
 			
 		$filename = $row['filename'];
@@ -99,7 +99,7 @@
 	$sql = "SELECT good, bad, tmbo, repost, comments from offensive_count_cache c
 			WHERE threadid=$id";
 	
-	$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+	$result = tmbo_query( $sql );
 	if( mysql_num_rows( $result ) > 0 ) {
 		list( $good, $bad, $tmbo, $repost, $comments  ) = mysql_fetch_array( $result );
 	}

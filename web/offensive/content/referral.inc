@@ -37,7 +37,7 @@
 		$sql = "select (created < date_sub( now(), INTERVAL 1 MONTH )) as canInvite
 					FROM users where userid=$uid";
 		if(!isset($link) || !$link) $link = openDbConnection();
-		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query( $sql );
 		$row = mysql_fetch_assoc( $result );
 
 		return $row['canInvite'] == 1;
@@ -76,7 +76,7 @@ Enjoy.
 					values( $uid, '$referral_code', '".sqlEscape($email)."' );
 		";
 		
-		mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		tmbo_query( $sql );
 
 		return $referral_code;
 	}
@@ -84,7 +84,7 @@ Enjoy.
 	function showReferrals( $uid ) {
 
 		$sql = "select * from referrals where userid=$uid";
-		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query( $sql );
 		while( $row = mysql_fetch_assoc( $result ) ) {
 			$nextStyle = ($nextStyle == "odd_row") ? "even_row" : "odd_row";
 			?>

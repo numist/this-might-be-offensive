@@ -21,7 +21,7 @@
 			$sql = "update users set password='$encrypted_pw' WHERE userid = $uid LIMIT 1";
 			
 			$link = openDbConnection();
-			@mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+			tmbo_query( $sql );
 			header( "Location: ./logn.php" );
 		}	
 		else {
@@ -34,7 +34,7 @@
 		$link = openDbConnection();
 		$username = sqlEscape( $username );
 		$sql = "SELECT * FROM users WHERE username='$username'";
-		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query( $sql );
 		if( mysql_num_rows( $result ) == 1 ) {
 			$row = mysql_fetch_assoc( $result );
 			$code = hashFromUserRow( $row );
@@ -127,7 +127,7 @@ http://".$_SERVER['SERVER_NAME']."/offensive/pwreset.php?x=$code
 		if( is_numeric( $id ) && $id > 1 ) {
 			$link = openDbConnection();
 			$sql = "SELECT * FROM users WHERE userid = $id";
-			$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+			$result = tmbo_query( $sql );
 			if( mysql_num_rows( $result ) == 1 ) {
 				$row = mysql_fetch_assoc( $result );
 				$hash = hashFromUserRow( $row );

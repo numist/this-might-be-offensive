@@ -27,7 +27,7 @@
 
 		if(!isset($link) || !$link) $link = openDbConnection();
 		$sql = "replace into maxxer_locations (userid, x, y) values ( $maxxerid, $x, $y )";
-		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query( $sql );
 		
 		if( file_exists( "users/$maxxerid.jpg" ) ) {
 			unlink( "users/$maxxerid.jpg" );

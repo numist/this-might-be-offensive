@@ -26,7 +26,7 @@
 				
 		$sql = "SELECT username
 					FROM users WHERE userid={$usrid}";
-		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query( $sql );
 		list($username) = mysql_fetch_array( $result );
 
 ?>
@@ -57,7 +57,7 @@
 						(select username from users where userid={$usrid}) AS referrer
 						FROM users WHERE referred_by={$usrid}
 						ORDER BY username";
-			$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+			$result = tmbo_query( $sql );
 	
 		
 			while( list($name, $status, $created, $userid, $referrer) = mysql_fetch_array($result)) {

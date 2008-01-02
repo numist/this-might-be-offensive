@@ -44,7 +44,7 @@
 					FROM users
 					ORDER BY created DESC LIMIT 100";
 					
-		$result = mysql_query($sql) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query($sql);
 
 ?>
 				<tr style="background:#bbbbee;">

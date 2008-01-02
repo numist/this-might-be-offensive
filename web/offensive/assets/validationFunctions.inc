@@ -14,7 +14,7 @@
 		if(!isset($link) || !$link) $link = openDbConnection();
 
 		$sql = "SELECT count(*) AS theCount FROM users WHERE email = '" . $email . "'";
-		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query( $sql );
 		$row = mysql_fetch_assoc( $result );
 		if( $row['theCount'] > 0 ) {
 			return new statusMessage( false, "An account with that email address already exists." );

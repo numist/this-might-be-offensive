@@ -26,7 +26,7 @@
 
 		if(!isset($link) || !$link) $link = openDbConnection();
 		$sql = "replace into maxxer_locations (userid, x, y, mapversion) values ( $maxxerid, $x, $y, 'google' )";
-		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query( $sql );
 		
 	}
 ?>
@@ -83,7 +83,7 @@
 		<?
 			$link = openDbConnection();
 			$sql = "select *, username from maxxer_locations, users where mapversion = 'google' AND maxxer_locations.userid = users.userid";
-			$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+			$result = tmbo_query( $sql );
 			
 			while( $row = mysql_fetch_array( $result ) ) {
 				?>

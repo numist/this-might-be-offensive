@@ -64,7 +64,7 @@
 	function getReferrerId( $refcode ) {
 
 		$sql = "SELECT * FROM referrals WHERE referral_code = '$refcode' LIMIT 1";
-		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query( $sql );
 		if( mysql_num_rows( $result ) == 1 ) {
 			$row = mysql_fetch_assoc( $result );
 			return $row['userid'];
@@ -89,7 +89,7 @@
 
 	    $query = "SELECT count(*) AS theCount FROM users WHERE username = '" . $uName . "'";
 
-	    $result = mysql_query($query) or trigger_error(mysql_error(), E_USER_ERROR);
+	    $result = tmbo_query($query);
 
 		// get the results of the query as an associative array, indexed by column name
 		$row = mysql_fetch_array( $result, MYSQL_ASSOC );
@@ -99,9 +99,10 @@
             $encrypted_pw = sha1( $pw );
 		
 			$query = "INSERT INTO users (username,password,email,created,ip,referred_by) VALUES ( '" . $uName . "','" . $encrypted_pw . "', '" . $_POST['email'] . "', now(), '" . $_SERVER['REMOTE_ADDR']. "', $referrerId )";
-			$result = mysql_query($query) or trigger_error(mysql_error(), E_USER_ERROR); 
-			$result = mysql_query("SELECT userid,account_status from users where username = '$uName'") or trigger_error(mysql_error(), E_USER_ERROR); 
-			$row = mysql_fetch_array( $result, MYSQL_ASSOC );
+			tmbo_query($query); 
+
+			$result = tmbo_query("SELECT userid,account_status from users where username = '$uName'"); 
+			$row = mysql_fetch_assoc( $result );
 			if( $row['account_status'] == 'normal' ) {
 				$_SESSION['userid'] = $row['userid'];
 				$_SESSION['username'] = $uName;
@@ -111,7 +112,9 @@
 			
 			mail( $_POST['email'], "[ this might be offensive ] account activation", "$activationMessage", "From: offensive@thismight.be (this might be offensive)");
 			
-			@mysql_query( "DELETE FROM referrals WHERE referral_code = '$referral' AND userid=$referrerId LIMIT 1" ) or trigger_error(mysql_error(), E_USER_WARNING);
+			/* this query not changed to tmbo_query
+			 * because it should be non-fatal if the query fails. */
+			mysql_query( "DELETE FROM referrals WHERE referral_code = '$referral' AND userid=$referrerId LIMIT 1" ) or trigger_error(mysql_error(), E_USER_WARNING);
 #			mail( "ray@mysocalled.com", "[" . $_SERVER["REMOTE_ADDR"] . "] - [ this might be offensive ] account created: $uName", $_POST['email'], "From: offensive@thismight.be (this might be offensive)");
 		} else {
 		 	$returnMessage = "The username you've chosen, \"" . $uName . "\", is not available.";

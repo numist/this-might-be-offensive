@@ -42,7 +42,7 @@
 				AND hall_of_fame.type = '$view'
 				ORDER BY hall_of_fame.id";
 
-		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query( $sql );
 		$count = 0;
 
 		while( $row = mysql_fetch_assoc( $result ) ) {

@@ -81,7 +81,7 @@
 					ORDER  BY value $sort_dir 
 					LIMIT 100";
 
-		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query( $sql );
 		statsTable( $result, $heading );
 	
 	}
@@ -94,7 +94,7 @@
 			AND type = '$vote'
 			ORDER BY value DESC LIMIT 25";
 
-		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query( $sql );
 		statsTable( $result, $heading );
 	}
 	
@@ -145,7 +145,7 @@
 		
 		$sql = "SELECT count(id) as thecount
 				from offensive_uploads";
-		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query( $sql );
 		$row = mysql_fetch_assoc( $result );
 		$totalUploads = $row['thecount'];
 
@@ -153,13 +153,13 @@
 					FROM offensive_uploads
 					WHERE timestamp > date_sub( now(), INTERVAL 24 HOUR )";
 
-		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query( $sql );
 		$row = mysql_fetch_assoc( $result );
 		$uploadsToday = $row['thecount'];
 
 
 		$sql = "SELECT vote, count(id) as thecount from offensive_comments group by vote";
-		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query( $sql );
 		$total = 0;
 		ob_start();
 		while( $row = mysql_fetch_assoc( $result ) ) {
@@ -194,7 +194,7 @@
 				ORDER BY value DESC
 				LIMIT 25";
 
-		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query( $sql );
 		statsTable( $result, "upload quality" );
 	}
 

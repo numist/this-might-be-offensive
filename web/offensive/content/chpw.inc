@@ -29,11 +29,11 @@
 							WHERE userid = $uid
 							AND password = '$encrypted_pw'";
 	
-				$result = mysql_query( $query ) or trigger_error(mysql_error(), E_USER_ERROR);
+				$result = tmbo_query( $query );
 				if( mysql_num_rows( $result ) == 1 ) {
 					$encrypted_pw = sha1( $new );
 					$sql = "UPDATE users SET password='$encrypted_pw' WHERE userid=$uid LIMIT 1";
-					$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+					$result = tmbo_query( $sql );
 					?>done.<br/><br/><?
 				}
 				else {

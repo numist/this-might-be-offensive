@@ -21,6 +21,8 @@
 	set_include_path("..");
 	require_once("offensive/assets/header.inc");
 
+	time_start($ptime);
+
 	if( ! is_numeric( $_SESSION['userid'] ) ) {
 		header( "Location: ./logn.php?redirect=" . urlencode( $_SERVER['HTTP_REFERER']));
 		exit;
@@ -342,6 +344,7 @@ if(ini_get("magic_quotes_gpc") == true)
 	<? require('includes/footer.txt'); ?>
 
 	<div class="textlinks">contents copyright &copy; 1997-<?= date("Y") ?> <a href="/contact/" class="textlinks" onmouseover='window.status="[ connect ]"; return true' onmouseout='window.status=""'>Ray Hatfield</a>. All rights reserved.</div>
+	<div class="textlinks"><?= number_format(time_end($ptime) - $querytime, 3)."s php, ".number_format($querytime, 3)."s sql, $queries queries"; ?></div>
 </div>
 <br />
 
@@ -388,7 +391,7 @@ if(ini_get("magic_quotes_gpc") == true)
 
 		$link = openDbConnection();
 
-		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query( $sql );
 		
 		if( mysql_num_rows( $result ) == 0 ) {
 			return;
@@ -440,7 +443,7 @@ if(ini_get("magic_quotes_gpc") == true)
 
 		// get the total number of users online
 		$sql = "SELECT COUNT(*) FROM users WHERE timestamp > DATE_SUB( now( ) , INTERVAL $timelimit MINUTE)";
-		$result = mysql_query($sql) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query($sql);
 		list($nonline) = mysql_fetch_array($result);
 
 		// start us off.
@@ -450,7 +453,7 @@ if(ini_get("magic_quotes_gpc") == true)
 		
 		// list out the latest people to do something
 		$sql = "SELECT userid, username FROM users WHERE timestamp > DATE_SUB( now( ) , INTERVAL $timelimit MINUTE) && userid != ".$_SESSION['userid']." ORDER BY timestamp DESC LIMIT $userlimit";
-		$result = mysql_query($sql) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query($sql);
 		while(false !== (list($userid, $username) = mysql_fetch_array($result))) {
 			$css = (!isset($css) || $css == "odd") ? "even" : "odd";
 			echo "<tr class=\"".$css."_row\"><td class=\"".$css."file\"><a href=\"./?c=user&userid=$userid\">$username</a></td></tr>\n";

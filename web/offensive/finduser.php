@@ -10,10 +10,7 @@
 	
 	$sql = "select userid from users where username like '" . sqlEscape($_REQUEST['finduser']) . "'";
 
-	$result = mysql_query($sql) or trigger_error(mysql_error(), E_USER_ERROR);
-
-	echo mysql_error();
-
+	$result = tmbo_query($sql);
 	$row = mysql_fetch_array( $result );
 
 	if( mysql_num_rows( $result ) == 1 ) {

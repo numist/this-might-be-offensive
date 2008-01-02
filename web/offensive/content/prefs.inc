@@ -78,7 +78,7 @@
 		include_once( 'admin/mysqlConnectionInfo.inc' );
 		if(!isset($link) || !$link) $link = openDbConnection();
 
-		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query( $sql );
 		while( $row = mysql_fetch_assoc( $result ) ) {
 			?>
 				<?= $row['value'] ?>: <input type="text" onkeypress="setKey( this, '<?= $row['value'] ?>', event );" maxlength="1" value="&larr;" size="3"/>

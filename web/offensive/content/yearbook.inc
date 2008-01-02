@@ -59,7 +59,7 @@
 						AND up.id = (SELECT MAX( up.id) FROM offensive_uploads up where type='avatar' AND userid=users.userid)
 					ORDER BY $order, up.id DESC";
 
-		$result = mysql_query($sql) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query($sql);
 
 		echo mysql_error();
 

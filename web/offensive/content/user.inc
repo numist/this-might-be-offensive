@@ -57,7 +57,7 @@
 					(select userid from users ref where users.referred_by=ref.userid) AS referrerid,
 					last_login_ip, timestamp
 					FROM users WHERE userid={$usrid}";
-		$res = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$res = tmbo_query( $sql );
 		list($name, $status, $email, $created, $referredby, $refid, $ip, $timestamp) = mysql_fetch_array( $res );
 	
 		$sql = "SELECT filename FROM offensive_uploads
@@ -66,7 +66,7 @@
 					ORDER BY TIMESTAMP DESC
 					LIMIT 1";
 
-		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query( $sql );
 		if( mysql_num_rows( $result ) == 1 ) {
 			list($avatar) = mysql_fetch_array( $result );
 		}
@@ -102,7 +102,7 @@
 								<?
 									if( isAdmin() ) {
 										$sql = "select distinct userid, username, account_status from users where last_login_ip = '$ip' AND userid != $usrid" ;
-										$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+										$result = tmbo_query( $sql );
 										if( mysql_num_rows( $result ) > 0 ) {
 											?><br/>Other users with the same ip:<br/><?
 											while( $row = mysql_fetch_assoc( $result ) ) {
@@ -161,7 +161,7 @@
 							
 							$sql = "SELECT count(*) as thecount FROM users
 										WHERE referred_by={$usrid}";
-							$res = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+							$res = tmbo_query( $sql );
 							list( $possecount ) = mysql_fetch_array( $res );
 							
 							if( $possecount > 0 ) {
@@ -222,7 +222,7 @@
 			LIMIT 300
 ";
 
-	$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+	$result = tmbo_query( $sql );
 
 	$class = 'evenfile';
 
@@ -276,7 +276,7 @@ function unreadComments( $uid ) {
 			LIMIT 30
 		";
 
-	$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+	$result = tmbo_query( $sql );
 	
 	if( mysql_num_rows( $result ) == 0 ) {
 		return;
@@ -317,7 +317,7 @@ function recentComments( $uid ) {
 			LIMIT 15";
 
 	if(!isset($link) || !$link) $link = openDbConnection();
-	$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+	$result = tmbo_query( $sql );
 	
 ?>
 	<div class="piletitle">the smartypants' most recent remarks:</div>
@@ -348,14 +348,14 @@ function handleSetStatusSubmission() {
 		$emailClause = $isEmailValid ? ", email = '$email' " : "";
 		if(!isset($link) || !$link) $link = openDbConnection();
 		$sql = "update users set account_status ='$status' $emailClause where userid = $usrid limit 1";
-		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query( $sql );
 	}
 }
 
 function setStatusForm( $id, $status, $email ) {
 
 	$sql = "SHOW COLUMNS FROM users LIKE 'account_status'";
-	$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+	$result = tmbo_query( $sql );
 	$row = mysql_fetch_row($result);
 	$options = explode("','",preg_replace("/(enum|set)\('(.+?)'\)/","\\2",$row[1]));
 	
@@ -395,7 +395,7 @@ function votingRecord( $id, $name ) {
 
 	if(!isset($link) || !$link) $link = openDbConnection();
 	
-	$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+	$result = tmbo_query( $sql );
 
 	$good = 0;
 	$bad = 0;

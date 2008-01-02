@@ -25,7 +25,7 @@
 	
 		if(!isset($link) || !$link) $link = openDbConnection();
 	
-		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query( $sql );
 		
 		$xCell = -1;
 		$yCell = -1;

@@ -33,14 +33,14 @@
 		if(!isset($link) || !$link) $link = openDbConnection();
 		$sql = "insert into offensive_comments( userid, fileid, comment, user_ip )
 				values( $uid, $topicid, '".sqlEscape($comment)."', '" . $_SERVER['REMOTE_ADDR'] . "' )";
-		mysql_query( $sql, $link ) or trigger_error(mysql_error(), E_USER_ERROR);
+		tmbo_query( $sql, $link );
 		
 		$commentid = mysql_insert_id( $link );
 		
 		$sql = "insert into offensive_count_cache ( threadid, comments ) VALUES ( $topicid, 1 )
 					on duplicate key update comments = comments + 1";
 					
-		mysql_query( $sql, $link ) or trigger_error(mysql_error(), E_USER_ERROR);
+		tmbo_query( $sql, $link );
 
 		return $commentid;
 	}
@@ -52,7 +52,7 @@
 		$sql = "insert into offensive_uploads ( userid, filename, ip, type )
 					VALUES ( $uid, '".sqlEscape($topic)."', '" . $_SERVER['REMOTE_ADDR'] . "', 'topic' )";
 					
-		mysql_query( $sql, $link ) or trigger_error(mysql_error(), E_USER_ERROR);
+		tmbo_query( $sql, $link );
 
 	 	$threadid = mysql_insert_id( $link );
 
@@ -67,7 +67,7 @@
 		$sql = "insert into offensive_subscriptions( userid, fileid )
 					values( $uid, $fileid )";
 					
-		$result = mysql_query( $sql ) or trigger_error(mysql_error(), E_USER_ERROR);
+		$result = tmbo_query( $sql );
 
 	}
 
