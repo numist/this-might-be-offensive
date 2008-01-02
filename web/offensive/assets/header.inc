@@ -86,7 +86,7 @@ function tmbo_query($sql) {
 
 	time_start($time);
 	$result = mysql_query($sql, $link) or 
-		trigger_error(mysql_error(), E_USER_ERROR);
+		trigger_error(mysql_error()." query '$sql'", E_USER_ERROR);
 	$querytime += time_end($time);
 	$queries++;
 	return $result;

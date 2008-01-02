@@ -18,6 +18,13 @@
 
 /*****************************************************************************/
 
+// how many users to display in the online list
+$userlimit = 20;
+// how long before a user is considered not online anymore
+$timelimit = 10;
+
+/*****************************************************************************/
+
 	set_include_path("..");
 	require_once("offensive/assets/header.inc");
 
@@ -313,11 +320,13 @@ if(ini_get("magic_quotes_gpc") == true)
 					</div>
 				<div class="blackbar"></div>
 			</div>
+			<? if(array_key_exists("c", $_REQUEST) && $_REQUEST['c'] != "online") { ?>
 			<div class="contentbox">
 				<div class="blackbar"></div>
 					<? whosOn(); ?>
 				<div class="blackbar"></div>
 			</div>
+			<? } ?>
 			
 		</div> <!-- end left column -->
 		
@@ -431,11 +440,6 @@ if(ini_get("magic_quotes_gpc") == true)
 
 	function whosOn() {
 		global $link, $userlimit, $timelimit;
-
-		// how many users to display in the online list
-		$userlimit = 20;
-		// how long before a user is considered not online anymore
-		$timelimit = 10;
 
 		if(!isset($link) || !$link) $link = openDbConnection();
 
