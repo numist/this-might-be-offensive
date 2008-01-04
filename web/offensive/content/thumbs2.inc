@@ -86,7 +86,7 @@ LIMIT $page_limit_clause, 100;
 			<td valign="top" colspan="2">
 			          <table width="100%" class="thumbnails">
             <?php
-            $result = mysql_query($sql) or trigger_error(mysql_error(), E_USER_ERROR);
+            $result = tmbo_query($sql);
             $output = 0;
             while( $row = mysql_fetch_assoc( $result ) ) 
             {
@@ -99,7 +99,7 @@ LIMIT $page_limit_clause, 100;
                     <td>
 
 	<a href="pages/pic.php?id=<?= $row['id'] ?>"><span<?= $css?>><img src="images/thumbs/th-<?= $filename?>" border="0"/></span></a><br/>
-	<a href="./?c=comments&fileid=<?= $row['id'] ?>"><?= $row['comments'] ?> comments (+<?= $row['good'] ?> -<?= $row['bad'] ?>)</a>
+	<a href="./?c=comments&fileid=<?= $row['id'] ?>"><?= $row['comments'] ?> comments (+<?= ($row['good'] != '')?$row['good']:0; ?> -<?= ($row['bad'] != '')?$row['bad']:0;?>)</a>
 </td>
                 <?php
                 if( $output % $THUMBS_PER_ROW == $THUMBS_PER_ROW - 1 ) {

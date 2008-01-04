@@ -83,7 +83,7 @@ LIMIT $page_limit_clause, 100;
 			<td valign="top" colspan="2">
 				<table width="100%">
             <?php
-            $result = mysql_query($sql) or trigger_error(mysql_error(), E_USER_ERROR);
+            $result = tmbo_query($sql);
             while( $row = mysql_fetch_assoc( $result ) ) 
             {
               $css = (isset($css) && $css == "odd_row") ? "even_row" : "odd_row";
@@ -94,7 +94,7 @@ LIMIT $page_limit_clause, 100;
               ?>
                   <tr class="<?= $css ?>">
                     <td class="<?= $css ?>"><div class="clipper"><a href="pages/pic.php?id=<?= $row['id'] ?>" class="<?= $css ?>" title="uploaded by <?= $row['username'] ?>"><?= $filename ?></a></div></td>
-                    <td class="<?= $css ?>" style="text-align:right;white-space:nowrap"><a href="./?c=comments&fileid=<?= $row['id'] ?>" class="<?= $css ?>"><?= $row['comments'] ?> comments</a> (+<?= $row['good'] ?> -<?= $row['bad'] ?>)</td>
+                    <td class="<?= $css ?>" style="text-align:right;white-space:nowrap"><a href="./?c=comments&fileid=<?= $row['id'] ?>" class="<?= $css ?>"><?= $row['comments'] ?> comments</a> (+<?= ($row['good'] != '')?$row['good']:0; ?> -<?= ($row['bad'] != '')?$row['bad']:0;?>)</td>
                   </tr>
                 <?php
             }
