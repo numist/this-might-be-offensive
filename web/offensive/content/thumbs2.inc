@@ -41,7 +41,7 @@ SELECT
   users.username
 FROM
   offensive_uploads
-JOIN offensive_count_cache
+LEFT JOIN offensive_count_cache
 ON  offensive_count_cache.threadid = offensive_uploads.id
 JOIN users
 ON offensive_uploads.userid = users.userid
@@ -49,6 +49,8 @@ WHERE
   offensive_uploads.type= 'image'
 AND
   offensive_uploads.status = 'normal'
+AND
+  users.account_status != 'locked'
 ORDER BY offensive_uploads.timestamp DESC, offensive_uploads.id DESC
 LIMIT $page_limit_clause, 100;
 ";
@@ -89,7 +91,7 @@ LIMIT $page_limit_clause, 100;
             while( $row = mysql_fetch_assoc( $result ) ) 
             {
               $css = $row['nsfw'] == 1 ? ' class="nsfw"' : "";
-              $filename = urlencode($row['filename']);
+              $filename = rawurlencode($row['filename']);
               	if( $output % $THUMBS_PER_ROW == 0 ) {
                   ?><tr><?php
                 }
