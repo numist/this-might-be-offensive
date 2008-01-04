@@ -1,0 +1,152 @@
+This file will get you situated and ready to work on TMBO.  
+
+Like any significant project, tmbo operates on some coding standards that must be maintained in order to provide a consistent and functional development environment.  This file documents these standards.
+
+###############################################################################
+                                  _         _      
+                              ___| |_ _   _| | ___ 
+                             / __| __| | | | |/ _ \
+                             \__ \ |_| |_| | |  __/
+                             |___/\__|\__, |_|\___|
+                                      |___/        
+
+###############################################################################
+For code block indentation, use hard tabs (\t).  Indentation that is not used to indent logical blocks of code should be aligned with the nearest block of code with hard tabs, and then use spaces beyond.
+
+For example:
+function blah()
+{
+	if(foo &&
+	   bar) {
+		baz;
+	} else {
+		qux;
+	}
+}
+
+Opening braces can and should share the line with their opening condition.  If the brace opens a function, the opening brace should have it's own line.
+
+PHP is a templating language, and as such there are <? ?> and <?= ?> blocks all over the place.  As the site currently stands, it is not egregiously bad, and as iterative changes take place, the appearance of the code has been improving.
+
+###############################################################################
+                                __ _ _           
+                               / _(_) | ___  ___ 
+                              | |_| | |/ _ \/ __|
+                              |  _| | |  __/\__ \
+                              |_| |_|_|\___||___/
+                                                 
+###############################################################################
+User navigable files end in .php, and files included into these files end in .inc and, in general, live in /offensive/assets/.
+
+All files that contain strictly php code must have no leading or trailing whitespace outside of the <? ?> block.
+
+-------------------------------------------------------------------------------
+                                      _           
+                                _ __ | |__  _ __  
+                               | '_ \| '_ \| '_ \ 
+                              _| |_) | | | | |_) |
+                             (_) .__/|_| |_| .__/ 
+                               |_|         |_|    
+
+-------------------------------------------------------------------------------
+User-navigable .php files should all begin with two lines of code, which set up the environment that a lot of code on the site depends on to function correctly.
+
+The first line is a call to set_include_path().  The argument to this function should be the relative path to the web root.  No PATH_SEPARATOR, no trailing /, nothing else extra.  You are allowed to assume that the script is executing in a POSIX environment and that the directory separator is "/".
+
+The second line is a require_once("offensive/assets/header.inc");  The header.inc file does many things that are required for every single page, including:
+* starting the session
+* setting up the error handler, which also starts output buffering if the user is not an admin
+* setting the time zone correctly
+* providing timing and performance ananlyzer functions
+* providing tmbo_query()
+
+-------------------------------------------------------------------------------
+                                   _            
+                                  (_)_ __   ___ 
+                                  | | '_ \ / __|
+                                 _| | | | | (__ 
+                                (_)_|_| |_|\___|
+                                                
+-------------------------------------------------------------------------------
+Code used within multiple .php files should be split off into a file for inclusion.  
+These files are (and should always be) allowed to make certain assumptions:
+* a session has been started, a user's online status can be determined by checking if $_SESSION['userid'] is set.
+* using get_include_path() as part of a path will put you at the web root.  For example, to open index.php, you could file_get_contents(get_include_path()."/offensive/index.php"); from anywhere in the codebase.
+
+###############################################################################
+                       _       _    __                  _   _                 
+   ___ _ __   ___  ___(_) __ _| |  / _|_   _ _ __   ___| |_(_) ___  _ __  ___ 
+  / __| '_ \ / _ \/ __| |/ _` | | | |_| | | | '_ \ / __| __| |/ _ \| '_ \/ __|
+  \__ \ |_) |  __/ (__| | (_| | | |  _| |_| | | | | (__| |_| | (_) | | | \__ \
+  |___/ .__/ \___|\___|_|\__,_|_| |_|  \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
+      |_|                                                                     
+###############################################################################
+TMBO has a few functions that make its codebase cleaner, more secure, and more portable.  
+
+-------------------------------------------------------------------------------
+                                 _        _     _ _ _ _         
+                _ __   ___  _ __| |_ __ _| |__ (_) (_) |_ _   _ 
+               | '_ \ / _ \| '__| __/ _` | '_ \| | | | __| | | |
+               | |_) | (_) | |  | || (_| | |_) | | | | |_| |_| |
+               | .__/ \___/|_|   \__\__,_|_.__/|_|_|_|\__|\__, |
+               |_|                                        |___/ 
+-------------------------------------------------------------------------------
+Due to a high requirement that the site be portable, some special functions have been created to handle various idiosyncracies that vary by environment.  These functions can be found in /offensive/assets/functions.inc.
+
+linkUrls($input)
+This function replaces occurrences of links to themaxx.com in the input text with a link to the current server.  In the future it will do this for links to thismight.be and tmbo.org as well.
+
+sqlEscape($string)
+This function returns a properly escaped string, when given input from a user.  Please note that if magic_quotes is enabled, this function will take into account that the string has been (potentially incorrectly) escaped already and will take steps to correct it, so please use mysql_real_escape_string() for strings that are not affected by magic_quotes.
+
+htmlEscape($string)
+This function returns a safed html string, with provisions for a few idiosyncracies of our environment.  The return value is safe from html injection, although not all html entities have been converted.  This is due to a bug in mysql that causes unicode that is not also in the ASCII set to be html encoded before insertion, but without converting other entities such as &, <, and >.  Use this function wherever you output strings from the database.
+
+-------------------------------------------------------------------------------
+                                               _ _         
+                      ___  ___  ___ _   _ _ __(_) |_ _   _ 
+                     / __|/ _ \/ __| | | | '__| | __| | | |
+                     \__ \  __/ (__| |_| | |  | | |_| |_| |
+                     |___/\___|\___|\__,_|_|  |_|\__|\__, |
+                                                     |___/ 
+-------------------------------------------------------------------------------
+For all error reporting, please use trigger_error(), with an E_USER_* error code.  Only administrators can see errors on the site, and fatal errors will redirect users to a kaboom page (/offensive/index.outoforder.php).  All errors are sent to the apache log.
+
+All queries must use tmbo_query().  This function not only provides error reporting on failed queries, but also instruments queries so an effective measure of the number of queries, and how long they take can be kept.  The only queries that do not currently use tmbo_query() are ones that are in legacy code that is slated to be rewritten.
+
+###############################################################################
+
+That's all the requirements there are.  In reality, the above is less a list of requirements so much as a list of conventions that are used to make the development life of the site much easier.
+
+###############################################################################
+                                           _ _   _   _             
+              ___ ___  _ __ ___  _ __ ___ (_) |_| |_(_)_ __   __ _ 
+             / __/ _ \| '_ ` _ \| '_ ` _ \| | __| __| | '_ \ / _` |
+            | (_| (_) | | | | | | | | | | | | |_| |_| | | | | (_| |
+             \___\___/|_| |_| |_|_| |_| |_|_|\__|\__|_|_| |_|\__, |
+                                                             |___/ 
+###############################################################################
+The development virtual machine comes with a checkout preinstalled and running.  If you don't have the virtual machine (or a subversion account), get in touch with numist and you will be provided with a link to the VM or a read-only subversion account.  Once you've written and exhaustively tested your code, and made sure your tree is up to date and free of conflicts, you need to have your change reviewed and merged into the site.  Here's how:
+
+cd to the web root.
+
+run svn diff > mychange.diff
+
+email mychange.diff to tmbo (@) numist (.) net
+
+work with themaxx or numist or whoever is handling your change when they pester you back.
+
+-------------------------------------------------------------------------------
+                      _ _                    _             
+                     | (_) ___ ___ _ __  ___(_)_ __   __ _ 
+                     | | |/ __/ _ \ '_ \/ __| | '_ \ / _` |
+                     | | | (_|  __/ | | \__ \ | | | | (_| |
+                     |_|_|\___\___|_| |_|___/_|_| |_|\__, |
+                                                     |___/ 
+-------------------------------------------------------------------------------
+Code submitted must have a license that is compatible with the idea that whatever themaxx wants to do with it (sale, restriction of source distribution, anything) is allowed.  This means no GPL, but LGPL and friends are cool. 
+
+The TMBO codebase should be considered proprietary software, all rights reserved.  If you're interested in a portion of the site, find the author and request their code's license from them.  
+
+The official licensing above looks harsh, but in practice is highly flexible, and exists to prevent malicious discovery of security threats and avoid license conflicts.  
+If you're a maxxer, just ask and you will likely receive.
