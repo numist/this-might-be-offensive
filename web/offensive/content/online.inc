@@ -54,9 +54,10 @@
 		if($minago > 0) {
 			echo "$minago:";
 			if(strlen($secago) == 1) echo "0";
-			echo "$secago minutes ago";
-		}
-		else echo "$secago seconds ago"; ?></td>
+			echo "$secago ago";
+		} else if ($secago == 0) {
+			echo "now";
+		} else echo $secago."s ago"; ?></td>
 				</tr>
 	<?	} ?>
 

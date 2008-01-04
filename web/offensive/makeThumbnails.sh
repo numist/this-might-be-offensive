@@ -9,7 +9,7 @@ PATH=/usr/local/bin:$PATH
 export PATH
 
 #cd /hsphere/local/home/thismightbe/thismight.be/offensive
-cd $THEMAXX
+#cd $THEMAXX
 
 extset="jpg JPG jpeg JPEG gif GIF png PNG"
 
