@@ -1,8 +1,5 @@
 <?
-	// Include, and check we've got a connection to the database.
-	include_once( 'admin/mysqlConnectionInfo.inc' );
-	if(!isset($link) || !$link) $link = openDbConnection();
-  
+
 	require_once( 'offensive/assets/tabs.inc' );
 	
 	function start() {
@@ -20,37 +17,6 @@
 		} else {
 			$last_update = -1;
 		}
-  
-  $page_limit_clause = array_key_exists("p", $_REQUEST) ? $_REQUEST['p'] * 100: 0;
-    
-    // This should be fine, after the key is in memory it is a fast query.
-    // We need to be sure that it is using the correct keys if the query is consistently slow
-    $sql = "
-SELECT
-  offensive_uploads.id,
-  offensive_uploads.timestamp,
-  offensive_uploads.filename,
-  offensive_uploads.nsfw,
-  offensive_uploads.tmbo,
-  offensive_uploads.type,
-  offensive_count_cache.good,
-  offensive_count_cache.bad,
-  offensive_count_cache.tmbo AS tmbo_vote,
-  offensive_count_cache.comments,
-  users.username
-FROM
-  offensive_uploads
-JOIN offensive_count_cache
-ON  offensive_count_cache.threadid = offensive_uploads.id
-JOIN users
-ON offensive_uploads.userid = users.userid
-WHERE
-  offensive_uploads.type= 'image'
-AND
-  offensive_uploads.status = 'normal'
-ORDER BY offensive_uploads.timestamp DESC, offensive_uploads.id DESC
-LIMIT $page_limit_clause, 100;
-";
 
 ?>
 <div class="heading">
@@ -79,25 +45,7 @@ LIMIT $page_limit_clause, 100;
 		</tr>
 		<tr>
 			<td valign="top" colspan="2">
-				<table width="100%">
-            <?php
-            $result = mysql_query($sql) or trigger_error(mysql_error(), E_USER_ERROR);
-            while( $row = mysql_fetch_assoc( $result ) ) 
-            {
-              $css = (isset($css) && $css == "even_row") ? "odd_row" : "even_row";
-              $filename = $row['filename'];
-              $filename = $row['tmbo'] != 1?$filename:'[tmbo] '.$filename;
-              $filename = $row['nsfw'] != 1?$filename:'[nsfw] '.$filename;
-              $filename = htmlspecialchars($filename);
-              ?>
-                  <tr class="<?= $css ?>">
-                    <td class="<?= $css ?>"><div class="clipper"><a href="pages/pic.php?id=<?= $row['id'] ?>" class="<?= $css ?>" title="uploaded by <?= $row['username'] ?>"><?= $filename ?></a></div></td>
-                    <td class="<?= $css ?>" style="text-align:right;white-space:nowrap"><a href="./?c=comments&fileid=<?= $row['id'] ?>" class="<?= $css ?>"><?= $row['comments'] ?> comments</a> (+<?= $row['good'] ?> -<?= $row['bad'] ?>)</td>
-                  </tr>
-                <?php
-            }
-          ?>
-          </table>
+				<?php require('offensive/indexList.txt'); ?>
 			</td>
 		</tr>
 	</table>
