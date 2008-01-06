@@ -150,7 +150,15 @@
 						</span>
 
 						<span style="margin-left:48px;">
-							<a href="/offensive/subscribe.php?fileid=<? echo $id ?>">subscribe</a> 
+						<?	// subscriptions
+							$sql = "select id from offensive_subscriptions where userid=" . $_SESSION['userid'] . " and fileid=$id limit 1";
+							$res = tmbo_query( $sql );
+							$subscribed = mysql_num_rows( $res ) > 0 ? true : false;
+							if( $subscribed ) { ?>
+								<a href="/offensive/subscribe.php?un=1&fileid=<?= $id ?>" title="take this file off my 'unread comments' watch list.">unsubscribe</a>
+						<?	} else { ?>
+								<a href="/offensive/subscribe.php?fileid=<?= $id ?>" title="watch this thread for new comments.">subscribe</a>
+						<?	} ?>
 						</span>
 
 						<span style="margin-left:48px;">nsfw filter: <?php

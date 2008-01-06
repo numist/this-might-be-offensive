@@ -88,12 +88,20 @@ LIMIT $page_limit_clause, 100;
             {
               $css = (isset($css) && $css == "odd_row") ? "even_row" : "odd_row";
               $filename = $row['filename'];
-              $filename = $row['tmbo'] != 1?$filename:'[tmbo] '.$filename;
-              $filename = $row['nsfw'] != 1?$filename:'[nsfw] '.$filename;
-              $filename = htmlspecialchars($filename);
+
+	      // mark tmbo and nsfw files, if they aren't already
+              $filename = $row['tmbo'] == 1 && strpos(strtolower($filename), "[tmbo]") === false ?
+	                  '[tmbo] '.$filename : $filename;
+              $filename = $row['nsfw'] == 1 && strpos(strtolower($filename), "[nsfw]") === false ?
+	                  '[nsfw] '.$filename : $filename;
+
+		// shorten filenames that are too long
+              $filename = strlen($filename) > 70 ? substr($filename, 0, 67)."..." : $filename;
+	      
+	      $filename = htmlEscape($filename);
               ?>
                   <tr class="<?= $css ?>">
-                    <td class="<?= $css ?>"><div class="clipper"><a href="pages/pic.php?id=<?= $row['id'] ?>" class="<?= $css ?>" title="uploaded by <?= $row['username'] ?>"><?= $filename ?></a></div></td>
+                    <td class="<?= $css ?>"><div class="clipper"><a href="pages/pic.php?id=<?= $row['id'] ?>" class="<?= $css ?>" title="uploaded by <?= htmlEscape($row['username']) ?>"><?= $filename ?></a></div></td>
                     <td class="<?= $css ?>" style="text-align:right;white-space:nowrap"><a href="./?c=comments&fileid=<?= $row['id'] ?>" class="<?= $css ?>"><?= $row['comments'] ?> comments</a> (+<?= ($row['good'] != '')?$row['good']:0; ?> -<?= ($row['bad'] != '')?$row['bad']:0;?>)</td>
                   </tr>
                 <?php

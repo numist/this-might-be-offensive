@@ -98,7 +98,7 @@ LIMIT $page_limit_clause, 100;
               ?>
                     <td>
 
-	<a href="pages/pic.php?id=<?= $row['id'] ?>"><span<?= $css?>><img src="images/thumbs/th-<?= $filename?>" border="0"/></span></a><br/>
+	<a href="pages/pic.php?id=<?= $row['id'] ?>"><span<?= $css?>><img src="images/thumbs/th-<?= $filename?>" border="0" alt="<?= htmlEscape($row['username']) ?>"/></span></a><br/>
 	<a href="./?c=comments&fileid=<?= $row['id'] ?>"><?= $row['comments'] ?> comments (+<?= ($row['good'] != '')?$row['good']:0; ?> -<?= ($row['bad'] != '')?$row['bad']:0;?>)</a>
 </td>
                 <?php
