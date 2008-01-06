@@ -238,13 +238,7 @@
 								</td>
 							</tr>
 						</table>
-						
-						
 					</div>
-		
-
-
-
 <?
 }
 
@@ -257,49 +251,6 @@ function emitFileRow( $css, $id, $filename, $comments, $good, $bad, $offensive, 
 	</tr>
 <?
 	return $id;
-}
-
-
-function unreadComments( $uid ) {
-
-	$currentUserId = $_SESSION['userid'];
-	if( $currentUserId != $uid ) {
-		return;
-	}
-	
-	
-	$sql = "select distinct fileid, filename
-			from offensive_uploads u, offensive_bookmarks b
-			where b.userid=$uid
-			and u.id = b.fileid
-			order by b.timestamp desc
-			LIMIT 30
-		";
-
-	$result = tmbo_query( $sql );
-	
-	if( mysql_num_rows( $result ) == 0 ) {
-		return;
-	}
-
-?>
-
-	<div class="piletitle">there are comments you haven't seen:</div>
-	<div style="padding:8px;">
-
-<?
-
-	while( $row = mysql_fetch_assoc( $result ) ) {
-		$css = $css == "evenfile" ? "oddfile" : "evenfile";
-?>
-		<div><a class="<?= $css ?>" href="?c=comments&fileid=<?= $row['fileid'] ?>"><?= $row['filename']?></a></div>
-<?
-
-	}
-?>
-	</div>
-<?
-
 }
 
 function recentComments( $uid ) {
