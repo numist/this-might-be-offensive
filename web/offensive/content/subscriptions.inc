@@ -25,7 +25,7 @@
 	
 		$usrid = $_SESSION['userid'];
 		$link = openDbConnection();
-		$sql = "select s.fileid, u.filename
+		$sql = "select distinct s.fileid, u.filename
 			from offensive_subscriptions s,
 				offensive_uploads u
 			where s.userid=" . $usrid . " 

@@ -14,7 +14,7 @@
 			return;
 		}
 
-		$sql = "SELECT b.fileid, u.filename, b.commentid
+		$sql = "SELECT DISTINCT b.fileid, u.filename, b.commentid
 					FROM offensive_uploads u, offensive_subscriptions b
 					WHERE b.userid = $uid 
 						AND u.id = b.fileid
