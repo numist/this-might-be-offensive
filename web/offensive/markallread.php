@@ -9,7 +9,7 @@
 	if( is_numeric( $uid ) ) {
 		
 		if(!isset($link) || !$link) $link = openDbConnection();
-		$sql = "DELETE FROM offensive_bookmarks WHERE userid=$uid";
+		$sql = "UPDATE offensive_subscriptions SET commentid = NULL WHERE userid=$uid";
 		tmbo_query( $sql );
 	}
 

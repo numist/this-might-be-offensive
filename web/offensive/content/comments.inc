@@ -10,11 +10,7 @@
 		global $link;
 		if(!isset($link) || !$link) $link = openDbConnection();
 		
-		# this ends up creating multiple bookmarks for the same user.
-		$sql = "INSERT INTO offensive_bookmarks (userid, fileid, commentid )
-					SELECT DISTINCT userid, fileid, $commentid AS commentid
-					FROM offensive_subscriptions
-					WHERE fileid = $fileid";
+		$sql = "UPDATE offensive_subscriptions SET commentid = $commentid WHERE fileid = $fileid && commentid IS NULL";
 					
 		$result = tmbo_query( $sql );
 
@@ -60,7 +56,7 @@
 			return;
 		}
 		if(!isset($link) || !$link) $link = openDbConnection();
-		$sql = "DELETE FROM offensive_bookmarks WHERE userid=$userid and fileid=$fileid";
+		$sql = "UPDATE offensive_subscriptions SET commentid = NULL WHERE userid=$userid and fileid=$fileid";
 		$result = tmbo_query( $sql );
 
 	}
@@ -128,7 +124,7 @@
 				$vote = null;
 			}
 			else {
-				$vote = $_REQUEST['vote'];
+				$vote = array_key_exists("vote", $_REQUEST) ? $_REQUEST['vote'] : null;
 			}
 
 			$offensive = array_key_exists("offensive", $_REQUEST) && $_REQUEST['offensive'] != "" ? 1 : 0;
@@ -228,9 +224,10 @@
 	if(!isset($link) || !$link) $link = openDbConnection();
 
 	$fid = $_REQUEST['fileid'];
-	$sql = "select id from offensive_subscriptions where userid=" . $_SESSION['userid'] . " and fileid=$fid limit 1";
-	$res = tmbo_query( $sql );
-	$subscribed = mysql_num_rows( $res ) > 0 ? true : false;
+	$sql = "SELECT * FROM offensive_subscriptions
+		WHERE userid=" . $_SESSION['userid'] . " 
+		&& fileid=$fid";
+	$subscribed = mysql_num_rows( tmbo_query($sql) ) > 0 ? true : false;
 
 	$sql = "SELECT (DATE_ADD( offensive_uploads.timestamp, INTERVAL 4 DAY ) < now() ) AS expired,
 			users.username, users.userid, users.account_status, offensive_uploads.filename, nsfw, tmbo, offensive_uploads.timestamp as upload_timestamp, offensive_uploads.type
@@ -246,7 +243,7 @@
 	$nsfw = $row['nsfw'];
 	$tmbo = $row['tmbo'];	
 	$type = $row['type'];
-	$expired = $row['expired'] == 1 ? true : false;
+	$expired = false; //$row['expired'] == 1 ? true : false;
 
 	$already_voted = $_SESSION['userid'] == $row['userid'];
 	
@@ -271,26 +268,23 @@
 		<div class="heading">
 <?
     // changeblog special header
-    if($_REQUEST['fileid'] == "211604") {
-            echo htmlEscape($filename);
-	    ?>
-        <br/><span style="color:#666699">beat to fit. paint to match.</span><br/>
-	    <?
-    }
-	else if( $type == 'topic' ) {
+	if($_REQUEST['fileid'] == "211604") {
+		echo htmlEscape($filename); 
+		?>
+		<br/><span style="color:#666699">beat to fit. paint to match.</span><br/>
+		<?
+	} else if( $type == 'topic' ) {
 		$prefix = $uploaderstatus == "admin" ? "" : "don't blame me,";
 
-	    echo htmlEscape($filename);
+		echo htmlEscape($filename);
 
 		?><br/><span style="color:#666699"><?= $prefix ?> <a href="./?c=user&userid=<?echo $uploaderid ?>" style="color:#666699"><?php echo $uploader?></a> started it.</span><br/>
 <?
-	}
-	else if( $type == 'audio' ) {
+	} else if( $type == 'audio' ) {
 		?><a class="heading" id="pic" href="images/audio/<?= $filename ?>"><?php 
 		    echo htmlEscape($filename);
 		?></a><br/><span style="color:#666699">uploaded by <a href="./?c=user&userid=<?echo $uploaderid ?>" style="color:#666699"><?php echo $uploader?></a></span><br/><?
-	}
-	else {
+	} else {
 ?>
 		<a class="heading" id="pic" href="<?= $href ?>"><?php 
 		    echo htmlEscape($filename);

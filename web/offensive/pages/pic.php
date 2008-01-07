@@ -151,7 +151,7 @@
 
 						<span style="margin-left:48px;">
 						<?	// subscriptions
-							$sql = "select id from offensive_subscriptions where userid=" . $_SESSION['userid'] . " and fileid=$id limit 1";
+							$sql = "SELECT * FROM offensive_subscriptions WHERE userid=" . $_SESSION['userid'] . " && fileid=$id";
 							$res = tmbo_query( $sql );
 							$subscribed = mysql_num_rows( $res ) > 0 ? true : false;
 							if( $subscribed ) { ?>

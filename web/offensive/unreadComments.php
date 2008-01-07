@@ -14,9 +14,11 @@
 			return;
 		}
 
-		$sql = "SELECT fileid, filename, min(commentid) as commentid
-					FROM offensive_uploads u, offensive_bookmarks b
-					WHERE b.userid = $uid AND u.id = b.fileid
+		$sql = "SELECT b.fileid, u.filename, b.commentid
+					FROM offensive_uploads u, offensive_subscriptions b
+					WHERE b.userid = $uid 
+						AND u.id = b.fileid
+						AND b.commentid IS NOT NULL
 					group by fileid
 					LIMIT 50";
 

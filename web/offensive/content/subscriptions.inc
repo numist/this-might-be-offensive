@@ -25,12 +25,12 @@
 	
 		$usrid = $_SESSION['userid'];
 		$link = openDbConnection();
-		$sql = "select distinct s.fileid, u.filename
+		$sql = "select s.fileid, u.filename
 			from offensive_subscriptions s,
 				offensive_uploads u
 			where s.userid=" . $usrid . " 
 				and s.fileid=u.id
-			order by u.timestamp DESC
+			order by s.fileid DESC
 			limit 600";
 			
 			
