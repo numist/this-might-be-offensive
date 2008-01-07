@@ -57,7 +57,7 @@ LIMIT $page_limit_clause, 100;
 ?>
 <div class="heading">
 
-	welcome back. we missed you. oh. and don't use apostrophes for plurals. ever.
+	welcome back. we missed you. oh, and don't use apostrophes for plurals. ever.
 	<!-- if you don't understand, upload a picture of yer mom and we'll do a little experiment. -->
 
 </div>

@@ -28,6 +28,9 @@
 	exit;
 
 	function subscribe( $uid, $fid ) {
+		$sql = "SELECT * FROM offensive_subscriptions WHERE userid = $uid AND fileid = $fid";
+		if(mysql_num_rows(tmbo_query($sql)) > 0) return;
+
 		$link = openDbConnection();
 		$sql = "insert into offensive_subscriptions (userid, fileid) values ( $uid, $fid )";
 		tmbo_query( $sql );

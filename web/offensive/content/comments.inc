@@ -37,6 +37,10 @@
 			return;
 		}
 		if(!isset($link) || !$link) $link = openDbConnection();
+
+		$sql = "SELECT * FROM offensive_subscriptions WHERE userid = $uid AND fileid = $fileid";
+		if(mysql_num_rows(tmbo_query($sql)) > 0) return;
+
 		$sql = "insert into offensive_subscriptions (userid, fileid) VALUES ($uid, $fileid)";
 		$result = tmbo_query( $sql );
 	}
