@@ -180,7 +180,7 @@
 						<span style="margin-left:48px;">tmbo filter: <?php
 							if( array_key_exists("prefs", $_SESSION) &&
 							    is_array($_SESSION['prefs']) &&
-							    array_key_exists("hide tmbo", $_SESSION) &&
+							    array_key_exists("hide tmbo", $_SESSION['prefs']) &&
 							    $_SESSION['prefs']['hide tmbo'] == 1 ) {
 								?>
 									<a href="/offensive/setPref.php?p=3&v=">off</a> on
