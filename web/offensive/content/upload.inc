@@ -151,8 +151,8 @@
 
 		if( $typeName == "image" ) {
 			ensureDirExists( "$destDir/thumbs" );
-#			shell_exec( "convert -resize 100x100 \"$destDir/$entry_id$file_extension\" \"$destDir/thumbs/th$entry_id$file_extension\"" );
-			shell_exec( "convert -resize 100x100 \"$destDir/$filename\" \"$destDir/thumbs/th$entry_id$file_extension\"" );
+#			shell_exec( "convert -resize 100x100 \"".escapeshellcmd($destDir/$entry_id$file_extension)."\" \"".escapeshellcmd($destDir/thumbs/th$entry_id$file_extension)."\"" );
+			shell_exec( "convert -resize 100x100 \"".escapeshellcmd($destDir/$filename)."\" \"".escapeshellcmd($destDir/thumbs/th$entry_id$file_extension)."\"" );
 		}
 
 		$sql = "insert into offensive_subscriptions (userid, fileid )
