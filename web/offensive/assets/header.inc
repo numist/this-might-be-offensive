@@ -85,9 +85,17 @@ function tmbo_query($sql) {
 	global $link, $queries, $querytime;
 
 	time_start($time);
+	
 	$result = mysql_query($sql, $link) or 
 		trigger_error(mysql_error()." query '$sql'", E_USER_ERROR);
-	$querytime += time_end($time);
+	
+	$time = time_end($time);
+	$querytime += $time;
+
+	if($time > 2) {
+		trigger_error("query took $time seconds: \"$sql\"", E_USER_WARNING);
+	}
+
 	$queries++;
 	return $result;
 }
