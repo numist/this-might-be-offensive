@@ -6,6 +6,8 @@
 	require_once( 'offensive/assets/tabs.inc' );
 
 	function start() {
+		mustLogIn();
+
 		setcookie( 'thumbnails', "yes", time()+3600*24*365*10, "/offensive/" );
 	}
 

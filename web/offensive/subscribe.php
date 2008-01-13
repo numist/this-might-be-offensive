@@ -2,6 +2,8 @@
 	set_include_path("..");
 	require_once("offensive/assets/header.inc");
 
+	mustLogIn();
+
 	// Include, and check we've got a connection to the database.
 	require_once( 'admin/mysqlConnectionInfo.inc' );
 	if(!isset($link) || !$link) $link = openDbConnection();
@@ -9,10 +11,6 @@
 	$uid = array_key_exists("userid", $_SESSION) ? $_SESSION['userid'] : "";
 	$fileid = array_key_exists("fileid", $_REQUEST) ? $_REQUEST['fileid'] : "";
 	
-	if( ! is_numeric( $uid ) || ! is_numeric( $fileid ) ) {
-		header( "Location: ./" );
-	}
-
 	if( array_key_exists("un", $_REQUEST) && $_REQUEST['un'] == 1 ) {
 		unsubscribe( $uid, $fileid );
 	}

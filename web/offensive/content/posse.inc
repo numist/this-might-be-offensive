@@ -4,11 +4,7 @@
 	require_once( 'offensive/assets/getPrefs.inc' );	
 
 	function start() {
-		if(!array_key_exists("userid", $_REQUEST) || 
-		   !is_numeric($_REQUEST['userid'])) {
-			header("Location: ./");
-			exit;
-		}
+		mustLogIn();
 	}
 	
 	function isAdmin() {

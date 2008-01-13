@@ -10,10 +10,8 @@
 	function start() {
 		global $link;
 
-		if( ! is_numeric( $_SESSION['userid'] )  ){
-			header( "Location: ./?c=mustLogIn" );
-		}
-		
+		mustLogIn();
+
 		if(!isset($link) || !$link) $link = openDbConnection();
 		
 		if( array_key_exists("invite", $_REQUEST) &&

@@ -30,11 +30,6 @@ $timelimit = 10;
 
 	time_start($ptime);
 
-	if( ! is_numeric( $_SESSION['userid'] ) ) {
-		header( "Location: ./logn.php?redirect=" . urlencode( $_SERVER['HTTP_REFERER']));
-		exit;
-	}
-
 	// in an upgrade, break glass:
 	if( $upgrading &&
 	    (!array_key_exists("status", $_SESSION) ||

@@ -3,13 +3,7 @@
 	require_once( 'offensive/assets/tabs.inc' );
 
 	function start() {
-	
-		$usrid = $_SESSION['userid'];
-		if( ! is_numeric( $usrid ) ) {
-			session_unset();
-			header( "Location: ./?c=mustLogIn" );
-		}
-	
+		mustLogIn();
 	}
 
 	function head() {

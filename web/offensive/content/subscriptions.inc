@@ -12,12 +12,7 @@
 	}
 
 	function start() {
-		global $filename;
-		
-		if( ! isset( $_SESSION['userid'] ) ){
-			header( "Location: ./" );
-			exit;
-		}
+		mustLogIn();
 	}
 
 	function body() {

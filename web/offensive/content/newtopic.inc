@@ -5,10 +5,7 @@
 	require_once( 'offensive/assets/functions.inc' );
 
 	function start() {
-		if( ! isset( $_SESSION['userid'] ) ){
-			header( "Location: ./" );
-			exit;
-		}
+		mustLogIn();
 
 		if( array_key_exists("submit", $_REQUEST) ) {
 			$topic = trim( $_REQUEST['topic'] );

@@ -6,12 +6,12 @@
 	require_once( 'offensive/assets/tabs.inc' );
 	require_once( 'offensive/assets/functions.inc' );
 	
-	function start() {		
-		if($_SESSION['status'] != 'admin' || 
-		   !array_key_exists("uid", $_REQUEST)) {
+	function start() {
+		mustLogIn();
+
+		if($_SESSION['status'] != 'admin') {
 			header( "Location: ./" );
 		}
-
 	}
 
 	function body() {

@@ -1,4 +1,9 @@
 ﻿<?
+
+	function start() {
+		mustLogIn();
+	}
+
 	function head() {
 ?>
 		<script type="text/javascript">

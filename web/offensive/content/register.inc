@@ -6,7 +6,6 @@
 	$message;
 
 	function start() {
-		
 		global $message;
 
 		$accountCreated = false;

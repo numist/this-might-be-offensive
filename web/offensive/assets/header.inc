@@ -104,5 +104,16 @@ if(array_key_exists("userid", $_SESSION)) {
 	tmbo_query("UPDATE users SET timestamp=now() WHERE userid=".$_SESSION['userid']." LIMIT 1");
 }
 
+function mustLogIn() {
+	if(array_key_exists("userid", $_SESSION) && is_numeric($_SESSION['userid'])) {
+		return;
+	}
+
+	session_unset();
+
+	ob_end_clean();
+	header("Location: /offensive/logn.php?redirect=".urlencode($_SERVER['REQUEST_URI']));
+	exit;
+}
 
 ?>

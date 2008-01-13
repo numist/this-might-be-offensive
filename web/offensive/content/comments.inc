@@ -90,13 +90,9 @@
 
 	function start() {
 		global $filename, $link;
-		
-		if( ! isset( $_SESSION['userid'] ) ){
-			header( "Location: ./?c=mustLogIn" );
-			exit;
-		}
 	
-	
+		mustLogIn();
+
 		if( ! is_numeric( $_REQUEST['fileid'] ) ){
 			header( "Location: ./" );
 			exit;

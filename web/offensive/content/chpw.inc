@@ -1,10 +1,6 @@
 <?
 	function start() {
-
-		if( ! is_numeric( $_SESSION['userid'] ) ) {
-			header( "Location: ./" );
-		}
-		
+		mustLogIn();
 	}
 
 

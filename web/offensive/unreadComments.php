@@ -2,6 +2,8 @@
 		set_include_path("..");
 		require_once("offensive/assets/header.inc");
 
+		mustLogIn();
+
 		header('Content-type: text/xml');
 
 		// Include, and check we've got a connection to the database.
@@ -9,10 +11,6 @@
 		if(!isset($link) || !$link) $link = openDbConnection();
 
 		$uid = $_SESSION['userid'];
-
-		if( ! is_numeric( $uid ) ) {
-			return;
-		}
 
 		$sql = "SELECT DISTINCT b.fileid, u.filename, b.commentid
 					FROM offensive_uploads u, offensive_subscriptions b

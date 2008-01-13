@@ -4,6 +4,11 @@
 	if(!isset($link) || !$link) $link = openDbConnection();
 
 	require_once 'offensive/assets/tabs.inc';
+
+	function start() {
+		mustLogIn();
+	}
+
 	function body() {
 		global $link;
 

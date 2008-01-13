@@ -7,6 +7,10 @@
 	require_once('offensive/assets/tabs.inc');
 	require_once('offensive/assets/functions.inc');
 	
+	function start() {
+		mustLogIn();
+	}
+
 	function body() {
 
 		$view = isset( $_REQUEST['t'] ) ? sqlEscape( $_REQUEST['t'] ) : 'hof';	

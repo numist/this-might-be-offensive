@@ -231,6 +231,7 @@
 								</td>
 							</tr>
 						</table>
+						<input type="hidden" name="redirect" value="<? echo array_key_exists("redirect", $_REQUEST) ? $_REQUEST['redirect'] : "./" ?>" />
 					</form>
 				
 				</span>

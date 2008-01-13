@@ -5,11 +5,7 @@
 	require_once( 'offensive/assets/functions.inc' );
 
 	function start() {
-		if( !array_key_exists("userid", $_REQUEST) ||
-		    ! is_numeric( $_REQUEST['userid'] ) ) {
-			header( "Location: ./" );
-		}
-	
+		mustLogIn();
 	}
 	
 	function isAdmin() {

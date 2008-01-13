@@ -6,10 +6,7 @@
 	require_once( "offensive/assets/functions.inc" );
 	
 	function start() {
-		if( ! isset( $_SESSION['userid'] ) ){
-			header( "Location: ./login.php" );
-			exit;
-		}
+		mustLogIn();
 
 		if( array_key_exists("killit", $_REQUEST) &&
 		    strlen( $_REQUEST['killit'] ) > 0 ) {
