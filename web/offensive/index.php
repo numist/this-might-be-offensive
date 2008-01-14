@@ -480,7 +480,7 @@ if(ini_get("magic_quotes_gpc") == true)
 
 		if(!isset($link) || !$link) $link = openDbConnection();
 
-		$sql = "SELECT DISTINCT u.userid, u.username FROM offensive_subscriptions sub JOIN users u ON sub.userid = u.userid WHERE fileid = ".$_REQUEST['fileid'];
+		$sql = "SELECT DISTINCT u.userid, u.username FROM offensive_subscriptions sub JOIN users u ON sub.userid = u.userid WHERE fileid = ".$_REQUEST['fileid']." ORDER BY u.username ASC";
 		$result = tmbo_query($sql);
 
 		if(mysql_num_rows($result) == 0) {
