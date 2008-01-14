@@ -113,7 +113,7 @@
 	    // also quietly snub them if they are not an admin and they are trying to post to the changeblog
 		if( array_key_exists("submit", $_REQUEST) && ($fileid != "211604" || $_SESSION['status'] == "admin")) {
 
-			$comment = trim( $_REQUEST['comment'] );
+			$comment = isset($_REQUEST['comment']) ? trim($_REQUEST['comment']) : "";
 			
 			$already_voted = alreadyVoted( $_SESSION['userid'], $_REQUEST['fileid'] );
 						

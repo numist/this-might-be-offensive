@@ -191,7 +191,7 @@
 							</tr>
 							<tr>
 								<td>
-									<div class="piletitle"><?echo $name ?>'s contributions to society: <!-- +<?php echo $good_votes ?> -<?php echo $bad_votes ?> (<a href="./?c=uservotedetail&userid=<?= $usrid ?>">click for details</a>) --></div>
+									<div class="piletitle"><?echo $name ?>'s contributions to society:<!-- +<?php echo isset($good_votes) ? $good_votes : 0; ?> -<?php echo isset($bad_votes) ? $bad_votes : 0; ?> (<a href="./?c=uservotedetail&userid=<?= $usrid ?>">click for details</a>)--></div>
 								</td>
 							</tr>
 						
