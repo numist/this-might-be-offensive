@@ -256,7 +256,7 @@ if(ini_get("magic_quotes_gpc") == true)
 
 			<div class="contentbox">
 				<div class="blackbar"></div>
-					<div class="heading">web hosting provided by:</div>
+					<div class="heading">brought to you by:</div>
 					<div class="bluebox" style="text-align:center">
 						<a href="http://tengun.net">tengun.net</a>
 					</div>
@@ -318,7 +318,10 @@ if(ini_get("magic_quotes_gpc") == true)
 			<? if(array_key_exists("c", $_REQUEST) && $_REQUEST['c'] != "online") { ?>
 			<div class="contentbox">
 				<div class="blackbar"></div>
-					<? whosOn(); ?>
+					<? 
+					if($_REQUEST['c'] != "comments") whosOn(); 
+					else subscribed();
+					?>
 				<div class="blackbar"></div>
 			</div>
 			<? } ?>
@@ -470,5 +473,32 @@ if(ini_get("magic_quotes_gpc") == true)
 		echo "\t\t\t\t\t\t</table>\n\t\t\t\t\t</div>\n";
 	}
 
-	
+	function subscribed() {
+		global $link;
+
+		if(!is_numeric($_REQUEST['fileid'])) trigger_error("non-numeric fileid!", E_USER_ERROR);
+
+		if(!isset($link) || !$link) $link = openDbConnection();
+
+		$sql = "SELECT DISTINCT u.userid, u.username FROM offensive_subscriptions sub JOIN users u ON sub.userid = u.userid WHERE fileid = ".$_REQUEST['fileid'];
+		$result = tmbo_query($sql);
+
+		if(mysql_num_rows($result) == 0) {
+			?><div class="heading">no watchers :(</div>
+			<?
+			return;
+		}
+
+		// start us off.
+?>		<div class="heading">subscribers:</div>
+			<div class="bluebox">
+				<table style="width:100%">
+<?
+		while(false !== (list($userid, $username) = mysql_fetch_array($result))) {
+			$css = (!isset($css) || $css == "odd") ? "even" : "odd";
+			echo "<tr class=\"".$css."_row\"><td class=\"".$css."file\"><a href=\"./?c=user&userid=$userid\">$username</a></td></tr>\n";
+		}
+
+		echo "\t\t\t\t\t\t</table>\n\t\t\t\t\t</div>\n";
+	}
 ?>
