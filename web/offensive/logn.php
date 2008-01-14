@@ -8,7 +8,7 @@
 		$redirect = './';
 	}
 
-	if( is_numeric( $_SESSION['userid'] ) ) {
+	if( array_key_exists("userid", $_SESSION) && is_numeric( $_SESSION['userid'] ) ) {
 		header( "Location: " . $redirect );
 		exit;
 	}
@@ -24,7 +24,7 @@
 	$login_message = "";
 
 
-	if( $_REQUEST['password'] ) {
+	if( isset($_REQUEST['password']) ) {
 		$success = login( $_REQUEST['username'], $_REQUEST['password'] );
 		if( $success === true ) {
 			if( array_key_exists("rememberme", $_REQUEST) && 
@@ -45,7 +45,9 @@
 	}
 
 	if( ! isset( $_SESSION['userid'] ) ) {
-		$rememberCookie = $_COOKIE['remember'];
+		if(isset($_COOKIE['remember'])) {
+			$rememberCookie = $_COOKIE['remember'];
+		}
 		if( isset( $rememberCookie ) ) {
 			if( loginFromCookie( $rememberCookie ) ) {
 				header( "Location: " . $redirect );

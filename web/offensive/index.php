@@ -154,6 +154,10 @@ if(ini_get("magic_quotes_gpc") == true)
 	
 		<div id="leftcol">
 
+			<?
+			// log in --> get info restricted block
+			if (array_key_exists("userid", $_SESSION) && is_numeric($_SESSION['userid'])) {
+			?>
 			<div class="contentbox">
 				<div class="blackbar"></div>
 					<div class="heading">log in</div>
@@ -170,6 +174,7 @@ if(ini_get("magic_quotes_gpc") == true)
 			</div>
 
 			<? 
+
 				if( function_exists( 'sidebar' ) ) {
 					sidebar();
 				}
@@ -228,6 +233,9 @@ if(ini_get("magic_quotes_gpc") == true)
 				<div class="blackbar"></div>
 			</div>
 
+			<?
+			} // log in --> get info restricted block
+			?>
 
 			<div class="contentbox">
 				<div class="blackbar"></div>
@@ -262,6 +270,11 @@ if(ini_get("magic_quotes_gpc") == true)
 					</div>
 				<div class="blackbar"></div>
 			</div>
+
+			<?
+			 // archive <--> bottom restricted block
+			if(array_key_exists("userid", $_SESSION) && is_numeric($_SESSION["userid"])) {
+			?>
 
 			<div class="contentbox">
 				<div class="blackbar"></div>
@@ -315,7 +328,8 @@ if(ini_get("magic_quotes_gpc") == true)
 					</div>
 				<div class="blackbar"></div>
 			</div>
-			<? if(array_key_exists("c", $_REQUEST) && $_REQUEST['c'] != "online") { ?>
+			<? if(array_key_exists("c", $_REQUEST) && $_REQUEST['c'] != "online" &&
+			      array_key_exists("status", $_SESSION) && $_SESSION['status'] == "admin") { ?>
 			<div class="contentbox">
 				<div class="blackbar"></div>
 					<? 
@@ -324,7 +338,11 @@ if(ini_get("magic_quotes_gpc") == true)
 					?>
 				<div class="blackbar"></div>
 			</div>
-			<? } ?>
+			<?
+			} 
+			
+		} // archive <--> bottom restricted block
+		?>
 			
 		</div> <!-- end left column -->
 		

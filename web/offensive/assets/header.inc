@@ -13,7 +13,7 @@ session_start();
  */
 
 // if we are not an admin, buffer output until the end in case of fatal errors.
-if(array_key_exists("status", $_SESSION) && $_SESSION['status'] != "admin") {
+if(!array_key_exists("status", $_SESSION) || $_SESSION['status'] != "admin") {
         ob_start(null, 0);
 }
 
