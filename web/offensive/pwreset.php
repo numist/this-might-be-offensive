@@ -8,7 +8,7 @@
 	require_once( "offensive/assets/validationFunctions.inc" );
 	require_once( 'offensive/assets/functions.inc' );
 
-	if( $_REQUEST['x2'] ) {
+	if( isset($_REQUEST['x2']) ) {
 		$code = $_REQUEST['x2'];
 		$pw = $_REQUEST['password'];
 		
@@ -103,7 +103,7 @@ http://".$_SERVER['SERVER_NAME']."/offensive/pwreset.php?x=$code
 			<form action="<?= $_SERVER['PHP_SELF']?>" method="post">
 				<table>
 					<tr>
-						<td colspan="2"><?php echo $login_message ?></td>
+						<td colspan="2"><?php echo isset($login_message) ? $login_message : ""; ?></td>
 					</tr>
 					<tr>
 						<td class="label">user name:</td>
@@ -166,9 +166,8 @@ http://".$_SERVER['SERVER_NAME']."/offensive/pwreset.php?x=$code
 							sendResetEmail( $username );
 						}
 						else {
-							$code = $_REQUEST['x'];
-							if( isset( $code ) && userRowFromCode( $code ) ) {
-								emitResetForm( $code );
+							if( isset( $_REQUEST['x'] ) && userRowFromCode( $_REQUEST['x'] ) ) {
+								emitResetForm( $_REQUEST['x'] );
 							}
 							else {
 								sendMessageForm( );
