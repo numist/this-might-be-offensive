@@ -162,7 +162,7 @@ http://".$_SERVER['SERVER_NAME']."/offensive/pwreset.php?x=$code
 
 					<? 
 						
-						if( $_REQUEST['username'] ) {
+						if( isset($_REQUEST['username']) ) {
 							sendResetEmail( $username );
 						}
 						else {
