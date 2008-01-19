@@ -3,7 +3,7 @@
 // PHP5 has a super little function called parse_ini_file() which will do most of the work here, so
 // we'll grab the contents of the settings file, located in this directory and .config into an array
 if(!($config = parse_ini_file("admin/.config"))) {
-	header( "Location: http://thismight.be/offensive/index.outoforder.php?noconfig" );
+	trigger_error("No configuration file found", E_USER_ERROR);
 }
 
 // Set $link null
@@ -18,14 +18,12 @@ function openDbConnection() {
 		// to the out of order URL.
 		if( !$link ) {
 			if(!($link = mysql_pconnect($config["database_host"],$config["database_user"],$config["database_pass"]))) {
-				file_put_contents("/tmp/tmbo.log", mysql_error()."\n", FILE_APPEND);
-				header( "Location: http://thismight.be/offensive/index.outoforder.php?noconnect");
+				trigger_error(mysql_error(), E_USER_ERROR);
 			}
 			
 			// We got a connection, so now select our database, or again forward to the out of order URL.
 			if(!mysql_select_db($config["database_name"],$link)) {
-				file_put_contents("/tmp/tmbo.log", mysql_error()."\n", FILE_APPEND);
-				header( "Location: http://thismight.be/offensive/index.outoforder.php?selectdb" );
+				trigger_error(mysql_error(), E_USER_ERROR);
 			}
 		}
 		return $link;		

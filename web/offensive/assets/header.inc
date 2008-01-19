@@ -74,11 +74,16 @@ function time_start(&$time) {
 	$time = microtime(true);
 }
 
-function time_break($time) {
-	return microtime(true) - $time;
+// time break will reset the clock
+function time_break(&$time) {
+	$elapsed = microtime(true) - $time;
+	time_start($time);
+	return $elapsed;
 }
+
+// time end will not
 function time_end($time) {
-	return time_break($time);
+	return microtime(true) - $time;
 }
 
 function tmbo_query($sql) {
