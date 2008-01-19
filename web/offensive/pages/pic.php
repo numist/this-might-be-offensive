@@ -3,10 +3,7 @@
 	set_include_path("../..");
 	require_once("offensive/assets/header.inc");
 
-	if( ! is_numeric( $_SESSION['userid'] ) ) {
-		header( "Location: ../logn.php?redirect=" . urlencode( $_SERVER['PHP_SELF'] . "?" . $_SERVER['QUERY_STRING'] ));
-		exit;
-	}
+	mustLogIn();
 
 	$id = $_REQUEST['id'];
 	if( ! is_numeric( $id ) ) {
