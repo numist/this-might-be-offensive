@@ -30,7 +30,7 @@
 
 			<table width="100%">
 
-			<tr class="<? echo $css ?>">
+			<tr class="<? $css = "evenfile"; echo $css ?>">
 				<td style="text-align:right"><b>rank</b></td>
 				<td><b>filename</b></td>
 				<td><b>uploaded by</b></td>
@@ -50,7 +50,7 @@
 		$count = 0;
 
 		while( $row = mysql_fetch_assoc( $result ) ) {
-			$css = isset($css) && $css == "evenfile" ? "oddfile" : "evenfile";
+			$css = $css == "evenfile" ? "oddfile" : "evenfile";
 			if( $row['userid'] == $_SESSION['userid'] ) {
 				$css = "odd_row";
 			}
