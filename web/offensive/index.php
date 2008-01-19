@@ -368,7 +368,7 @@ if(ini_get("magic_quotes_gpc") == true)
 
 	<? require('includes/footer.txt'); ?>
 
-	<div class="textlinks">contents copyright &copy; 1997-<?= date("Y") ?> <a href="/contact/" class="textlinks" onmouseover='window.status="[ connect ]"; return true' onmouseout='window.status=""'>Ray Hatfield</a>. All rights reserved.</div>
+	<div class="textlinks">portions &copy; 1997-<?= date("Y") ?>. site development by <a href="/contact/" class="textlinks" onmouseover='window.status="[ connect ]"; return true' onmouseout='window.status=""'>ray hatfield</a>, scott perry, and others.</div>
 	<div class="textlinks"><?= number_format(time_end($ptime), 3)."s php, ".number_format($querytime, 3)."s sql, $queries queries"; ?></div>
 </div>
 <br />
