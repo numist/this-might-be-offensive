@@ -40,14 +40,15 @@ function tmbo_error_handler($errno, $errstr, $errfile, $errline, $errcontext) {
                 E_RECOVERABLE_ERROR  => 'Catchable Fatal Error'
                 );
 
-        if(isset($_SESSION['status']) && $_SESSION['status'] == "admin") {
-                echo "<br />\n".
-                     "<b>".$errortype[$errno]."</b>: $errstr in ".
-		     "<b>$errfile</b> on line <b>$errline</b><br />";
-        }
 
         $shortfile = (strlen($errfile) > 25 ? 
 	             "...".substr($errfile, -22) : $errfile);
+
+        if(isset($_SESSION['status']) && $_SESSION['status'] == "admin") {
+                echo "<br />\n".
+                     "<b>".$errortype[$errno]."</b>: $errstr in ".
+		     "<b>$shortfile</b> on line <b>$errline</b><br />";
+        }
 
         error_log("$shortfile:$errline:[".$errortype[$errno]."] ".$errstr);
 
@@ -89,16 +90,24 @@ function time_end($time) {
 function tmbo_query($sql) {
 	global $link, $queries, $querytime;
 
+	$trace = debug_backtrace();
+	$trace = $trace[0];
+
 	time_start($time);
 	
 	$result = mysql_query($sql, $link) or 
-		trigger_error(mysql_error()." query '$sql'", E_USER_ERROR);
-	
+		tmbo_error_handler(E_USER_ERROR, mysql_error()." query '$sql'", 
+		                   $trace['file'], $trace['line'], null);
+	sleep(5);
+
 	$time = time_end($time);
 	$querytime += $time;
 
 	if($time > 2) {
-		trigger_error("query took $time seconds: \"$sql\"", E_USER_WARNING);
+		$trace = debug_backtrace();
+		$trace = $trace[0];
+		tmbo_error_handler(E_USER_WARNING, "query took ".number_format($time, 0).
+		                   "s: \"$sql\"", $trace['file'], $trace['line'], null);
 	}
 
 	$queries++;
