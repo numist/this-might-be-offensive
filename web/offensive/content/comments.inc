@@ -152,7 +152,8 @@
 								strlen( $comment ) > 0 ? 1 : 0 );
 
 			if( array_key_exists("redirect", $_REQUEST) ) {
-				if( strpos( $_SERVER['HTTP_REFERER'], 'audio' ) > 0 ) {
+				if( isset($_SERVER['HTTP_REFERER']) && 
+				    strpos( $_SERVER['HTTP_REFERER'], 'audio' ) !== false ) {
 					header( "Location: " . $_SERVER['HTTP_REFERER'] );
 					exit;
 				}
