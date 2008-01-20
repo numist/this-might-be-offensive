@@ -98,8 +98,6 @@ function tmbo_query($sql) {
 	$result = mysql_query($sql, $link) or 
 		tmbo_error_handler(E_USER_ERROR, mysql_error()." query '$sql'", 
 		                   $trace['file'], $trace['line'], null);
-	sleep(5);
-
 	$time = time_end($time);
 	$querytime += $time;
 
