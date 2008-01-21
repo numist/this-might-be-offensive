@@ -1,5 +1,8 @@
 <?php
 
+/* make TMBO read-only */
+$readonly = false;
+
 /* all pages require an active session eventually */
 
 session_start();
@@ -88,10 +91,17 @@ function time_end($time) {
 }
 
 function tmbo_query($sql) {
-	global $link, $queries, $querytime;
+	global $link, $queries, $querytime, $readonly;
 
 	$trace = debug_backtrace();
 	$trace = $trace[0];
+
+	if($readonly && 
+	   ((strpos(strtolower(trim($sql)), "select") !== 0 && 
+	     strpos(strtolower(trim($sql)), "show") !== 0) || 
+	    strpos($sql, ";") !== false)) {
+		return;
+	}
 
 	time_start($time);
 	

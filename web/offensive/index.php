@@ -134,13 +134,14 @@ $timelimit = 10;
 <body bgcolor="#333366" link="#000066" vlink="#000033">
 
 <?php 
-if(ini_get("magic_quotes_gpc") == true)
-	trigger_error("magic_quotes_gpc is enabled", E_USER_NOTICE); 
 	if($upgrading) {
 		echo "upgrade in progress.  if you're not doing it, don't touch anything.\n";
 	}
 	if($fixing) {
 		echo "someone's trying to fix the site.  if it's not you, try not to break anything.\n";
+	}
+	if($readonly) {
+		echo "tmbo is currently read-only.  don't try anything funny.\n";
 	}
 
 	require( "includes/headerbuttons.txt" );

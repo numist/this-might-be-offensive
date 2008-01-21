@@ -14,7 +14,7 @@
 
 	$lastpic = array_key_exists($cookiename, $_COOKIE) ? $_COOKIE[ $cookiename ] : "";
 	
-	if( ! is_numeric( $lastpic ) || $id > $lastpic ) {
+	if(!$readonly && (!is_numeric( $lastpic ) || $id > $lastpic)) {
 		setcookie( $cookiename, "$id", time()+3600 * 24 * 365, "/offensive/" );
 	}
 

@@ -54,7 +54,7 @@ AND
 AND
   users.account_status != 'locked'
 ORDER BY offensive_uploads.timestamp DESC, offensive_uploads.id DESC
-LIMIT $page_limit_clause, 100;
+LIMIT $page_limit_clause, 100
 ";
 ?>
 <div class="heading">

@@ -18,6 +18,10 @@
 		}
 	}
 
+	if($readonly) {
+		header("Location: ./");
+	}
+
 	$fileuploaded = false;
 	$fileid = null;
 	$filePath=dirname(realpath($_SERVER['SCRIPT_FILENAME']));
