@@ -68,7 +68,7 @@ function tmbo_error_handler($errno, $errstr, $errfile, $errline, $errcontext) {
 set_error_handler("tmbo_error_handler");
 
 /* timezone error fix applies to all pages */
-date_default_timezone_set("America/Chicago");
+date_default_timezone_set("America/Los_Angeles");
 
 /* debugging information gathering */
 $queries = 0;
