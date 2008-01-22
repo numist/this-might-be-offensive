@@ -262,7 +262,7 @@ $timelimit = 10;
 					</div>
 				<div class="blackbar"></div>
 			</div>
-
+<!--
 			<div class="contentbox">
 				<div class="blackbar"></div>
 					<div class="heading">brought to you by:</div>
@@ -271,7 +271,7 @@ $timelimit = 10;
 					</div>
 				<div class="blackbar"></div>
 			</div>
-
+-->
 			<?
 			 // archive <--> bottom restricted block
 			if(array_key_exists("userid", $_SESSION) && is_numeric($_SESSION["userid"])) {
