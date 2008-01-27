@@ -104,7 +104,13 @@ LIMIT $page_limit_clause, 100
               ?>
                   <tr class="<?= $css ?>">
                     <td class="<?= $css ?>"><div class="clipper"><a href="pages/pic.php?id=<?= $row['id'] ?>" class="<?= $css ?>" title="uploaded by <?= htmlEscape($row['username']) ?>"><?= $filename ?></a></div></td>
-                    <td class="<?= $css ?>" style="text-align:right;white-space:nowrap"><a href="./?c=comments&fileid=<?= $row['id'] ?>" class="<?= $css ?>"><?= $row['comments'] ?> comments</a> (+<?= ($row['good'] != '')?$row['good']:0; ?> -<?= ($row['bad'] != '')?$row['bad']:0;?>)</td>
+			<td class="<?= $css ?>" style="text-align:right;white-space:nowrap"><a href="./?c=comments&fileid=<?= $row['id'] ?>" class="<?= $css ?>"><?= 
+				($row['comments'] != '')?$row['comments']:0;
+			?> comments</a> (+<?=
+				($row['good'] != '')?$row['good']:0;
+			?> -<?=
+				($row['bad'] != '')?$row['bad']:0;
+			?>)</td>
                   </tr>
                 <?php
             }

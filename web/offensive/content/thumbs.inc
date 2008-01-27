@@ -104,7 +104,13 @@ LIMIT $page_limit_clause, 100
 			echo "graphics/previewNotAvailable.gif";
 		} 
 		?>" border="0" alt="uploaded by <?= htmlEscape($row['username']) ?>"/></span></a><br/>
-	<a href="./?c=comments&fileid=<?= $row['id'] ?>"><?= $row['comments'] ?> comments (+<?= ($row['good'] != '')?$row['good']:0; ?> -<?= ($row['bad'] != '')?$row['bad']:0;?>)</a>
+	<a href="./?c=comments&fileid=<?= $row['id'] ?>"><?= 
+		($row['comments'] != '')?$row['comments']:0;
+	?> comments (+<?= 
+		($row['good'] != '')?$row['good']:0;
+	?> -<?= 
+		($row['bad'] != '')?$row['bad']:0;
+	?>)</a>
 </td>
                 <?php
                 if( $output % $THUMBS_PER_ROW == $THUMBS_PER_ROW - 1 ) {
