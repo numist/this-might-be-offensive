@@ -67,7 +67,7 @@
 			$css = (isset($css) && $css == "even_row") ? "odd_row" : "even_row";
 			$filename = $row['filename'];
 			// shorten filenames that are too long
-			$filename = strlen($filename) > 70 ? substr($filename, 0, 67)."..." : $filename;
+			$filename = strlen($filename) > 60 ? substr($filename, 0, 57)."..." : $filename;
 			$filename = htmlEscape($filename);
 
 			?>
