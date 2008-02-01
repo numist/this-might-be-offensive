@@ -65,7 +65,11 @@
 
 		while( $row = mysql_fetch_assoc( $result ) ) {
 			$css = (isset($css) && $css == "even_row") ? "odd_row" : "even_row";
-			$row['filename'] = htmlEscape($row['filename']);
+			$filename = $row['filename'];
+			// shorten filenames that are too long
+			$filename = strlen($filename) > 70 ? substr($filename, 0, 67)."..." : $filename;
+			$filename = htmlEscape($filename);
+
 			?>
 				<tr class="<?= $css ?>">
 					<td><a href="./?c=comments&fileid=<?= $row['fileid'] ?>"><?= $row['filename'] ?></a></td>

@@ -269,9 +269,9 @@
 		<div class="heading">
 <?
     // changeblog special header
-	if($_REQUEST['fileid'] == "211604") {
-		echo htmlEscape($filename); 
+	if($type == "changeblog") {
 		?>
+		changeblog
 		<br/><span style="color:#666699">beat to fit. paint to match.</span><br/>
 		<?
 	} else if( $type == 'topic' ) {
@@ -306,7 +306,7 @@
 
 <?php if( $comments_exist ) { 
         // changeblog doesn't say anything demeaning about the people who posted.
-        if($_REQUEST['fileid'] != "211604") { ?>		
+        if($type != "changeblog") { ?>		
 
 		    <b><?php echo $comments_heading?></b>
 <?php
@@ -453,7 +453,7 @@
 
 <?php
     // changeblog shouldn't tease the users with a comment field
-    if($_REQUEST['fileid'] != "211604" || $_SESSION['status'] == "admin") {
+    if($type != "changeblog" || $_SESSION['status'] == "admin") {
 ?>
 
 	<div class="contentbox">
