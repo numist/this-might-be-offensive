@@ -72,7 +72,7 @@
 
 			?>
 				<tr class="<?= $css ?>">
-					<td><a href="./?c=comments&fileid=<?= $row['fileid'] ?>"><?= $row['filename'] ?></a></td>
+					<td><a href="./?c=comments&fileid=<?= $row['fileid'] ?>"><?= $filename ?></a></td>
 					<td style="text-align:right"><a href="./?c=comments&fileid=<?= $row['fileid'] ?>">(<?= $row['comments'] ?> comments)</a></td>
 					<td style="text-align:right"><?= $row['latest'] ?></td>
 				</tr>
