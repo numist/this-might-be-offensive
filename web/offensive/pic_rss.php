@@ -16,7 +16,7 @@ require_once("offensive/assets/header.inc");
 	$link = openDbConnection();
 	
 	$sql = "select offensive_uploads.*, users.username
-			FROM offensive_uploads
+			FROM offensive_uploads USE KEY (t_t_id)
 				LEFT JOIN users ON offensive_uploads.userid = users.userid
 			WHERE type='image' AND status='normal'
 			ORDER BY timestamp DESC

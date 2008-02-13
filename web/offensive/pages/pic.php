@@ -287,5 +287,8 @@
 			?>
 
 		</div>
+
+<? include_once("analytics.inc"); ?>
+
 	</body>
 </html>

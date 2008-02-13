@@ -25,8 +25,10 @@
   
   $page_limit_clause = array_key_exists("p", $_REQUEST) ? $_REQUEST['p'] * 100: 0;
     
-    // This should be fine, after the key is in memory it is a fast query.
-    // We need to be sure that it is using the correct keys if the query is consistently slow
+	/* adding the USE KEY statement seems to have resolved performance
+	 * issues with this query.  Why MySQL wasn't using the key to
+	 * begin with is anyone's guess.  Thanks jonxp for the help.
+	 */
     $sql = "
 SELECT
   offensive_uploads.id,
@@ -41,7 +43,7 @@ SELECT
   offensive_count_cache.comments,
   users.username
 FROM
-  offensive_uploads
+  offensive_uploads USE KEY (t_t_id)
 LEFT JOIN offensive_count_cache
 ON  offensive_count_cache.threadid = offensive_uploads.id
 JOIN users

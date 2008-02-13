@@ -374,6 +374,8 @@ $timelimit = 10;
 </div>
 <br />
 
+<? include_once("analytics.inc"); ?>
+
 </body>
 </html>
 <?

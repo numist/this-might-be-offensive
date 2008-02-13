@@ -16,4 +16,4 @@ ErrorDocument 403 /fuckoff.php
 RewriteEngine on 
 RewriteCond %{HTTP_REFERER} !^$ 
 RewriteCond %{HTTP_REFERER} !^http://[w\.]*(.*netvibes\.com|tmbo\.org|thismight\.be|rocketsheep\.com|mysocalled\.com|.*tengun\.net|.*filepile\.org).*$ [NC] 
-RewriteRule .*(jpg|JPG|jpeg|JPEG|gif|GIF)$ http://tmbo.org/tmbologo.gif
+RewriteRule .*(jpg|JPG|jpeg|JPEG|gif|GIF)$ http://thismight.be/tmbologo.gif

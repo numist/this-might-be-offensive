@@ -42,12 +42,14 @@ function tmbo_error_handler($errno, $errstr, $errfile, $errline, $errcontext) {
                 E_STRICT             => 'Runtime Notice',
                 E_RECOVERABLE_ERROR  => 'Catchable Fatal Error'
                 );
+        $critical = E_ERROR | E_WARNING | E_PARSE | E_CORE_ERROR | E_CORE_WARNING | 
+                    E_COMPILE_ERROR | E_COMPILE_WARNING | E_USER_ERROR | E_USER_WARNING;
 
 
         $shortfile = (strlen($errfile) > 25 ? 
 	             "...".substr($errfile, -22) : $errfile);
 
-        if(isset($_SESSION['status']) && $_SESSION['status'] == "admin") {
+        if(isset($_SESSION['status']) && $_SESSION['status'] == "admin" && $errno & $critical) {
                 echo "<br />\n".
                      "<b>".$errortype[$errno]."</b>: $errstr in ".
 		     "<b>$shortfile</b> on line <b>$errline</b><br />";
@@ -114,7 +116,7 @@ function tmbo_query($sql) {
 	if($time > 2) {
 		$trace = debug_backtrace();
 		$trace = $trace[0];
-		tmbo_error_handler(E_USER_WARNING, "query took ".number_format($time, 0).
+		tmbo_error_handler(E_USER_NOTICE, "query took ".number_format($time, 0).
 		                   "s: \"$sql\"", $trace['file'], $trace['line'], null);
 	}
 

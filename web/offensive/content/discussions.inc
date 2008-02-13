@@ -65,9 +65,8 @@
 
 		while( $row = mysql_fetch_assoc( $result ) ) {
 			$css = (isset($css) && $css == "even_row") ? "odd_row" : "even_row";
-			$filename = $row['filename'];
-			// shorten filenames that are too long
-			$filename = strlen($filename) > 60 ? substr($filename, 0, 57)."..." : $filename;
+			
+			$filename = trim($row['filename']);
 			$filename = htmlEscape($filename);
 
 			?>
