@@ -248,7 +248,7 @@
 					} else {
 						?>
 						<div class="<?php echo $is_nsfw == 1 ? 'nsfw' : 'image' ?> u<?= $uploaderid ?>">
-							<a href="<?= urlencode($filepath) ?>" target="_blank"><img src="<?= "../uploads/$year/$month/$day/image/" . rawurlencode( $imgfilename ) ?>" style="border:none"/></a>
+							<a href="<?= "../uploads/$year/$month/$day/image/" . rawurlencode( $imgfilename ) ?>" target="_blank"><img src="<?= "../uploads/$year/$month/$day/image/" . rawurlencode( $imgfilename ) ?>" style="border:none"/></a>
 						</div>
 	
 						<?						
