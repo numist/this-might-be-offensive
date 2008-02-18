@@ -14,7 +14,8 @@ $sql = "SELECT offensive_uploads.timestamp
 		ORDER BY timestamp DESC
 		LIMIT 1";
 $res = tmbo_query($sql);
-$lastBuildDate = array_pop(mysql_fetch_array($res));
+$row = mysql_fetch_array($res);
+$lastBuildDate = array_pop($row);
 $lastBuildTime = strtotime($lastBuildDate);
 conditionalGet($lastBuildTime);
 
