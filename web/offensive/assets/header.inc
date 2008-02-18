@@ -200,7 +200,7 @@ function print_url($filepath, $webpath, $mime=null) {
 			$mime = "image/png";
 		} else {
 			trigger_error("misunderstood file type: $filepath", E_USER_WARNING);
-			return $webpath;
+			echo $webpath;
 		}
 	}
 	

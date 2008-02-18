@@ -388,8 +388,8 @@
 	
 
 		$thumb = "th-{$filename}";
-		$thumbdir = (($type == 'avatar') ? "images/users/thumbs/" : "images/thumbs/");
-		$ppath = "$thumbdir/{$thumb}";
+		$thumbdir = (($type == 'avatar') ? "images/users/thumbs" : "images/thumbs");
+		$ppath = "$thumbdir/$thumb";
 		if( file_exists( $ppath ) ) {
 			?>
 				<div style="<?= nextStyle() ?>; border-top:1px solid #000033">
@@ -408,7 +408,7 @@
 								?><div style="padding:40px;">[ thumbnail filtered ]</div><?
 							}
 							else {
-								?><a href="<?= $href ?>"><img style="margin:12px;" src="<?= $thumbdir . rawurlencode( $thumb ) ?>"/></a><?
+								?><a href="<?= $href ?>"><img style="margin:12px;" src="<? print_url($thumbdir."/".$thumb, $thumbdir . "/" . rawurlencode( $thumb )); ?>"/></a><?
 							}
 						}
 					?>

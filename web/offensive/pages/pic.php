@@ -198,12 +198,18 @@
 			</div>
 
 			<?
-				$extension = substr( $filename, strrpos( $filename, '.' ) );
-				$filepath = "../uploads/$year/$month/$day/image/$id$extension";
-				$imgfilename = "$id$extension";
+
+				$filepath = "../uploads/$year/$month/$day/image/$filename";
+				$imgfilename = "$filename";
 				if( ! file_exists( $filepath ) ) {
-					$filepath = "../uploads/$year/$month/$day/image/$filename";
-					$imgfilename = "$filename";
+					// offset one day?  argh.
+					if(file_exists("../uploads/$year/$month/".($day - 1)."/image/$filename")) {
+						trigger_error("moving $filename from $year/$month/".($day - 1)." to $year/$month/$day", E_USER_WARNING);
+						copy("../uploads/$year/$month/".($day - 1)."/image/$filename", $filepath);
+					} else if(file_exists("../uploads/$year/$month/".($day + 1)."/image/$filename")) {
+						trigger_error("moving $filename from $year/$month/".($day + 1)." to $year/$month/$day", E_USER_WARNING);
+						copy("../uploads/$year/$month/".($day + 1)."/image/$filename", $filepath);
+					}
 				}
 
 			?>
@@ -229,18 +235,8 @@
 			<br/><br/>
 			<?
 				if( ! file_exists( $filepath ) ) {
-#					$oldId = getOldestExistingFileId();
-					if( isset($oldId) && $oldId > 0 ) {
-						?>
-							<div style="padding:128px;">
-								<p>This image is unavailable and has probably expired.</p>
-							<!--	<p><a href="./pic.php?id=<?=$oldId?>">Click here</a> to jump to the oldest unexpired image.</p> -->
-							</div>
-						<?
-					}
-				}
-				else {
-			
+					trigger_error("could not find $filepath in ".getcwd(), E_USER_WARNING);
+				} else {
 					if( array_key_exists("prefs", $_SESSION) &&
 					    is_array($_SESSION['prefs']) &&
 					    (array_key_exists("hide nsfw", $_SESSION['prefs']) && 
@@ -249,12 +245,10 @@
 					    $_SESSION['prefs']['hide tmbo'] == 1 && $is_tmbo == 1) 
 						|| ( in_array( $uploaderid, explode( ',', $_SESSION['prefs']['squelched'] ) ) ) ) {
 						?><div style="padding:128px;">[ filtered ] <!-- <?= $uploaderid ?> --></div><?
-					}
-					else {
+					} else {
 						?>
 						<div class="<?php echo $is_nsfw == 1 ? 'nsfw' : 'image' ?> u<?= $uploaderid ?>">
-<? /*							<!-- 							<a href="<?= $filepath ?>" target="_blank"><img src="http://images.thismight.be/offensive/<?= "uploads/$year/$month/$day/image/" . rawurlencode( $imgfilename ) ?>" style="border:none"/></a>-->  */ ?>
-<a href="<?= $filepath ?>" target="_blank"><img src="<?= "../uploads/$year/$month/$day/image/" . rawurlencode( $imgfilename ) ?>" style="border:none"/></a> 
+							<a href="<?= urlencode($filepath) ?>" target="_blank"><img src="<?= "../uploads/$year/$month/$day/image/" . rawurlencode( $imgfilename ) ?>" style="border:none"/></a>
 						</div>
 	
 						<?						

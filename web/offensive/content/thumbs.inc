@@ -104,7 +104,7 @@ LIMIT $page_limit_clause, 100
 		} else {
 			echo "graphics/previewNotAvailable.gif";
 		}
-		?>" border="0" alt="<?= htmlEscape($filename) ?>" title="uploaded by <?= htmlEscape($row['username']) ?>"/></span></a><br/>
+		?>" border="0" alt="<?= htmlEscape($row['filename']) ?>" title="uploaded by <?= htmlEscape($row['username']) ?>"/></span></a><br/>
 	<a href="./?c=comments&fileid=<?= $row['id'] ?>"><?= 
 		($row['comments'] != '')?$row['comments']:0;
 	?> comments (+<?= 
