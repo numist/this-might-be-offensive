@@ -78,7 +78,7 @@
 							$thumbnail = file_exists( "images/users/thumbs/th-" . $row['filename'] ) ? "th-" . $row['filename'] : "th-unavailable.gif";
 							
 							if(file_exists("images/users/thumbs/th-" . $row['filename'])) {
-								print_url("images/users/thumbs/th-" . $row['filename'], "images/users/thumbs/th-" . urlencode($row['filename']));
+								echo "images/users/thumbs/th-" . $row['filename'];
 							} else {
 								echo "graphics/previewNotAvailable.gif";
 							}
