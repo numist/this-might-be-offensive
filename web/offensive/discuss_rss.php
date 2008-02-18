@@ -14,7 +14,8 @@ $sql = "SELECT offensive_uploads.timestamp
 		ORDER BY timestamp DESC
 		LIMIT 1";
 $res = tmbo_query($sql);
-$lastBuildDate = array_pop(mysql_fetch_array($res));
+$row = mysql_fetch_array($res);
+$lastBuildDate = array_pop($row);
 $lastBuildTime = strtotime($lastBuildDate);
 conditionalGet($lastBuildTime);
 
@@ -29,7 +30,7 @@ conditionalGet($lastBuildTime);
 		?></lastBuildDate>
 
 <?
-	$sql = "select offensive_uploads.*, users.username
+	$sql = "SELECT offensive_uploads.*, users.username, users.userid
 			FROM offensive_uploads
 				LEFT JOIN users ON offensive_uploads.userid = users.userid
 			WHERE type='topic' AND status='normal'
@@ -45,9 +46,16 @@ conditionalGet($lastBuildTime);
 ?>
 
 		<item>
-			<title><![CDATA[<? echo $nsfw . $row['filename']?> (uploaded by <? echo $row['username']?>)]]></title>
+			<title><![CDATA[<? echo $nsfw . $row['filename']?> (started by <? echo $row['username']?>)]]></title>
 			<link>http://themaxx.com/offensive/pages/pic.php?id=<? echo $row['id'] ?></link>
-			<description><![CDATA[<img src="http://images.themaxx.com/mirror.php/offensive/images/picpile/<? echo htmlentities( $row['filename'] )?>"/>]]></description>
+			<description><![CDATA[<?
+			$sql = "SELECT comment, userid from offensive_comments where fileid = 226019 order by id asc limit 1";
+			$res = tmbo_query($sql);
+			$ro = mysql_fetch_assoc($res);
+			if($ro['userid'] == $row['userid']) {
+				echo htmlEncode($ro['comment']);
+			}
+			?>]]></description>
 			<pubDate><? echo date( "r", strtotime( $row['timestamp'] ) ) ?></pubDate>			
 			<comments><![CDATA[http://themaxx.com/offensive/page.php?c=comments&fileid=<? echo $row['id'] ?>]]></comments>
 		</item>

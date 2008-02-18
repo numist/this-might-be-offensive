@@ -100,7 +100,7 @@ LIMIT $page_limit_clause, 100
 
 	<a href="pages/pic.php?id=<?= $row['id'] ?>"><span<?= $css?>><img src="<?
 		if(file_exists("images/thumbs/th-".$row['filename'])) {
-			echo "images/thumbs/th-$filename";
+			print_url("images/thumbs/th-".$row['filename'], "images/thumbs/th-$filename");
 		} else {
 			echo "graphics/previewNotAvailable.gif";
 		}

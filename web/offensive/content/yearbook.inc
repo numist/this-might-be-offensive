@@ -74,10 +74,16 @@
 			?>
 				
 					<td>
-						<?
-							$thumbnail = file_exists( "images/users/thumbs/th-" . $row['filename'] ) ? "th-" . $row['filename'] : "th-unavailable.gif"
-						?>
-						<a href="images/users/<?= $row['filename'] ?>"><img src="images/users/thumbs/<?= $thumbnail ?>"/></a>
+						<a href="images/users/<?= $row['filename'] ?>"><img src="<?
+							$thumbnail = file_exists( "images/users/thumbs/th-" . $row['filename'] ) ? "th-" . $row['filename'] : "th-unavailable.gif";
+							
+							if(file_exists("images/users/thumbs/th-" . $row['filename'])) {
+								print_url("images/users/thumbs/th-" . $row['filename'], "images/users/thumbs/th-" . urlencode($row['filename']));
+							} else {
+								echo "graphics/previewNotAvailable.gif";
+							}
+
+						?>"/></a>
 						<br/>
 						<a href="./?c=user&userid=<?= $row['userid'] ?>"><?= $row['username'] ?></a>
 						<a href="./?c=comments&fileid=<?= $row['id'] ?>">[c]</a>						

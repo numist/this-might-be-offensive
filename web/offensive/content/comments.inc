@@ -74,7 +74,7 @@
 		global $link;
 
 		$usrid = $_SESSION['userid'];
-		$sql = "insert into offensive_count_cache ( threadid, good, bad, repost, tmbo, comments )
+		$sql = "INSERT INTO offensive_count_cache ( threadid, good, bad, repost, tmbo, comments )
 					VALUES ( $threadid, $good, $bad, $repost, $tmbo, $comment )
 					ON DUPLICATE KEY UPDATE
 							good = good + $good,
@@ -105,7 +105,7 @@
 
 		if(!isset($link) || !$link) $link = openDbConnection();
 
-		$sql = "select filename, nsfw, tmbo from offensive_uploads where id=$fileid";
+		$sql = "SELECT filename, nsfw, tmbo from offensive_uploads where id=$fileid";
 		$result = tmbo_query( $sql );
 		list( $filename, $nsfw, $tmbo ) = mysql_fetch_array( $result );
 	
