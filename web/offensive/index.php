@@ -522,4 +522,6 @@ $timelimit = 10;
 
 		echo "\t\t\t\t\t\t</table>\n\t\t\t\t\t</div>\n";
 	}
+	
+	record_hit();
 ?>

@@ -30,8 +30,7 @@
 	 * issues with this query.  Why MySQL wasn't using the key to
 	 * begin with is anyone's guess.  Thanks jonxp for the help.
 	 */
-    $sql = "
-SELECT
+    $sql = "SELECT
   offensive_uploads.id,
   offensive_uploads.timestamp,
   offensive_uploads.filename,
@@ -104,8 +103,8 @@ LIMIT $page_limit_clause, 100
 			echo "images/thumbs/th-$filename";
 		} else {
 			echo "graphics/previewNotAvailable.gif";
-		} 
-		?>" border="0" alt="uploaded by <?= htmlEscape($row['username']) ?>"/></span></a><br/>
+		}
+		?>" border="0" alt="<?= htmlEscape($filename) ?>" title="uploaded by <?= htmlEscape($row['username']) ?>"/></span></a><br/>
 	<a href="./?c=comments&fileid=<?= $row['id'] ?>"><?= 
 		($row['comments'] != '')?$row['comments']:0;
 	?> comments (+<?= 

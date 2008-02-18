@@ -94,6 +94,12 @@ function time_end($time) {
 
 function tmbo_query($sql) {
 	global $link, $queries, $querytime, $readonly;
+	
+	if(!$link) {
+		trigger_error("MySQL link not pre-existent or invalid", E_USER_WARNING);
+		require_once('admin/mysqlConnectionInfo.inc');
+		$link = openDbConnection();
+	}
 
 	$trace = debug_backtrace();
 	$trace = $trace[0];
@@ -125,15 +131,17 @@ function tmbo_query($sql) {
 }
 
 /* accurate timekeeping */
-if(array_key_exists("userid", $_SESSION)) {
-	global $link;
-
-	if(!isset($link) || !$link) {
-		require_once("admin/mysqlConnectionInfo.inc");
-		$link = openDbConnection();
-	}
+function record_hit() {
+	if(array_key_exists("userid", $_SESSION)) {
+		global $link;
 	
-	tmbo_query("UPDATE users SET timestamp=now() WHERE userid=".$_SESSION['userid']." LIMIT 1");
+		if(!isset($link) || !$link) {
+			require_once("admin/mysqlConnectionInfo.inc");
+			$link = openDbConnection();
+		}
+		
+		tmbo_query("UPDATE users SET timestamp=now() WHERE userid=".$_SESSION['userid']." LIMIT 1");
+	}
 }
 
 function mustLogIn() {
@@ -146,6 +154,52 @@ function mustLogIn() {
 	ob_end_clean();
 	header("Location: /offensive/logn.php?redirect=".urlencode($_SERVER['REQUEST_URI']));
 	exit;
+}
+
+function byte_format($size, $digits=2) {	
+	if($size > 1073741824) {
+		return number_format(($size / 1073741824), $digits)."GB";
+	} else if ($size > 1048576) {
+		return number_format(($size / 1048576), $digits)."MB";
+	} else if ($size > 1024) {
+		return number_format(($size / 1024), $digits)."KB";
+	} else {
+		return $size."B";
+	}
+}
+
+function data_url($file, $mime) 
+{
+  $contents = file_get_contents($file);
+  $base64   = base64_encode($contents); 
+  return ('data:' . $mime . ';base64,' . $base64);
+}
+
+function print_url($filepath, $webpath, $mime=null) {
+	/* Internet Explorer does not support the data: URI scheme
+	 * http://en.wikipedia.org/wiki/Data:_URI
+	 */
+	$browser = get_browser(null, true);
+	if($browser['browser'] == "IE") {
+		echo $webpath;
+		return;
+	}
+	
+	// figure out mimetype based on file type, if possible
+	if($mime == null) {
+		if(ereg("[jJ][pP][eE]?[gG]$", $filepath)) {
+			$mime = "image/jpeg";
+		} else if(ereg("[gG][iI][fF]$", $filepath)) {
+			$mime = "image/gif";
+		} else if(ereg("[pP][nN][gG]$", $filepath)) {
+			$mime = "image/png";
+		} else {
+			trigger_error("misunderstood file type: $filepath", E_USER_WARNING);
+			return $webpath;
+		}
+	}
+	
+	echo data_url($filepath, $mime);
 }
 
 ?>

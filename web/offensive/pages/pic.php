@@ -82,7 +82,7 @@
 		$k = "";
 		if( file_exists( $fpath ) ) {
 			$size = filesize( $fpath );
-			$k = "(" . round( ($size/1024) ) . "k)";		
+			$k = byte_format($size);
 		}
 		return $k;
 	}
@@ -274,21 +274,13 @@
 		usort($files, 'DateCmp');
 	}
 
-	
-	
-	
-	
-	
-	
-	
-	
-	
-
-			?>
-
+		?>
 		</div>
 
-<? include_once("analytics.inc"); ?>
+<? 
+	record_hit();
+	include_once("analytics.inc"); 
+?>
 
 	</body>
 </html>

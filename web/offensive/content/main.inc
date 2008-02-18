@@ -29,8 +29,7 @@
 	 * issues with this query.  Why MySQL wasn't using the key to
 	 * begin with is anyone's guess.  Thanks jonxp for the help.
 	 */
-    $sql = "
-SELECT
+    $sql = "SELECT
   offensive_uploads.id,
   offensive_uploads.timestamp,
   offensive_uploads.filename,
@@ -55,8 +54,7 @@ AND
 AND
   users.account_status != 'locked'
 ORDER BY offensive_uploads.timestamp DESC, offensive_uploads.id DESC
-LIMIT $page_limit_clause, 100
-";
+LIMIT $page_limit_clause, 100";
 
 ?>
 <div class="heading">

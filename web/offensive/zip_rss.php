@@ -1,15 +1,8 @@
 <?
 	set_include_path("..");
-	header('Content-type: text/xml');
-	$dateFormat = "r"; 
-?><rss version="2.0">
-	<channel>
-		<title>themaxx.com : [ this might be offensive ] : archives</title>
-		<link>http://themaxx.com/offensive/</link>
-		<description>[ this might be offensive ]</description>
-		<lastBuildDate><? echo date( $dateFormat ); ?></lastBuildDate>
-
-<?php
+	require_once("offensive/assets/header.inc");
+	require_once("offensive/assets/conditionalGet.inc");
+	
 	$fileList = array();
 
 	$path = "./zips";
@@ -20,9 +13,23 @@
 		}
 	}
 	
-	sort( $fileList );
-	$fileList = array_reverse( $fileList );
+	rsort( $fileList );
 	
+	conditionalGet(filectime($path."/".$fileList[0]));
+	
+	header('Content-type: text/xml');
+	$dateFormat = "r"; 
+	
+?><rss version="2.0">
+	<channel>
+		<title>[ this might be offensive ] : archives</title>
+		<link>http://thismight.be/offensive/</link>
+		<description>[ this might be offensive ]</description>
+		<lastBuildDate><?
+			echo gmdate($dateFormat, $time);
+		?></lastBuildDate>
+
+<?php
 	foreach( $fileList as $file ) {
 	
 	$url = "http://themaxx.com/offensive/zips/$file";
@@ -31,7 +38,7 @@
 		<title><?php echo $file?></title>
 		<link><? echo $url ?></link>
 		<description><![CDATA[
-			<a href="<? echo $url?>"><b><?php echo $url ?></b></a> (<? echo number_format(filesize($path . "/" . $file)/1048576, 1)?> Mb)<br/><hr/>
+			<a href="<?= $url ?>"><b><?= $url ?></b></a> (<? echo byte_format(filesize($path . "/" . $file))?>)<br/><hr/>
 			<?
 				$manifest = str_replace( ".zip", "_MANIFEST.txt", "$path/$file" );
 				if( file_exists( $manifest ) ) {
