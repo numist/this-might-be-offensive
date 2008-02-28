@@ -27,4 +27,43 @@ function htmlEscape($string) {
 	                                $string));
 }
 
+function data_url($file, $mime) 
+{
+  $contents = file_get_contents($file) or trigger_error("couldn't find $file from ".getcwd(), E_USER_ERROR);
+  $base64   = base64_encode($contents); 
+  return ('data:' . $mime . ';base64,' . $base64);
+}
+
+function print_url($filepath, $webpath, $mime=null) {
+	/* Internet Explorer does not support the data: URI scheme
+	 * http://en.wikipedia.org/wiki/Data:_URI
+	 */
+	if(ini_get("browscap")) {
+		$browser = get_browser(null, true);
+		if($browser['browser'] == "IE") {
+			echo $webpath;
+			return;
+		}
+	} else {
+		echo $webpath;
+		return;
+	}
+	
+	// figure out mimetype based on file type, if possible
+	if($mime == null) {
+		if(ereg("[jJ][pP][eE]?[gG]$", $filepath)) {
+			$mime = "image/jpeg";
+		} else if(ereg("[gG][iI][fF]$", $filepath)) {
+			$mime = "image/gif";
+		} else if(ereg("[pP][nN][gG]$", $filepath)) {
+			$mime = "image/png";
+		} else {
+			trigger_error("misunderstood file type: $filepath", E_USER_WARNING);
+			echo $webpath;
+		}
+	}
+	
+	echo data_url($filepath, $mime);
+}
+
 ?>

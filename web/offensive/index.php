@@ -296,7 +296,7 @@ $timelimit = 10;
 	$fileList = array_reverse( $fileList );
 
 	foreach( $fileList as $file ) {
-		?><a href="/offensive/<?=$path?>/<?php echo $file; ?>"><?php echo $file; ?></a> (<?php echo number_format(filesize($path . "/" . $file)/1048576, 1)?> MB)<br/><?php
+		?><a href="/offensive/<?=$path?>/<?php echo $file; ?>"><?php echo $file; ?></a> (<?php echo byte_format(filesize($path . "/" . $file), 1)?>)<br/><?php
 	}
 					?>
 				</div>
