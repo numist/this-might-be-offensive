@@ -152,9 +152,9 @@
 							$res = tmbo_query( $sql );
 							$subscribed = mysql_num_rows( $res ) > 0 ? true : false;
 							if( $subscribed ) { ?>
-								<a href="/offensive/subscribe.php?un=1&fileid=<?= $id ?>" title="take this file off my 'unread comments' watch list.">unsubscribe</a>
+								<a id="unsubscribeLink" href="/offensive/subscribe.php?un=1&fileid=<?= $id ?>" title="take this file off my 'unread comments' watch list.">unsubscribe</a>
 						<?	} else { ?>
-								<a href="/offensive/subscribe.php?fileid=<?= $id ?>" title="watch this thread for new comments.">subscribe</a>
+								<a id="subscribeLink" href="/offensive/subscribe.php?fileid=<?= $id ?>" title="watch this thread for new comments.">subscribe</a>
 						<?	} ?>
 						</span>
 
@@ -220,15 +220,15 @@
 			<? echo htmlEscape($filename); ?> <span style="color:#999999"><?= getFileSize( $filepath ) ?></span>
 			<br/>
 			<span style="color:#999999">
-				uploaded by <a href="../?c=user&userid=<? echo $uploaderid ?>"><? echo htmlEscape($uploader); ?></a> @ <?= $timestamp ?>
+				uploaded by <a id="userLink" href="../?c=user&userid=<? echo $uploaderid ?>"><? echo htmlEscape($uploader); ?></a> @ <?= $timestamp ?>
 			</span>	
 			<span style="margin-left:48px">
 				<?
 				if( isSquelched( $uploaderid ) ) {
-					?><a style="color:#999999" href="/offensive/setPref.php?unsq=<?= $uploaderid ?>">unsquelch <?= $uploader ?></a><?
+					?><a id="unsquelchLink" style="color:#999999" href="/offensive/setPref.php?unsq=<?= $uploaderid ?>">unsquelch <?= $uploader ?></a><?
 				}
 				else {
-					?><a style="color:#999999" href="/offensive/setPref.php?sq=<?= $uploaderid ?>">squelch <?= $uploader ?></a><?
+					?><a id="squelchLink" style="color:#999999" href="/offensive/setPref.php?sq=<?= $uploaderid ?>">squelch <?= $uploader ?></a><?
 				}
 				?>
 			</span>
@@ -248,7 +248,7 @@
 					} else {
 						?>
 						<div class="<?php echo $is_nsfw == 1 ? 'nsfw' : 'image' ?> u<?= $uploaderid ?>">
-							<a href="<?= "../uploads/$year/$month/$day/image/" . rawurlencode( $imgfilename ) ?>" target="_blank"><img src="<?= "../uploads/$year/$month/$day/image/" . rawurlencode( $imgfilename ) ?>" style="border:none"/></a>
+							<a id="imageLink" href="<?= "../uploads/$year/$month/$day/image/" . rawurlencode( $imgfilename ) ?>" target="_blank"><img src="<?= "../uploads/$year/$month/$day/image/" . rawurlencode( $imgfilename ) ?>" style="border:none"/></a>
 						</div>
 	
 						<?						
