@@ -110,9 +110,25 @@
 		list( $filename, $nsfw, $tmbo ) = mysql_fetch_array( $result );
 	
 	    // check to see if someone's posting.  
+	    
+	    /* check to see if someone is being hoodwinked by a link in comments
+	     * while we're at it, let them know.
+	     * NB: only works if the client is reporting REFERERS. 
+	     */
+	    if(array_key_exists("submit", $_GET) && $_SERVER['HTTP_REFERER'] !== "" && 
+	       (strpos($_SERVER['HTTP_REFERER'], $_SERVER['SERVER_NAME']."/offensive/?c=comments&fileid=") !== false ||
+	       strpos($_SERVER['HTTP_REFERER'], $_SERVER['SERVER_NAME']."/offensive/index.php?c=comments&fileid=") !== false)) {
+	        echo "you've been had.";
+	        trigger_error("link in discussions tried to vote", E_USER_WARNING);
+	        return;
+	    }
+	    
 	    // also quietly snub them if they are not an admin and they are trying to post to the changeblog
-		if( array_key_exists("submit", $_REQUEST) && ($fileid != "211604" || $_SESSION['status'] == "admin")) {
-
+	    if(array_key_exists("submit", $_REQUEST) && $fileid == "211604" && $_SESSION['status'] != "admin") {
+	        return;
+	    }
+	    
+		if( array_key_exists("submit", $_REQUEST)) {		    
 			$comment = isset($_REQUEST['comment']) ? trim($_REQUEST['comment']) : "";
 			
 			$already_voted = alreadyVoted( $_SESSION['userid'], $_REQUEST['fileid'] );
@@ -469,7 +485,7 @@
 			<div class="heading"><?php echo $add_comment_heading?></div>
 			<div class="bluebox" style="text-align:center">			
 			<a name="form"></a>
-			<form method="post" action="<?php echo $_SERVER['PHP_SELF']?>">
+			<form method="POST" action="<?php echo $_SERVER['PHP_SELF']?>">
 
 			
 				<p>
