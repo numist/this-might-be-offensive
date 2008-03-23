@@ -112,12 +112,13 @@
 	    // check to see if someone's posting.  
 	    
 	    /* check to see if someone is being hoodwinked by a link in comments
-	     * while we're at it, let them know.
+	     * or outside the site's borders. while we're at it, let them know.
 	     * NB: only works if the client is reporting REFERERS. 
 	     */
 	    if(array_key_exists("submit", $_GET) && $_SERVER['HTTP_REFERER'] !== "" && 
 	       (strpos($_SERVER['HTTP_REFERER'], $_SERVER['SERVER_NAME']."/offensive/?c=comments&fileid=") !== false ||
-	       strpos($_SERVER['HTTP_REFERER'], $_SERVER['SERVER_NAME']."/offensive/index.php?c=comments&fileid=") !== false)) {
+	       strpos($_SERVER['HTTP_REFERER'], $_SERVER['SERVER_NAME']."/offensive/index.php?c=comments&fileid=") !== false ||
+	       strpos($_SERVER['HTTP_REFERER'], "//".$_SERVER['SERVER_NAME']."/") === false)) {
 	        echo "you've been had.";
 	        trigger_error("link in discussions tried to vote", E_USER_WARNING);
 	        return;
