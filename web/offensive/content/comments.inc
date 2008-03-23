@@ -335,7 +335,15 @@
 */
 
 				if( ! isSquelched( $row['userid'] ) ) {
-					 echo nl2br( linkUrls( $comment ) );
+				    
+				    // remisser entrapment url gag
+				    if($_SESSION['userid'] != 2935 && $row['userid'] == 2935) {
+				        $pattern = "/(http[s]*:\/\/[^\s<>]+)/i";
+                    	$replacement = "http://preview.tinyurl.com/2tx";
+                    	$comment = preg_replace( $pattern, $replacement, $comment );
+				    }
+				    
+					echo nl2br( linkUrls( $comment ) );
 				}
 				else {
 					echo "<div class='squelched'>[ squelched ]</div>";
