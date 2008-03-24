@@ -119,9 +119,11 @@
 	       (strpos($_SERVER['HTTP_REFERER'], $_SERVER['SERVER_NAME']."/offensive/?c=comments&fileid=") !== false ||
 	       strpos($_SERVER['HTTP_REFERER'], $_SERVER['SERVER_NAME']."/offensive/index.php?c=comments&fileid=") !== false ||
 	       strpos($_SERVER['HTTP_REFERER'], "//".$_SERVER['SERVER_NAME']."/") === false)) {
-	        echo "you've been had.";
+	           trigger_error("(false?) alarm voting with GET, referer: ".$_SERVER['HTTP_REFERER'], E_USER_WARNING);
+/*	        echo "you've been had.";
 	        trigger_error("link in discussions tried to vote", E_USER_WARNING);
 	        return;
+*/
 	    }
 	    
 	    // also quietly snub them if they are not an admin and they are trying to post to the changeblog
