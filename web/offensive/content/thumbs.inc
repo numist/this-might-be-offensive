@@ -63,6 +63,13 @@ LIMIT $page_limit_clause, 100
         <!-- welcome back. we missed you. oh, and don't use apostrophes for plurals. ever. -->
         if you don't understand, upload a picture of yer mom and we'll do a little experiment.
 
+<?
+    $employee = get_include_path()."/offensive/employeeOfTheMonth.txt";
+    if(file_exists($employee) && time() - filemtime($employee) < 7200) {
+        require("offensive/employeeOfTheMonth.txt");
+    }
+?>
+
 </div>
 
 <?

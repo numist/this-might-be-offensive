@@ -10,21 +10,9 @@ if( $ENV{'DOCUMENT_ROOT'} ){
 	exit();
 }
 
-# set the current directory to the directory containing the script
-# so our relative path references (images, etc) work regardless of
-# where the script was invoked. (the primary reason for this is that
-# we intend to run it periodically via crontab.) $0 gives us the path
-# to the script.
-
-# grab everything up to the last slash.
-@pathToScript = $0 =~ /.*\//gi;
-
-# change to that directory.
-chdir $pathToScript[0];
-
 # Grab the configuration options, and then set some variables to use
 # throughout the script.
-my $config = ConfigReader::Simple->new("../admin/.config", [qw(database_host database_user database_pass database_name)]);
+my $config = ConfigReader::Simple->new("../admin/.config");
 my $database_host = $config->get("database_host");
 my $db_user_name = $config->get("database_user");
 my $db_password = $config->get("database_pass");
@@ -40,16 +28,14 @@ if (! $dbh) {										#<-- Make sure we got a valid connection
 }
 
 
-my $sql = "SELECT count( vote ) AS thecount, username, users.userid
-			FROM offensive_comments, offensive_uploads, users
-			WHERE vote = 'this is good'
-				AND fileid = offensive_uploads.id
-				AND offensive_uploads.userid = users.userid
-				AND users.username != 'Fipi Lele'
-				AND offensive_uploads.timestamp > DATE_SUB( now( ) , INTERVAL 1 MONTH )
-			GROUP BY offensive_uploads.userid
-			ORDER BY thecount DESC
-			LIMIT 1";
+my $sql = "SELECT count( offensive_comments.vote ) AS thecount, users.username, users.userid 
+   FROM offensive_comments
+   JOIN offensive_uploads ON offensive_comments.fileid = offensive_uploads.id
+   JOIN users ON offensive_uploads.userid = users.userid
+   WHERE offensive_comments.timestamp > DATE_SUB( now( ) , INTERVAL 1 MONTH ) 
+     AND offensive_comments.vote = 'this is good' 
+   GROUP BY offensive_uploads.userid 
+   ORDER BY thecount DESC LIMIT 1";
 
 	my $statement = $dbh->prepare( $sql );
 	$statement->execute();
@@ -58,6 +44,6 @@ my $sql = "SELECT count( vote ) AS thecount, username, users.userid
 	
 	open( EOM_FILE, ">employeeOfTheMonth.txt" ) or die("couldn't create employee of the month file.\n");
 	
-	print EOM_FILE qq ^<div class="orange">employee of the month: <a class="orange" href="./?c=user&userid=$userid">$username</a> ($count good votes)</div>\n^;
+	print EOM_FILE qq ^<div class="orange">employee of the month: <a class="orange" href="./?c=user&userid=$userid">$username</a> (+$count)</div>\n^;
 
 	close( EOM_FILE );

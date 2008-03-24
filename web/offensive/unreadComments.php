@@ -30,8 +30,6 @@
 		}
 	
 	?>
-	
-	
 			<div class="contentbox">
 				<div class="blackbar"></div>
 					<div class="heading">unread comments:</div>
@@ -55,7 +53,3 @@
 
 				<div class="blackbar"></div>
 			</div>
-	
-
-	<?
-?>

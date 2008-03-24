@@ -1,5 +1,8 @@
-employee of the month: 
 <?php
+    if(file_exists(get_include_path()."/offensive/employeeOfTheMonth.txt")) {
+        require("/offensive/employeeOfTheMonth.txt");
+    }
+
 	// Include, and check we've got a connection to the database.
 	require_once( 'admin/mysqlConnectionInfo.inc' );
 	if(!isset($link) || !$link) $link = openDbConnection();

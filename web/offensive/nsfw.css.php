@@ -29,5 +29,3 @@ session_start();
 	<?php
 		}
 	?>
-
-

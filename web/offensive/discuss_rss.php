@@ -67,5 +67,3 @@ conditionalGet($lastBuildTime);
 		
 	</channel>
 </rss>
-
-
