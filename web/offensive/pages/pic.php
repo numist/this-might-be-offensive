@@ -142,13 +142,27 @@
 						?>
 						
 						<span style="margin-left:48px;">
+						<?
+							if($uploaderid != $_SESSION['userid']) {
+								$sql = "SELECT *
+								          FROM offensive_comments
+									 WHERE userid = ".$_SESSION['userid']."
+									   AND fileid = $id
+									   AND vote != ''";
+								$res = tmbo_query($sql);
+								if(mysql_num_rows($res) == 0) {
+						?>
 							vote: <a id="good"  href="/offensive/?c=comments&submit=submit&fileid=<? echo $id ?>&vote=this%20is%20good&redirect=true">[ this is good ]</a> . 
 									<a id="bad" href="/offensive/?c=comments&submit=submit&fileid=<? echo $id ?>&vote=this%20is%20bad&redirect=true">[ this is bad ]</a>
+						<?
+								}
+							}
+						?>
 						</span>
 
 						<span style="margin-left:48px;">
 						<?	// subscriptions
-							$sql = "SELECT * FROM offensive_subscriptions WHERE userid=" . $_SESSION['userid'] . " && fileid=$id";
+							$sql = "SELECT * FROM offensive_subscriptions WHERE userid=" . $_SESSION['userid'] . " AND fileid=$id";
 							$res = tmbo_query( $sql );
 							$subscribed = mysql_num_rows( $res ) > 0 ? true : false;
 							if( $subscribed ) { ?>
@@ -157,7 +171,6 @@
 								<a id="subscribeLink" href="/offensive/subscribe.php?fileid=<?= $id ?>" title="watch this thread for new comments.">subscribe</a>
 						<?	} ?>
 						</span>
-
 						<span style="margin-left:48px;">nsfw filter: <?php
 							if( array_key_exists("prefs", $_SESSION) &&
 							    is_array($_SESSION['prefs']) &&

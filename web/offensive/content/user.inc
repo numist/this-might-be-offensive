@@ -75,7 +75,11 @@
 			case "awaiting activation":
 				$accountMessage = "$name has not picked up his keys yet.";
 			break;
-			
+		
+			case "admin":
+				$accountMessage = "$name carries the keys to the short bus.";
+			break;
+
 			default:
 				$accountMessage = "$name is welcome here.";
 			break;
