@@ -1,10 +1,10 @@
 <?
 
-	require_once( 'offensive/assets/activationFunctions.inc' );
-	require_once( "offensive/getid3/getid3.php" );
+	require_once( "offensive/assets/activationFunctions.inc" );
 	require_once( "offensive/assets/tabs.inc" );
 	require_once( "offensive/assets/functions.inc" );
-	
+	require_once( "offensive/getid3/getid3.php");
+
 	function start() {
 		mustLogIn();
 
@@ -48,7 +48,7 @@
 
 		$getID3 = new getID3;
 		$fileinfo = $getID3->analyze( $_FILES['image']['tmp_name'] );
-	
+
 //		if( ! preg_match( "/(jpg|jpeg|gif|png|mp3|ogg|mov|wmv|mpg|quicktime|mp4)/i", $fileinfo["fileformat"] ) ) {
 		if( ! preg_match( "/(jpg|jpeg|gif|png)/i", $fileinfo["fileformat"] ) ) {
 			$quarantine = $filePath . "/quarantine/";		
@@ -70,8 +70,6 @@
 				exit;
 			}
 		}
-
-		getid3_lib::CopyTagsToComments($fileinfo);
 
 		$imagePath = pathFor( $fileinfo["fileformat"] );
 
@@ -153,7 +151,20 @@
 		if( $typeName == "image" ) {
 			ensureDirExists( "$destDir/thumbs" );
 #			shell_exec( "convert -resize 100x100 \"".escapeshellcmd("$destDir/$entry_id$file_extension")."\" \"".escapeshellcmd("$destDir/thumbs/th$entry_id$file_extension")."\"" );
-			shell_exec( "convert -resize 100x100 \"".escapeshellcmd("$destDir/$filename")."\" \"".escapeshellcmd("$destDir/thumbs/th$entry_id$file_extension")."\"" );
+			$cmd = "convert -resize 100x100 \"".escapeshellcmd("$destDir/$filename")."\" \"".escapeshellcmd("$destDir/thumbs/th$entry_id$file_extension")."\"";
+			shell_exec($cmd);
+			if(!file_exists("$destDir/thumbs/th$entry_id$file_extension")) {
+				$epath = "$destDir/thumbs";
+				trigger_error("$cmd failed as ".exec("whoami").".  $epath has permissions ".substr(sprintf('%o', fileperms($epath)), -4)." ".fileowner($epath).":".filegroup($epath), E_USER_WARNING);
+			}
+			$cmd = "convert -resize 100x100 \"".escapeshellcmd("$destDir/$filename")."\" \"".escapeshellcmd("images/thumbs/th-$filename")."\"";
+			trigger_error($cmd, E_USER_WARNING);
+			shell_exec($cmd);
+			if(!file_exists("images/thumbs/th-$filename")) {
+				$epath = "images/thumbs";
+				trigger_error("$cmd failed as ".exec("whoami").".  $epath has permissions ".substr(sprintf('%o', fileperms($epath)), -4)." ".fileowner($epath).":".filegroup($epath), E_USER_WARNING);
+			}
+
 		}
 
 		$sql = "insert into offensive_subscriptions (userid, fileid )
