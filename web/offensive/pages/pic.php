@@ -265,6 +265,7 @@
 							if( $_SESSION['userid'] == 151 && date( "m/d" ) == "03/31" && $id % 3 == 0 ) {
 								$imgurl = "../2008/03/31/image/%5Bmp%5D%20fried%20baltic%20herring%20with%20onion%20spinach%20filling%20and%20potatoes.jpg";
 							}
+							?>
 							<a id="imageLink" href="<?= "../uploads/$year/$month/$day/image/" . rawurlencode( $imgfilename ) ?>" target="_blank"><img src="<?= $imgurl ?>" style="border:none"/></a>
 						</div>
 	
