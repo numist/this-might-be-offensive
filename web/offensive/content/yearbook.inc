@@ -53,12 +53,11 @@
 					WHERE users.userid=up.userid
 						AND up.type='avatar'
 						AND account_status != 'locked'
-						AND up.id = (SELECT MAX( up.id) FROM offensive_uploads up where type='avatar' AND userid=users.userid)
+						AND users.timestamp > DATE_SUB( NOW(), INTERVAL 12 MONTH )
+						AND up.id = (SELECT MAX( up.id) FROM offensive_uploads up WHERE type='avatar' AND userid=users.userid)
 					ORDER BY $order, up.id DESC";
 
 		$result = tmbo_query($sql);
-
-		echo mysql_error();
 
 		$THUMBS_PER_ROW = 4;
 		$count = 0;

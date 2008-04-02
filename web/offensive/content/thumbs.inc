@@ -65,7 +65,7 @@ LIMIT $page_limit_clause, 100
 
 <?
     $employee = get_include_path()."/offensive/employeeOfTheMonth.txt";
-    if(file_exists($employee) && time() - filemtime($employee) < 7200) {
+    if(file_exists($employee) && time() - filemtime($employee) < 172800) {
         require("offensive/employeeOfTheMonth.txt");
     }
 ?>

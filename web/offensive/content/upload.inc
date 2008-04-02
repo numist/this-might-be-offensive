@@ -151,13 +151,21 @@
 		if( $typeName == "image" ) {
 			ensureDirExists( "$destDir/thumbs" );
 #			shell_exec( "convert -resize 100x100 \"".escapeshellcmd("$destDir/$entry_id$file_extension")."\" \"".escapeshellcmd("$destDir/thumbs/th$entry_id$file_extension")."\"" );
-			$cmd = "convert -resize 100x100 \"".escapeshellcmd("$destDir/$filename")."\" \"".escapeshellcmd("$destDir/thumbs/th$entry_id$file_extension")."\"";
+
+			$cmd = "convert -resize 100x100 ".
+			       str_replace(" ", "\\ ", escapeshellcmd("$destDir/$filename")).
+			       " ".
+			       str_replace(" ", "\\ ", escapeshellcmd("$destDir/thumbs/th$entry_id$file_extension"));
 			shell_exec($cmd);
 			if(!file_exists("$destDir/thumbs/th$entry_id$file_extension")) {
 				$epath = "$destDir/thumbs";
 				trigger_error("$cmd failed as ".exec("whoami").".  $epath has permissions ".substr(sprintf('%o', fileperms($epath)), -4)." ".fileowner($epath).":".filegroup($epath), E_USER_WARNING);
 			}
-			$cmd = "convert -resize 100x100 \"".escapeshellcmd("$destDir/$filename")."\" \"".escapeshellcmd("images/thumbs/th-$filename")."\"";
+
+			$cmd = "convert -resize 100x100 ".
+			       str_replace(" ", "\\ ", escapeshellcmd("$destDir/$filename")).
+			       " ".
+			       str_replace(" ", "\\ ", escapeshellcmd("images/thumbs/th-$filename"));
 			trigger_error($cmd, E_USER_WARNING);
 			shell_exec($cmd);
 			if(!file_exists("images/thumbs/th-$filename")) {
