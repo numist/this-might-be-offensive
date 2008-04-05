@@ -32,7 +32,7 @@
 
 	function writeNav( $id ) {
 	
-		global $filename, $is_nsfw, $is_tmbo, $uploader, $uploaderid, $timestamp, $year, $month, $day;
+		global $filename, $is_nsfw, $is_tmbo, $uploader, $uploaderid, $timestamp, $year, $month, $day, $nextid, $previd;
 		
 		$sql = "SELECT offensive_uploads.*, users.username, users.userid,
 					(select min( id ) from offensive_uploads where id > $id AND type='image' and status='normal') as nextid,
@@ -61,10 +61,9 @@
 		$timestamp = date( "Y-m-d h:i:s a", strtotime( $row['timestamp'] ) );
 			
 
-		filenav( $nextid, $previd, $uploaderid, $uploader );
 	}
 
-	function filenav( $nextid, $previousid, $uploader_id, $uploader_name ) {
+	function fileNav( $nextid, $previousid, $uploader_id, $uploader_name ) {
 		if( isset( $nextid ) ) {
 		 ?>
 			<a id="next" href="<? echo $_SERVER['PHP_SELF']?>?id=<?= $nextid ?>">newer</a>
@@ -101,6 +100,33 @@
 		list( $good, $bad, $tmbo, $repost, $comments  ) = mysql_fetch_array( $result );
 	}
 
+
+	writeNav( $id );
+
+	/*
+	 * if the filename for this image is not found, it could be due to a time zone
+	 * difference between the database and the server.  this is largely due to the
+	 * moves tmbo has undergone, but can manifest if the server's DST settings are
+	 * incorrect.  if the file exists in the next/previous day's image pile, copy
+	 * the image to today.
+	 *
+	 * if the image still does not exist, give the user a 404.  they're probably
+	 * looking at an expired image anyway.
+	 */
+	$filepath = "../uploads/$year/$month/$day/image/$filename";
+	if( ! file_exists( $filepath ) ) {
+		if(file_exists("../uploads/$year/$month/".($day - 1)."/image/$filename")) {
+			trigger_error("moving $filename from $year/$month/".($day - 1)." to $year/$month/$day", E_USER_WARNING);
+			copy("../uploads/$year/$month/".($day - 1)."/image/$filename", $filepath);
+		} else if(file_exists("../uploads/$year/$month/".($day + 1)."/image/$filename")) {
+			trigger_error("moving $filename from $year/$month/".($day + 1)." to $year/$month/$day", E_USER_WARNING);
+			copy("../uploads/$year/$month/".($day + 1)."/image/$filename", $filepath);
+		}
+	}
+	if( ! file_exists( $filepath ) || $filename == "") {
+		header("Refresh: 0; url=/offensive/404.php", false, 404);
+		exit;
+	}
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
    "http://www.w3.org/TR/html4/loose.dtd">
@@ -108,7 +134,7 @@
 <html>
 	<head>
 		<META NAME="ROBOTS" CONTENT="NOARCHIVE" />
-		<title>[ this might be offensive ] : <? echo isset($filename) ? $filename : ""; ?> </title>
+		<title>[ this might be offensive ]<?= $filename ? " : ".$filename: ""; ?> </title>
 		<link rel="stylesheet" type="text/css" href="styles.php"/>
 		<script type="text/javascript">
 			self.file_id = "";
@@ -134,13 +160,9 @@
 
 			&nbsp;&nbsp;
 
-				<? writeNav( $id ); ?>
+				<? fileNav( $nextid, $previd, $uploaderid, $uploader ); ?>
 				 <a style="margin-left:48px;" id="comments" href="/offensive/?c=comments&fileid=<? echo $id?>">comments</a> (<?php echo "{$comments}c +$good -$bad"; if( $tmbo > 0 ) { echo " <span style=\"color:#990000\">x$tmbo</span>"; }?>)	
 
-				<?php
-					if( $_SESSION['userid'] ) {
-						?>
-						
 						<span style="margin-left:48px;">
 						<?
 							if($uploaderid != $_SESSION['userid']) {
@@ -202,28 +224,11 @@
 								<?php
 							}
 						?></span>
-
-						<?php
-						
-					}
-				?>
-
 			</div>
 
 			<?
 
-				$filepath = "../uploads/$year/$month/$day/image/$filename";
 				$imgfilename = "$filename";
-				if( ! file_exists( $filepath ) ) {
-					// offset one day?  argh.
-					if(file_exists("../uploads/$year/$month/".($day - 1)."/image/$filename")) {
-						trigger_error("moving $filename from $year/$month/".($day - 1)." to $year/$month/$day", E_USER_WARNING);
-						copy("../uploads/$year/$month/".($day - 1)."/image/$filename", $filepath);
-					} else if(file_exists("../uploads/$year/$month/".($day + 1)."/image/$filename")) {
-						trigger_error("moving $filename from $year/$month/".($day + 1)." to $year/$month/$day", E_USER_WARNING);
-						copy("../uploads/$year/$month/".($day + 1)."/image/$filename", $filepath);
-					}
-				}
 
 			?>
 
