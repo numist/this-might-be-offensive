@@ -36,7 +36,7 @@
 				<td><b>uploaded by</b></td>
 				<td><b>comments</b></td>
 				<td><b>votes</b></td>
-				<td><b>weeks</b></td>
+				<td><b><? if($view=="today") { ?> hours <? } else { ?> weeks <? } ?></b></td> 
 			</tr>
 
 <?	
@@ -54,8 +54,9 @@
 			if( $row['userid'] == $_SESSION['userid'] ) {
 				$css = "odd_row";
 			}
-			$weeks = weeksSince( $row['timestamp'] );
-			$cssw = $view == 'hof' ? "$css weeks_$weeks" : $css;
+			if($view=="today") $timeSince=hoursSince($row['timestamp']);
+			if($view=="hof") $timeSince = weeksSince($row['timestamp']);
+			$cssw = $view == 'hof' ? "$css weeks_$timeSince" : $css;
 ?>
 			<tr class="<? echo $cssw ?>">
 				<td style="text-align:right"><? echo ++$count ?>.</td>
@@ -64,7 +65,7 @@
 				<td><a class="<? echo $cssw ?>" href="./?c=user&userid=<? echo $row['userid'] ?>"><? echo htmlEscape($row['username']) ?></a></td>
 				<td><a class="<? echo $cssw ?>" href="./?c=comments&fileid=<?= $row['fileid'] ?>">comments</a></td>
 				<td>(+<? echo $row['votes'] ?>)</td>
-				<td style="text-align:right"><?= $weeks ?></td>
+				<td style="text-align:right"><?= $timeSince ?></td>
 			</tr>
 <?
 		}
@@ -90,6 +91,10 @@
 
 	function weeksSince( $timestamp ) {
 		return floor( (time() - strtotime( $timestamp )) / (60 * 60 * 24 * 7) );
+	}
+
+	function hoursSince( $timestamp) {
+		return floor((time() - strtotime($timestamp)) / (60*60));
 	}
 
 ?>

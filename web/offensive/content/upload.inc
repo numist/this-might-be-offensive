@@ -153,9 +153,9 @@
 #			shell_exec( "convert -resize 100x100 \"".escapeshellcmd("$destDir/$entry_id$file_extension")."\" \"".escapeshellcmd("$destDir/thumbs/th$entry_id$file_extension")."\"" );
 
 			$cmd = "convert -resize 100x100 ".
-			       str_replace(array(" ","\"","'"), array("\\ ","\\\"","\\'"), escapeshellcmd("$destDir/$filename")).
+			       str_replace(array(" ","\""), array("\\ ","\\\""), escapeshellcmd("$destDir/$filename")).
 			       " ".
-			       str_replace(array(" ","\"","'"), array("\\ ","\\\"","\\'"), escapeshellcmd("$destDir/thumbs/th$entry_id$file_extension"));
+			       str_replace(array(" ","\""), array("\\ ","\\\""), escapeshellcmd("$destDir/thumbs/th$entry_id$file_extension"));
 			shell_exec($cmd);
 			if(!file_exists("$destDir/thumbs/th$entry_id$file_extension")) {
 				$epath = "$destDir/thumbs";
@@ -163,9 +163,9 @@
 			}
 
 			$cmd = "convert -resize 100x100 ".
-			       str_replace(array(" ","\"","'"), array("\\ ","\\\"","\\'"), escapeshellcmd("$destDir/$filename")).
+			       str_replace(array(" ","\""), array("\\ ","\\\""), escapeshellcmd("$destDir/$filename")).
 			       " ".
-			       str_replace(array(" ","\"","'"), array("\\ ","\\\"","\\'"), escapeshellcmd("images/thumbs/th-$filename"));
+			       str_replace(array(" ","\""), array("\\ ","\\\""), escapeshellcmd("images/thumbs/th-$filename"));
 			shell_exec($cmd);
 			if(!file_exists("images/thumbs/th-$filename")) {
 				$epath = "images/thumbs";
