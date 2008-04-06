@@ -330,13 +330,21 @@
 <?php
         }
 
-	
+	global $warudo;
 	$numgood = 0;
 	$numbad = 0;
+	$commentnum = 0;
 	while( $row = mysql_fetch_assoc( $result ) ) {
+
+		/*
+		 * to disable warudo comment hack, comment out the next line of code.
+		 * inspiration from: http://thismight.be/offensive/?c=comments&fileid=229329#6340701
+		 */
+	        $warudo = strpos($row['comment'], "ZA WARUDO") !== false;
+
 	?>
 	<a name="<?= $row['commentid'] ?>"></a>
-	<div class="entry u<?= $row['userid'] ?>" style="<?php echo nextStyle()?>">
+	<div class="entry u<?= $row['userid'] ?>" style="<?php echo nextStyle($commentnum++)?>">
 
 			<?php
 			
@@ -557,9 +565,13 @@
     }
 }
 
-	function nextStyle() {
-		global $style;
-		$style = $style == "background:#bbbbee;" ? "" : "background:#bbbbee;";
+	function nextStyle($i) {
+		global $style, $warudo;
+		if($warudo) {
+		    $style = $i % 2 ? "background:#444411;" : "background:#333300";
+		} else {
+		    $style = $i % 2 ? "background:#bbbbee;" : "background:#ccccff";
+		}
 		return $style;
 	}
 
