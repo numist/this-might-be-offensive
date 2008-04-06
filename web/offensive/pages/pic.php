@@ -233,9 +233,11 @@
 			?>
 
 			<br /><br />
-			<? echo $is_nsfw == 1 ? "<span style=\"color:#990000\">[NSFW]</span>" : "" ?></span>
-			<? echo $is_tmbo == 1 ? "<span style=\"color:#990000\">[TMBO]</span>" : "" ?></span>
-			<? echo htmlEscape($filename); ?> <span style="color:#999999"><?= getFileSize( $filepath ) ?></span>
+			<?
+				echo $is_nsfw == 1 ? "<span style=\"color:#990000\">[nsfw]</span>" : "";
+				echo $is_tmbo == 1 ? "<span style=\"color:#990000\">[tmbo]</span>" : "";
+				// XXX: at some point I want to remove [nsfw] and [tmbo] if it exists in the filename. hmm...
+				echo htmlEscape($filename); ?> <span style="color:#999999"><?= getFileSize( $filepath ) ?></span>
 			<br/>
 			<span style="color:#999999">
 				uploaded by <a id="userLink" href="../?c=user&userid=<? echo $uploaderid ?>"><? echo htmlEscape($uploader); ?></a> @ <?= $timestamp ?>
