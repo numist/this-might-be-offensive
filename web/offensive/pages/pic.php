@@ -124,8 +124,6 @@
 		}
 	}
 	if( ! file_exists( $filepath ) || $filename == "") {
-		header("Refresh: 0; url=/offensive/404.php", false, 404);
-		exit;
 	}
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
