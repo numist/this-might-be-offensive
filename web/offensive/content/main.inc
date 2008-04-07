@@ -126,6 +126,17 @@ LIMIT $page_limit_clause, 100";
           </table>
 			</td>
 		</tr>
+		<tr>
+			<td>
+				<? if( $page > 0 ) { ?>
+					<a href="<?= $_SERVER['PHP_SELF']?>?c=<?= $_REQUEST['c'] ?>&order=<?=$order?>&p=<?= $page - 1 ?>">&laquo; <b>previous page</b></a></td>
+				<? } ?>
+			</td>
+			<td style="text-align:right">
+				<? if( mysql_num_rows( $result ) == $numPerPage ) { ?>
+					<a href="<?= $_SERVER['PHP_SELF']?>?c=<?= $_REQUEST['c'] ?>&order=<?=$order?>&p=<?= $page + 1 ?>"><b>next page</b></a> &raquo;</td>
+				<? } ?>
+		</tr>
 	</table>
 			
 </div>

@@ -426,7 +426,7 @@
 		$ppath = "$thumbdir/$thumb";
 		if( file_exists( $ppath ) ) {
 			?>
-				<div style="<?= nextStyle() ?>; border-top:1px solid #000033">
+				<div style="<?= nextStyle($commentnum++) ?>; border-top:1px solid #000033">
 					<div style="float:right"><? toggleThumbnailLink() ?></div>
 					<?
 						if( showThumbnails() ) {
