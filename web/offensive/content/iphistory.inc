@@ -49,7 +49,7 @@
 		echo mysql_error();
 
 ?>
-				<tr class="<?= $css ?>">
+				<tr style="background:#bbbbee;text-align:left;">
 					<td><div class="clipper">ip</div></td>
 					<td><div class="clipper">last seen</div></td>
 				</tr>
@@ -74,4 +74,5 @@
 
 <?
 	}
+
 ?>
