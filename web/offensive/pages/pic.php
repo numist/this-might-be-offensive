@@ -163,6 +163,7 @@
 
 						<span style="margin-left:48px;">
 						<?
+							$votelinks_enabled = false;
 							if($uploaderid != $_SESSION['userid']) {
 								$sql = "SELECT *
 								          FROM offensive_comments
@@ -171,12 +172,10 @@
 									   AND vote != ''";
 								$res = tmbo_query($sql);
 								if(mysql_num_rows($res) == 0) {
-						?>
-							vote: <a id="good"  href="/offensive/?c=comments&submit=submit&fileid=<? echo $id ?>&vote=this%20is%20good&redirect=true">[ this is good ]</a> . 
-									<a id="bad" href="/offensive/?c=comments&submit=submit&fileid=<? echo $id ?>&vote=this%20is%20bad&redirect=true">[ this is bad ]</a>
-						<?
+									$votelinks_enabled = true;
 								}
 							}
+							votelinks( $id, $votelinks_enabled );
 						?>
 						</span>
 
@@ -289,6 +288,18 @@
 
 	function SortByDate(&$files) {
 		usort($files, 'DateCmp');
+	}
+	
+	function votelinks( $id, $enabled ) {
+		$good_href = $enabled ? "href=\"/offensive/?c=comments&submit=submit&fileid=$id&vote=this%20is%20good&redirect=true\"" : "";
+		$bad_href = $enabled ? "href=\"/offensive/?c=comments&submit=submit&fileid=$id&vote=this%20is%20bad&redirect=true\"" : "";
+		$class = $enabled ? "on" : "off";
+	?>
+		<span id="votelinks" class="<?= $class ?>">
+		vote: <a id="good" class="votelink" <?= $good_href ?>>[ this is good ]</a> . 
+			  <a id="bad" class="votelink" <?= $bad_href ?>>[ this is bad ]</a>
+		</span>
+	<?
 	}
 
 		?>

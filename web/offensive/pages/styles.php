@@ -21,6 +21,11 @@ body {
 
 }
 
+#votelinks.off, #votelinks.off a {
+	color:#ccc;
+	text-decoration:none;
+}
+
 .nsfw {
 
 	<?php
