@@ -35,6 +35,13 @@ function data_url($file, $mime)
 }
 
 function print_url($filepath, $webpath, $mime=null) {
+
+	/*
+	 * [rh 2008.04.07] short-circuiting this because i'm sick of not seeing thumbnails on the comments pages.
+	 */
+	echo $webpath;
+	return;
+	
 	/* Internet Explorer does not support the data: URI scheme
 	 * http://en.wikipedia.org/wiki/Data:_URI
 	 */
