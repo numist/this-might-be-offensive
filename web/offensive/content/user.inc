@@ -217,7 +217,7 @@
 		$sql = "SELECT up.*, up.id AS fileid, up.timestamp as uploadtime, counts.*
 				FROM offensive_uploads up
 				LEFT JOIN offensive_count_cache counts ON up.id = counts.threadid
-			WHERE up.userid = $usrid AND (type='image' OR type='audio')
+			WHERE up.userid = $usrid AND (type='image' OR type='audio') AND status != 'pending'
 			ORDER BY up.timestamp DESC 
 			LIMIT 300
 ";
@@ -243,6 +243,10 @@
 }
 
 function emitFileRow( $css, $id, $filename, $comments, $good, $bad, $offensive, $timestamp ) {
+	if(!is_numeric($good)) $good = 0;
+	if(!is_numeric($bad)) $bad = 0;
+	if(!is_numeric($offensive)) $offensive = 0;
+	if(!is_numeric($comments)) $comments = 0;
 ?>
 	<tr>
 		<td style="width:100%" class="<?php echo $css?>"><div class="clipper"><a href="pages/pic.php?id=<?php echo $id ?>" class="<?php echo $css?>"><?= maxString(htmlEscape($filename),45) ?></div></td>
