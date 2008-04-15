@@ -56,7 +56,7 @@
 		$res = tmbo_query( $sql );
 		list($name, $status, $email, $created, $referredby, $refid, $ip, $timestamp) = mysql_fetch_array( $res );
 	
-		$sql = "SELECT filename FROM offensive_uploads
+		$sql = "SELECT id, filename, timestamp FROM offensive_uploads
 					WHERE userid={$usrid}
 						AND type='avatar'
 					ORDER BY TIMESTAMP DESC
@@ -64,7 +64,7 @@
 
 		$result = tmbo_query( $sql );
 		if( mysql_num_rows( $result ) == 1 ) {
-			list($avatar) = mysql_fetch_array( $result );
+			list($avid, $avatar, $avstamp) = mysql_fetch_array( $result );
 		}
 	
 		switch ($status) {
@@ -145,13 +145,14 @@
 						</div>
 
 						<?
-						
-							if( isset( $avatar ) && file_exists( "images/users/$avatar" ) ) {
+							if(isset($avstamp) && isset($avatar) && isset($avid)) {
+								if(getFile($avid, $avatar, $avstamp, 'avatar')) {
 								?>
 									<div class="piletitle" style="margin-bottom:12px;">
-										<a href="images/users/<?= $avatar ?>" target="_blank"><?= $name ?> is gorgeous.</a>
+										<a href="<?= getFileURL($avid, $avatar, $avstamp, 'avatar') ?>" target="_blank"><?= $name ?> is gorgeous.</a>
 									</div>
 								<?
+								}
 							}
 							
 							if( $_SESSION['userid'] == $usrid ) {

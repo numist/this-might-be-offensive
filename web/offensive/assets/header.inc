@@ -51,7 +51,7 @@ function tmbo_error_handler($errno, $errstr, $errfile, $errline, $errcontext) {
 
         if(isset($_SESSION['status']) && $_SESSION['status'] == "admin" && $errno & $critical) {
                 echo "<br />\n".
-                     "<b>".$errortype[$errno]."</b>: $errstr in ".
+                     "<b>".$errortype[$errno]."</b>: ".nl2br($errstr)." in ".
 		     "<b>$shortfile</b> on line <b>$errline</b><br />";
         }
 

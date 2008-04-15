@@ -5,6 +5,8 @@
 
 ## wooha, yehp. -jerry Sun Jan 30 12:49:03 CST 2005
 
+## this file is deprecated.  it shouldn't be used anymore and will be removed in the near future --numist Apr 14 22:00:47 PDT 2008
+
 PATH=/usr/local/bin:$PATH
 export PATH
 

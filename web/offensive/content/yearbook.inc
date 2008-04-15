@@ -48,7 +48,7 @@
 		}
 		$start = ($page * $numPerPage);
 
-		$sql = "SELECT users.userid, username, account_status, filename, up.id
+		$sql = "SELECT users.userid, username, account_status, filename, up.id, up.timestamp
 					FROM users, offensive_uploads up
 					WHERE users.userid=up.userid
 						AND up.type='avatar'
@@ -73,15 +73,8 @@
 			?>
 				
 					<td>
-						<a href="images/users/<?= $row['filename'] ?>"><img src="<?
-							$thumbnail = file_exists( "images/users/thumbs/th-" . $row['filename'] ) ? "th-" . $row['filename'] : "th-unavailable.gif";
-							
-							if(file_exists("images/users/thumbs/th-" . $row['filename'])) {
-								echo "images/users/thumbs/th-" . $row['filename'];
-							} else {
-								echo "graphics/previewNotAvailable.gif";
-							}
-
+						<a href="images/users/<?= $row['filename'] ?>"><img src="<?=
+							getThumbURL($row['id'], $row['filename'], $row['timestamp'], 'avatar');
 						?>"/></a>
 						<br/>
 						<a href="./?c=user&userid=<?= $row['userid'] ?>"><?= $row['username'] ?></a>

@@ -1,5 +1,6 @@
 #!/usr/bin/perl
 
+# this file is on my short list for removal.  --numist Apr 14 22:02:12 PDT 2008
 
 use DBI;
 use File::Copy;
@@ -88,9 +89,9 @@ $sql = "SELECT fileid, filename FROM hall_of_fame, offensive_uploads WHERE offen
 $statement = $dbh->prepare( $sql );
 $statement->execute();
 
-while( my( $id, $filename) = $statement->fetchrow_array() ) {
+#while( my( $id, $filename) = $statement->fetchrow_array() ) {
 #	print $id . ":" . $filename;
-	if( -e "images/picpile/" . $filename ) {
-		copy "images/picpile/" . $filename, "images/halloffame/" . $filename;
-	}
-}
+#	if( -e "images/picpile/" . $filename ) {
+#		copy "images/picpile/" . $filename, "images/halloffame/" . $filename;
+#	}
+#}

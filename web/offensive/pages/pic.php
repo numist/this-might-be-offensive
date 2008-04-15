@@ -251,9 +251,6 @@
 			</span>
 			<br/><br/>
 			<?
-				if( ! file_exists( $filepath ) ) {
-					trigger_error("could not find $filepath in ".getcwd(), E_USER_WARNING);
-				} else {
 					if( array_key_exists("prefs", $_SESSION) &&
 					    is_array($_SESSION['prefs']) &&
 					    (array_key_exists("hide nsfw", $_SESSION['prefs']) && 
@@ -265,18 +262,19 @@
 					} else {
 						?>
 						<div class="<?php echo $is_nsfw == 1 ? 'nsfw' : 'image' ?> u<?= $uploaderid ?>">
-							<? $imgurl = "../uploads/$year/$month/$day/image/" . rawurlencode( $imgfilename );
-							if( $_SESSION['userid'] == 162 && date( "m/d" ) == "04/01" && $id % 2 == 0 ) {
-								$imgurl = "../uploads/2008/03/31/image/%5Bmp%5D%20fried%20baltic%20herring%20with%20onion%20spinach%20filling%20and%20potatoes.jpg";
-							}
+							<? 
+								$imgurl = '';
+								if(getFile($id, $filename, $timestamp) != '')
+									$imgurl = getFileURL($id, $filename, $timestamp);
+								if($imgurl != '') {
 							?>
-							<a id="imageLink" href="<?= "../uploads/$year/$month/$day/image/" . rawurlencode( $imgfilename ) ?>" target="_blank"><img src="<?= $imgurl ?>" style="border:none"/></a>
+							<a id="imageLink" href="<?= $imgurl ?>" target="_blank"><img src="<?= $imgurl ?>" style="border:none"/></a>
+							<? } else echo "got nothin' for ya."; ?>
 						</div>
 	
 						<?						
 					}
 					
-				}
 			?>
 			<br/><br/>
 			

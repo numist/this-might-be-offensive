@@ -248,8 +248,7 @@
 		&& fileid=$fid";
 	$subscribed = mysql_num_rows( tmbo_query($sql) ) > 0 ? true : false;
 
-	$sql = "SELECT (DATE_ADD( offensive_uploads.timestamp, INTERVAL 4 DAY ) < now() ) AS expired,
-			users.username, users.userid, users.account_status, offensive_uploads.filename, nsfw, tmbo, offensive_uploads.timestamp as upload_timestamp, offensive_uploads.type
+	$sql = "SELECT users.username, users.userid, users.account_status, offensive_uploads.filename, nsfw, tmbo, offensive_uploads.timestamp as upload_timestamp, offensive_uploads.type
 				FROM users, offensive_uploads
 				WHERE users.userid = offensive_uploads.userid
 				AND offensive_uploads.id = " . $_REQUEST['fileid'];
@@ -259,10 +258,11 @@
 	$filename = $row['filename'];
 	$uploaderid = $row['userid'];
 	$uploaderstatus = $row['account_status'];
+	$uploadstamp = $row['upload_timestamp'];
 	$nsfw = $row['nsfw'];
 	$tmbo = $row['tmbo'];	
 	$type = $row['type'];
-	$expired = false; //$row['expired'] == 1 ? true : false;
+	$expired = getFile($_REQUEST['fileid'], $filename, $uploadstamp, $type) == ''? true : false;
 
 	$already_voted = $_SESSION['userid'] == $row['userid'];
 	
@@ -279,7 +279,7 @@
 	$comments_heading = "the dorks who came before you said:";
 	$add_comment_heading = $comments_exist ? "and then you came along and were all:" : "you were first on the scene and were all:";
 
-	$href = (($type == 'avatar') ? "images/users/" . rawurlencode( $filename ) : "pages/pic.php?id=" . $_REQUEST['fileid'] );
+	$href = getFileURL($_REQUEST['fileid'], $filename, $uploadstamp, $type);
 
 ?>	
 
@@ -420,11 +420,7 @@
 	
 	}
 	
-
-		$thumb = "th-{$filename}";
-		$thumbdir = (($type == 'avatar') ? "images/users/thumbs" : "images/thumbs");
-		$ppath = "$thumbdir/$thumb";
-		if( file_exists( $ppath ) ) {
+		if( $type == 'image' || $type == 'avatar' ) {
 			?>
 				<div style="<?= nextStyle($commentnum++) ?>; border-top:1px solid #000033">
 					<div style="float:right"><? toggleThumbnailLink() ?></div>
@@ -442,7 +438,7 @@
 								?><div style="padding:40px;">[ thumbnail filtered ]</div><?
 							}
 							else {
-								?><a href="<?= $href ?>"><img style="margin:12px;" src="<? print_url($thumbdir."/".$thumb, $thumbdir . "/" . rawurlencode( $thumb )); ?>"/></a><?
+								?><a href="<?= $href ?>" target="_blank"><img style="margin:12px;" src="<?= getThumbURL($_REQUEST['fileid'], $filename, $uploadstamp, $type); ?>"/></a><?
 							}
 						}
 					?>
@@ -452,7 +448,6 @@
 				</div>
 			<?
 		}
-
 
 	?>
 	
@@ -577,3 +572,4 @@
 
 
 ?>
+                                                                                                                                                        

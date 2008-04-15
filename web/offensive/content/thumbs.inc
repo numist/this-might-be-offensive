@@ -105,13 +105,9 @@ LIMIT $page_limit_clause, 100
               ?>
                     <td>
 
-	<a href="pages/pic.php?id=<?= $row['id'] ?>"><span<?= $css?>><img src="<?
-		if(file_exists("images/thumbs/th-".$row['filename'])) {
-			echo "images/thumbs/th-$filename";
-		} else {
-			echo "graphics/previewNotAvailable.gif";
-		}
-		?>" border="0" alt="<?= htmlEscape($row['filename']) ?>" title="uploaded by <?= htmlEscape($row['username']) ?>"/></span></a><br/>
+	<a href="pages/pic.php?id=<?= $row['id'] ?>"><span<?= $css?>><img src="<?=
+		getThumbURL($row['id'], $row['filename'], $row['timestamp']);
+	?>" border="0" alt="<?= htmlEscape($row['filename']) ?>" title="uploaded by <?= htmlEscape($row['username']) ?>"/></span></a><br/>
 	<a href="./?c=comments&fileid=<?= $row['id'] ?>"><?= 
 		($row['comments'] != '')?$row['comments']:0;
 	?> comments (+<?= 

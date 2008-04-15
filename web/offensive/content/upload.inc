@@ -5,227 +5,35 @@
 	require_once( "offensive/assets/functions.inc" );
 	require_once( "offensive/getid3/getid3.php");
 
+	$tmpdir = "quarantine";
+
 	function start() {
+		global $readonly;
+		
 		mustLogIn();
 
-		if( array_key_exists("killit", $_REQUEST) &&
-		    strlen( $_REQUEST['killit'] ) > 0 ) {
-			killRepost();
-		}
-		else if( array_key_exists("postit", $_REQUEST) &&
-		         strlen( $_REQUEST['postit'] ) > 0 ) {
-			postAnyway();
-		}
-	}
-
-	if($readonly) {
-		header("Location: ./");
-	}
-
-	$fileuploaded = false;
-	$fileid = null;
-	$filePath=dirname(realpath($_SERVER['SCRIPT_FILENAME']));
-	$imagePath = $filePath . "/images/picpile/";
-
-	if( array_key_exists("image", $_FILES) && 
-	    is_array($_FILES['image']) &&
-	    array_key_exists("name", $_FILES['image']) &&
-	    $_FILES['image']['name'] != "" && 
-	    array_key_exists("size", $_FILES['image']) &&
-	    $_FILES['image']['size'] > 0 && 
-	    !exceededUploadLimit($_SESSION['userid']) ) {
-
-		// hack solution to a problem where files with .php in their names (e.g. xxx.php.jpg)
-		// would get executed when the image was requested. 
-		$f_name = $_FILES['image']['name'];
-		if( strstr( $f_name, ".php" ) !== false ) {
-			?>Accepted file types: jpg, gif, png.<?php
-			mail( "ray@mysocalled.com", "[" . $_SERVER["REMOTE_ADDR"] . "] - SUSPICIOUS UPLOAD!!! " . $_SESSION['username'], requestDetail(), "From: offensive@themaxx.com (this might be offensive)\r\nPriority: urgent" );
-			exit;			
-		}
-
-		preg_match( "/\.[^\.]+$/", $_FILES['image']['name'], $matches );
-
-		$getID3 = new getID3;
-		$fileinfo = $getID3->analyze( $_FILES['image']['tmp_name'] );
-
-//		if( ! preg_match( "/(jpg|jpeg|gif|png|mp3|ogg|mov|wmv|mpg|quicktime|mp4)/i", $fileinfo["fileformat"] ) ) {
-		if( ! preg_match( "/(jpg|jpeg|gif|png)/i", $fileinfo["fileformat"] ) ) {
-			$quarantine = $filePath . "/quarantine/";		
-			$filename = $_FILES['image']['name'];
-			$filename = uniqueFilename( $quarantine, stripslashes( $filename ) );
-			$destination = $quarantine . $filename;
-			move_uploaded_file( $_FILES['image']['tmp_name'], $destination );
-			echo "Unaccepted file type. Accepted file types are: jpg, gif, png.";
-			mail( "ray@mysocalled.com", "[" . $_SERVER["REMOTE_ADDR"] . "] - SUSPICIOUS UPLOAD!!! " . $_SESSION['username'], requestDetail(), "From: offensive@themaxx.com (this might be offensive)\r\nPriority: urgent" );
-			exit;
-		}
-
-		$file_extension = "";
-
-		if( is_array( $matches ) ) {
-			$file_extension = $matches[0];
-			if( ! preg_match( "/(jpg|jpeg|gif|png)/i", $file_extension ) ) {
-				?>Accepted file types: jpg, gif, png.<?php
-				exit;
-			}
-		}
-
-		$imagePath = pathFor( $fileinfo["fileformat"] );
-
-		// Include, and check we've got a connection to the database.
-		include_once( 'admin/mysqlConnectionInfo.inc' );
-		if(!isset($link) || !$link) $link = openDbConnection();
-
-		$filename = strlen( $_REQUEST['filename'] ) > 0 ? $_REQUEST['filename'] : $_FILES['image']['name'];
-
-		$filename = uniqueFilename( $imagePath, stripslashes( filenameFor( $fileinfo, $filename ) ) );
-
-		$nsfw = isset( $_REQUEST['nsfw'] ) ? 1 : 0;
-		$tmbo = isset( $_REQUEST['tmbo'] ) ? 1 : 0;
-#		$puntme = isset( $_REQUEST['puntme'] ) ? 1 : 0;
-#
-#		if( $puntme == 1 ) {
-#			$sql = "update users set account_status = 'locked' where userid=" .  $_SESSION['userid'] . " limit 1";
-#			tmbo_query( $sql );
-#		}
-
-		if( ! isAvatarUpload() ) {
-			// not to be confused with the hash() function in activationFunctions
-			$hash = getHash( $_FILES['image']['tmp_name'] );
-	
-			if( strlen( $hash ) > 15 ) { // 15 is arbitrary. just want to make sure we have a hash
-				$sql = "SELECT id, filename, hash
-						FROM offensive_uploads 
-						WHERE hash = '$hash'
-						ORDER by timestamp DESC
-						LIMIT 1";
-				$result = tmbo_query( $sql );
-				if( mysql_num_rows( $result ) > 0 ) {
-					$repost_row = mysql_fetch_assoc( $result );
-				}
-			}
+		if($readonly) {
+			header("Location: ./");
 		}
 		
-		$bytesPerPixel = 0;
-		$filesize = $_FILES['image']['size'];
-		list($width, $height, $type, $attr) = getimagesize( $_FILES['image']['tmp_name'] );
-		
-		$expectedFileSize = round(($width * $height * .2)/1024);
-		if( is_numeric( $filesize ) && is_numeric( $width ) && ($width * $height > 0 ) ) {
-			$bytesPerPixel = ( 1.0 * $filesize / (1.0 * $width * $height ) );
-			$filesize = round($filesize/1024);
-		}
-		
-		$sql = "INSERT INTO offensive_uploads ( userid,filename,ip,nsfw,tmbo,hash,type,status )
-		                VALUES ( " . $_SESSION['userid'] . ", '" . sqlEscape( $filename ) . "', '" . $_SERVER['REMOTE_ADDR'] . "', $nsfw, $tmbo, '$hash', '" . typeFor( $fileinfo["fileformat"] ) . "', 'pending' ) ";
-
-
-		$result = tmbo_query( $sql );
-
-		$entry_id = mysql_insert_id();
-
-		$destination = $imagePath . $filename;
-
-		move_uploaded_file( $_FILES['image']['tmp_name'], $destination ) or
-			trigger_error("failed to move file from ".$_FILES['image']['tmp_name']." to ".$destination, E_USER_ERROR);
-
-		chmod($destination, 0644);
-		
-		$curdate = time();
-		$year = date( "Y", $curdate );
-		$month = date( "m", $curdate );
-		$day = date( "d", $curdate );
-
-		$typeName = typeFor( $fileinfo["fileformat"] );
-		
-		$destDir = "uploads/$year/$month/$day/$typeName";
-				
-		ensureDirExists( $destDir );
-
-#		copy( $destination, "$filePath/$destDir/$entry_id$file_extension" );
-
-		copy( $destination, "$filePath/$destDir/$filename" ) or
-			trigger_error("failed to move file from ".$destination." to $filePath/$destDir/$filename", E_USER_ERROR);
-
-		if( $typeName == "image" ) {
-			ensureDirExists( "$destDir/thumbs" );
-
-            $find = array(" ", "\"", "'", "!");
-            $replace = array("\\ ","\\\"", "\\'", "\\!");
-			$cmd = "convert -resize 100x100 ".
-			       str_replace($find, $replace, escapeshellcmd("$destDir/$filename")).
-			       " ".
-			       str_replace($find, $replace, escapeshellcmd("$destDir/thumbs/th$entry_id$file_extension"));
-			shell_exec($cmd);
-			if(!file_exists("$destDir/thumbs/th$entry_id$file_extension")) {
-				$epath = "$destDir/thumbs";
-				trigger_error("$cmd failed as ".exec("whoami").".  $epath has permissions ".substr(sprintf('%o', fileperms($epath)), -4)." ".fileowner($epath).":".filegroup($epath), E_USER_WARNING);
-			}
-
-			$cmd = "convert -resize 100x100 ".
-			       str_replace($find, $replace, escapeshellcmd("$destDir/$filename")).
-			       " ".
-			       str_replace($find, $replace, escapeshellcmd("images/thumbs/th-$filename"));
-			shell_exec($cmd);
-			if(!file_exists("images/thumbs/th-$filename")) {
-				$epath = "images/thumbs";
-				trigger_error("$cmd failed as ".exec("whoami").".  $epath has permissions ".substr(sprintf('%o', fileperms($epath)), -4)." ".fileowner($epath).":".filegroup($epath), E_USER_WARNING);
-			}
-
-		}
-
-		$sql = "insert into offensive_subscriptions (userid, fileid )
-		                values ( " . $_SESSION['userid'] . ", $entry_id ) ";
-
-		tmbo_query( $sql );
-
-#		mail( "ray@mysocalled.com", "[" . $_SERVER["REMOTE_ADDR"] . "] - file uploaded. " . $_SESSION['username'], $filename . "\n\nhttp://themaxx.com/offensive/pages/pic.php?id=" . $entry_id, "From: offensive@themaxx.com (this might be offensive)" );
-		
-		$fileuploaded = true;
-		$fileid = $entry_id;
 	}
 	
-	function ensureDirExists( $path ) {
-	
-		$basePath = dirname(realpath($_SERVER['SCRIPT_FILENAME']));	
-		$curPath = $basePath;
-		foreach( explode( '/', $path ) as $dir ) {
-			$curPath .= "/$dir";
-			if( ! file_exists( $curPath ) ) {
-				mkdir( $curPath );
-			}
-
-		}
-
+	function isAvatarUpload($postdata) {
+		if(!array_key_exists('avatar', $postdata)) return false;
+		return $postdata['avatar'];
 	}
 	
+	function typeFor( $postdata ) {
 
-	
-	function isAvatarUpload() {
-		return isset( $_REQUEST['avatar'] );
-	}
-	
-	function filenameFor( $fileinfo, $default ) {
-		
-		if( $fileinfo["fileformat"] == "mp3" || $fileinfo["fileformat"] == "ogg" ) {
-			if( isset( $fileinfo['comments_html']['artist'] ) && isset( $fileinfo['comments_html']['title'] ) ) {
-				return str_replace( "/", "-",  (implode( $fileinfo['comments_html']['artist'], " " ) . " - " . implode( $fileinfo['comments_html']['title'], "" ) ) . "." . $fileinfo["fileformat"] );
-			}
-		}
-		
-		if( isAvatarUpload() ) {
-			return $_SESSION['userid'] . "." . $fileinfo["fileformat"];
-		}
+		/*
+		 * a bug was present in this code that allowed people to upload
+		 * arbitrary accepted file types as their avatars.
+		 * since we do not actually allow people to use music or video as
+		 * their avatars, the check was moved to the default: block of the
+		 * switch statement below.
+		 */
 
-		return $default;
-	}
-
-	function typeFor( $format ) {
-		if( isAvatarUpload() ) {
-			return "avatar";
-		}
-		switch( $format ) {
+		switch( $postdata['format'] ) {
 			case "quicktime":
 				return "video";
 			break;
@@ -236,35 +44,19 @@
 			break;
 			
 			default:
+				if( isAvatarUpload($postdata) ) {
+					return "avatar";
+				}
 				return "image";
 		}
-		return "image";
 	}
-
-	function pathFor( $format ) {
-		global $filePath;
-		
-		if( isAvatarUpload() ) {
-			return $filePath . "/images/users/";
-		}
-		
-		$dir = "/images/picpile/";
-		
-		switch( typeFor( $format ) ) {
-			case "audio":
-				$dir = "/images/audio/";
-			break;
-			
-			case "video":
-				$dir =  "/images/video/";
-			break;
-			
-			default:
-				$dir = "/images/picpile/";
-
-		}
-		
-		return $filePath . $dir;
+	
+	function pathFor($postdata, $timestamp) {
+		$type = typeFor($postdata);
+		$year = date( "Y", $timestamp );
+		$month = date( "m", $timestamp );
+		$day = date( "d", $timestamp );
+		return "uploads/$year/$month/$day/$type";
 	}
 
 	function getHash( $filePath ) {
@@ -340,8 +132,7 @@
 	// appends or increments a numeric filename suffix to ensure a unique filename
 	function uniqueFilename( $imageDir, $original ) {
 		$filename = $original;
-		$x = 1;
-		while( file_exists( $imageDir . $filename ) && $x++ < 1000 ) {
+		while( file_exists( $imageDir ."/". $filename )) {
 			$filename = incrementSuffix( $filename );
 		}
 		return $filename;
@@ -372,86 +163,204 @@
 		tmbo_query( $sql );
 	}
 
+	function uploading_file() {
+		if(array_key_exists("image", $_FILES) && 
+			is_array($_FILES['image']) &&
+			array_key_exists("name", $_FILES['image']) &&
+			$_FILES['image']['name'] != "" && 
+			array_key_exists("size", $_FILES['image']) &&
+			$_FILES['image']['size'] > 0 && 
+			!exceededUploadLimit($_SESSION['userid'])) {
+				
+			return true;
+		}
+		return false;
+	}
+
 	function body() {
-		global $fileuploaded, $fileid, $repost_row, $bytesPerPixel, $filesize, $expectedFileSize, $width, $height, $hash;
+		global $hash, $tmpdir;
+		$postdata = array();
+		
+		// is there an incoming file?
+		if( uploading_file() ) {
+			$postdata['tmpname'] = explode("/", $_FILES['image']['tmp_name']);
+			$postdata['tmpname'] = array_pop($postdata['tmpname']);
+			// having the file extension helps ImageMagick do its thing.
+			$postdata['file_extension'] = getFileExtension($_FILES['image']['name']);
+			$postdata['tmpname'] = $postdata['tmpname'].$postdata['file_extension'];
 
-		if( isset( $repost_row ) ) {
-			$message = "Your file appears to be a repost of <a target=\"_blank\" href=\"pages/pic.php?id=" . $repost_row['id'] . "\">" . $repost_row['filename'] . "</a>.";
-			$hash = $repost_row['hash'];
-			repostForm( $message, $hash );
-		}
-		else if( $bytesPerPixel > .45 ) {
-			$message = "Your upload exceeds the recommended file size for an image of its dimensions. Expected file size: ${expectedFileSize}k. Your file: ${filesize}k. (If you'd like to compress it but don't have the tools, you might try running it through <a target=\"_blank\" href=\"http://mmppt.porkchop.net\">porkchop's magic maxx photo prep thing</a>. (thanks porkchop!))<br/>Post it anyway?</br>";
-			repostForm( $message, $hash );			
-		}
-		else if( $width > 1200 || $height > 1200 ) {
-			$message = "This image is rather large ($width x $height). (If you'd like to resize it but don't have the tools, you might try running it through <a target=\"_blank\" href=\"http://mmppt.porkchop.net\">porkchop's magic maxx photo prep thing</a>. (thanks porkchop!))<br/>Post it anyway?";
-			repostForm( $message, $hash );			
-		}
-		else {
+			ensureDirExists($tmpdir);
+			move_uploaded_file($_FILES['image']['tmp_name'], $tmpdir."/".$postdata['tmpname']) or trigger_error("", E_USER_ERROR);
+			
+			// determine filetype
+			$getID3 = new getID3;
+			$fileinfo = $getID3->analyze( $tmpdir."/".$postdata['tmpname'] );
 
-			if( $fileuploaded ) {
-				if($fileid == 0) trigger_error("gahhh no fileid", E_USER_WARNING);
-				else updateStatus( $fileid, 'normal' );
-				thanks();		
+			if(!preg_match( "/(jpg|jpeg|gif|png)/i", $fileinfo["fileformat"])) {
+				box("acceptable file types: jpg, gif, png.", "sorry.");
+
+				mail( "ray@mysocalled.com", "[" . $_SERVER["REMOTE_ADDR"] . "] - SUSPICIOUS UPLOAD!!! " . $_SESSION['username'] . $postdata['tmpname'], requestDetail(), "From: offensive@themaxx.com (this might be offensive)\r\nPriority: urgent" );
+
+				uploadForm();
+				return;
+			}
+			$postdata['format'] = $fileinfo['fileformat'];
+
+			if( strlen($postdata['file_extension']) > 0 ) {
+				if( ! preg_match( "/(jpg|jpeg|gif|png)/i", $postdata['file_extension'] ) ) {
+					box("accepted file types: jpg, gif, png.", "sorry:");
+					uploadForm();
+					return;
+				}
+			} else {
+				unlink($tmpdir."/".$postdata['tmpname']);
+			}
+			
+			$postdata['filename'] = $_FILES['image']['name'];
+			$postdata['size'] = $_FILES['image']['size'];
+			
+			if(array_key_exists('nsfw', $_POST))
+				$postdata['nsfw'] = $_POST['nsfw'];
+			if(array_key_exists('tmbo', $_POST))
+				$postdata['tmbo'] = $_POST['tmbo'];
+			$postdata['avatar'] = array_key_exists('avatar', $_POST);
+			$postdata['redirect'] = array_key_exists('redirect', $_POST) && strlen($_POST['redirect']) > 0 ? 
+			                        $_POST['redirect'] : null;
+			$postdata['hash'] = getHash($tmpdir."/".$postdata['tmpname']);
+			
+		} else if(array_key_exists('postdata', $_SESSION) && $postdata = unserialize($_SESSION['postdata'])) {
+			if(array_key_exists('resize', $_POST))
+				$postdata['resize'] = $_POST['resize'];
+			if(array_key_exists('noresize', $_POST))
+				$postdata['noresize'] = $_POST['resize'];
+			if(array_key_exists('repost', $_POST))
+				$postdata['repost'] = $_POST['repost'];			
+			
+			// if the file doesn't exist, we're not doing any posting, are we...
+			if(!file_exists($tmpdir."/".$postdata['tmpname'])) {
+				trigger_error("post from SESSION failed: file not found.", E_USER_WARNING);
+				$message = "couldn't find the file you wanted to upload, sorry.";
+				box($message);
+				killUpload($postdata);
+				unset($postdata);
+				return;
 			}
 
-			uploadForm();
-
+			if(array_key_exists('killit', $_POST)) {
+				box("another one bites the dust", "all right:");
+				killUpload($postdata);
+				return;
+			}
+		} else {
+			unset($postdata);
 		}
+
+		if(!isset($postdata) || !$postdata) {
+			uploadForm();
+			return;
+		}
+	
+		/*
+		 * repost checking
+		 * note that this does not check avatars for duplicates.  yearbooks can be reposts, it's fine.
+		 */
+		if(!array_key_exists("repost", $postdata) && checkRepost($postdata))
+			return;
+		
+		/*
+		 * image size/filesize checking
+		 * this checks both filesize and pixelsize.
+		 */
+		if(!array_key_exists("resize", $postdata) && !array_key_exists("noresize", $postdata) && 
+		   checkSize($postdata)) {
+			return;
+		} else if (array_key_exists("resize", $postdata)) {
+			$cmd = "convert -resize 1024x1024 $tmpdir/".$postdata['tmpname']." $tmpdir/".$postdata['tmpname'];
+			$err = shell_exec($cmd);
+			if(strlen($err) > 0) trigger_error("ImageMagick failed: $err", E_USER_ERROR);
+		}
+
+		// ok, all that stuff's sorted, now to actually finish the upload jobbie:
+		include_once( 'admin/mysqlConnectionInfo.inc' );
+		if(!isset($link) || !$link) $link = openDbConnection();
+
+		/*
+		 * get the current time from the database instead of from the server
+		 * this solves the time zone problems that occur when we put a file in
+		 * the uploads directory for one date, and the database is already in 
+		 * the next (or previous) day.  in tmbo's case, the times are 
+		 * traditionally 2 hours apart or so, and issues occur when moving
+		 * between servers.
+		 */ 
+		// XXX: use getThumb and getFile here if/where possible
+		$sql = "SELECT NOW()";
+		$res = tmbo_query($sql);
+		list($now) = mysql_fetch_array($res);
+		$now = strtotime($now);
+		$path = pathFor($postdata, $now);
+
+		$nsfw = array_key_exists('nsfw', $postdata) ? 1 : 0;
+		$tmbo = array_key_exists('tmbo', $postdata) ? 1 : 0;
+
+		if(strlen($postdata['hash']) < 15) trigger_error("no hash!", E_USER_ERROR);
+
+		$sql = "INSERT INTO offensive_uploads ( userid,filename,ip,nsfw,tmbo,hash,type,status )
+				   VALUES ( " . $_SESSION['userid'] . ", '" . 
+				                sqlEscape( $postdata['filename'] ) . "', '" . 
+				                $_SERVER['REMOTE_ADDR'] . "', 
+				                $nsfw, $tmbo, '".$postdata['hash']."', '" . 
+				                typeFor( $postdata ) . "', 'normal')";
+		tmbo_query($sql);
+		$fileid = mysql_insert_id();
+
+		ensureDirExists("$path");
+		
+		// image types get thumbnails
+		if(typeFor($postdata) == "image" || typeFor($postdata) == "avatar") {
+			ensureDirExists("$path/thumbs");
+	
+			// generate the thumbnail
+			$cmd = "convert -resize 100x100 $tmpdir/".$postdata['tmpname']." $tmpdir/th".$postdata['tmpname'];
+			$err = shell_exec($cmd);
+			if(strlen($err) > 0) trigger_error("ImageMagick failed: $err", E_USER_ERROR);
+
+			// move into place
+			rename($tmpdir."/th".$postdata['tmpname'], 
+			     "$path/thumbs/th$fileid".$postdata['file_extension']) 
+				or trigger_error("could not copy thumbnail to $path/thumbs!", E_USER_ERROR);
+		}
+		
+		rename($tmpdir."/".$postdata['tmpname'], 
+		     "$path/".$fileid."_".$postdata['filename'])
+			or trigger_error("could not copy file to $path!", E_USER_ERROR);
+
+
+		$message = "<p>
+			Thanks. Your upload can be viewed <a href=\"./pages/pic.php?id=$fileid\">here</a>.
+		</p>
+		<p>
+				You may <a href=\"./?c=comments&fileid=$fileid\">comment on this file here</a>.
+		</p>		
+		<p>
+			<a href=\"./\">Back to the list</a>
+		</p>";
+		box($message, "yummy.");
+		unset($_SESSION['postdata']);
+		uploadForm(true);
 
 	} 
 
-
-function thanks() {
-	global $fileid;
-	
-	if( array_key_exists("redirect", $_REQUEST) ) {
-		header( "Location: " . $_REQUEST['redirect'] );
-	}
-?>
-	<div class="heading">yummy.</div>
-
-	<div class="bluebox">
-	
-		<div style="text-align:center">
-		
-			
-				<p>
-					Thanks. Your upload can be viewed <a href="./pages/pic.php?id=<?= $fileid?>">here</a>.
-				</p>
-				<? if( isset( $fileid ) ) { ?>
-					<p>
-						You may <a href="./?c=comments&fileid=<? echo $fileid ?>">comment on this file here</a>.
-					</p>
-				<? } ?>
-				
-				<p>
-					<a href="./">Back to the list</a>
-				</p>
-
-		</div>		
-	
-	</div>
-
-	<div class="blackbar"></div>
-
-<?
-}
-
-function uploadForm() {
+function uploadForm($fileuploaded=false) {
+		$uploadsRemaining = numUploadsRemaining( $_SESSION['userid'] );
 
 		?>
-			<div class="heading"><? echo isset($fileuploaded) ? "thank you, sir, may i have another?" : "gimme."?></div>
+			<div class="heading"><? echo $fileuploaded && $uploadsRemaining > 0 ? "thank you, sir, may i have another?" : "gimme."?></div>
 		
 		<div class="bluebox">
 		
 			<div style="text-align:center">
 						
 				<?php 
-				
-					$uploadsRemaining = numUploadsRemaining( $_SESSION['userid'] );
-					
 				
 					if( $uploadsRemaining > 0 || $_SESSION['status'] == "admin" ) { 
 					
@@ -481,13 +390,7 @@ function uploadForm() {
 								<tr>
 									<td></td>
 									<td><input type="checkbox" id="tmbo" name="tmbo" value="1"/><label for="tmbo">[ this might be offensive ]</label></td>
-								</tr>
-								<!--
-								<tr>
-									<td></td>
-									<td><input type="checkbox" id="puntme" name="puntme" value="1"/><label for="puntme">[ please ban me and lock my account. ]</label></td>
-								</tr>								
-								-->				
+								</tr>			
 								
 								<tr>
 									<td></td>
@@ -515,102 +418,118 @@ function uploadForm() {
 
 }
 
-
-function repostForm( $message, $hash ) {
-	global $fileid;
-
-	$rehash = tmbohash( $fileid, $hash );
-?>
-
-	<div class="heading">poster child:</div>
-	<div class="bluebox">
-		<?= $message ?>
-		<form action="<?= $_SERVER['PHP_SELF'] ?>">
-			<input type="hidden" name="c" value="upload">
-			<input type="hidden" name="repost" value="<?= $rehash ?>"/>
-			<input type="submit" name="killit" value="Cancel this upload."/>
-			<input type="submit" name="postit" value="Post it anyway."/>
-		</form>
-	</div>
-
-<?		
-
+function box($message, $title="hmm:") {
+	?>
+		<div class="heading"><?= $title ?></div>
+		<div class="bluebox">
+			<div style="text-align:center">
+				<?= $message ?>
+			</div>
+		</div>
+	<?
 }
 
-function killRepost() {
-	global $link;
+function checkRepost($postdata) {
+	global $hash, $tmpdir;
 	
-	$repostId = id_from_hash( $_REQUEST['repost'] );
+	// avatars are exempt
+	if(isAvatarUpload($postdata)) return false;
 	
-	if( ! is_numeric( $repostId ) ) {
-		return;	
-	}
-	
-	$sql = "SELECT hash
-				FROM offensive_uploads
-				WHERE id = $repostId
-				AND userid = " . $_SESSION['userid'] . "
-				LIMIT 1";
+	// not to be confused with the hash() function in activationFunctions
+	$hash = getHash($tmpdir."/".$postdata['tmpname']);
 
-	if(!isset($link) || !$link) $link = openDbConnection();
-	$result = tmbo_query( $sql );
-	if( mysql_num_rows( $result ) > 0 ) {
-		
-		$row = mysql_fetch_assoc( $result );
-		$dbHash = $row['hash'];
-
-		$rehash = tmbohash( $repostId, $dbHash );
-
-		if( $rehash == $_REQUEST['repost'] ) {
-
-			$sql = "DELETE FROM offensive_uploads
-						WHERE id=$repostId
-						AND hash = '$dbHash'
-						AND userid=" . $_SESSION['userid'] . "
-						LIMIT 1";
-
-			tmbo_query( $sql );
-
+    
+	// XXX: how often is this conditional not true??
+	if( strlen( $hash ) > 15 ) { // 15 is arbitrary. just want to make sure we have a hash
+		$sql = "SELECT id, filename, timestamp, type
+				FROM offensive_uploads 
+				WHERE hash = '$hash' AND type != 'avatar'
+				ORDER by timestamp DESC";
+		$result = tmbo_query( $sql );
+		if( mysql_num_rows( $result ) > 0 ) {
+			$filePath=dirname(realpath($_SERVER['SCRIPT_FILENAME']));
+			
+			?><div class="heading">poster child:</div>
+			<div class="bluebox">
+			<div style="text-align:center">
+			Your file appears to be a repost of:
+			<br /><center>
+			<table><?
+			while($row = mysql_fetch_assoc($result)) {
+				$css = (isset($css) && $css == "even_row") ? "odd_row" : "even_row";
+				
+				$repdate = strtotime($row['timestamp']);
+				$fpath = getThumb($row['id'], $row['filename'], $row['timestamp'], $row['type']);
+				?><tr class="<?= $css ?>">
+				<td><a href="/offensive/pages/pic.php?id=<?= $row['id'] ?>" target="_blank"><img src="<?= 
+					$fpath != '' ? 
+						getThumbURL($row['id'], $row['filename'], $row['timestamp'], $row['type']) :
+						"/offensive/graphics/previewNotAvailable.gif" ?>"></a></td>
+				<td><a href="/offensive/?c=comments&fileid=<?= $row['id'] ?>" target="_blank"><?= $row['filename'] ?></a></td>
+				</tr><?
+			}
+			?></table></center><br />
+			<form action="<?= $_SERVER['PHP_SELF'] ?>" method="POST">
+				<input type="hidden" name="c" value="upload">
+				<input type="submit" name="killit" value="Cancel this upload."/>
+				<input type="submit" name="repost" value="Post it anyway."/>
+			</form>
+			</div>
+			</div>
+			<?
+			$_SESSION['postdata'] = serialize($postdata);
+			return true;
 		}
-
+	} else {
+		// XXX: well, I guess we'll see how often the hash is crap.  kill it if it does.
+		trigger_error("hash was < 15 chars!  how?!\n".var_dump($postdata), E_USER_ERROR);
 	}
-
+	return false;
 }
 
+function checkSize($postdata) {
+	global $tmpdir;
 
-function postAnyway() {
-	global $link;
+	// size only matters with images and avatars.
+	if(typeFor($postdata) != "image" && typeFor($postdata) != "avatar")
+		return false;
 	
-	$repostId = id_from_hash( $_REQUEST['repost'] );
+	$filesize = filesize($tmpdir."/".$postdata['tmpname']);
+	list($width, $height, $type, $attr) = getimagesize($tmpdir."/".$postdata['tmpname']);
 	
-	if( ! is_numeric( $repostId ) ) {
-		return;	
+	if($height > 1024 && $width > 10) {
+		$message = "This image is rather large ($width x $height). If you want, I can try resizing it for you.<br/><br/>
+		<form action=\"{$_SERVER['PHP_SELF']}\" method=\"POST\">
+			<input type=\"hidden\" name=\"c\" value=\"upload\">
+			<input type=\"submit\" name=\"killit\" value=\"Cancel this upload.\"/>
+			<input type=\"submit\" name=\"resize\" value=\"Resize it for me.\"/>
+			<input type=\"submit\" name=\"noresize\" value=\"Post it anyway.\"/>
+		</form>";
+		box($message, "whoa, nelly");
+		$_SESSION['postdata'] = serialize($postdata);
+		return true;
 	}
-
-    global $fileuploaded;
-    $fileuploaded = true;
 	
-	$sql = "SELECT hash
-				FROM offensive_uploads
-				WHERE id = $repostId
-				AND userid = " . $_SESSION['userid'] . "
-				LIMIT 1";
-
-	if(!isset($link) || !$link) $link = openDbConnection();
-	$result = tmbo_query( $sql );
-	if( mysql_num_rows( $result ) > 0 ) {
-
-		$row = mysql_fetch_assoc( $result );
-		$dbHash = $row['hash'];
-
-		$rehash = tmbohash( $repostId, $dbHash );
-
-		if( $rehash == $_REQUEST['repost'] ) {
-			updateStatus( $repostId, 'normal' );
-		}
-
-	}
+	// this stuff is for extra large (uncompressed) images.  not sure if we care as much.
+	//$bytesPerPixel = 0;
+	//$expectedFileSize = round(($width * $height * .2)/1024);
+	//if(is_numeric( $width ) && ($width * $height > 0 ) ) {
+	//	$bytesPerPixel = ( 1.0 * $filesize / (1.0 * $width * $height ) );
+	//	$filesize = round($filesize/1024);
+	//}
+	//
+	//if($bytesPerPixel > 0.45) {
+	//	// I don't really think this is often a problem....
+	//}
+	
 }
 
+function killUpload($postdata) {
+	global $tmpdir;
+	unset($_SESSION['postdata']);
+	if(file_exists($tmpdir."/".$postdata['tmpname']))
+		unlink($tmpdir."/".$postdata['tmpname']);
+	uploadForm();
+}
 
 ?>
