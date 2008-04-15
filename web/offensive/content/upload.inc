@@ -313,6 +313,11 @@
 				                typeFor( $postdata ) . "', 'normal')";
 		tmbo_query($sql);
 		$fileid = mysql_insert_id();
+		
+		$sql = "insert into offensive_subscriptions (userid, fileid )
+		        values ( " . $_SESSION['userid'] . ", $fileid ) ";
+		tmbo_query( $sql );
+		
 
 		ensureDirExists("$path");
 		

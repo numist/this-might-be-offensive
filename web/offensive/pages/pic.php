@@ -2,6 +2,7 @@
 
 	set_include_path("../..");
 	require_once("offensive/assets/header.inc");
+	require_once("offensive/assets/functions.inc");
 
 	mustLogIn();
 
@@ -103,27 +104,10 @@
 
 	writeNav( $id );
 
-	/*
-	 * if the filename for this image is not found, it could be due to a time zone
-	 * difference between the database and the server.  this is largely due to the
-	 * moves tmbo has undergone, but can manifest if the server's DST settings are
-	 * incorrect.  if the file exists in the next/previous day's image pile, copy
-	 * the image to today.
-	 *
-	 * if the image still does not exist, give the user a 404.  they're probably
-	 * looking at an expired image anyway.
-	 */
-	$filepath = "../uploads/$year/$month/$day/image/$filename";
-	if( ! file_exists( $filepath ) ) {
-		if(file_exists("../uploads/$year/$month/".($day - 1)."/image/$filename")) {
-			trigger_error("moving $filename from $year/$month/".($day - 1)." to $year/$month/$day", E_USER_WARNING);
-			copy("../uploads/$year/$month/".($day - 1)."/image/$filename", $filepath);
-		} else if(file_exists("../uploads/$year/$month/".($day + 1)."/image/$filename")) {
-			trigger_error("moving $filename from $year/$month/".($day + 1)." to $year/$month/$day", E_USER_WARNING);
-			copy("../uploads/$year/$month/".($day + 1)."/image/$filename", $filepath);
-		}
-	}
-	if( ! file_exists( $filepath ) || $filename == "") {
+	$filepath = get_include_path()."/".getFile($id, $filename, $timestamp);
+	
+	if( !file_exists( $filepath ) || $filename == "") {
+		?><!-- header("Location: /offensive/404.php"); --><?
 	}
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
@@ -234,7 +218,7 @@
 				echo $is_nsfw == 1 ? "<span style=\"color:#990000\">[nsfw]</span>" : "";
 				echo $is_tmbo == 1 ? "<span style=\"color:#990000\">[tmbo]</span>" : "";
 				// XXX: at some point I want to remove [nsfw] and [tmbo] if it exists in the filename. hmm...
-				echo htmlEscape($filename); ?> <span style="color:#999999"><?= getFileSize( $filepath ) ?></span>
+				echo " ".htmlEscape($filename); ?> <span style="color:#999999"><?= getFileSize( $filepath ) ?></span>
 			<br/>
 			<span style="color:#999999">
 				uploaded by <a id="userLink" href="../?c=user&userid=<? echo $uploaderid ?>"><? echo htmlEscape($uploader); ?></a> @ <?= $timestamp ?>
@@ -264,7 +248,7 @@
 						<div class="<?php echo $is_nsfw == 1 ? 'nsfw' : 'image' ?> u<?= $uploaderid ?>">
 							<? 
 								$imgurl = '';
-								if(getFile($id, $filename, $timestamp) != '')
+								if($filepath != '')
 									$imgurl = getFileURL($id, $filename, $timestamp);
 								if($imgurl != '') {
 							?>
