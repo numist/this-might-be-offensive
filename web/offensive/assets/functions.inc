@@ -74,8 +74,8 @@ function getThumb($id, $filename, $timestamp, $type='image') {
 			$timestamp = strtotime($timestamp);
 			$yesterday = $timestamp - 86400;
 			$tomorrow = $timestamp + 86400;
-			if(fileConform(getThumb($id, $filename, $yesterday, $type), $id, $filename, $timestamp, $type)) return $retname;
-			if(fileConform(getThumb($id, $filename, $tomorrow, $type), $id, $filename, $timestamp, $type)) return $retname;
+			if(thumbConform(getThumb($id, $filename, $yesterday, $type), $id, $filename, $timestamp, $type)) return $retname;
+			if(thumbConform(getThumb($id, $filename, $tomorrow, $type), $id, $filename, $timestamp, $type)) return $retname;
 		}
 		
 		
