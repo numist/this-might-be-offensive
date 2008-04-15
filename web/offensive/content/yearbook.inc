@@ -73,7 +73,7 @@
 			?>
 				
 					<td>
-						<a href="images/users/<?= $row['filename'] ?>"><img src="<?=
+						<a href="<?= getFileURL($row['id'], $row['filename'], $row['timestamp'], 'avatar'); ?>"><img src="<?=
 							getThumbURL($row['id'], $row['filename'], $row['timestamp'], 'avatar');
 						?>"/></a>
 						<br/>
