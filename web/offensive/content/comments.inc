@@ -438,7 +438,7 @@
 								?><div style="padding:40px;">[ thumbnail filtered ]</div><?
 							}
 							else {
-								?><a href="<?= $href ?>" target="_blank"><img style="margin:12px;" src="<?= getThumbURL($_REQUEST['fileid'], $filename, $uploadstamp, $type); ?>"/></a><?
+								?><a href="<?= $href ?>"><img style="margin:12px;" src="<?= getThumbURL($_REQUEST['fileid'], $filename, $uploadstamp, $type); ?>"/></a><?
 							}
 						}
 					?>
