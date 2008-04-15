@@ -104,7 +104,7 @@
 
 	writeNav( $id );
 
-	$filepath = get_include_path()."/".getFile($id, $filename, $timestamp);
+	$filepath = getFile($id, $filename, $timestamp);
 	
 	if( !file_exists( $filepath ) || $filename == "") {
 		?><!-- header("Location: /offensive/404.php"); --><?

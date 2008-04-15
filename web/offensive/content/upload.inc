@@ -445,55 +445,51 @@ function checkRepost($postdata) {
 	$hash = getHash($tmpdir."/".$postdata['tmpname']);
 
     
-// XXX: how often is this conditional not true??
-	if( strlen( $hash ) > 15 ) { // 15 is arbitrary. just want to make sure we have a hash
-		$sql = "SELECT id, filename, timestamp, type, nsfw, tmbo, userid
-				FROM offensive_uploads 
-				WHERE hash = '$hash' AND type != 'avatar'
-				ORDER by timestamp DESC";
-		$result = tmbo_query( $sql );
-		if( mysql_num_rows( $result ) > 0 ) {
-			$filePath=dirname(realpath($_SERVER['SCRIPT_FILENAME']));
-			
-			?><div class="heading">poster child:</div>
-			<div class="bluebox">
-			<div style="text-align:center">
-			Your file appears to be a repost of:
-			<br /><center>
-			<table><?
-			while($row = mysql_fetch_assoc($result)) {
-				$css = (isset($css) && $css == "even_row") ? "odd_row" : "even_row";
-				
-				$repdate = strtotime($row['timestamp']);
-				$fpath = getThumb($row['id'], $row['filename'], $row['timestamp'], $row['type']);
-				?><tr class="<?= $css ?>">
-				<td><a href="/offensive/pages/pic.php?id=<?= $row['id'] ?>" target="_blank"><?
-				if(hideImage($row['nsfw'], $row['tmbo'], $row['userid'])) {
-					?>[ filtered ]<?
-				} else {
-					?><img src="<?= getThumbURL($row['id'], $row['filename'], $row['timestamp'], $row['type']) ?>"><?
-				}
-				?></a></td>
-				<td><a href="/offensive/?c=comments&fileid=<?= $row['id'] ?>" target="_blank"><?= $row['filename'] ?></a></td>
-				</tr><?
-			}
-			?></table></center><br />
-			<form action="<?= $_SERVER['PHP_SELF'] ?>" method="POST">
-				<input type="hidden" name="c" value="upload">
-				<input type="submit" name="killit" value="Cancel this upload."/>
-				<input type="submit" name="repost" value="Post it anyway."/>
-			</form>
-			</div>
-			</div>
-			<?
-			$_SESSION['postdata'] = serialize($postdata);
-			return true;
-		}
-	} else {
-// XXX: well, I guess we'll see how often the hash is crap.  kill it if it does.
+	if( strlen( $hash ) < 15 ) {
 		trigger_error("hash was < 15 chars!  how?!\n".var_dump($postdata), E_USER_ERROR);
 	}
-	return false;
+
+	$sql = "SELECT id, filename, timestamp, type, nsfw, tmbo, userid
+			FROM offensive_uploads 
+			WHERE hash = '$hash' AND type != 'avatar'
+			ORDER by timestamp DESC";
+	$result = tmbo_query( $sql );
+	if( mysql_num_rows( $result ) == 0 ) return false;
+	
+	$filePath=dirname(realpath($_SERVER['SCRIPT_FILENAME']));
+	
+	?><div class="heading">poster child:</div>
+	<div class="bluebox">
+	<div style="text-align:center">
+	Your file appears to be a repost of:
+	<br /><center>
+	<table><?
+	while($row = mysql_fetch_assoc($result)) {
+		$css = (isset($css) && $css == "even_row") ? "odd_row" : "even_row";
+		
+		$repdate = strtotime($row['timestamp']);
+		?><tr class="<?= $css ?>">
+		<td><a href="/offensive/pages/pic.php?id=<?= $row['id'] ?>" target="_blank"><?
+		if(hideImage($row['nsfw'], $row['tmbo'], $row['userid'])) {
+			?>[ filtered ]<?
+		} else {
+			?><img src="<?= getThumbURL($row['id'], $row['filename'], $row['timestamp'], $row['type']) ?>"><?
+		}
+		?></a></td>
+		<td><a href="/offensive/?c=comments&fileid=<?= $row['id'] ?>" target="_blank"><?= $row['filename'] ?></a></td>
+		</tr><?
+	}
+	?></table></center><br />
+	<form action="<?= $_SERVER['PHP_SELF'] ?>" method="POST">
+		<input type="hidden" name="c" value="upload">
+		<input type="submit" name="killit" value="Cancel this upload."/>
+		<input type="submit" name="repost" value="Post it anyway."/>
+	</form>
+	</div>
+	</div>
+	<?
+	$_SESSION['postdata'] = serialize($postdata);
+	return true;
 }
 
 function checkSize($postdata) {

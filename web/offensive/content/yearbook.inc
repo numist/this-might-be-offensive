@@ -53,6 +53,7 @@
 					WHERE users.userid=up.userid
 						AND up.type='avatar'
 						AND account_status != 'locked'
+						AND status != 'pending'
 						AND users.timestamp > DATE_SUB( NOW(), INTERVAL 12 MONTH )
 						AND up.id = (SELECT MAX( up.id) FROM offensive_uploads up WHERE type='avatar' AND userid=users.userid)
 					ORDER BY $order, up.id DESC";
@@ -63,7 +64,7 @@
 		$count = 0;
 
 		while( $row = mysql_fetch_assoc( $result ) ) {
-// XXX: if the thumb does not exists here, skip this entry.
+			if(getThumb($row['id'], $row['filename'], $row['timestamp'], 'avatar') == '') continue;
 		
 			if( (($count++) % $THUMBS_PER_ROW) == 0 ) {
 				$css = (isset($css) && $css == "even_row") ? "odd_row" : "even_row";

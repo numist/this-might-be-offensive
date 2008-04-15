@@ -44,14 +44,14 @@ function getFileExtension($filename) {
  * helper functions for getting paths to files and thumbnails
  */
 
-function basePath($timestamp, $type) {
+function basePath($timestamp, $type, $nopath=false) {
 	if(!is_numeric($timestamp))
 		$tstamp = strtotime($timestamp);
 	else $tstamp = $timestamp;
 	$year = date( "Y", $tstamp );
 	$month = date( "m", $tstamp );
 	$day = date( "d", $tstamp );
-	return "offensive/uploads/$year/$month/$day/$type/";
+	return ($nopath ? "" : get_include_path()."/")."offensive/uploads/$year/$month/$day/$type/";
 }
 
 function getThumb($id, $filename, $timestamp, $type='image') {
@@ -59,8 +59,8 @@ function getThumb($id, $filename, $timestamp, $type='image') {
 	
 	$retname = basePath($timestamp, $type)."thumbs/th$id".getFileExtension($filename);
 	
-	if(!file_exists(get_include_path()."/".$retname)) {
-		trigger_error("could not find ".get_include_path()."/".$retname, E_USER_NOTICE);
+	if(!file_exists($retname)) {
+		trigger_error("could not find ".$retname, E_USER_NOTICE);
 		
 		// WELL FIND IT THEN!
 		if($type == 'avatar')
@@ -79,7 +79,7 @@ function getThumb($id, $filename, $timestamp, $type='image') {
 		}
 		
 		
-		$bigfile = get_include_path()."/".getFile($id, $filename, $timestamp, $type);
+		$bigfile = getFile($id, $filename, $timestamp, $type);
 		if($bigfile != '') {
 			// man, I sure hope this doesn't happen often.
 
@@ -93,8 +93,8 @@ function getThumb($id, $filename, $timestamp, $type='image') {
 				trigger_error("ImageMagick failed: $err", E_USER_WARNING);
 				return '';
 			}
-			ensureDirExists(get_include_path()."/".dirname($retname));
-			rename($tmpfile, get_include_path()."/".$retname);
+			ensureDirExists(dirname($retname));
+			rename($tmpfile, $retname);
 			
 			trigger_error("CONFORM: resized $bigfile to $retname", E_USER_NOTICE);
 			
@@ -108,8 +108,8 @@ function getThumb($id, $filename, $timestamp, $type='image') {
 }
 
 function getThumbURL($id, $filename, $timestamp, $type='image') {
-	if(getThumb($id, $filename, $timestamp, $type) != '')
-		return "/".basePath($timestamp, $type)."thumbs/th$id".getFileExtension($filename);
+	if(getFile($id, $filename, $timestamp, $type) != '' && getThumb($id, $filename, $timestamp, $type) != '')
+		return "/".basePath($timestamp, $type, true)."thumbs/th$id".getFileExtension($filename);
 	return "/offensive/graphics/previewNotAvailable.gif";
 }
 
@@ -119,15 +119,15 @@ function getFile($id, $filename, $timestamp, $type='image') {
 	$retname = basePath($timestamp, $type).$id."_".$filename;
 	
 	// ignore the man behind the curtain
-	if(!file_exists(get_include_path()."/".$retname)) {
-		trigger_error("could not find ".get_include_path()."/".$retname, E_USER_NOTICE);
+	if(!file_exists($retname)) {
+		trigger_error("could not find ".$retname, E_USER_NOTICE);
 		
 		// WELL FIND IT THEN!
 		if(isset($_REQUEST['c']) && $_REQUEST['c'] == 'hof')
 			if(fileConform(get_include_path()."/offensive/images/halloffame/$filename", $id, $filename, $timestamp, $type)) return $retname;
 		if($type == 'image') {
-			if(fileConform(get_include_path()."/".basePath($timestamp, $type).$filename, $id, $filename, $timestamp, $type)) {
-				unlink(get_include_path()."/".basePath($timestamp, $type).$filename);
+			if(fileConform(basePath($timestamp, $type).$filename, $id, $filename, $timestamp, $type)) {
+				unlink(basePath($timestamp, $type).$filename);
 				return $retname;
 			}
 			if(fileConform(get_include_path()."/offensive/images/picpile/".$filename, $id, $filename, $timestamp, $type)) return $retname;
@@ -160,24 +160,24 @@ function getFileURL($id, $filename, $timestamp, $type='image') {
 	// quick hack to make sure getFile gets a chance to run its frantic search function.
 	getFile($id, $filename, $timestamp, $type);
 	
-	return "/".basePath($timestamp, $type).$id."_".rawurlencode($filename);
+	return "/".basePath($timestamp, $type, true).$id."_".rawurlencode($filename);
 }
 
 /* these two functions are the main players allowing files to be reorganized
  * on the fly without having to take the site down to restructure everything all at once.
  */
 function fileConform($path, $id, $filename, $timestamp, $type) {
-	if($path == '' || !file_exists($path)) return false;;
-	$target = get_include_path()."/".basePath($timestamp, $type).$id."_".$filename;
-	ensureDirExists(get_include_path()."/".basePath($timestamp, $type));
+	if($path == '' || !file_exists($path)) return false;
+	$target = basePath($timestamp, $type).$id."_".$filename;
+	ensureDirExists(basePath($timestamp, $type));
 	copy($path, $target);
 	trigger_error("CONFORM: moved $path to $target", E_USER_NOTICE);
 	return true;
 }
 function thumbConform($path, $id, $filename, $timestamp, $type) {
 	if($path == '' || !file_exists($path)) return false;
-	$target = get_include_path()."/".basePath($timestamp, $type)."thumbs/th$id".getFileExtension($filename);
-	ensureDirExists(get_include_path()."/".basePath($timestamp, $type)."thumbs/");
+	$target = basePath($timestamp, $type)."thumbs/th$id".getFileExtension($filename);
+	ensureDirExists(basePath($timestamp, $type)."thumbs/");
 	copy($path, $target);
 	trigger_error("CONFORM: moved $path to $target", E_USER_NOTICE);
 	return true;

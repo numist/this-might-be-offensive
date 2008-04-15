@@ -74,13 +74,15 @@
 					<td><a class="<?echo $css ?>" href="./pages/pic.php?id=<? echo $row['id'] ?>"><? echo $row['filename'] ?></a> <? echo  $expired ?></td>
 					<td><a class="<?echo $css ?>" href="./?c=comments&fileid=<? echo $row['id'] ?>"><?= 
 						($row['comments'] != '')?$row['comments']:0;
-					?> comments</a> (+<?=
+					?> comments</a> <br />(+<?=
 						($row['good'] != '')?$row['good']:0;
 					?> -<?=
 						($row['bad'] != '')?$row['bad']:0;
 					?> x<?=
 						($row['tmbo'] != '')?$row['tmbo']:0;
-					?>)</td>
+					?>)<br /><?=
+						date( "Y-m-d", strtotime( $row['timestamp'] ) )
+					?></td>
 				<? } ?>
 				<? if( $type == 'topic' ) { ?>
 					<td width="100px"><? echo date( "Y-m-d", strtotime( $row['timestamp'] ) ) ?></td>
