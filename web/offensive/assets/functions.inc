@@ -163,6 +163,7 @@ function ensureDirExists( $path ) {
 		$curPath .= "/$dir";
 		if( ! file_exists( $curPath ) ) {
 			mkdir( $curPath ) or trigger_error("could not create directory path $curPath from ".getcwd(), E_USER_ERROR);
+			chmod($curPath, 0755);
 		}
 	}
 }
