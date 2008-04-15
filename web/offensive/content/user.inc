@@ -146,6 +146,7 @@
 
 						<?
 							if(isset($avstamp) && isset($avatar) && isset($avid)) {
+// XXX: avatar history
 								if(getFile($avid, $avatar, $avstamp, 'avatar')) {
 								?>
 									<div class="piletitle" style="margin-bottom:12px;">

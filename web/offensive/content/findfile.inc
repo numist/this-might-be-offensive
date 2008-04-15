@@ -11,14 +11,25 @@
 	function body() {
 		global $link;
 
+// XXX: this should be paginated
+
+		$numperpage = 100;
+		$start = (isset($_REQUEST['p']) && is_numeric($_REQUEST['p']) ?
+			$_REQUEST['p'] : 0) * $numperpage;
 		$find = $_REQUEST['findfile'];
 	
-		$sql = "SELECT id, filename, offensive_uploads.timestamp, users.userid, username, offensive_uploads.type
-					FROM offensive_uploads, users
+		$sql = "SELECT offensive_uploads.id, filename, offensive_uploads.timestamp,
+					offensive_uploads.type, offensive_uploads.nsfw as is_nsfw,
+					offensive_uploads.tmbo as is_tmbo,
+					users.userid, username,
+					offensive_count_cache.good, offensive_count_cache.bad,
+					offensive_count_cache.tmbo, offensive_count_cache.comments
+					FROM offensive_uploads, users, offensive_count_cache
 					WHERE filename LIKE '%".sqlEscape($find)."%'
 					AND offensive_uploads.userid = users.userid
+					AND offensive_count_cache.threadid = offensive_uploads.id
 					ORDER BY offensive_uploads.timestamp DESC
-					LIMIT 100;
+					LIMIT $start, $numperpage;
 				";
 
 		if(!isset($link) || !$link) $link = openDbConnection();
@@ -44,20 +55,38 @@
 		  
 		  $row['filename'] = htmlEscape($row['filename']);
 			
+			$style = (isset($style) && $style == "") ? "background:#bbbbee;" : "";
 			$css = (isset($css) && $css == "evenfile") ? "oddfile" : "evenfile";
 			$type = $row['type'];
-			$expired = $type == 'image' && strtotime( $row['timestamp'] ) < time() - 60 * 60 * 24 * 3 ? "(expired)" : ""
+			$expired = $type == 'image' && getFile($row['id'], $row['filename'], $row['timestamp']) == '' ? "(expired)" : ""
 ?>
 	
-			<tr class="<? echo $css ?>">
-				<td><? echo date( "Y-m-d", strtotime( $row['timestamp'] ) ) ?></td>
+			<tr class="<? echo $css ?>" style="<?= $style ?>">
 				<? if( $type == 'image' ) { ?>
+					<td width="100px"><a class="<?echo $css ?>" href="./pages/pic.php?id=<? echo $row['id'] ?>"><?
+
+					if(hideImage($row['is_nsfw'], $row['is_tmbo'])) {
+						?>[ filtered ]<?
+					} else {
+						?><img src="<?= getThumbURL($row['id'], $row['filename'], $row['timestamp']) ?>"/><?
+					}
+					?></a></td>
 					<td><a class="<?echo $css ?>" href="./pages/pic.php?id=<? echo $row['id'] ?>"><? echo $row['filename'] ?></a> <? echo  $expired ?></td>
+					<td><a class="<?echo $css ?>" href="./?c=comments&fileid=<? echo $row['id'] ?>"><?= 
+						($row['comments'] != '')?$row['comments']:0;
+					?> comments</a> (+<?=
+						($row['good'] != '')?$row['good']:0;
+					?> -<?=
+						($row['bad'] != '')?$row['bad']:0;
+					?> x<?=
+						($row['tmbo'] != '')?$row['tmbo']:0;
+					?>)</td>
 				<? } ?>
 				<? if( $type == 'topic' ) { ?>
+					<td width="100px"><? echo date( "Y-m-d", strtotime( $row['timestamp'] ) ) ?></td>
 					<td><a class="<?echo $css ?>" href="./?c=comments&fileid=<? echo $row['id'] ?>"><?= $type ?>: <? echo $row['filename'] ?></a></td>
+					<td><a class="<?echo $css ?>" href="./?c=comments&fileid=<? echo $row['id'] ?>"><?= $row['comments'] ?> comments</td>
 				<? } ?>
-				<td><a class="<?echo $css ?>" href="./?c=comments&fileid=<? echo $row['id'] ?>">comments</td>
 			</tr>
 	
 <?	

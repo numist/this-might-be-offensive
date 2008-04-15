@@ -13,7 +13,7 @@
 
 	function doSearch( $find ) {
 		global $link;
-		
+// XXX: this should be paginated
 		$start = 0;
 		$end = 50;
 

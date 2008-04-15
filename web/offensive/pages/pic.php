@@ -217,7 +217,7 @@
 			<?
 				echo $is_nsfw == 1 ? "<span style=\"color:#990000\">[nsfw]</span>" : "";
 				echo $is_tmbo == 1 ? "<span style=\"color:#990000\">[tmbo]</span>" : "";
-				// XXX: at some point I want to remove [nsfw] and [tmbo] if it exists in the filename. hmm...
+// XXX: at some point I want to remove [nsfw] and [tmbo] if it exists in the filename. hmm...
 				echo " ".htmlEscape($filename); ?> <span style="color:#999999"><?= getFileSize( $filepath ) ?></span>
 			<br/>
 			<span style="color:#999999">
@@ -235,13 +235,7 @@
 			</span>
 			<br/><br/>
 			<?
-					if( array_key_exists("prefs", $_SESSION) &&
-					    is_array($_SESSION['prefs']) &&
-					    (array_key_exists("hide nsfw", $_SESSION['prefs']) && 
-					    $_SESSION['prefs']['hide nsfw'] == 1 && $is_nsfw == 1) || 
-					    (array_key_exists("hide tmbo", $_SESSION['prefs']) &&
-					    $_SESSION['prefs']['hide tmbo'] == 1 && $is_tmbo == 1) 
-						|| ( in_array( $uploaderid, explode( ',', $_SESSION['prefs']['squelched'] ) ) ) ) {
+					if( hideImage($is_nsfw, $is_tmbo) ) {
 						?><div style="padding:128px;">[ filtered ] <!-- <?= $uploaderid ?> --></div><?
 					} else {
 						?>

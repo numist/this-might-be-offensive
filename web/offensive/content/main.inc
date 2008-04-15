@@ -22,8 +22,8 @@
 		} else {
 			$last_update = -1;
 		}
-  
-  $page_limit_clause = array_key_exists("p", $_REQUEST) ? $_REQUEST['p'] * 100: 0;
+// XXX: this should be paginated
+	$page_limit_clause = array_key_exists("p", $_REQUEST) ? $_REQUEST['p'] * 100: 0;
     
 	/* adding the USE KEY statement seems to have resolved performance
 	 * issues with this query.  Why MySQL wasn't using the key to
@@ -118,6 +118,7 @@ LIMIT $page_limit_clause, 100";
 				($row['good'] != '')?$row['good']:0;
 			?> -<?=
 				($row['bad'] != '')?$row['bad']:0;
+// XXX: tmbo count here
 			?>)</td>
                   </tr>
                 <?php

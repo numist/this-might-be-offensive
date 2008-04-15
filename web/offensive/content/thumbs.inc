@@ -24,6 +24,7 @@
 		} else {
 			$last_update = -1;
 		}
+// XXX: this should be paginated
   $page_limit_clause = array_key_exists("p", $_REQUEST) ? $_REQUEST['p'] * 100: 0;
     
 	/* adding the USE KEY statement seems to have resolved performance
@@ -114,6 +115,7 @@ LIMIT $page_limit_clause, 100
 		($row['good'] != '')?$row['good']:0;
 	?> -<?= 
 		($row['bad'] != '')?$row['bad']:0;
+// XXX: tmbo count here
 	?>)</a>
 </td>
                 <?php

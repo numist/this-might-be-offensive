@@ -3,6 +3,7 @@ header( "Content-type: text/xml" );
 set_include_path("..");
 require_once("offensive/assets/header.inc");
 require_once("offensive/assets/conditionalGet.inc");
+require_once("offensive/assets/functions.inc");
 // Include, and check we've got a connection to the database.
 require_once( 'admin/mysqlConnectionInfo.inc' );
 $link = openDbConnection();
@@ -59,7 +60,7 @@ conditionalGet($lastBuildTime);
 		<item>
 			<title><![CDATA[<?= $filename ?> (uploaded by <?= $row['username'] ?>)]]></title>
 			<link>http://thismight.be/offensive/pages/pic.php?id=<? echo $row['id'] ?></link>
-			<description><![CDATA[<img src="<?= "http://thismight.be/offensive/uploads/$year/$month/$day/image/" . rawurlencode( $row['filename'] ) ?>"/>]]></description>
+			<description><![CDATA[<img src="<?= getFileURL($row['id'], $row['filename'], $row['timestamp']); ?>"/>]]></description>
 			<pubDate><? echo gmdate( "r", strtotime( $row['timestamp'] ) ) ?></pubDate>			
 			<comments><![CDATA[http://tmbo.org/offensive/?c=comments&fileid=<? echo $row['id'] ?>]]></comments>
 		</item>

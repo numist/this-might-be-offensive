@@ -110,8 +110,7 @@
 		list( $filename, $nsfw, $tmbo ) = mysql_fetch_array( $result );
 	
 	    // check to see if someone's posting.  
-	    
-	    /* check to see if someone is being hoodwinked by a link in comments
+	    /* check if someone is being hoodwinked by a link in comments
 	     * or outside the site's borders. while we're at it, let them know.
 	     * NB: only works if the client is reporting REFERERS. 
 	     */
@@ -279,8 +278,7 @@
 	$comments_heading = "the dorks who came before you said:";
 	$add_comment_heading = $comments_exist ? "and then you came along and were all:" : "you were first on the scene and were all:";
 
-	$href = getFileURL($_REQUEST['fileid'], $filename, $uploadstamp, $type);
-
+	$href = "/offensive/pages/pic.php?id=".$_REQUEST['fileid'];
 ?>	
 
 
@@ -361,13 +359,14 @@
 */
 
 				if( ! isSquelched( $row['userid'] ) ) {
-				    
-				    // remisser entrapment url gag
-				    if($_SESSION['userid'] != 2935 && $row['userid'] == 2935) {
-				        $pattern = "/(http[s]*:\/\/[^\s<>]+)/i";
-                    	$replacement = "http://preview.tinyurl.com/2tx";
-                    	$comment = preg_replace( $pattern, $replacement, $comment );
-				    }
+					
+					//// remisser entrapping url gag
+					//-now that there's a fix in place, this isn't necessary.  plus it's been long enough
+					//if($_SESSION['userid'] != 2935 && $row['userid'] == 2935) {
+					//    $pattern = "/(http[s]*:\/\/[^\s<>]+)/i";
+					//                    	$replacement = "http://preview.tinyurl.com/2tx";
+					//                    	$comment = preg_replace( $pattern, $replacement, $comment );
+					//}
 				    
 					echo nl2br( linkUrls( $comment ) );
 				}
@@ -394,7 +393,7 @@
 				
 				if( $row['userid'] == $_SESSION['userid'] ) {
 					$already_voted = true;
-				}		
+				}
 			}
 			
 			
@@ -405,14 +404,7 @@
 			if( $row['repost'] == 1 ) {
 				?><span class="vote"> [ this is a repost ]</span><?php
 			}
-/*
-			if( ! isSquelched( $row['userid'] ) ) {
-				?><a href="setPref.php?sq=<?= $row['userid'] ?>" class="squelched" style="margin-left:8px">squelch</a><?
-			}
-			else {
-				?><a href="setPref.php?unsq=<?= $row['userid'] ?>" class="squelched" style="margin-left:8px">unsquelch</a><?
-			}
-*/
+
 			?>
 	</div>
 	

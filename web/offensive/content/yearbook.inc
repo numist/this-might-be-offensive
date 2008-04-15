@@ -63,7 +63,7 @@
 		$count = 0;
 
 		while( $row = mysql_fetch_assoc( $result ) ) {
-		
+// XXX: if the thumb does not exists here, skip this entry.
 		
 			if( (($count++) % $THUMBS_PER_ROW) == 0 ) {
 				$css = (isset($css) && $css == "even_row") ? "odd_row" : "even_row";

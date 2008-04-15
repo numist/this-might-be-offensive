@@ -293,7 +293,7 @@
 		 * traditionally 2 hours apart or so, and issues occur when moving
 		 * between servers.
 		 */ 
-		// XXX: use getThumb and getFile here if/where possible
+// XXX: use getThumb and getFile here if/where possible
 		$sql = "SELECT NOW()";
 		$res = tmbo_query($sql);
 		list($now) = mysql_fetch_array($res);
@@ -445,9 +445,9 @@ function checkRepost($postdata) {
 	$hash = getHash($tmpdir."/".$postdata['tmpname']);
 
     
-	// XXX: how often is this conditional not true??
+// XXX: how often is this conditional not true??
 	if( strlen( $hash ) > 15 ) { // 15 is arbitrary. just want to make sure we have a hash
-		$sql = "SELECT id, filename, timestamp, type
+		$sql = "SELECT id, filename, timestamp, type, nsfw, tmbo
 				FROM offensive_uploads 
 				WHERE hash = '$hash' AND type != 'avatar'
 				ORDER by timestamp DESC";
@@ -467,10 +467,13 @@ function checkRepost($postdata) {
 				$repdate = strtotime($row['timestamp']);
 				$fpath = getThumb($row['id'], $row['filename'], $row['timestamp'], $row['type']);
 				?><tr class="<?= $css ?>">
-				<td><a href="/offensive/pages/pic.php?id=<?= $row['id'] ?>" target="_blank"><img src="<?= 
-					$fpath != '' ? 
-						getThumbURL($row['id'], $row['filename'], $row['timestamp'], $row['type']) :
-						"/offensive/graphics/previewNotAvailable.gif" ?>"></a></td>
+				<td><a href="/offensive/pages/pic.php?id=<?= $row['id'] ?>" target="_blank"><?
+				if(hideImage($row['nsfw'], $row['tmbo'])) {
+					?>[ filtered ]<?
+				} else {
+					?><img src="<?= getThumbURL($row['id'], $row['filename'], $row['timestamp'], $row['type']) ?>"><?
+				}
+				?></a></td>
 				<td><a href="/offensive/?c=comments&fileid=<?= $row['id'] ?>" target="_blank"><?= $row['filename'] ?></a></td>
 				</tr><?
 			}
@@ -487,7 +490,7 @@ function checkRepost($postdata) {
 			return true;
 		}
 	} else {
-		// XXX: well, I guess we'll see how often the hash is crap.  kill it if it does.
+// XXX: well, I guess we'll see how often the hash is crap.  kill it if it does.
 		trigger_error("hash was < 15 chars!  how?!\n".var_dump($postdata), E_USER_ERROR);
 	}
 	return false;
@@ -516,6 +519,13 @@ function checkSize($postdata) {
 		return true;
 	}
 	
+/*
+ * XXX: this should be factored out into another step in the upload process
+ * it should be aware of animations and complain but not stop the process,
+ * it should stop the process if the image is not animated, huge, and offer
+ * to convert to a mid-high quality jpeg (or maybe a list of formats 
+ * presented to the user).
+ */
 	// this stuff is for extra large (uncompressed) images.  not sure if we care as much.
 	//$bytesPerPixel = 0;
 	//$expectedFileSize = round(($width * $height * .2)/1024);
