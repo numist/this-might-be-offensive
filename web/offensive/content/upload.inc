@@ -447,7 +447,7 @@ function checkRepost($postdata) {
     
 // XXX: how often is this conditional not true??
 	if( strlen( $hash ) > 15 ) { // 15 is arbitrary. just want to make sure we have a hash
-		$sql = "SELECT id, filename, timestamp, type, nsfw, tmbo
+		$sql = "SELECT id, filename, timestamp, type, nsfw, tmbo, userid
 				FROM offensive_uploads 
 				WHERE hash = '$hash' AND type != 'avatar'
 				ORDER by timestamp DESC";
@@ -468,7 +468,7 @@ function checkRepost($postdata) {
 				$fpath = getThumb($row['id'], $row['filename'], $row['timestamp'], $row['type']);
 				?><tr class="<?= $css ?>">
 				<td><a href="/offensive/pages/pic.php?id=<?= $row['id'] ?>" target="_blank"><?
-				if(hideImage($row['nsfw'], $row['tmbo'])) {
+				if(hideImage($row['nsfw'], $row['tmbo'], $row['userid'])) {
 					?>[ filtered ]<?
 				} else {
 					?><img src="<?= getThumbURL($row['id'], $row['filename'], $row['timestamp'], $row['type']) ?>"><?

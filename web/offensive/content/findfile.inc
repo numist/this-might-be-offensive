@@ -65,7 +65,7 @@
 				<? if( $type == 'image' ) { ?>
 					<td width="100px"><a class="<?echo $css ?>" href="./pages/pic.php?id=<? echo $row['id'] ?>"><?
 
-					if(hideImage($row['is_nsfw'], $row['is_tmbo'])) {
+					if(hideImage($row['is_nsfw'], $row['is_tmbo'], $row['userid'])) {
 						?>[ filtered ]<?
 					} else {
 						?><img src="<?= getThumbURL($row['id'], $row['filename'], $row['timestamp']) ?>"/><?

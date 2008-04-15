@@ -194,7 +194,7 @@ function ensureDirExists( $path ) {
 	}
 }
 
-function hideImage($is_nsfw, $is_tmbo) {
+function hideImage($is_nsfw, $is_tmbo, $uploaderid) {
 	return ( array_key_exists("prefs", $_SESSION) &&
 	    is_array($_SESSION['prefs']) &&
 	    (array_key_exists("hide nsfw", $_SESSION['prefs']) && 

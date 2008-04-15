@@ -235,7 +235,7 @@
 			</span>
 			<br/><br/>
 			<?
-					if( hideImage($is_nsfw, $is_tmbo) ) {
+					if( hideImage($is_nsfw, $is_tmbo, $uploaderid) ) {
 						?><div style="padding:128px;">[ filtered ] <!-- <?= $uploaderid ?> --></div><?
 					} else {
 						?>
