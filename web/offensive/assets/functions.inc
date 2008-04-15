@@ -103,6 +103,8 @@ function getThumbURL($id, $filename, $timestamp, $type='image') {
 }
 
 function getFile($id, $filename, $timestamp, $type='image') {
+	if($type == 'topic') return '';
+	
 	$retname = basePath($timestamp, $type).$id."_".$filename;
 	
 	if(!file_exists(get_include_path()."/".$retname)) {
@@ -130,6 +132,8 @@ function getFile($id, $filename, $timestamp, $type='image') {
 }
 
 function getFileURL($id, $filename, $timestamp, $type='image') {
+	if($type == 'topic') return '';
+		
 	// quick hack to make sure getFile gets a chance to run its frantic search function.
 	getFile($id, $filename, $timestamp, $type);
 	
@@ -163,7 +167,6 @@ function ensureDirExists( $path ) {
 		$curPath .= "/$dir";
 		if( ! file_exists( $curPath ) ) {
 			mkdir( $curPath ) or trigger_error("could not create directory path $curPath from ".getcwd(), E_USER_ERROR);
-			chmod($curPath, 0755);
 		}
 	}
 }

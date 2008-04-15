@@ -191,7 +191,7 @@
 
 			ensureDirExists($tmpdir);
 			move_uploaded_file($_FILES['image']['tmp_name'], $tmpdir."/".$postdata['tmpname']) or trigger_error("", E_USER_ERROR);
-			chmod($tmpdir."/".$postdata['tmpname'], 0644)
+			chmod($tmpdir."/".$postdata['tmpname'], 0644);
 			
 			// determine filetype
 			$getID3 = new getID3;
