@@ -15,7 +15,8 @@
 	
 	rsort( $fileList );
 	
-	conditionalGet(filectime($path."/".$fileList[0]));
+	$time = filectime($path."/".$fileList[0]);
+	conditionalGet($time);
 	
 	header('Content-type: text/xml');
 	$dateFormat = "r"; 
