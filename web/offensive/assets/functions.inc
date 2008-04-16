@@ -59,8 +59,6 @@ function getThumb($id, $filename, $timestamp, $type='image') {
 	$retname = basePath($timestamp, $type)."thumbs/th$id".getFileExtension($filename);
 	
 	if(!file_exists($retname)) {
-		trigger_error("could not find ".$retname, E_USER_NOTICE);
-		
 		// WELL FIND IT THEN!
 		if($type == 'avatar')
 			if(thumbConform("images/users/thumbs/th-$filename", $id, $filename, $timestamp, $type)) return $retname;
@@ -118,9 +116,7 @@ function getFile($id, $filename, $timestamp, $type='image') {
 	$retname = basePath($timestamp, $type).$id."_".$filename;
 	
 	// ignore the man behind the curtain
-	if(!file_exists($retname)) {
-		trigger_error("could not find ".$retname, E_USER_NOTICE);
-		
+	if(!file_exists($retname)) {		
 		// WELL FIND IT THEN!
 		if(isset($_REQUEST['c']) && $_REQUEST['c'] == 'hof')
 			if(fileConform(get_include_path()."/offensive/images/halloffame/$filename", $id, $filename, $timestamp, $type)) return $retname;
