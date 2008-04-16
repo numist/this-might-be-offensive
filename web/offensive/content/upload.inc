@@ -51,14 +51,6 @@
 		}
 	}
 	
-	function pathFor($postdata, $timestamp) {
-		$type = typeFor($postdata);
-		$year = date( "Y", $timestamp );
-		$month = date( "m", $timestamp );
-		$day = date( "d", $timestamp );
-		return "uploads/$year/$month/$day/$type";
-	}
-
 	function getHash( $filePath ) {
 		$file = fopen( $filePath, "r" );
 		$filedata = fread ( $file, min( 4096, filesize( $filePath ) ) );
@@ -188,6 +180,7 @@
 			// having the file extension helps ImageMagick do its thing.
 			$postdata['file_extension'] = getFileExtension($_FILES['image']['name']);
 			$postdata['tmpname'] = $postdata['tmpname'].$postdata['file_extension'];
+			$postdata['filename'] = $_FILES['image']['name'];
 
 			ensureDirExists($tmpdir);
 			move_uploaded_file($_FILES['image']['tmp_name'], $tmpdir."/".$postdata['tmpname']) or trigger_error("", E_USER_ERROR);
@@ -207,18 +200,20 @@
 			}
 			$postdata['format'] = $fileinfo['fileformat'];
 
-			if( strlen($postdata['file_extension']) > 0 ) {
-				if( ! preg_match( "/(jpg|jpeg|gif|png)/i", $postdata['file_extension'] ) ) {
-					box("accepted file types: jpg, gif, png.", "sorry:");
-					uploadForm();
-					return;
-				}
-			} else {
-				unlink($tmpdir."/".$postdata['tmpname']);
+			if(strlen($postdata['file_extension']) == 0) {
+				$postdata['file_extension'] = ".".$postdata["format"];
+				$postdata['filename'] .= $postdata['file_extension'];
+				rename($tmpdir."/".$postdata['tmpname'], 
+				       $tmpdir."/".$postdata['tmpname'].$postdata['file_extension']) or trigger_error("", E_USER_ERROR);
+				$postdata['tmpname'] .= $postdata['file_extension'];
 			}
-			
-			$postdata['filename'] = $_FILES['image']['name'];
-			$postdata['size'] = $_FILES['image']['size'];
+
+			if( ! preg_match( "/(jpg|jpeg|gif|png)/i", $postdata['file_extension'] ) ) {
+				box("accepted file types: jpg, gif, png.", "sorry.");
+				killUpload($postdata);
+				unset($postdata);
+				return;
+			}
 			
 			if(array_key_exists('nsfw', $_POST))
 				$postdata['nsfw'] = $_POST['nsfw'];
@@ -230,12 +225,23 @@
 			$postdata['hash'] = getHash($tmpdir."/".$postdata['tmpname']);
 			
 		} else if(array_key_exists('postdata', $_SESSION) && $postdata = unserialize($_SESSION['postdata'])) {
+			
+			if(array_key_exists('killit', $_POST)) {
+				box("another one bites the dust", "all right!");
+				killUpload($postdata);
+				return;
+			}
+			
 			if(array_key_exists('resize', $_POST))
 				$postdata['resize'] = $_POST['resize'];
 			if(array_key_exists('noresize', $_POST))
 				$postdata['noresize'] = $_POST['resize'];
 			if(array_key_exists('repost', $_POST))
 				$postdata['repost'] = $_POST['repost'];			
+			if(array_key_exists('resample', $_POST))
+				$postdata['resample'] = $_POST['resample'];			
+			if(array_key_exists('noresample', $_POST))
+				$postdata['noresample'] = $_POST['noresample'];			
 			
 			// if the file doesn't exist, we're not doing any posting, are we...
 			if(!file_exists($tmpdir."/".$postdata['tmpname'])) {
@@ -244,12 +250,6 @@
 				box($message);
 				killUpload($postdata);
 				unset($postdata);
-				return;
-			}
-
-			if(array_key_exists('killit', $_POST)) {
-				box("another one bites the dust", "all right:");
-				killUpload($postdata);
 				return;
 			}
 		} else {
@@ -261,6 +261,11 @@
 			return;
 		}
 	
+	
+		/**********************************************************************
+		* these blocks ensire that the file being uploaded is not a repost,   *
+		* not incredibly large (filesize), and not unreasonably big (pixels)  *
+		**********************************************************************/
 		/*
 		 * repost checking
 		 * note that this does not check avatars for duplicates.  yearbooks can be reposts, it's fine.
@@ -269,11 +274,10 @@
 			return;
 		
 		/*
-		 * image size/filesize checking
-		 * this checks both filesize and pixelsize.
+		 * image dimension checking
 		 */
 		if(!array_key_exists("resize", $postdata) && !array_key_exists("noresize", $postdata) && 
-		   checkSize($postdata)) {
+		   checkDim($postdata)) {
 			return;
 		} else if (array_key_exists("resize", $postdata)) {
 			$cmd = "convert -resize 1024x1024 $tmpdir/".$postdata['tmpname']." $tmpdir/".$postdata['tmpname'];
@@ -281,10 +285,35 @@
 			if(strlen($err) > 0) trigger_error("ImageMagick failed: $err", E_USER_ERROR);
 		}
 
-		// ok, all that stuff's sorted, now to actually finish the upload jobbie:
-		include_once( 'admin/mysqlConnectionInfo.inc' );
-		if(!isset($link) || !$link) $link = openDbConnection();
+		/*
+		 * image size checking
+		 */
+ 		if(!array_key_exists("resample", $postdata) && !array_key_exists("noresample", $postdata) &&
+		   checkSize($postdata)) {
+ 			return;
+ 		} else if (array_key_exists("resample", $postdata)) {
+			// convert from file.ext to file.jpg, quality 80
+			$newtmp = substr($postdata['tmpname'], 0, 0 - strlen($postdata['file_extension'])).".jpg";
+			$newfilename = substr($postdata['filename'], 0, 0 - strlen($postdata['file_extension'])).".jpg";
+			
+			$cmd = "convert -quality 80 $tmpdir/".$postdata['tmpname']." $tmpdir/$newtmp";
+			$err = shell_exec($cmd);
+			if(strlen($err) > 0) {
+				trigger_error("ImageMagick failed with: $err", E_USER_ERROR);
+			}
+			$postdata['tmpname'] = $newtmp;
+			$postdata['filename'] = $newfilename;
+			$postdata['file_extension'] = ".jpg";
+			$postdata['format'] = "jpg";
+			var_dump($postdata);
+		}
 
+		/**********************************************************************
+		* all tests passed, everything from this point on is relevant to the  *
+		* process of actually uploading the file and generating the necessary *
+		* metadata in the database and on the filesystem.                     *
+		**********************************************************************/
+		
 		/*
 		 * get the current time from the database instead of from the server
 		 * this solves the time zone problems that occur when we put a file in
@@ -293,12 +322,10 @@
 		 * traditionally 2 hours apart or so, and issues occur when moving
 		 * between servers.
 		 */ 
-// XXX: use getThumb and getFile here if/where possible
 		$sql = "SELECT NOW()";
 		$res = tmbo_query($sql);
 		list($now) = mysql_fetch_array($res);
-		$now = strtotime($now);
-		$path = pathFor($postdata, $now);
+		$path = basePath($now, typeFor($postdata));
 
 		$nsfw = array_key_exists('nsfw', $postdata) ? 1 : 0;
 		$tmbo = array_key_exists('tmbo', $postdata) ? 1 : 0;
@@ -310,12 +337,12 @@
 				                sqlEscape( $postdata['filename'] ) . "', '" . 
 				                $_SERVER['REMOTE_ADDR'] . "', 
 				                $nsfw, $tmbo, '".$postdata['hash']."', '" . 
-				                typeFor( $postdata ) . "', 'normal')";
+				                typeFor( $postdata ) . "', 'pending')";
 		tmbo_query($sql);
 		$fileid = mysql_insert_id();
 		
-		$sql = "insert into offensive_subscriptions (userid, fileid )
-		        values ( " . $_SESSION['userid'] . ", $fileid ) ";
+		$sql = "INSERT INTO offensive_subscriptions (userid, fileid )
+		        VALUES ( " . $_SESSION['userid'] . ", $fileid ) ";
 		tmbo_query( $sql );
 		
 
@@ -340,6 +367,15 @@
 		     "$path/".$fileid."_".$postdata['filename'])
 			or trigger_error("could not copy file to $path!", E_USER_ERROR);
 
+		// initialize a row in the count cache
+		$sql = "INSERT INTO offensive_count_cache ( threadid, good, bad, repost, tmbo, comments )
+					VALUES ( $fileid, 0, 0, 0, 0, 0 )";
+		tmbo_query($sql);
+		
+		// all set, let's go
+		$sql = "UPDATE offensive_uploads SET status = 'normal' where id = $fileid";
+		tmbo_query($sql);
+		
 
 		$message = "<p>
 			Thanks. Your upload can be viewed <a href=\"./pages/pic.php?id=$fileid\">here</a>.
@@ -492,7 +528,7 @@ function checkRepost($postdata) {
 	return true;
 }
 
-function checkSize($postdata) {
+function checkDim($postdata) {
 	global $tmpdir;
 
 	// size only matters with images and avatars.
@@ -502,8 +538,24 @@ function checkSize($postdata) {
 	$filesize = filesize($tmpdir."/".$postdata['tmpname']);
 	list($width, $height, $type, $attr) = getimagesize($tmpdir."/".$postdata['tmpname']);
 	
-	if($height > 1024 && $width > 10) {
-		$message = "This image is rather large ($width x $height). If you want, I can try resizing it for you.<br/><br/>
+	// sanity check
+	if(!is_numeric( $width ) || !is_numeric($height) || $width * $height == 0 ) {
+		box("something's wrong with this image...  it doesnt seem to be valid.", "oops.");
+		killUpload($postdata);
+		return true;
+	}
+	
+	// outright reject anything of the spaceball.gif variety
+	if($width < 5 && $height < 5) {
+		$message = "Why would you try to upload a $width x $height pixel image?";
+		box($message, "spaceballs alive!");
+		killUpload($postdata);
+		return true;
+	}
+	
+	// outrageous!
+	if($height > 1024 && $width > 1024) {
+		$message = "This image is rather large ($width x $height).<br />If you want, I can try resizing it for you.<br/><br/>
 		<form action=\"{$_SERVER['PHP_SELF']}\" method=\"POST\">
 			<input type=\"hidden\" name=\"c\" value=\"upload\">
 			<input type=\"submit\" name=\"killit\" value=\"Cancel this upload.\"/>
@@ -514,26 +566,38 @@ function checkSize($postdata) {
 		$_SESSION['postdata'] = serialize($postdata);
 		return true;
 	}
+}
+
+function checkSize($postdata) {
+	global $tmpdir;
 	
-/*
- * XXX: this should be factored out into another step in the upload process
- * it should be aware of animations and complain but not stop the process,
- * it should stop the process if the image is not animated, huge, and offer
- * to convert to a mid-high quality jpeg (or maybe a list of formats 
- * presented to the user).
- */
+	if(typeFor($postdata) != 'image' && typeFor($postdata) != 'avatar')
+		return false;
+	
 	// this stuff is for extra large (uncompressed) images.  not sure if we care as much.
-	//$bytesPerPixel = 0;
-	//$expectedFileSize = round(($width * $height * .2)/1024);
-	//if(is_numeric( $width ) && ($width * $height > 0 ) ) {
-	//	$bytesPerPixel = ( 1.0 * $filesize / (1.0 * $width * $height ) );
-	//	$filesize = round($filesize/1024);
-	//}
-	//
-	//if($bytesPerPixel > 0.45) {
-	//	// I don't really think this is often a problem....
-	//}
+	$filesize = filesize($tmpdir."/".$postdata['tmpname']);
 	
+	list($width, $height, $type, $attr) = getimagesize($tmpdir."/".$postdata['tmpname']);
+	
+	$bytesPerPixel = 0.0;
+	$expectedFileSize = round(($width * $height * 0.2)/1024);
+	$bytesPerPixel = ( 1.0 * $filesize / (1.0 * $width * $height ) );
+	$filesize = round($filesize/1024);
+	
+	if($bytesPerPixel <= 0.45) return false;
+	
+	$message = "This image has a pretty big filesize for its dimensions. Expected file size: ${expectedFileSize}k. Your file: ${filesize}k.<br />If you want, I can resample it as an 80% quality JPG image.<br /><br />
+		<form action=\"{$_SERVER['PHP_SELF']}\" method=\"POST\">
+			<input type=\"hidden\" name=\"c\" value=\"upload\">
+			<input type=\"submit\" name=\"killit\" value=\"Cancel this upload.\"/>
+			<input type=\"submit\" name=\"resample\" value=\"Compress my file.\"/>
+			<input type=\"submit\" name=\"noresample\" value=\"Post it anyway.\"/>
+		</form>";
+	if($postdata['format'] == 'gif') $message .= "<br /><br />(If this is an animated gif, don't click the \"Compress\" button!)";
+	
+	box($message, "whoa, nelly");
+	$_SESSION['postdata'] = serialize($postdata);
+	return true;
 }
 
 function killUpload($postdata) {

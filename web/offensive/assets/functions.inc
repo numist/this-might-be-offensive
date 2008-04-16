@@ -46,11 +46,10 @@ function getFileExtension($filename) {
 
 function basePath($timestamp, $type, $nopath=false) {
 	if(!is_numeric($timestamp))
-		$tstamp = strtotime($timestamp);
-	else $tstamp = $timestamp;
-	$year = date( "Y", $tstamp );
-	$month = date( "m", $tstamp );
-	$day = date( "d", $tstamp );
+		$timestamp = strtotime($timestamp);
+	$year = date( "Y", $timestamp );
+	$month = date( "m", $timestamp );
+	$day = date( "d", $timestamp );
 	return ($nopath ? "" : get_include_path()."/")."offensive/uploads/$year/$month/$day/$type/";
 }
 
@@ -170,15 +169,22 @@ function fileConform($path, $id, $filename, $timestamp, $type) {
 	if($path == '' || !file_exists($path)) return false;
 	$target = basePath($timestamp, $type).$id."_".$filename;
 	ensureDirExists(basePath($timestamp, $type));
-	copy($path, $target);
+	if(!link($path, $target)) {
+		copy($path, $target);
+		trigger_error("link doesn't work", E_USER_WARNING);
+	}
 	trigger_error("CONFORM: moved $path to $target", E_USER_NOTICE);
 	return true;
 }
+
 function thumbConform($path, $id, $filename, $timestamp, $type) {
 	if($path == '' || !file_exists($path)) return false;
 	$target = basePath($timestamp, $type)."thumbs/th$id".getFileExtension($filename);
 	ensureDirExists(basePath($timestamp, $type)."thumbs/");
-	copy($path, $target);
+	if(!link($path, $target)) {
+		copy($path, $target);
+		trigger_error("link doesn't work", E_USER_WARNING);
+	}
 	trigger_error("CONFORM: moved $path to $target", E_USER_NOTICE);
 	return true;
 }
