@@ -320,95 +320,96 @@
 	
 		<div class="bluebox" style="text-align:left">	
 
-<?php if( $comments_exist ) { 
-        // changeblog doesn't say anything demeaning about the people who posted.
-        if($_REQUEST['fileid'] != "211604") { ?>		
+<?php 
 
-		    <b><?php echo $comments_heading?></b>
-<?php
+	$commentnum = 0;
+	if( $comments_exist ) { 
+        // changeblog doesn't say anything demeaning about the people who posted.
+        if($_REQUEST['fileid'] != "211604") { 
+			echo "<b>$comments_heading</b>";
         }
 
-	global $warudo;
-	$numgood = 0;
-	$numbad = 0;
-	$commentnum = 0;
-	while( $row = mysql_fetch_assoc( $result ) ) {
-
-		/*
-		 * to disable warudo comment hack, comment out the next line of code.
-		 * inspiration from: http://thismight.be/offensive/?c=comments&fileid=229329#6340701
-		 */
-	        $warudo = strpos($row['comment'], "ZA WARUDO") !== false;
-
-	?>
-	<a name="<?= $row['commentid'] ?>"></a>
-	<div class="entry u<?= $row['userid'] ?>" style="<?php echo nextStyle($commentnum++)?>">
-
-			<?php
-			
-				$comment = htmlEscape($row['comment']);
-
-/*				
-				// darkstalker and zetsumei drama queen gag
-				if( (! isset( $_REQUEST['dsgag'] ) )
-					&& ($_SESSION['userid'] != 1613 && $_SESSION['userid'] != 3940)
-					&& ($row['userid'] == 1613 || $row['userid'] == 3940 )
-					&& strlen( $comment ) > 0 )  {
-					$comment = "Hey everybody! Look at me! Look at me! I'm leaving! See? Here I go! Don't try to stop me!";
-				}
-*/
-
-				if( ! isSquelched( $row['userid'] ) ) {
-					
-					//// remisser entrapping url gag
-					//-now that there's a fix in place, this isn't necessary.  plus it's been long enough
-					//if($_SESSION['userid'] != 2935 && $row['userid'] == 2935) {
-					//    $pattern = "/(http[s]*:\/\/[^\s<>]+)/i";
-					//                    	$replacement = "http://preview.tinyurl.com/2tx";
-					//                    	$comment = preg_replace( $pattern, $replacement, $comment );
-					//}
-				    
-					echo nl2br( linkUrls( $comment ) );
-				}
-				else {
-					echo "<div class='squelched'>[ squelched ]</div>";
-				}
-				?>
-                <br/>
-					 
- 	 			<div class="timestamp"><a href="#<?= $row['commentid'] ?>"><?= $row['comment_timestamp'] ?></a></div>
-				&raquo; 
-
-			<?php
-
-			echo "<a href=\"./?c=user&userid=" . $row['userid'] . "\">" . $row['username'] . "</a>";
-						
-			if( $row['vote'] ) {
-				$thevote = $row['vote'];
-
-				$numgood += ($thevote == 'this is good') ? 1 : 0;
-				$numbad += ($thevote == 'this is bad') ? 1 : 0;
-
-				echo "<span title=\"+$numgood -$numbad\" class='vote" . additionalCssFor( $thevote ) . "'> [ " . $thevote . " ]</span>";
+		global $warudo;
+		$numgood = 0;
+		$numbad = 0;
+		while( $row = mysql_fetch_assoc( $result ) ) {
+    	
+			/*
+			 * to disable warudo comment hack, comment out the next line of code.
+			 * inspiration from: http://thismight.be/offensive/?c=comments&fileid=229329#6340701
+			 */
+		        $warudo = strpos($row['comment'], "ZA WARUDO") !== false;
+    	
+		?>
+		<a name="<?= $row['commentid'] ?>"></a>
+		<div class="entry u<?= $row['userid'] ?>" style="<?php echo nextStyle($commentnum++)?>">
+    	
+				<?php
 				
-				if( $row['userid'] == $_SESSION['userid'] ) {
-					$already_voted = true;
+					$comment = htmlEscape($row['comment']);
+    	
+/*					
+					// darkstalker and zetsumei drama queen gag
+					if( (! isset( $_REQUEST['dsgag'] ) )
+						&& ($_SESSION['userid'] != 1613 && $_SESSION['userid'] != 3940)
+						&& ($row['userid'] == 1613 || $row['userid'] == 3940 )
+						&& strlen( $comment ) > 0 )  {
+						$comment = "Hey everybody! Look at me! Look at me! I'm leaving! See? Here I go! Don't try to stop me!";
+					}
+*/  	
+    	
+					if( ! isSquelched( $row['userid'] ) ) {
+						
+						//// remisser entrapping url gag
+						//-now that there's a fix in place, this isn't necessary.  plus it's been long enough
+						//if($_SESSION['userid'] != 2935 && $row['userid'] == 2935) {
+						//    $pattern = "/(http[s]*:\/\/[^\s<>]+)/i";
+						//                    	$replacement = "http://preview.tinyurl.com/2tx";
+						//                    	$comment = preg_replace( $pattern, $replacement, $comment );
+						//}
+					    
+						echo nl2br( linkUrls( $comment ) );
+					}
+					else {
+						echo "<div class='squelched'>[ squelched ]</div>";
+					}
+					?>
+    	            <br/>
+						 
+ 		 			<div class="timestamp"><a href="#<?= $row['commentid'] ?>"><?= $row['comment_timestamp'] ?></a></div>
+					&raquo; 
+    	
+				<?php
+    	
+				echo "<a href=\"./?c=user&userid=" . $row['userid'] . "\">" . $row['username'] . "</a>";
+							
+				if( $row['vote'] ) {
+					$thevote = $row['vote'];
+    	
+					$numgood += ($thevote == 'this is good') ? 1 : 0;
+					$numbad += ($thevote == 'this is bad') ? 1 : 0;
+    	
+					echo "<span title=\"+$numgood -$numbad\" class='vote" . additionalCssFor( $thevote ) . "'> [ " . $thevote . " ]</span>";
+					
+					if( $row['userid'] == $_SESSION['userid'] ) {
+						$already_voted = true;
+					}
 				}
-			}
-			
-			
-			if( $row['offensive'] == 1 ) {
-				?><span class="vote"> [ this might be offensive ]</span><?php
-			}
-			
-			if( $row['repost'] == 1 ) {
-				?><span class="vote"> [ this is a repost ]</span><?php
-			}
-
-			?>
-	</div>
-	
-	<?php } 
+				
+				
+				if( $row['offensive'] == 1 ) {
+					?><span class="vote"> [ this might be offensive ]</span><?php
+				}
+				
+				if( $row['repost'] == 1 ) {
+					?><span class="vote"> [ this is a repost ]</span><?php
+				}
+    	
+				?>
+		</div>
+		
+		<?php 
+		} 
 	
 	}
 	

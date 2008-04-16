@@ -235,7 +235,7 @@
 			if(array_key_exists('resize', $_POST))
 				$postdata['resize'] = $_POST['resize'];
 			if(array_key_exists('noresize', $_POST))
-				$postdata['noresize'] = $_POST['resize'];
+				$postdata['noresize'] = $_POST['noresize'];
 			if(array_key_exists('repost', $_POST))
 				$postdata['repost'] = $_POST['repost'];			
 			if(array_key_exists('resample', $_POST))
