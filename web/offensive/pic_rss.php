@@ -23,12 +23,14 @@ conditionalGet($lastBuildTime);
 ?>
 <rss <? if( isset($_GET['gallery']) ) { echo 'xmlns:media="http://search.yahoo.com/mrss"'; } ?> version="2.0">
 	<channel>
-		<title>[ this might be offensive ] : images</title>
-		<link>http://thismight.be/offensive/</link>
-		<description>[ this might be offensive ]</description>
-		<lastBuildDate><?
-			echo gmdate('r', $lastBuildTime);
-		?></lastBuildDate>
+		<? if( ! isset($_GET['gallery']) ) { ?>
+			<title>[ this might be offensive ] : images</title>
+			<link>http://thismight.be/offensive/</link>
+			<description>[ this might be offensive ]</description>
+			<lastBuildDate><?
+				echo gmdate('r', $lastBuildTime);
+			?></lastBuildDate>
+		<? } ?>
 
 <?
 	$sql = "SELECT offensive_uploads.*, users.username
@@ -54,15 +56,16 @@ conditionalGet($lastBuildTime);
 ?>
 
 		<item>
-			<title><![CDATA[<?= $filename ?> (uploaded by <?= $row['username'] ?>)]]></title>
-			<link>http://thismight.be/offensive/pages/pic.php?id=<?= $row['id'] ?></link>
-			<description><![CDATA[<? if($fileURL != '') { ?><img src="<?= $fileURL ?>"/><? } else { echo "(expired)"; } ?>]]></description>
-			<pubDate><? echo gmdate( "r", strtotime( $row['timestamp'] ) ) ?></pubDate>			
-			<comments><![CDATA[http://tmbo.org/offensive/?c=comments&fileid=<?= $row['id'] ?>]]></comments>
 			<? if( isset($_GET['gallery']) ) { ?>
-			<media:content url="<?= $fileURL ?>" />
-			<media:thumbnail url="<?= $thumbURL ?>" />
-			<guid isPermaLink="false">tmbo-<?= $row['id'] ?></guid>
+				<media:content url="<?= $fileURL ?>" />
+				<media:thumbnail url="<?= $thumbURL ?>" />
+				<guid isPermaLink="false">tmbo-<?= $row['id'] ?></guid>
+			<? } else { ?>
+				<title><![CDATA[<?= $filename ?> (uploaded by <?= $row['username'] ?>)]]></title>
+				<link>http://thismight.be/offensive/pages/pic.php?id=<?= $row['id'] ?></link>
+				<description><![CDATA[<? if($fileURL != '') { ?><img src="<?= $fileURL ?>"/><? } else { echo "(expired)"; } ?>]]></description>
+				<pubDate><? echo gmdate( "r", strtotime( $row['timestamp'] ) ) ?></pubDate>			
+				<comments><![CDATA[http://tmbo.org/offensive/?c=comments&fileid=<?= $row['id'] ?>]]></comments>
 			<? } ?>
 		</item>
 <?
