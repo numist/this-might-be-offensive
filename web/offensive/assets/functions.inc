@@ -157,7 +157,7 @@ function getFileURL($id, $filename, $timestamp, $type='image') {
 	if($type == 'topic') return '';
 		
 	// quick hack to make sure getFile gets a chance to run its frantic search function.
-	getFile($id, $filename, $timestamp, $type);
+	if(getFile($id, $filename, $timestamp, $type) == '') return '';
 	
 	return "/".basePath($timestamp, $type, true).$id."_".rawurlencode($filename);
 }

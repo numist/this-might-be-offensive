@@ -21,7 +21,7 @@ $lastBuildTime = strtotime($lastBuildDate);
 conditionalGet($lastBuildTime);
 
 ?>
-<rss version="2.0">
+<rss <? if( isset($_GET['gallery']) ) { echo 'xmlns:media="http://search.yahoo.com/mrss"'; } ?> version="2.0">
 	<channel>
 		<title>[ this might be offensive ] : images</title>
 		<link>http://thismight.be/offensive/</link>
@@ -48,21 +48,22 @@ conditionalGet($lastBuildTime);
 				'[tmbo] '.$filename : $filename;
 			$filename = $row['nsfw'] == 1 && strpos(strtolower($filename), "[nsfw]") === false ?
 				'[nsfw] '.$filename : $filename;
-		
-		$time = strtotime( $row['timestamp'] );
-		$year = date( "Y", $time );
-		$month = date( "m", $time );
-		$day = date( "d", $time );
-		$extension = substr( $filename, strrpos( $filename, '.' ) );
 
+		$fileURL = "http://thismight.be" . getFileURL($row['id'], $row['filename'], $row['timestamp']);
+		$thumbURL = "http://thismight.be" . getThumbURL($row['id'], $row['filename'], $row['timestamp']);
 ?>
 
 		<item>
 			<title><![CDATA[<?= $filename ?> (uploaded by <?= $row['username'] ?>)]]></title>
-			<link>http://thismight.be/offensive/pages/pic.php?id=<? echo $row['id'] ?></link>
-			<description><![CDATA[<img src="<?= getFileURL($row['id'], $row['filename'], $row['timestamp']); ?>"/>]]></description>
+			<link>http://thismight.be/offensive/pages/pic.php?id=<?= $row['id'] ?></link>
+			<description><![CDATA[<? if($fileURL != '') { ?><img src="<?= $fileURL ?>"/><? } else { echo "(expired)"; } ?>]]></description>
 			<pubDate><? echo gmdate( "r", strtotime( $row['timestamp'] ) ) ?></pubDate>			
-			<comments><![CDATA[http://tmbo.org/offensive/?c=comments&fileid=<? echo $row['id'] ?>]]></comments>
+			<comments><![CDATA[http://tmbo.org/offensive/?c=comments&fileid=<?= $row['id'] ?>]]></comments>
+			<? if( isset($_GET['gallery']) ) { ?>
+			<media:content url="<?= $fileURL ?>" />
+			<media:thumbnail url="<?= $thumbURL ?>" />
+			<guid isPermaLink="false">tmbo-<?= $row['id'] ?></guid>
+			<? } ?>
 		</item>
 <?
 	}
