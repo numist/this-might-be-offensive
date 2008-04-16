@@ -1,6 +1,11 @@
 <?
 
 function conditionalGet($timestamp) {
+	if(!is_numeric($timestamp)) {
+		$timestamp = strtotime($timestamp);
+		if($timestamp === false) return;
+	}
+		
 	$last_modified = gmdate('D, d M Y H:i:s \G\M\T', $timestamp);
 	$etag = '"'.md5($last_modified).'"';
 		
