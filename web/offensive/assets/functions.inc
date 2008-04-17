@@ -27,13 +27,6 @@ function htmlEscape($string) {
 	                                $string));
 }
 
-function data_url($file, $mime) 
-{
-  $contents = file_get_contents($file) or trigger_error("couldn't find $file from ".getcwd(), E_USER_ERROR);
-  $base64   = base64_encode($contents); 
-  return ('data:' . $mime . ';base64,' . $base64);
-}
-
 function getFileExtension($filename) {
 	preg_match( "/\.[^\.]+$/", $filename, $matches );
 	if(is_array($matches) && isset($matches[0])) return $matches[0];
@@ -54,17 +47,13 @@ function basePath($timestamp, $type, $nopath=false) {
 }
 
 function getThumb($id, $filename, $timestamp, $type='image') {
+	if($id == null || $filename == '' || $timestamp == "" || $type == "") return "";
+	
 	if($type != 'image' && $type != 'avatar') return '';
 	
 	$retname = basePath($timestamp, $type)."thumbs/th$id".getFileExtension($filename);
 	
 	if(!file_exists($retname)) {
-		// WELL FIND IT THEN!
-		if($type == 'avatar')
-			if(thumbConform("images/users/thumbs/th-$filename", $id, $filename, $timestamp, $type)) return $retname;
-		if($type == 'image')
-			if(thumbConform("images/thumbs/th-$filename", $id, $filename, $timestamp, $type)) return $retname;
-		
 		// what about yesterday?  or tomorrow?
 		// NOTE: if timestamp is a number, don't fall for the infinite recursion trap
 		if(!is_numeric($timestamp)) {
@@ -105,44 +94,32 @@ function getThumb($id, $filename, $timestamp, $type='image') {
 }
 
 function getThumbURL($id, $filename, $timestamp, $type='image') {
+	if($id == null || $filename == '' || $timestamp == "" || $type == "") return "";
+	
 	if(getFile($id, $filename, $timestamp, $type) != '' && getThumb($id, $filename, $timestamp, $type) != '')
 		return "/".basePath($timestamp, $type, true)."thumbs/th$id".getFileExtension($filename);
 	return "/offensive/graphics/previewNotAvailable.gif";
 }
 
 function getFile($id, $filename, $timestamp, $type='image') {
+	if($id == null || $filename == '' || $timestamp == "" || $type == "") return "";
+	
 	if($type == 'topic') return '';
 	
 	$retname = basePath($timestamp, $type).$id."_".$filename;
 	
 	// ignore the man behind the curtain
 	if(!file_exists($retname)) {		
-		// WELL FIND IT THEN!
-		if(isset($_REQUEST['c']) && $_REQUEST['c'] == 'hof')
-			if(fileConform(get_include_path()."/offensive/images/halloffame/$filename", $id, $filename, $timestamp, $type)) return $retname;
-		if($type == 'image') {
-			if(fileConform(basePath($timestamp, $type).$filename, $id, $filename, $timestamp, $type)) {
-				unlink(basePath($timestamp, $type).$filename);
-				return $retname;
-			}
-			if(fileConform(get_include_path()."/offensive/images/picpile/".$filename, $id, $filename, $timestamp, $type)) return $retname;
-			if(fileConform(get_include_path()."/offensive/images/halloffame/".$filename, $id, $filename, $timestamp, $type)) return $retname;
-			
-			// what about yesterday?  or tomorrow?
-			// NOTE: if timestamp is a number, don't fall for the infinite recursion trap
-			if(!is_numeric($timestamp)) {
-				$timestamp = strtotime($timestamp);
-				$yesterday = $timestamp - 86400;
-				$tomorrow = $timestamp + 86400;
-				if(fileConform(getFile($id, $filename, $yesterday, $type), $id, $filename, $timestamp, $type)) return $retname;
-				if(fileConform(getFile($id, $filename, $tomorrow, $type), $id, $filename, $timestamp, $type)) return $retname;
-			}
+		// what about yesterday?  or tomorrow?
+		// NOTE: if timestamp is a number, don't fall for the infinite recursion trap
+		if(!is_numeric($timestamp)) {
+			$timestamp = strtotime($timestamp);
+			$yesterday = $timestamp - 86400;
+			$tomorrow = $timestamp + 86400;
+			if(fileConform(getFile($id, $filename, $yesterday, $type), $id, $filename, $timestamp, $type)) return $retname;
+			if(fileConform(getFile($id, $filename, $tomorrow, $type), $id, $filename, $timestamp, $type)) return $retname;
+		}
 
-		}
-		if($type == 'avatar') {
-			if(fileConform(get_include_path()."/offensive/images/users/".$filename, $id, $filename, $timestamp, $type)) return $retname;
-		}
-		
 		return '';
 	}
 	
@@ -150,6 +127,8 @@ function getFile($id, $filename, $timestamp, $type='image') {
 }
 
 function getFileURL($id, $filename, $timestamp, $type='image') {
+	if($id == null || $filename == '' || $timestamp == "" || $type == "") return "";
+	
 	if($type == 'topic') return '';
 		
 	// quick hack to make sure getFile gets a chance to run its frantic search function.
@@ -162,6 +141,8 @@ function getFileURL($id, $filename, $timestamp, $type='image') {
  * on the fly without having to take the site down to restructure everything all at once.
  */
 function fileConform($path, $id, $filename, $timestamp, $type) {
+	if($id == null || $filename == '' || $timestamp == "" || $type == "") return "";
+	
 	if($path == '' || !file_exists($path)) return false;
 	$target = basePath($timestamp, $type).$id."_".$filename;
 	ensureDirExists(basePath($timestamp, $type));
@@ -174,6 +155,8 @@ function fileConform($path, $id, $filename, $timestamp, $type) {
 }
 
 function thumbConform($path, $id, $filename, $timestamp, $type) {
+	if($id == null || $filename == '' || $timestamp == "" || $type == "") return "";
+	
 	if($path == '' || !file_exists($path)) return false;
 	$target = basePath($timestamp, $type)."thumbs/th$id".getFileExtension($filename);
 	ensureDirExists(basePath($timestamp, $type)."thumbs/");
