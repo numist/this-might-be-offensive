@@ -8,6 +8,7 @@ require_once("offensive/assets/functions.inc");
 require_once( 'admin/mysqlConnectionInfo.inc' );
 $link = openDbConnection();
 
+// XXX: accept nonsfw and notmbo flags
 $sql = "SELECT offensive_uploads.timestamp
 		FROM offensive_uploads USE KEY (t_t_id)
 			LEFT JOIN users ON offensive_uploads.userid = users.userid

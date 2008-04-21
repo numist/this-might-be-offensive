@@ -3,6 +3,7 @@
 	require_once( "offensive/assets/activationFunctions.inc" );
 	require_once( "offensive/assets/tabs.inc" );
 	require_once( "offensive/assets/functions.inc" );
+// XXX: the reliance on getid3 needs to be removed, the library has a lot of warnings
 	require_once( "offensive/getid3/getid3.php");
 
 	$tmpdir = "quarantine";
@@ -305,7 +306,6 @@
 			$postdata['filename'] = $newfilename;
 			$postdata['file_extension'] = ".jpg";
 			$postdata['format'] = "jpg";
-			var_dump($postdata);
 		}
 
 		/**********************************************************************
@@ -458,17 +458,6 @@ function uploadForm($fileuploaded=false) {
 		
 		<?
 
-}
-
-function box($message, $title="hmm:") {
-	?>
-		<div class="heading"><?= $title ?></div>
-		<div class="bluebox">
-			<div style="text-align:center">
-				<?= $message ?>
-			</div>
-		</div>
-	<?
 }
 
 function checkRepost($postdata) {

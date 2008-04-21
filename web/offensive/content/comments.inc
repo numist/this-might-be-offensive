@@ -6,6 +6,8 @@
 	require_once( 'offensive/assets/getPrefs.inc' );
 	require_once( 'offensive/assets/tabs.inc' );
 
+// XXX: [tpg] — allow current winner to vote current image as new winner if [tpg] tag exists
+
 	function addBookmarks( $fileid, $commentid ) {
 		global $link;
 		if(!isset($link) || !$link) $link = openDbConnection();
@@ -41,7 +43,7 @@
 		$sql = "SELECT * FROM offensive_subscriptions WHERE userid = $uid AND fileid = $fileid";
 		if(mysql_num_rows(tmbo_query($sql)) > 0) return;
 
-		$sql = "insert into offensive_subscriptions (userid, fileid) VALUES ($uid, $fileid)";
+		$sql = "INSERT INTO offensive_subscriptions (userid, fileid) VALUES ($uid, $fileid)";
 		$result = tmbo_query( $sql );
 	}
 
@@ -89,7 +91,7 @@
 	}
 
 	function start() {
-		global $filename, $link;
+		global $filename, $link, $expired;
 	
 		mustLogIn();
 
@@ -100,14 +102,16 @@
 		
 		$usrid = $_SESSION['userid'];
 		$fileid = $_REQUEST['fileid'];
-		
+				
 		clearBookmarks( $usrid, $fileid );
 
 		if(!isset($link) || !$link) $link = openDbConnection();
 
-		$sql = "SELECT filename, nsfw, tmbo from offensive_uploads where id=$fileid";
+		$sql = "SELECT filename, nsfw, tmbo, timestamp, type FROM offensive_uploads WHERE id=$fileid";
 		$result = tmbo_query( $sql );
-		list( $filename, $nsfw, $tmbo ) = mysql_fetch_array( $result );
+		list($filename, $nsfw, $tmbo, $uploadstamp, $type) = mysql_fetch_array( $result );
+		
+		$expired = getFile($_REQUEST['fileid'], $filename, $uploadstamp, $type) == ''? true : false;
 	
 	    // check to see if someone's posting.  
 	    /* check if someone is being hoodwinked by a link in comments
@@ -131,6 +135,19 @@
 	    
 		if( array_key_exists("submit", $_REQUEST)) {		    
 			$comment = isset($_REQUEST['comment']) ? trim($_REQUEST['comment']) : "";
+			
+			// prevent doubleposts, but only content doubleposts
+			$sql = "SELECT id, fileid, timestamp, comment, NOW() as curtime FROM offensive_comments WHERE userid = ".$_SESSION['userid'].
+			       " ORDER BY timestamp DESC";
+			$res = tmbo_query($sql);
+			$row = mysql_fetch_assoc($res);
+			if($row['fileid'] == $fileid &&
+			   $row['comment'] == $comment && 
+			   $comment != "" &&
+			   strtotime($row['curtime']) - strtotime($row['timestamp']) < 3000) {
+				header("Location: ./?c=comments&fileid=".$fileid."#".$row['id']);
+				exit;
+			}
 			
 			$already_voted = alreadyVoted( $_SESSION['userid'], $_REQUEST['fileid'] );
 						
@@ -237,7 +254,7 @@
 	}
 
 	function body() {
-		global $link;
+		global $link, $expired;
 	
 	if(!isset($link) || !$link) $link = openDbConnection();
 
@@ -261,7 +278,6 @@
 	$nsfw = $row['nsfw'];
 	$tmbo = $row['tmbo'];	
 	$type = $row['type'];
-	$expired = getFile($_REQUEST['fileid'], $filename, $uploadstamp, $type) == ''? true : false;
 
 	$already_voted = $_SESSION['userid'] == $row['userid'];
 	
@@ -356,7 +372,9 @@
 						&& strlen( $comment ) > 0 )  {
 						$comment = "Hey everybody! Look at me! Look at me! I'm leaving! See? Here I go! Don't try to stop me!";
 					}
-*/  	
+					
+ 
+*/
     	
 					if( ! isSquelched( $row['userid'] ) ) {
 						
@@ -380,8 +398,17 @@
 					&raquo; 
     	
 				<?php
-    	
-				echo "<a href=\"./?c=user&userid=" . $row['userid'] . "\">" . $row['username'] . "</a>";
+  
+  				$username = $row['username'];
+				/* if the filename contains charlie, with any of the letters repeated any number of times
+				 * (and in any case), replace "banana" in the poster's username with "boonana".
+				 * this easter egg provided by: http://thismight.be/offensive/?c=comments&fileid=231407#6464287
+				 */
+				if(strpos($username, "banana") !== false && 
+				   preg_match("/[Cc]+[Hh]+[Aa]+[Rr]+[Ll]+[Ii]+[Ee]+/", $filename) > 0) {
+					$username = str_replace("banana", "boonana", $username);
+				}
+				echo "<a href=\"./?c=user&userid=" . $row['userid'] . "\">$username</a>";
 							
 				if( $row['vote'] ) {
 					$thevote = $row['vote'];

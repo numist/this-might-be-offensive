@@ -20,6 +20,7 @@
 	
 		$usrid = $_SESSION['userid'];
 		$link = openDbConnection();
+// XXX: this should be paginated
 		$sql = "select distinct s.fileid, u.filename
 			from offensive_subscriptions s,
 				offensive_uploads u

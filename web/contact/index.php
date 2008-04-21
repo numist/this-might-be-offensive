@@ -32,7 +32,7 @@ function logBadRequest() {
 }
 
 
-	if( $body <> "" ) {
+	if( isset($body) && $body != "" ) {
 
 		if(ini_get("magic_quotes_gpc")) {
 			// replace \' with '

@@ -145,10 +145,14 @@ function fileConform($path, $id, $filename, $timestamp, $type) {
 	if($path == '' || !file_exists($path)) return false;
 	$target = basePath($timestamp, $type).$id."_".$filename;
 	ensureDirExists(basePath($timestamp, $type));
-	if(!link($path, $target)) {
-		copy($path, $target);
-		trigger_error("link doesn't work", E_USER_WARNING);
+	
+	// if timestamp is numeric, we want to move, not copy
+	if(is_numeric($timestamp) && !rename($path, $target)) {
+		trigger_error("rename($path, $target) failed", E_USER_WARNING);
+	} else if(!link($path, $target)) {
+		trigger_error("link($path, $target) failed", E_USER_WARNING);
 	}
+	
 	trigger_error("CONFORM: moved $path to $target", E_USER_NOTICE);
 	return true;
 }
@@ -159,10 +163,14 @@ function thumbConform($path, $id, $filename, $timestamp, $type) {
 	if($path == '' || !file_exists($path)) return false;
 	$target = basePath($timestamp, $type)."thumbs/th$id".getFileExtension($filename);
 	ensureDirExists(basePath($timestamp, $type)."thumbs/");
-	if(!link($path, $target)) {
-		copy($path, $target);
-		trigger_error("link doesn't work", E_USER_WARNING);
+	
+	// if timestamp is numeric, we want to move, not copy
+	if(is_numeric($timestamp) && !rename($path, $target)) {
+		trigger_error("rename($path, $target) failed", E_USER_WARNING);
+	} else if(!link($path, $target)) {
+		trigger_error("link($path, $target) failed", E_USER_WARNING);
 	}
+	
 	trigger_error("CONFORM: moved $path to $target", E_USER_NOTICE);
 	return true;
 }
@@ -186,6 +194,29 @@ function hideImage($is_nsfw, $is_tmbo, $uploaderid) {
 	    (array_key_exists("hide tmbo", $_SESSION['prefs']) &&
 	    $_SESSION['prefs']['hide tmbo'] == 1 && $is_tmbo == 1) 
 		|| ( in_array( $uploaderid, explode( ',', $_SESSION['prefs']['squelched'] ) ) ) );
+}
+
+function commentLabel($comments, $good, $bad, $tmbo, $votes=true) {
+	if(!is_numeric($comments)) $comments = 0;
+	
+	$retval = "$comments comment".($comments == 1?"":"s");
+	if(!$votes) return $retval;
+	if(!is_numeric($good)) $good = 0;
+	if(!is_numeric($bad)) $bad = 0;
+	if(!is_numeric($tmbo)) $tmbo = 0;
+	$retval .= " (+$good -$bad".($tmbo > 0?" x$tmbo":"").")";
+	return $retval;
+}
+
+function box($message, $title="hmm:") {
+	?>
+		<div class="heading"><?= $title ?></div>
+		<div class="bluebox">
+			<div style="text-align:center">
+				<?= $message ?>
+			</div>
+		</div>
+	<?
 }
 
 ?>

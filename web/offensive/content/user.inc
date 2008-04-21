@@ -6,6 +6,8 @@
 
 	function start() {
 		mustLogIn();
+		
+		if(!isset($_REQUEST['userid'])) { header("Location: ./"); }
 	}
 	
 	function isAdmin() {
@@ -101,7 +103,7 @@
 								<br/>Last seen on <?= date( "F d, Y", strtotime($timestamp) ) ?><? if( isAdmin() ) { ?> from <?= $ip ?> (<a href="./?c=iphistory&uid=<?= $usrid ?>">view history</a>)<? } ?>.
 								<?
 									if( isAdmin() ) {
-										$sql = "select distinct userid, username, account_status from users where last_login_ip = '$ip' AND userid != $usrid" ;
+										$sql = "SELECT DISTINCT userid, username, account_status FROM users WHERE last_login_ip = '$ip' AND userid != $usrid" ;
 										$result = tmbo_query( $sql );
 										if( mysql_num_rows( $result ) > 0 ) {
 											?><br/>Other users with the same ip:<br/><?
@@ -152,6 +154,7 @@
 									<div class="piletitle" style="margin-bottom:12px;">
 										<a href="<?= getFileURL($avid, $avatar, $avstamp, 'avatar') ?>" target="_blank"><?= $name ?> is gorgeous.</a>
 									</div>
+									<!-- next onclick="img.src=arr[i]" -->
 								<?
 								}
 							}
@@ -219,7 +222,7 @@
 		$sql = "SELECT up.*, up.id AS fileid, up.timestamp as uploadtime, counts.*
 				FROM offensive_uploads up
 				LEFT JOIN offensive_count_cache counts ON up.id = counts.threadid
-			WHERE up.userid = $usrid AND (type='image' OR type='audio') AND status != 'pending'
+			WHERE up.userid = $usrid AND status != 'pending'
 			ORDER BY up.timestamp DESC 
 			LIMIT 300
 ";
@@ -231,7 +234,7 @@
 	while( $row = mysql_fetch_assoc( $result ) ) {
 		$id = $row['fileid'];
 		$class = ($class == 'evenfile') ? 'oddfile' : 'evenfile';
-		emitFileRow( $class, $row['fileid'], $row['filename'], $row['comments'], $row['good'], $row['bad'], $row['tmbo'], $row['uploadtime'] );
+		emitFileRow( $class, $row );
 	}
 
 ?>
@@ -244,15 +247,21 @@
 <?
 }
 
-function emitFileRow( $css, $id, $filename, $comments, $good, $bad, $offensive, $timestamp ) {
-	if(!is_numeric($good)) $good = 0;
-	if(!is_numeric($bad)) $bad = 0;
-	if(!is_numeric($offensive)) $offensive = 0;
-	if(!is_numeric($comments)) $comments = 0;
+function emitFileRow( $css, $row ) {
+	$id = $row['fileid'];
+	$filename = $row['filename'];
+	$comments = $row['comments'];
+	$good = $row['good'];
+	$bad = $row['bad'];
+	$offensive = $row['tmbo'];
+	$timestamp = $row['uploadtime'];
+	$type = $row['type'];
 ?>
 	<tr>
 		<td style="width:100%" class="<?php echo $css?>"><div class="clipper"><a href="pages/pic.php?id=<?php echo $id ?>" class="<?php echo $css?>"><?= maxString(htmlEscape($filename),45) ?></div></td>
-		<td class="<?php echo $css?>" style="text-align:right;white-space:nowrap;width:100%"><a href="./?c=comments&fileid=<?php echo $id ?>" class="<?php echo $css?>"><? echo "$comments comments (+$good -$bad x$offensive)" ?></a></td>
+		<td class="<?php echo $css?>" style="text-align:right;white-space:nowrap;width:100%"><a href="./?c=comments&fileid=<?php echo $id ?>" class="<?php echo $css?>"><?=
+			commentLabel($comments, $good, $bad, $offensive, !($type == 'topic'));
+		?></a></td>
 		<td style="text-align:right;white-space:nowrap;width:100%" class="<?php echo $css?>"><?php echo $timestamp?></td>
 	</tr>
 <?
@@ -261,8 +270,6 @@ function emitFileRow( $css, $id, $filename, $comments, $good, $bad, $offensive, 
 
 function recentComments( $uid ) {
 	global $link;
-
-	//return;
 
 	$sql="SELECT up.id, up.filename, offensive_comments.timestamp, offensive_comments.id as commentid
 			FROM offensive_uploads up, offensive_comments
@@ -345,6 +352,7 @@ function votingRecord( $id, $name ) {
 
 	//return;
 	
+// XXX: this query needs an index to be created in the database
 	$sql = "SELECT count( vote ) as count, vote
 				FROM offensive_comments
 				WHERE userid = $id

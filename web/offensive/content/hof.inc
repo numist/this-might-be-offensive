@@ -39,7 +39,8 @@
 				<td><b><? if($view=="today") { ?> hours <? } else { ?> weeks <? } ?></b></td> 
 			</tr>
 
-<?	
+<?
+// XXX: HOF should use offensive_count_cache and offensive_uploads instead of a hof table updated from cron
 		$sql = "SELECT hall_of_fame.fileid, hall_of_fame.votes, up.userid, up.filename, up.timestamp, users.username, up.nsfw
 				FROM hall_of_fame, offensive_uploads up, users
 				WHERE up.id = fileid AND users.userid = up.userid

@@ -143,7 +143,9 @@
 			&nbsp;&nbsp;
 
 				<? fileNav( $nextid, $previd, $uploaderid, $uploader ); ?>
-				 <a style="margin-left:48px;" id="comments" href="/offensive/?c=comments&fileid=<? echo $id?>">comments</a> (<?php echo "{$comments}c +$good -$bad"; if( $tmbo > 0 ) { echo " <span style=\"color:#990000\">x$tmbo</span>"; }?>)	
+				 <a style="margin-left:48px;" id="comments" href="/offensive/?c=comments&fileid=<? echo $id?>">comments</a> (<?php 
+// XXX: this might be a good place for commentLabel($comments, $good, $bad, $tmbo)?  that <span> doesn't jibe.
+					echo "{$comments}c +$good -$bad"; if( $tmbo > 0 ) { echo " <span style=\"color:#990000\">x$tmbo</span>"; }?>)	
 
 						<span style="margin-left:48px;">
 						<?

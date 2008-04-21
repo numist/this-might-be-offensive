@@ -10,6 +10,15 @@
 
 		setcookie( 'thumbnails', "yes", time()+3600*24*365*10, "/offensive/" );
 	}
+	
+	function head() {
+		return  <<<EOT
+		<link id="gallery" rel="alternate" href="/offensive/pic_rss.php?gallery=true" type="application/rss+xml" title="PicLens feed" />
+		<link rel="alternate" type="application/rss+xml" title="image stream" href="/offensive/pic_rss.php" />
+		<link rel="alternate" type="application/rss+xml" title="daily archives" href="/offensive/zip_rss.php" />
+		<link rel="alternate" type="application/rss+xml" title="discussions" href="/offensive/discuss_rss.php" />
+EOT;
+	}
 
 	function body() {
   
@@ -110,13 +119,8 @@ LIMIT $page_limit_clause, 100
 		getThumbURL($row['id'], $row['filename'], $row['timestamp']);
 	?>" border="0" alt="<?= htmlEscape($row['filename']) ?>" title="uploaded by <?= htmlEscape($row['username']) ?>"/></span></a><br/>
 	<a href="./?c=comments&fileid=<?= $row['id'] ?>"><?= 
-		($row['comments'] != '')?$row['comments']:0;
-	?> comments (+<?= 
-		($row['good'] != '')?$row['good']:0;
-	?> -<?= 
-		($row['bad'] != '')?$row['bad']:0;
-// XXX: tmbo count here
-	?>)</a>
+		commentLabel($row['comments'], $row['good'], $row['bad'], $row['tmbo_vote']);
+	?></a>
 </td>
                 <?php
                 if( $output % $THUMBS_PER_ROW == $THUMBS_PER_ROW - 1 ) {

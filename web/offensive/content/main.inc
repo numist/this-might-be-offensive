@@ -10,6 +10,15 @@
 
 		setcookie( 'thumbnails', "no", time()-3600, "/offensive/" );
 	}
+	
+	function head() {
+		return  <<<EOT
+		<link id="gallery" rel="alternate" href="/offensive/pic_rss.php?gallery=true" type="application/rss+xml" title="PicLens feed" />
+		<link rel="alternate" type="application/rss+xml" title="image stream" href="/offensive/pic_rss.php" />
+		<link rel="alternate" type="application/rss+xml" title="daily archives" href="/offensive/zip_rss.php" />
+		<link rel="alternate" type="application/rss+xml" title="discussions" href="/offensive/discuss_rss.php" />
+EOT;
+	}
 
 	function body() {
 		
@@ -64,6 +73,8 @@ LIMIT $page_limit_clause, 100";
 	<!-- if you don't understand, upload a picture of yer mom and we'll do a little experiment. -->
 
 <?
+// XXX: [tpg] — instead of eom, put current tpg winner here.  
+// Current [tpg] winner: ________.  See current submissions. (link to findfile [tpg] since (winnerdate))
     $employee = get_include_path()."/offensive/employeeOfTheMonth.txt";
     if(file_exists($employee) && time() - filemtime($employee) < 172800) {
         require("offensive/employeeOfTheMonth.txt");
@@ -113,13 +124,8 @@ LIMIT $page_limit_clause, 100";
                   <tr class="<?= $css ?>">
                     <td class="<?= $css ?>"><div class="clipper"><a href="pages/pic.php?id=<?= $row['id'] ?>" class="<?= $css ?>" title="uploaded by <?= htmlEscape($row['username']) ?>"><?= $filename ?></a></div></td>
 			<td class="<?= $css ?>" style="text-align:right;white-space:nowrap"><a href="./?c=comments&fileid=<?= $row['id'] ?>" class="<?= $css ?>"><?= 
-				($row['comments'] != '')?$row['comments']:0;
-			?> comments</a> (+<?=
-				($row['good'] != '')?$row['good']:0;
-			?> -<?=
-				($row['bad'] != '')?$row['bad']:0;
-// XXX: tmbo count here
-			?>)</td>
+				commentLabel($row['comments'], $row['good'], $row['bad'], $row['tmbo_vote']);
+			?></a></td>
                   </tr>
                 <?php
             }

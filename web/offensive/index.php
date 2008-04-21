@@ -95,16 +95,17 @@ $timelimit = 10;
 		}
 	?>
 	</title>
+	<?
+		if(function_exists('head')) {
+			echo head();
+		}
+	?>
 	<META NAME="ROBOTS" CONTENT="NOARCHIVE">
 	<link rel="icon" href="/favicon.ico" />
 	<link rel="shortcut icon" href="/favicon.ico" />
 	<link rel="stylesheet" type="text/css" href="filepilestyle.css" />
 	<link rel="stylesheet" type="text/css" href="/styles/oldskool.css"/>
 	<link rel="stylesheet" type="text/css" href="nsfw.css.php"/>
-	<link rel="alternate" type="application/rss+xml" title="image stream" href="/offensive/pic_rss.php" />
-	<link rel="alternate" type="application/rss+xml" title="daily archives" href="/offensive/zip_rss.php" />
-	<link rel="alternate" type="application/rss+xml" title="discussions" href="/offensive/discuss_rss.php" />
-	<link id="gallery" rel="alternate" href="/offensive/pic_rss.php?gallery=true" type="application/rss+xml" title="PicLens feed" />
 
 	
 <style type="text/css">

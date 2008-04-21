@@ -13,6 +13,8 @@
 
 // XXX: this should be paginated
 
+// XXX: _REQUEST['since'] gives a lower timestamp bound
+
 		$numperpage = 100;
 		$start = (isset($_REQUEST['p']) && is_numeric($_REQUEST['p']) ?
 			$_REQUEST['p'] : 0) * $numperpage;
@@ -87,7 +89,9 @@
 				<? if( $type == 'topic' ) { ?>
 					<td width="100px"><? echo date( "Y-m-d", strtotime( $row['timestamp'] ) ) ?></td>
 					<td><a class="<?echo $css ?>" href="./?c=comments&fileid=<? echo $row['id'] ?>"><?= $type ?>: <? echo $row['filename'] ?></a></td>
-					<td><a class="<?echo $css ?>" href="./?c=comments&fileid=<? echo $row['id'] ?>"><?= $row['comments'] ?> comments</td>
+					<td><a class="<?echo $css ?>" href="./?c=comments&fileid=<? echo $row['id'] ?>"><?=
+						commentLabel($row['comments'], 0, 0, 0, false);
+						?></td>
 				<? } ?>
 			</tr>
 	
