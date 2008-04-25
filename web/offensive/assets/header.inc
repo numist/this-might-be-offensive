@@ -92,7 +92,7 @@ function time_end($time) {
 	return microtime(true) - $time;
 }
 
-function tmbo_query($sql) {
+function tmbo_query($sql, $timeout=2) {
 	global $link, $queries, $querytime, $readonly;
 	
 	if(!$link) {
@@ -119,7 +119,7 @@ function tmbo_query($sql) {
 	$time = time_end($time);
 	$querytime += $time;
 
-	if($time > 2) {
+	if($time > $timeout && $timeout != 0) {
 		$trace = debug_backtrace();
 		$trace = $trace[0];
 		tmbo_error_handler(E_USER_NOTICE, "query took ".number_format($time, 0).

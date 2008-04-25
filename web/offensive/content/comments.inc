@@ -138,7 +138,7 @@
 			
 			// prevent doubleposts, but only content doubleposts
 			$sql = "SELECT id, fileid, timestamp, comment, NOW() as curtime FROM offensive_comments WHERE userid = ".$_SESSION['userid'].
-			       " ORDER BY timestamp DESC";
+			       " ORDER BY timestamp DESC LIMIT 1";
 			$res = tmbo_query($sql);
 			$row = mysql_fetch_assoc($res);
 			if($row['fileid'] == $fileid &&

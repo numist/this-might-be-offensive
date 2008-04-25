@@ -13,7 +13,7 @@
 
 // XXX: this should be paginated
 
-// XXX: _REQUEST['since'] gives a lower timestamp bound
+// XXX: _REQUEST['since'] gives a lower timestamp bound -- I forget why I wanted this...
 
 		$numperpage = 100;
 		$start = (isset($_REQUEST['p']) && is_numeric($_REQUEST['p']) ?
@@ -35,7 +35,7 @@
 				";
 
 		if(!isset($link) || !$link) $link = openDbConnection();
-		$result = tmbo_query( $sql );
+		$result = tmbo_query($sql, 5);
 		
 		
 ?>

@@ -8,12 +8,11 @@ require_once("offensive/assets/functions.inc");
 require_once( 'admin/mysqlConnectionInfo.inc' );
 $link = openDbConnection();
 
-// XXX: accept nonsfw and notmbo flags
 $sql = "SELECT offensive_uploads.timestamp
 		FROM offensive_uploads USE KEY (t_t_id)
 			LEFT JOIN users ON offensive_uploads.userid = users.userid
 		WHERE type='image' AND status='normal'
-		ORDER BY timestamp DESC
+ 		ORDER BY timestamp DESC
 		LIMIT 1";
 $res = tmbo_query($sql);
 $row = mysql_fetch_array($res);
@@ -37,8 +36,10 @@ conditionalGet($lastBuildTime);
 	$sql = "SELECT offensive_uploads.*, users.username
 			FROM offensive_uploads USE KEY (t_t_id)
 				LEFT JOIN users ON offensive_uploads.userid = users.userid
-			WHERE type='image' AND status='normal'
-			ORDER BY timestamp DESC
+			WHERE type='image' AND status='normal'";
+	if(isset($_REQUEST['nonsfw'])) $sql .= " AND nsfw = 0";
+	if(isset($_REQUEST['notmbo'])) $sql .= " AND tmbo = 0";
+	$sql .=	" ORDER BY timestamp DESC
 			LIMIT 200";
 
 	$result = tmbo_query( $sql );

@@ -42,6 +42,8 @@
 <?
 		$sql = "SELECT up.id as fileid, cache.good as votes, up.userid, up.filename, up.timestamp, users.username, up.nsfw FROM offensive_uploads up, users, offensive_count_cache cache WHERE up.id = cache.threadid AND users.userid = up.userid AND up.type = 'image'";
 		if($view == "today") $sql .= " AND up.timestamp > now() - INTERVAL 1 DAY";
+		if(isset($_REQUEST['nonsfw'])) $sql .= " AND up.nsfw = 0";
+		if(isset($_REQUEST['notmbo'])) $sql .= " AND up.tmbo = 0";
 		$sql .=" ORDER BY cache.good DESC LIMIT 100";
 
 		$result = tmbo_query( $sql );

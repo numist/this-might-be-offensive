@@ -159,7 +159,6 @@
 						<?
 							$votelinks_enabled = false;
 							if($uploaderid != $_SESSION['userid']) {
-// XXX: this can probably just use the count_cache?
 								$sql = "SELECT *
 								          FROM offensive_comments
 									 WHERE userid = ".$_SESSION['userid']."
