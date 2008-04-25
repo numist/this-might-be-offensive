@@ -40,12 +40,9 @@
 			</tr>
 
 <?
-// XXX: HOF should use offensive_count_cache and offensive_uploads instead of a hof table updated from cron
-		$sql = "SELECT hall_of_fame.fileid, hall_of_fame.votes, up.userid, up.filename, up.timestamp, users.username, up.nsfw
-				FROM hall_of_fame, offensive_uploads up, users
-				WHERE up.id = fileid AND users.userid = up.userid
-				AND hall_of_fame.type = '$view'
-				ORDER BY hall_of_fame.id";
+		$sql = "SELECT up.id as fileid, cache.good as votes, up.userid, up.filename, up.timestamp, users.username, up.nsfw FROM offensive_uploads up, users, offensive_count_cache cache WHERE up.id = cache.threadid AND users.userid = up.userid AND up.type = 'image'";
+		if($view == "today") $sql .= " AND up.timestamp > now() - INTERVAL 1 DAY";
+		$sql .=" ORDER BY cache.good DESC LIMIT 100";
 
 		$result = tmbo_query( $sql );
 		$count = 0;
@@ -61,9 +58,7 @@
 ?>
 			<tr class="<? echo $cssw ?>">
 				<td style="text-align:right"><? echo ++$count ?>.</td>
-				<td><a class="<? echo $cssw ?>" href="<?=
-					getFileURL($row['fileid'], $row['filename'], $row['timestamp']);
-				?>"><? echo truncate( (($row['nsfw'] == 1) ? "[nsfw] " : "" ) . htmlEscape($row['filename']), 50 )
+				<td><a class="<? echo $cssw ?>" href="pages/pic.php?id=<?= $row['fileid'] ?>"><? echo truncate( (($row['nsfw'] == 1) ? "[nsfw] " : "" ) . htmlEscape($row['filename']), 50 )
 			    ?></a></td>
 				<td><a class="<? echo $cssw ?>" href="./?c=user&userid=<? echo $row['userid'] ?>"><? echo htmlEscape($row['username']) ?></a></td>
 				<td><a class="<? echo $cssw ?>" href="./?c=comments&fileid=<?= $row['fileid'] ?>">comments</a></td>

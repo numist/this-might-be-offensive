@@ -1,5 +1,4 @@
 <?php 
-
 	set_include_path("../..");
 	require_once("offensive/assets/header.inc");
 	require_once("offensive/assets/functions.inc");
@@ -33,19 +32,25 @@
 
 	function writeNav( $id ) {
 	
-		global $filename, $is_nsfw, $is_tmbo, $uploader, $uploaderid, $timestamp, $year, $month, $day, $nextid, $previd;
+		global $filename, $is_nsfw, $is_tmbo, $uploader, $uploaderid, $timestamp, $year, $month, $day, $nextid, $previd, $type;
 		
+// XXX: nextid and previd should account for expired images once q26 gets the DVDs to me and they're all restored.
 		$sql = "SELECT offensive_uploads.*, users.username, users.userid,
 					(select min( id ) from offensive_uploads where id > $id AND type='image' and status='normal') as nextid,
 					(select max( id ) from offensive_uploads where id < $id AND type='image' and status='normal') as previd
 				FROM offensive_uploads, users
 				WHERE id = $id 
 					AND offensive_uploads.userid = users.userid
-					AND type='image'
+					AND (type = 'image' OR type = 'avatar')
 				LIMIT 1";
-#					AND type='image' AND users.account_status != 'locked'
 					
 		$result = tmbo_query( $sql );
+		
+		// if the file does not at all exist not even a little bit, 404.
+		if(mysql_num_rows($result) == 0) {
+			header("Location: ../ ");
+		}
+		
 		$row = mysql_fetch_assoc( $result );
 			
 		$filename = $row['filename'];
@@ -60,22 +65,29 @@
 		$month = date( "m", $time );			
 		$day = date( "d", $time );
 		$timestamp = date( "Y-m-d h:i:s a", strtotime( $row['timestamp'] ) );
-			
+		$type = $row['type'];
 
 	}
 
-	function fileNav( $nextid, $previousid, $uploader_id, $uploader_name ) {
+	function fileNav( $nextid, $previousid, $uploader_id, $uploader_name, $type ) {
+		if($type == 'avatar') {?>
+			<a href="../" id="next" style="visibility:hidden">newer</a> . <a id="index" href="/offensive/">index</a> . <a id="previous" href="../" style="visibility:hidden">older</a>
+		<?
+			return;
+		}
 		if( isset( $nextid ) ) {
 		 ?>
 			<a id="next" href="<? echo $_SERVER['PHP_SELF']?>?id=<?= $nextid ?>">newer</a>
 		<? } 
 		else {
-			?><a href="../" id="next" style="visibility:hidden">newer</a><?
-		} ?>
+			?><a href="../" id="next" style="visibility:hidden">newer</a>
+		<? } ?>
 		 . <a id="index" href="/offensive/">index</a> .
-		 <? if( isset( $previousid ) ) { ?>
+		<? if( isset( $previousid ) ) { ?>
 			<a id="previous" href="<? echo $_SERVER['PHP_SELF']?>?id=<?= $previousid ?>">older</a>
-		<? } 
+		<? } else { ?>
+			<a id="previous" href="../" style="visibility:hidden">older</a>
+		<?}
 	}
 
 	function getFileSize( $fpath ) {
@@ -104,11 +116,7 @@
 
 	writeNav( $id );
 
-	$filepath = getFile($id, $filename, $timestamp);
-	
-	if( !file_exists( $filepath ) || $filename == "") {
-		?><!-- header("Location: /offensive/404.php"); --><?
-	}
+	$filepath = getFile($id, $filename, $timestamp, $type);
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
    "http://www.w3.org/TR/html4/loose.dtd">
@@ -142,7 +150,7 @@
 
 			&nbsp;&nbsp;
 
-				<? fileNav( $nextid, $previd, $uploaderid, $uploader ); ?>
+				<? fileNav( $nextid, $previd, $uploaderid, $uploader, $type); ?>
 				 <a style="margin-left:48px;" id="comments" href="/offensive/?c=comments&fileid=<? echo $id?>">comments</a> (<?php 
 // XXX: this might be a good place for commentLabel($comments, $good, $bad, $tmbo)?  that <span> doesn't jibe.
 					echo "{$comments}c +$good -$bad"; if( $tmbo > 0 ) { echo " <span style=\"color:#990000\">x$tmbo</span>"; }?>)	
@@ -151,6 +159,7 @@
 						<?
 							$votelinks_enabled = false;
 							if($uploaderid != $_SESSION['userid']) {
+// XXX: this can probably just use the count_cache?
 								$sql = "SELECT *
 								          FROM offensive_comments
 									 WHERE userid = ".$_SESSION['userid']."
@@ -244,7 +253,7 @@
 							<? 
 								$imgurl = '';
 								if($filepath != '')
-									$imgurl = getFileURL($id, $filename, $timestamp);
+									$imgurl = getFileURL($id, $filename, $timestamp, $type);
 								if($imgurl != '') {
 							?>
 							<a id="imageLink" href="<?= $imgurl ?>" target="_blank"><img src="<?= $imgurl ?>" style="border:none"/></a>

@@ -148,13 +148,13 @@
 	
 	function voteCount() {
 		
-		$sql = "SELECT count(id) as thecount
+		$sql = "SELECT COUNT(*) as thecount
 				from offensive_uploads";
 		$result = tmbo_query( $sql );
 		$row = mysql_fetch_assoc( $result );
 		$totalUploads = $row['thecount'];
 
-		$sql = "SELECT count( id ) as thecount
+		$sql = "SELECT count(*) as thecount
 					FROM offensive_uploads
 					WHERE timestamp > date_sub( now(), INTERVAL 24 HOUR )";
 
@@ -163,7 +163,7 @@
 		$uploadsToday = $row['thecount'];
 
 
-		$sql = "SELECT vote, count(id) as thecount from offensive_comments group by vote";
+		$sql = "SELECT vote, count(*) as thecount from offensive_comments group by vote";
 		$result = tmbo_query( $sql );
 		$total = 0;
 		ob_start();

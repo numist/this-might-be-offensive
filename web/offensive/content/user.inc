@@ -353,7 +353,7 @@ function votingRecord( $id, $name ) {
 	//return;
 	
 // XXX: this query needs an index to be created in the database
-	$sql = "SELECT count( vote ) as count, vote
+	$sql = "SELECT count(*) as count, vote
 				FROM offensive_comments
 				WHERE userid = $id
 				GROUP  BY vote";

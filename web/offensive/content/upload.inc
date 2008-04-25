@@ -332,6 +332,13 @@
 
 		if(strlen($postdata['hash']) < 15) trigger_error("no hash!", E_USER_ERROR);
 
+/* XXX: UPDATE tablename SET new_unix_big_int_field = UNIX_TIMESTAMP(old_datetime) 
+ * we should be using epoch seconds in the database.  this gives us flexibility in maths,
+ * manipulation, but requires a complete rescan of the code to change every place where 
+ * timestamps are set (usually implicitly), compared (DATE_SUB() is the most common call),
+ * or updates (usually implicitly).
+ */
+
 		$sql = "INSERT INTO offensive_uploads ( userid,filename,ip,nsfw,tmbo,hash,type,status )
 				   VALUES ( " . $_SESSION['userid'] . ", '" . 
 				                sqlEscape( $postdata['filename'] ) . "', '" . 

@@ -82,7 +82,7 @@
 			?>
 				
 					<td>
-						<a href="<?= getFileURL($row['id'], $row['filename'], $row['timestamp'], 'avatar'); ?>"><img src="<?=
+						<a href="pages/pic.php?id=<?= $row['id'] ?>"><img src="<?=
 							getThumbURL($row['id'], $row['filename'], $row['timestamp'], 'avatar');
 						?>"/></a>
 						<br/>

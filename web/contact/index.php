@@ -179,7 +179,7 @@ will be stapled to a pigeon and flown directly to me.
 											<td>
 											
 										<?php
-											if( $body == "" ) {
+											if( !isset($body) || $body == "" ) {
 										?>
 												<form action="./" method="post">
 													<table border="0">

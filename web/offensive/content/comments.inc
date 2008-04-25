@@ -375,6 +375,7 @@
 					
  
 */
+// XXX: no, but we need a pink/rainbow one for when someone says "RHIIIIIIIIIIIIIIIIIIIIIIII!" 
     	
 					if( ! isSquelched( $row['userid'] ) ) {
 						
