@@ -354,7 +354,9 @@
 			 * to disable warudo comment hack, comment out the next line of code.
 			 * inspiration from: http://thismight.be/offensive/?c=comments&fileid=229329#6340701
 			 */
-		        $warudo = strpos($row['comment'], "ZA WARUDO") !== false;
+			// Nicker(1765) is not allowed to warudo anymore.
+		        $warudo = strpos($row['comment'], "ZA WARUDO") !== false && 
+				          $row['userid'] != 1765;
     	
 		?>
 		<a name="<?= $row['commentid'] ?>"></a>
