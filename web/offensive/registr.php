@@ -15,21 +15,21 @@
 	require_once( "offensive/assets/validationFunctions.inc" );	
 	require_once( "offensive/classes/statusMessage.inc" );
 
-	$message;
-
-	$username = trim( $_POST['username'] );
-	$password = trim( $_POST['password'] );
-	$referralcode = trim( $_POST['referralcode'] );
+	$message = null;
+	$username = isset($_POST['username']) ? trim( $_POST['username'] ) : "";
+	$password = isset($_POST['password']) ? trim( $_POST['password'] ) : "";
+	$referralcode = isset($_POST['referralcode']) ? trim( $_POST['referralcode'] ) : "";
 	
 	$accountCreated = false;
-	
-	if( $_REQUEST['username'] != "" ) {
+	if( $username != "" ) {		
 		$message = handleAccountRequest();
 	}
 
 	function handleAccountRequest() {
 		
 		global $username, $password, $referralcode, $accountCreated;
+		
+		$message = null;
 		
 		$emailValidation = isValidEmail( $_REQUEST['email'] );
 		
@@ -175,7 +175,7 @@
 
 			<?php if( ! $accountCreated ) { ?>
 				<span class="small" >
-					<div style="width:400px;margin-bottom:12px;"><?php echo $message->message?></div>
+					<div style="width:400px;margin-bottom:12px;"><?= $message != null ? $message->message : "" ?></div>
 					<form name="newaccount" action="<? echo $_SERVER['PHP_SELF']?>" method="post" onSubmit="return checkPasswords()" method="post">
 						<table>
 							<tr>
@@ -192,7 +192,7 @@
 							</tr>
 							<tr>
 								<td class="label">email:</td>
-								<td><input type="text" name="email" size="20" value="<?php echo $email?>"/></td>
+								<td><input type="text" name="email" size="20" value="<?= isset($email) ? $email : "" ?>"/></td>
 							</tr>
 							<tr>
 								<td class="label">referral code:</td>

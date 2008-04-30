@@ -13,9 +13,11 @@
 
 	function doSearch( $find ) {
 		global $link;
-// XXX: this should be paginated
-		$start = 0;
-		$end = 50;
+		
+		$numPerPage = 100;
+		$page = isset($_REQUEST['p']) && is_numeric($_REQUEST['p']) ?
+			    $_REQUEST['p'] : 0;
+		$start = $page * $numPerPage;
 
 		if(!isset($link) || !$link) $link = openDbConnection();
 		$sql = "SELECT *, offensive_comments.timestamp AS comment_timestamp, offensive_comments.id as commentid
@@ -24,12 +26,12 @@
 					AND offensive_comments.fileid = offensive_uploads.id
 					AND offensive_comments.userid = users.userid
 					ORDER BY offensive_comments.timestamp DESC
-					LIMIT $start, $end
+					LIMIT $start, $numPerPage
 		";
 
 		$result = tmbo_query( $sql );
 		
-		renderResults( $result );
+		renderResults( $result, $numPerPage, $page );
 	
 	}
 
@@ -44,7 +46,7 @@
 		<?
 	}
 
-	function renderResults( $result ) {
+	function renderResults( $result, $numPerPage, $page ) {
 		while( $row = mysql_fetch_assoc( $result ) ) {
 			$css = (isset($css) && $css == "") ? "background:#bbbbee;" : "";
 			?>
@@ -75,6 +77,23 @@
 			</div>
 			<?
 		}
+		?>
+		<table width="100%">
+			<tr>
+				<td>
+					<? if( $page > 0 ) { ?>
+						<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'] ?>&find=<?= urlencode($_REQUEST['find']) ?>&p=<?= $page - 1 ?>">&laquo; <b>previous page</b></a></td>
+					<? } ?>
+				</td>
+				<td style="text-align:right">
+					<? if( mysql_num_rows( $result ) == $numPerPage ) { ?>
+						<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'] ?>&find=<?= urlencode($_REQUEST['find']) ?>&p=<?= $page + 1 ?>"><b>next page</b></a> &raquo;
+					<? } ?>
+				</td>
+			</tr>        
+		</table>
+		
+		<?
 	}
 
 	function body() {

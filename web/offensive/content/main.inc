@@ -31,8 +31,11 @@ EOT;
 		} else {
 			$last_update = -1;
 		}
-// XXX: this should be paginated
-	$page_limit_clause = array_key_exists("p", $_REQUEST) ? $_REQUEST['p'] * 100: 0;
+
+		$numPerPage = 100;
+		$page = isset($_REQUEST['p']) && is_numeric($_REQUEST['p']) ?
+			    $_REQUEST['p'] : 0;
+		$start = $page * $numPerPage;
     
 	/* adding the USE KEY statement seems to have resolved performance
 	 * issues with this query.  Why MySQL wasn't using the key to
@@ -63,7 +66,7 @@ AND
 AND
   users.account_status != 'locked'
 ORDER BY offensive_uploads.timestamp DESC, offensive_uploads.id DESC
-LIMIT $page_limit_clause, 100";
+LIMIT $start, $numPerPage";
 
 ?>
 <div class="heading">
@@ -131,6 +134,18 @@ LIMIT $page_limit_clause, 100";
             }
           ?>
           </table>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<? if( $page > 0 ) { ?>
+					<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'] ?>&p=<?= $page - 1 ?>">&laquo; <b>previous page</b></a></td>
+				<? } ?>
+			</td>
+			<td style="text-align:right">
+				<? if( mysql_num_rows( $result ) == $numPerPage ) { ?>
+					<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'] ?>&p=<?= $page + 1 ?>"><b>next page</b></a> &raquo;
+				<? } ?>
 			</td>
 		</tr>
 	</table>

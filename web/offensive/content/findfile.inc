@@ -6,18 +6,20 @@
 
 	function start() {
 		mustLogIn();
+		
+		if(!isset($_REQUEST['findfile']))
+			header("Location: ./");
 	}
 
 	function body() {
 		global $link;
 
-// XXX: this should be paginated
-
 // XXX: _REQUEST['since'] gives a lower timestamp bound -- I forget why I wanted this...
 
-		$numperpage = 100;
-		$start = (isset($_REQUEST['p']) && is_numeric($_REQUEST['p']) ?
-			$_REQUEST['p'] : 0) * $numperpage;
+		$numPerPage = 100;
+		$page = isset($_REQUEST['p']) && is_numeric($_REQUEST['p']) ?
+			    $_REQUEST['p'] : 0;
+		$start = $page * $numPerPage;
 		$find = $_REQUEST['findfile'];
 	
 		$sql = "SELECT offensive_uploads.id, filename, offensive_uploads.timestamp,
@@ -31,7 +33,7 @@
 					AND offensive_uploads.userid = users.userid
 					AND offensive_count_cache.threadid = offensive_uploads.id
 					ORDER BY offensive_uploads.timestamp DESC
-					LIMIT $start, $numperpage;
+					LIMIT $start, $numPerPage;
 				";
 
 		if(!isset($link) || !$link) $link = openDbConnection();
@@ -74,7 +76,7 @@
 					}
 					?></a></td>
 					<td><a class="<?echo $css ?>" href="./pages/pic.php?id=<? echo $row['id'] ?>"><? echo $row['filename'] ?></a> <? echo  $expired ?></td>
-					<td><a class="<?echo $css ?>" href="./?c=comments&fileid=<? echo $row['id'] ?>"><?= 
+					<td width="100px" align="center"><a class="<?echo $css ?>" href="./?c=comments&fileid=<? echo $row['id'] ?>"><?= 
 						($row['comments'] != '')?$row['comments']:0;
 					?> comments</a> <br />(+<?=
 						($row['good'] != '')?$row['good']:0;
@@ -89,7 +91,7 @@
 				<? if( $type == 'topic' ) { ?>
 					<td width="100px"><? echo date( "Y-m-d", strtotime( $row['timestamp'] ) ) ?></td>
 					<td><a class="<?echo $css ?>" href="./?c=comments&fileid=<? echo $row['id'] ?>"><?= $type ?>: <? echo $row['filename'] ?></a></td>
-					<td><a class="<?echo $css ?>" href="./?c=comments&fileid=<? echo $row['id'] ?>"><?=
+					<td width="100px" align="center"><a class="<?echo $css ?>" href="./?c=comments&fileid=<? echo $row['id'] ?>"><?=
 						commentLabel($row['comments'], 0, 0, 0, false);
 						?></td>
 				<? } ?>
@@ -98,6 +100,20 @@
 <?	
 		}
 ?>
+
+	<tr>
+		<td>
+			<? if( $page > 0 ) { ?>
+				<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'] ?>&findfile=<?= urlencode($_REQUEST['findfile']) ?>&p=<?= $page - 1 ?>">&laquo; <b>previous page</b></a></td>
+			<? } ?>
+		</td>
+		<td></td>
+		<td style="text-align:right">
+			<? if( mysql_num_rows( $result ) == $numPerPage ) { ?>
+				<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'] ?>&findfile=<?= urlencode($_REQUEST['findfile']) ?>&p=<?= $page + 1 ?>"><b>next page</b></a> &raquo;
+			<? } ?>
+		</td>
+	</tr>
 
 
 </table>

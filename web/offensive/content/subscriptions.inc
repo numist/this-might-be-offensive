@@ -20,21 +20,24 @@
 	
 		$usrid = $_SESSION['userid'];
 		$link = openDbConnection();
-// XXX: this should be paginated
-		$sql = "select distinct s.fileid, u.filename
-			from offensive_subscriptions s,
+
+		$numPerPage = 4;
+		$page = isset($_REQUEST['p']) && is_numeric($_REQUEST['p']) ?
+			    $_REQUEST['p'] : 0;
+		$start = $page * $numPerPage;
+
+		$sql = "SELECT DISTINCT s.fileid, u.filename
+			FROM offensive_subscriptions s,
 				offensive_uploads u
-			where s.userid=" . $usrid . " 
-				and s.fileid=u.id
-			order by s.fileid DESC
-			limit 600";
+			WHERE s.userid=$usrid 
+				AND s.fileid=u.id
+			ORDER BY s.fileid DESC
+			LIMIT $start, $numPerPage";
 			
 			
 
 
 		$result = tmbo_query( $sql );
-		echo mysql_error();
-
 ?>	
 
 
@@ -62,8 +65,23 @@
 			<? 		
 		}
 
-	?>	</div><?
-	
+	?>
+		<table width="100%">
+			<tr>
+				<td>
+					<? if( $page > 0 ) { ?>
+						<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'] ?>&p=<?= $page - 1 ?>">&laquo; <b>previous page</b></a></td>
+					<? } ?>
+				</td>
+				<td style="text-align:right">
+					<? if( mysql_num_rows( $result ) == $numPerPage ) { ?>
+						<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'] ?>&p=<?= $page + 1 ?>"><b>next page</b></a> &raquo;
+					<? } ?>
+				</td>
+			</tr>        
+		</table>
+		</div>
+	<?
 	}
 
 	function nextStyle() {

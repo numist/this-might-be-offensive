@@ -91,8 +91,9 @@
 				<td></td>
 				<td style="text-align:right">
 					<? if( mysql_num_rows( $result ) == $numPerPage ) { ?>
-						<a href="<?= $_SERVER['PHP_SELF']?>?c=<?= $_REQUEST['c'] ?>&order=<?=$order?>&p=<?= $page + 1 ?>"><b>next page</b></a> &raquo;</td>
+						<a href="<?= $_SERVER['PHP_SELF']?>?c=<?= $_REQUEST['c'] ?>&order=<?=$order?>&p=<?= $page + 1 ?>"><b>next page</b></a> &raquo;
 					<? } ?>
+				</td>
 			</tr>
 
 	</table>
