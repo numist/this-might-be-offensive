@@ -21,7 +21,7 @@
 		$usrid = $_SESSION['userid'];
 		$link = openDbConnection();
 
-		$numPerPage = 4;
+		$numPerPage = 100;
 		$page = isset($_REQUEST['p']) && is_numeric($_REQUEST['p']) ?
 			    $_REQUEST['p'] : 0;
 		$start = $page * $numPerPage;
