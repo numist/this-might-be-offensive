@@ -84,7 +84,7 @@ $timelimit = 10;
 
 <html>
 <head>
-	<meta http-equiv="Content-Type" content="text/html;charset=ISO-8859-1">
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 	<title>
 	<?
 		if( function_exists( 'title' ) ) {
@@ -103,9 +103,9 @@ $timelimit = 10;
 	<META NAME="ROBOTS" CONTENT="NOARCHIVE">
 	<link rel="icon" href="/favicon.ico" />
 	<link rel="shortcut icon" href="/favicon.ico" />
-	<link rel="stylesheet" type="text/css" href="filepilestyle.css" />
+	<link rel="stylesheet" type="text/css" href="/offensive/filepilestyle.css" />
 	<link rel="stylesheet" type="text/css" href="/styles/oldskool.css"/>
-	<link rel="stylesheet" type="text/css" href="nsfw.css.php"/>
+	<link rel="stylesheet" type="text/css" href="/offensive/nsfw.css.php"/>
 
 	
 <style type="text/css">
@@ -128,6 +128,19 @@ $timelimit = 10;
 	}
 	
 </style>
+
+<script type="text/javascript">
+	function gochat()
+	{
+		w = 792;
+		h = 646;
+		l = (screen.width-w)/2;
+		t = (screen.height-h)/2;
+		widthHeight = "width="+w+",height="+h+",left="+l+",top="+t+",menubar=no,resizable=yes,scrollbars=no,status=no,toolbar=no,location=no";
+		window.open("/offensive/pages/chat.php","tmbo_chat",widthHeight);
+		return true
+	}
+</script>
 
 <?
 	if( function_exists( 'head' ) ) {
@@ -330,6 +343,7 @@ $timelimit = 10;
 				<div class="blackbar"></div>
 					<div class="heading">contact:</div>
 					<div class="bluebox">
+						<a onClick="gochat()">chat</a><br>
 						<a href="/contact/">email</a><br>
 						aim: <a href="aim:goim?screenname=themaxxcom">themaxxcom</a><br>
 					</div>
