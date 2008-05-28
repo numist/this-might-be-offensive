@@ -31,7 +31,11 @@ function logBadRequest() {
 			"From: themaxx.com contact form" );	
 }
 
-
+	$body = $_POST['body'];
+	$head = $_POST['head'];
+	$from = $_POST['from'];
+	$email = $_POST['email'];
+	
 	if( isset($body) && $body != "" ) {
 
 		if(ini_get("magic_quotes_gpc")) {
@@ -42,10 +46,11 @@ function logBadRequest() {
 			$body = str_replace( "\\\"", "\"", $body );
 		}
 
+		$remoteaddr = $_SERVER['REMOTE_ADDR'];
+
 		// email a copy of the new post to myself.
-		mail( "ray@mysocalled.com", "$head", "$body\n\n--\n\n[$REMOTE_ADDR] - $from\n\n$email\n", "From: $email ($from via themaxx.com contact form)\nReply-To: $email");
+		mail( "ray@mysocalled.com", "$head", "$body\n\n--\n\n[$remoteaddr] - $from\n\n$email\n", "From: $email ($from via themaxx.com contact form)\nReply-To: $email");
 	}
-	
 	
 	function requestDetail() {
 		ob_start();
