@@ -23,12 +23,9 @@ conditionalGet($lastBuildTime);
 <rss version="2.0">
 	<channel>
 		<title>[ this might be offensive ] : discussions</title>
-		<link>http://thismight.be/offensive/</link>
+		<link>http://<?= $_SERVER['SERVER_NAME'] ?>/offensive/</link>
 		<description>[ this might be offensive ]</description>
-		<lastBuildDate><?
-		echo gmdate('r', $lastBuildTime);
-		?></lastBuildDate>
-
+		<lastBuildDate><?= gmdate('r', $lastBuildTime); ?></lastBuildDate>
 <?
 	$sql = "SELECT offensive_uploads.*, users.username, users.userid
 			FROM offensive_uploads
@@ -47,7 +44,7 @@ conditionalGet($lastBuildTime);
 
 		<item>
 			<title><![CDATA[<? echo $nsfw . $row['filename']?> (started by <? echo $row['username']?>)]]></title>
-			<link>http://themaxx.com/offensive/pages/pic.php?id=<? echo $row['id'] ?></link>
+			<link>http://<?= $_SERVER['SERVER_NAME'] ?>/offensive/pages/pic.php?id=<? echo $row['id'] ?></link>
 			<description><![CDATA[<?
 			$sql = "SELECT comment, userid from offensive_comments where fileid = 226019 order by id asc limit 1";
 			$res = tmbo_query($sql);
@@ -57,7 +54,7 @@ conditionalGet($lastBuildTime);
 			}
 			?>]]></description>
 			<pubDate><? echo date( "r", strtotime( $row['timestamp'] ) ) ?></pubDate>			
-			<comments><![CDATA[http://themaxx.com/offensive/page.php?c=comments&fileid=<? echo $row['id'] ?>]]></comments>
+			<comments><![CDATA[http://<?= $_SERVER['SERVER_NAME'] ?>/offensive/page.php?c=comments&fileid=<? echo $row['id'] ?>]]></comments>
 		</item>
 <?
 	}

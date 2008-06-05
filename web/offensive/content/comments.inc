@@ -117,8 +117,11 @@
 	    /* check if someone is being hoodwinked by a link in comments
 	     * or outside the site's borders. while we're at it, let them know.
 	     * NB: only works if the client is reporting REFERERS. 
+		 * NNBB: this code will allow cheater-voting on discussions, since 
+		 * that's an easter egg anyway.
 	     */
-	    if(array_key_exists("submit", $_GET) && array_key_exists("HTTP_REFERER", $_SERVER) && 
+	    if($type != 'topic' &&
+		   array_key_exists("submit", $_GET) && array_key_exists("HTTP_REFERER", $_SERVER) && 
 	       trim($_SERVER['HTTP_REFERER']) !== "" &&
 	       (strpos($_SERVER['HTTP_REFERER'], $_SERVER['SERVER_NAME']."/offensive/?c=comments&fileid=") !== false ||
 	       strpos($_SERVER['HTTP_REFERER'], $_SERVER['SERVER_NAME']."/offensive/index.php?c=comments&fileid=") !== false ||

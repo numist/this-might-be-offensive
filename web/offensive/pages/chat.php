@@ -35,7 +35,6 @@ mustLogIn();
 			<div class="blackbar"></div>
 			<div class="heading">welcome to #themaxx on EFnet</div>
 			<div class="bluebox">
-
 				<applet code=IRCApplet.class archive="../assets/irc.jar,../assets/pixx.jar" width=100% height=500>
 					<param name="CABINETS" value="../assets/irc.cab,../assets/securedirc.cab,../assets/pixx.cab">
 					<param name="language" value="../assets/english">
@@ -43,7 +42,8 @@ mustLogIn();
 							
 					<param name="nick" value="<?= $_SESSION['username'] ?>">
 					<param name="alternatenick" value="tmb<?= $_SESSION['userid']?>">
-					<param name="name" value="tmb<?= $_SESSION['userid'] ?>">
+					<param name="userid" value="tmb<?= $_SESSION['userid'] ?>">
+					<param name="name" value="<?= $_SESSION['username'] ?>">
 					<param name="host" value="irc.efnet.net">
 					<param name="alternateserver1" value="irc.chowned.org 6667">
 					<param name="alternateserver2" value="irc.choopa.net 6667">

@@ -25,14 +25,10 @@ conditionalGet($lastBuildTime);
 	<channel>
 		<? if( ! isset($_GET['gallery']) ) { ?>
 			<title>[ this might be offensive ] : images</title>
-			<link>http://thismight.be/offensive/</link>
+			<link>http://<?= $_SERVER['SERVER_NAME'] ?>/offensive/</link>
 			<description>[ this might be offensive ]</description>
-			<lastBuildDate><?
-				echo gmdate('r', $lastBuildTime);
-			?></lastBuildDate>
-		<? } ?>
-
-<?
+			<lastBuildDate><?= gmdate('r', $lastBuildTime);	?></lastBuildDate>
+		<? } 
 	$sql = "SELECT offensive_uploads.*, users.username
 			FROM offensive_uploads USE KEY (t_t_id)
 				LEFT JOIN users ON offensive_uploads.userid = users.userid
@@ -53,8 +49,8 @@ conditionalGet($lastBuildTime);
 			$filename = $row['nsfw'] == 1 && strpos(strtolower($filename), "[nsfw]") === false ?
 				'[nsfw] '.$filename : $filename;
 
-		$fileURL = "http://thismight.be" . getFileURL($row['id'], $row['filename'], $row['timestamp']);
-		$thumbURL = "http://thismight.be" . getThumbURL($row['id'], $row['filename'], $row['timestamp']);
+		$fileURL = "http://". $_SERVER['SERVER_NAME'] . getFileURL($row['id'], $row['filename'], $row['timestamp']);
+		$thumbURL = "http://". $_SERVER['SERVER_NAME'] . getThumbURL($row['id'], $row['filename'], $row['timestamp']);
 ?>
 
 		<item>
@@ -64,10 +60,10 @@ conditionalGet($lastBuildTime);
 				<guid isPermaLink="false">tmbo-<?= $row['id'] ?></guid>
 			<? } else { ?>
 				<title><![CDATA[<?= $filename ?> (uploaded by <?= $row['username'] ?>)]]></title>
-				<link>http://thismight.be/offensive/pages/pic.php?id=<?= $row['id'] ?></link>
+				<link>http://<?= $_SERVER['SERVER_NAME'] ?>/offensive/pages/pic.php?id=<?= $row['id'] ?></link>
 				<description><![CDATA[<? if($fileURL != '') { ?><img src="<?= $fileURL ?>"/><? } else { echo "(expired)"; } ?>]]></description>
 				<pubDate><? echo gmdate( "r", strtotime( $row['timestamp'] ) ) ?></pubDate>			
-				<comments><![CDATA[http://tmbo.org/offensive/?c=comments&fileid=<?= $row['id'] ?>]]></comments>
+				<comments><![CDATA[http://<?= $_SERVER['SERVER_NAME'] ?>/offensive/?c=comments&fileid=<?= $row['id'] ?>]]></comments>
 			<? } ?>
 		</item>
 <?

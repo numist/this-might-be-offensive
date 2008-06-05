@@ -64,7 +64,7 @@
 	}
 
 	function exceededUploadLimit($uid) {
-		return (numUploadsRemaining( $uid ) == 0 && $_SESSION['status'] != 'admin');
+		return (numUploadsRemaining( $uid ) === 0 && $_SESSION['status'] != 'admin');
 	}
 
 	function numUploadsRemaining( $uid ) {
@@ -89,6 +89,11 @@
 
 	function numAllowedUploads( $uid ) {
 		global $link;
+	
+		// Fipi Lele is allowed (effectively) unlimited uploads.
+		if($_SESSION['userid'] == 143) {
+			return 9999;
+		}
 	
 		if(!isset($link) || !$link) $link = openDbConnection();
 
@@ -403,7 +408,7 @@ function uploadForm($fileuploaded=false) {
 		$uploadsRemaining = numUploadsRemaining( $_SESSION['userid'] );
 
 		?>
-			<div class="heading"><? echo $fileuploaded && $uploadsRemaining > 0 ? "thank you, sir, may i have another?" : "gimme."?></div>
+			<div class="heading"><? echo $fileuploaded && $uploadsRemaining !== 0 ? "thank you, sir, may i have another?" : "gimme."?></div>
 		
 		<div class="bluebox">
 		
@@ -411,11 +416,12 @@ function uploadForm($fileuploaded=false) {
 						
 				<?php 
 				
-					if( $uploadsRemaining > 0 || $_SESSION['status'] == "admin" ) { 
+					if( $uploadsRemaining !== 0 || $_SESSION['status'] == "admin" ) { 
+						$remaining = $_SESSION['status'] == 'admin' ? '∞' : $uploadsRemaining;
 					
 				?>
 		
-						<p>You have <? echo $uploadsRemaining ?> upload<? echo $uploadsRemaining == 1 ? "" : "s"?> left.</p>
+						<p>You have <? echo $remaining ?> upload<? echo $remaining === 1 ? "" : "s"?> left.</p>
 		
 						<p>If you haven't already, please take a look at <a href="./?c=faq">the rules</a> before uploading.</p>
 		

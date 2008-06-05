@@ -99,7 +99,7 @@
 <html>
 <head>
 	<title>Untitled</title>
-	<meta name="generator" content="BBEdit 8.2">
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 	<style type="text/css">
 		.cellDetail {
 			border:1px solid black;
