@@ -8,14 +8,9 @@
 
 // XXX: [tpg] — allow current winner to vote current image as new winner if [tpg] tag exists
 
-	function addBookmarks( $fileid, $commentid ) {
-		global $link;
-		if(!isset($link) || !$link) $link = openDbConnection();
-		
+	function addBookmarks( $fileid, $commentid ) {		
 		$sql = "UPDATE offensive_subscriptions SET commentid = $commentid WHERE fileid = $fileid && commentid IS NULL";
-					
 		$result = tmbo_query( $sql );
-
 	}
 
 	function additionalCssFor( $vote ) {
@@ -34,12 +29,9 @@
 
 	
 	function subscribe( $fileid, $uid ) {
-		global $link;
 		if( ! is_numeric( $uid ) || ! is_numeric( $fileid ) ) {
 			return;
 		}
-		if(!isset($link) || !$link) $link = openDbConnection();
-
 		$sql = "SELECT * FROM offensive_subscriptions WHERE userid = $uid AND fileid = $fileid";
 		if(mysql_num_rows(tmbo_query($sql)) > 0) return;
 
@@ -57,11 +49,9 @@
 	}
 
 	function clearBookmarks( $userid, $fileid ) {
-		global $link;
-		if( (! is_numeric( $userid ) ) || (! is_numeric( $fileid ) ) ) {
+		if(!loggedin()) {
 			return;
 		}
-		if(!isset($link) || !$link) $link = openDbConnection();
 		$sql = "UPDATE offensive_subscriptions SET commentid = NULL WHERE userid=$userid and fileid=$fileid";
 		$result = tmbo_query( $sql );
 
@@ -73,8 +63,6 @@
 	}
 	
 	function updateCommentCount( $threadid, $good, $bad, $repost, $tmbo, $comment ) {
-		global $link;
-
 		$usrid = $_SESSION['userid'];
 		$sql = "INSERT INTO offensive_count_cache ( threadid, good, bad, repost, tmbo, comments )
 					VALUES ( $threadid, $good, $bad, $repost, $tmbo, $comment )
@@ -85,7 +73,6 @@
 							tmbo = tmbo + $tmbo,
 							comments = comments + $comment";
 		
-		if(!isset($link) || !$link) $link = openDbConnection();
 		$result = tmbo_query( $sql );
 
 	}
@@ -179,7 +166,7 @@
 			}
 
 			if( strlen( $comment ) > 0 || $vote == 'this is bad' || $subscribe ) {
-				$commentid = mysql_insert_id( $link );
+				$commentid = mysql_insert_id();
 				subscribe( $fileid, $_SESSION['userid'] );
 				if( strlen( $comment ) > 0 ) {
 					addBookmarks( $fileid, $commentid );

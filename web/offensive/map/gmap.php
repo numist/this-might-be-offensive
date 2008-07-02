@@ -7,6 +7,7 @@
 	}
 
 	require_once( 'admin/mysqlConnectionInfo.inc' );
+	if(!isset($link) || !$link) $link = openDbConnection();
 
 	$x = array_key_exists("x", $_REQUEST) ? $_REQUEST['x'] : "";
 	$y = array_key_exists("y", $_REQUEST) ? $_REQUEST['y'] : "";
@@ -18,13 +19,11 @@
 	}
 
 	function setMaxxerLoc( $maxxerid, $x, $y ) {
-		global $link;
 
 		if( ! is_numeric( $maxxerid ) ) {
 			return;
 		}
 
-		if(!isset($link) || !$link) $link = openDbConnection();
 		$sql = "replace into maxxer_locations (userid, x, y, mapversion) values ( $maxxerid, $x, $y, 'google' )";
 		$result = tmbo_query( $sql );
 		
@@ -82,7 +81,6 @@
 		icon.infoWindowAnchor = new GPoint(5, 1);
 		
 		<?
-			$link = openDbConnection();
 			$sql = "select *, username from maxxer_locations, users where mapversion = 'google' AND maxxer_locations.userid = users.userid";
 			$result = tmbo_query( $sql );
 			

@@ -20,7 +20,6 @@
 
 			$sql = "update users set password='$encrypted_pw' WHERE userid = $uid LIMIT 1";
 			
-			$link = openDbConnection();
 			tmbo_query( $sql );
 			header( "Location: ./logn.php" );
 		}	
@@ -31,7 +30,6 @@
 
 	function sendResetEmail( $username ) {
 		
-		$link = openDbConnection();
 		$username = sqlEscape( $username );
 		$sql = "SELECT * FROM users WHERE username='$username'";
 		$result = tmbo_query( $sql );
@@ -125,7 +123,6 @@ http://".$_SERVER['SERVER_NAME']."/offensive/pwreset.php?x=$code
 	
 		$id = id_from_hash( $code );
 		if( is_numeric( $id ) && $id > 1 ) {
-			$link = openDbConnection();
 			$sql = "SELECT * FROM users WHERE userid = $id";
 			$result = tmbo_query( $sql );
 			if( mysql_num_rows( $result ) == 1 ) {

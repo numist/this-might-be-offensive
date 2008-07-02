@@ -79,8 +79,6 @@
 	
 		$returnMessage = "OK";
 		
-	    $link = openDbConnection();
-	
 		$referrerId = getReferrerId( $referral );
 	
 		if( $referrerId == -1 ) {
@@ -120,9 +118,6 @@
 		 	$returnMessage = "The username you've chosen, \"" . $uName . "\", is not available.";
 		}
 		
-	    /* Closing connection */
-	    mysql_close($link);
-	    
     	return $returnMessage;
 	}
 

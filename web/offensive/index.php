@@ -437,8 +437,6 @@ $timelimit = 10;
 					ORDER BY fileid ASC
 					LIMIT 50";
 
-		$link = openDbConnection();
-
 		$result = tmbo_query( $sql );
 		
 		if( mysql_num_rows( $result ) == 0 ) {
@@ -480,9 +478,7 @@ $timelimit = 10;
 	}
 
 	function whosOn() {
-		global $link, $userlimit, $timelimit;
-
-		if(!isset($link) || !$link) $link = openDbConnection();
+		global $userlimit, $timelimit;
 
 		// get the total number of users online
 		$sql = "SELECT COUNT(*) FROM users WHERE timestamp > DATE_SUB( now( ) , INTERVAL $timelimit MINUTE)";
@@ -515,11 +511,7 @@ $timelimit = 10;
 	}
 
 	function subscribed() {
-		global $link;
-
 		if(!is_numeric($_REQUEST['fileid'])) trigger_error("non-numeric fileid!", E_USER_ERROR);
-
-		if(!isset($link) || !$link) $link = openDbConnection();
 
 		$sql = "SELECT DISTINCT u.userid, u.username FROM offensive_subscriptions sub JOIN users u ON sub.userid = u.userid WHERE fileid = ".$_REQUEST['fileid']." ORDER BY u.username ASC";
 		$result = tmbo_query($sql);

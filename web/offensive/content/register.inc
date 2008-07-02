@@ -2,6 +2,9 @@
 
 	require_once( "offensive/assets/activationFunctions.inc" );
 	require_once( "offensive/classes/statusMessage.inc" );
+	require_once( 'admin/mysqlConnectionInfo.inc' );
+	if(!isset($link) || !$link) $link = openDbConnection();
+	
 
 	$message;
 
@@ -67,8 +70,6 @@
 	}
 
 	function isValidEmail( $email ) {
-		global $link;
-	
 		$valid = preg_match( '/[a-zA-Z0-9-_\.]+\@[a-zA-Z0-9-_\.]+\.[a-zA-Z0-9-_\.]+/', $email ) > 0
 		&& strpos( $email, "hotmail.com" ) == false
 		&& strpos( $email, "mailinator.com" ) == false		
@@ -78,7 +79,6 @@
 			return new statusMessage( false, "The email address provided is invalid, either because it contains structural errors or is from an unsupported provider (yahoo, hotmail, etc)." );
 		}
 	
-	    if(!isset($link) || !$link) $link = openDbConnection();
 	    $sql = "SELECT count(*) AS theCount FROM users WHERE email = '" . $email . "'";
 	    $res = tmbo_query( $sql );
 	    $row = mysql_fetch_assoc( $res );
@@ -98,13 +98,7 @@
 
 	
 	function createAccount( $uName, $pw, $email, $referral ) {
-		global $link;
-
 		$returnMessage = "OK";
-		
-	    // Include, and check we've got a connection to the database.
-		require_once( 'admin/mysqlConnectionInfo.inc' );
-		if(!isset($link) || !$link) $link = openDbConnection();
 		
 	    $query = "SELECT count(*) AS theCount FROM users WHERE username = '" . $uName . "'";
 

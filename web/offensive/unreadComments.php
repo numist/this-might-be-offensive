@@ -19,8 +19,6 @@
 					group by fileid
 					LIMIT 50";
 
-		$link = openDbConnection();
-
 		$result = tmbo_query( $sql );
 		
 		if( mysql_num_rows( $result ) == 0 ) {

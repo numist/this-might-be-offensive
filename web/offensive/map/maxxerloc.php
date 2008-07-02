@@ -7,6 +7,7 @@
 	}
 
 	require_once( 'admin/mysqlConnectionInfo.inc' );
+	if(!isset($link) || !$link) $link = openDbConnection();
 
 	$x = array_key_exists("map_x", $_REQUEST) ? $_REQUEST['map_x'] : "";
 	$y = array_key_exists("map_y", $_REQUEST) ? $_REQUEST['map_y'] : "";
@@ -19,13 +20,10 @@
 	}
 
 	function setMaxxerLoc( $maxxerid, $x, $y ) {
-		global $link;
-
 		if( ! is_numeric( $maxxerid ) ) {
 			return;
 		}
 
-		if(!isset($link) || !$link) $link = openDbConnection();
 		$sql = "replace into maxxer_locations (userid, x, y) values ( $maxxerid, $x, $y )";
 		$result = tmbo_query( $sql );
 		

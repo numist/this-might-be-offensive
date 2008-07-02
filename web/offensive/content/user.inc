@@ -39,8 +39,6 @@
 	}
 	
 	function body() {
-		global $link;
-	
 		if( isAdmin() && 
 		    array_key_exists("set_account_status", $_REQUEST) && 
 		    $_REQUEST['set_account_status'] ) {
@@ -273,8 +271,6 @@ function emitFileRow( $css, $row ) {
 }
 
 function recentComments( $uid ) {
-	global $link;
-
 	$sql="SELECT up.*, offensive_comments.timestamp, offensive_comments.id as commentid
 			FROM offensive_uploads up, offensive_comments
 			WHERE offensive_comments.userid = $uid
@@ -283,8 +279,6 @@ function recentComments( $uid ) {
 			GROUP BY fileid
 			ORDER  BY offensive_comments.timestamp DESC 
 			LIMIT 15";
-
-	if(!isset($link) || !$link) $link = openDbConnection();
 	$result = tmbo_query( $sql );
 	
 ?>
@@ -307,14 +301,12 @@ function recentComments( $uid ) {
 
 
 function handleSetStatusSubmission() {
-	global $link;
 	$usrid =  sqlEscape( $_POST['userid'] );
 	$status =  sqlEscape( $_POST['set_account_status'] );
 	$email =  sqlEscape( $_POST['set_email'] );
 	if( is_numeric($usrid ) && $status !== "" ) {
 		$isEmailValid = preg_match( '/[a-zA-Z0-9-_\.]+\@[a-zA-Z0-9-_\.]+\.[a-zA-Z0-9-_\.]+/', $email ) > 0;
 		$emailClause = $isEmailValid ? ", email = '$email' " : "";
-		if(!isset($link) || !$link) $link = openDbConnection();
 		$sql = "update users set account_status ='$status' $emailClause where userid = $usrid limit 1";
 		$result = tmbo_query( $sql );
 	}
@@ -352,8 +344,6 @@ function setStatusForm( $id, $status, $email ) {
 
 
 function votingRecord( $id, $name ) {
-	global $link;
-
 	//return;
 	
 // XXX: this query needs an index to be created in the database
@@ -362,8 +352,6 @@ function votingRecord( $id, $name ) {
 				WHERE userid = $id
 				GROUP  BY vote";
 
-	if(!isset($link) || !$link) $link = openDbConnection();
-	
 	$result = tmbo_query( $sql );
 
 	$good = 0;

@@ -109,9 +109,7 @@ function tmbo_query($sql, $timeout=2) {
 	global $link, $queries, $querytime, $readonly;
 	
 	if(!$link) {
-		trigger_error("MySQL link not pre-existent or invalid", E_USER_WARNING);
-		require_once('admin/mysqlConnectionInfo.inc');
-		$link = openDbConnection();
+		trigger_error("MySQL link not pre-existent or invalid", E_USER_ERROR);
 	}
 
 	$trace = debug_backtrace();
@@ -186,10 +184,6 @@ function loggedin($lite=true) {
  * auth), mustLogIn will exit the script.
  */
 function mustLogIn($type="logn") {
-	global $link;
-	require_once('admin/mysqlConnectionInfo.inc');
-	if(!isset($link) || !$link) $link = openDbConnection();
-	
 	// login checks are authorization checks, so a heavy loggedin() request is required.
 	if(loggedin(false)) {
 		return;

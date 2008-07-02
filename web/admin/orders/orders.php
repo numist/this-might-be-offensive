@@ -1,6 +1,6 @@
 <?
 	require_once( '../mysqlConnectionInfo.php' );	
-	$link = openDbConnection();
+	if(!isset($link) || !$link) $link = openDbConnection();
 
 	if( $_REQUEST['action'] == "shipped" ) {
 		$orderid = $_REQUEST['orderid'];

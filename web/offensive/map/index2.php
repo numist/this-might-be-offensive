@@ -1,6 +1,8 @@
 <?
 	set_include_path("../..");
 	require_once( 'offensive/assets/header.inc' );
+	require_once( 'admin/mysqlConnectionInfo.inc' );
+	if(!isset($link) || !$link) $link = openDbConnection();
 
 	$usrid = $_SESSION['userid'];
 	if( ! is_numeric( $usrid ) ) {
@@ -14,7 +16,7 @@
 	$cellSize = 100;
 	
 	function emitCellDetails() {
-		global $cells, $cellSize, $link;
+		global $cells, $cellSize;
 		$sql = "SELECT maxxer_locations.userid,
 						floor(x/$cellSize) as xCell,
 						floor(y/$cellSize) as yCell,
@@ -22,8 +24,6 @@
 		FROM maxxer_locations, users
 		WHERE users.userid = maxxer_locations.userid
 		order by xCell, yCell, username";
-	
-		if(!isset($link) || !$link) $link = openDbConnection();
 	
 		$result = tmbo_query( $sql );
 		

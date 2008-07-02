@@ -3,7 +3,7 @@
 	require_once("offensive/assets/header.inc");
 	// Include, and check we've got a connection to the database.
 	require_once( 'admin/mysqlConnectionInfo.inc' );
-	$link = openDbConnection();
+	if(!isset($link) || !$link) $link = openDbConnection();
 	
 	mustLogIn("http");
 	

@@ -1,5 +1,6 @@
 <?
-	require_once( '../../admin/mysqlConnectionInfo.inc' );
+	require_once( 'admin/mysqlConnectionInfo.inc' );
+	if(!isset($link) || !$link) $link = openDbConnection();
 
 	// read the post from PayPal system and add 'cmd'
 	$req = 'cmd=_notify-validate';
@@ -14,9 +15,6 @@
 	$header .= "Content-Type: application/x-www-form-urlencoded\r\n";
 	$header .= "Content-Length: " . strlen($req) . "\r\n\r\n";
 	$fp = fsockopen ('www.paypal.com', 80, $errno, $errstr, 30);
-
-
-	$link = openDbConnection();
 	
 	// assign posted variables to local variables
 	$item_name = mysql_real_escape_string( $_POST['item_name'] );

@@ -28,14 +28,14 @@
 	function addComment( $topicid, $comment, $uid ) {
 		$sql = "insert into offensive_comments( userid, fileid, comment, user_ip )
 				values( $uid, $topicid, '".sqlEscape($comment)."', '" . $_SERVER['REMOTE_ADDR'] . "' )";
-		tmbo_query( $sql, $link );
+		tmbo_query($sql);
 		
-		$commentid = mysql_insert_id( $link );
+		$commentid = mysql_insert_id();
 		
 		$sql = "insert into offensive_count_cache ( threadid, comments ) VALUES ( $topicid, 1 )
 					on duplicate key update comments = comments + 1";
 					
-		tmbo_query( $sql, $link );
+		tmbo_query($sql);
 
 		return $commentid;
 	}
@@ -44,9 +44,9 @@
 		$sql = "insert into offensive_uploads ( userid, filename, ip, type )
 					VALUES ( $uid, '".sqlEscape($topic)."', '" . $_SERVER['REMOTE_ADDR'] . "', 'topic' )";
 					
-		tmbo_query( $sql, $link );
+		tmbo_query($sql);
 
-	 	$threadid = mysql_insert_id( $link );
+	 	$threadid = mysql_insert_id();
 
 		return $threadid;
 
