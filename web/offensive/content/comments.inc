@@ -109,6 +109,12 @@
 
 		$sql = "SELECT filename, nsfw, tmbo, timestamp, type FROM offensive_uploads WHERE id=$fileid";
 		$result = tmbo_query( $sql );
+		
+		if(mysql_num_rows($result) == 0) {
+			header("Location: ./404.php");
+			exit;
+		}
+		
 		list($filename, $nsfw, $tmbo, $uploadstamp, $type) = mysql_fetch_array( $result );
 		
 		$expired = getFile($_REQUEST['fileid'], $filename, $uploadstamp, $type) == ''? true : false;
@@ -272,6 +278,7 @@
 				WHERE users.userid = offensive_uploads.userid
 				AND offensive_uploads.id = " . $_REQUEST['fileid'];
 	$result = tmbo_query( $sql );
+		
 	$row = mysql_fetch_assoc( $result );
 	$uploader = $row['username'];
 	$filename = $row['filename'];
@@ -305,7 +312,7 @@
 <?
     // changeblog special header
 	if($_REQUEST['fileid'] == "211604") {
-		echo htmlEscape($filename); 
+		echo htmlFilename($row); 
 		?>
 		<br/><span style="color:#666699">beat to fit. paint to match.</span><br/>
 		<?
@@ -318,12 +325,12 @@
 <?
 	} else if( $type == 'audio' ) {
 		?><a class="heading" id="pic" href="images/audio/<?= $filename ?>"><?php 
-		    echo htmlEscape($filename);
+		    echo htmlFilename($row);
 		?></a><br/><span style="color:#666699">uploaded by <a href="./?c=user&userid=<?echo $uploaderid ?>" style="color:#666699"><?php echo $uploader?></a></span><br/><?
 	} else {
 ?>
 		<a class="heading" id="pic" href="<?= $href ?>"><?php 
-		    echo htmlEscape($filename);
+		    echo htmlFilename($row);
 		?></a><br/><span style="color:#666699">uploaded by <a href="./?c=user&userid=<?echo $uploaderid ?>" style="color:#666699"><?php echo $uploader?></a></span><br/>
 <?
 	}	
@@ -399,10 +406,7 @@
 					}
 					?>
     	            <br/>
-						 
- 		 			<div class="timestamp"><a href="#<?= $row['commentid'] ?>"><?= $row['comment_timestamp'] ?></a></div>
-					&raquo; 
-    	
+
 				<?php
   
   				$username = $row['username'];
@@ -414,7 +418,17 @@
 				   preg_match("/[Cc]+[Hh]+[Aa]+[Rr]+[Ll]+[Ii]+[Ee]+/", $filename) > 0) {
 					$username = str_replace("banana", "boonana", $username);
 				}
-				echo "<a href=\"./?c=user&userid=" . $row['userid'] . "\">$username</a>";
+				
+				// see:  http://thismight.be/offensive/?c=comments&fileid=237653#274220091
+				if($username == "hork") {
+					$username = "H. Winthrop Nerdlington III";
+				}
+				?>
+				
+				&raquo; <a href="./?c=user&userid=<?= $row['userid'] ?>"><?= $username ?></a>
+				
+				<div class="timestamp"><a href="#<?= $row['commentid'] ?>"><?= $row['comment_timestamp'] ?></a></div>
+				<?
 							
 				if( $row['vote'] ) {
 					$thevote = $row['vote'];
@@ -494,7 +508,10 @@
 					<div>
 					<? if ( $type == 'image' ) { ?>
 						<a class="heading" id="pic" href="pages/pic.php?id=<?php echo $_REQUEST['fileid']?>"><?php 
-						echo htmlEscape($filename);
+						
+						// TODO: easy optimization -- find the data in this file so we don't go to the db in this call
+						echo htmlFilename($fid);
+						
 						?></a><br/>
 					<? }
 						else {
@@ -522,7 +539,7 @@
 				<p>
 					<input type="hidden" name="fileid" value="<?php echo $_REQUEST['fileid']?>"/>
 					<input type="hidden" name="c" value="comments"/>
-					<textarea name="comment" style="width:80%;height:150px;"></textarea>
+					<textarea name="comment" rows="12" cols="64"></textarea>
 				</p>
 				
 

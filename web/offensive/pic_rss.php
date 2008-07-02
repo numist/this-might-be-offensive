@@ -2,11 +2,14 @@
 header( "Content-type: text/xml" ); 
 set_include_path("..");
 require_once("offensive/assets/header.inc");
-require_once("offensive/assets/conditionalGet.inc");
-require_once("offensive/assets/functions.inc");
 // Include, and check we've got a connection to the database.
 require_once( 'admin/mysqlConnectionInfo.inc' );
 $link = openDbConnection();
+
+mustLogIn("http");
+
+require_once("offensive/assets/conditionalGet.inc");
+require_once("offensive/assets/functions.inc");
 
 $sql = "SELECT offensive_uploads.timestamp
 		FROM offensive_uploads USE KEY (t_t_id)

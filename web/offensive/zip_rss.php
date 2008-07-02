@@ -1,6 +1,12 @@
 <?
 	set_include_path("..");
 	require_once("offensive/assets/header.inc");
+	// Include, and check we've got a connection to the database.
+	require_once( 'admin/mysqlConnectionInfo.inc' );
+	$link = openDbConnection();
+	
+	mustLogIn("http");
+	
 	require_once("offensive/assets/conditionalGet.inc");
 	
 	$fileList = array();

@@ -23,11 +23,11 @@
 		$find = $_REQUEST['findfile'];
 	
 		$sql = "SELECT offensive_uploads.id, filename, offensive_uploads.timestamp,
-					offensive_uploads.type, offensive_uploads.nsfw as is_nsfw,
-					offensive_uploads.tmbo as is_tmbo,
+					offensive_uploads.type, offensive_uploads.nsfw,
+					offensive_uploads.tmbo, offensive_uploads.type,
 					users.userid, username,
 					offensive_count_cache.good, offensive_count_cache.bad,
-					offensive_count_cache.tmbo, offensive_count_cache.comments
+					offensive_count_cache.tmbo as is_tmbo, offensive_count_cache.comments
 					FROM offensive_uploads, users, offensive_count_cache
 					WHERE filename LIKE '%".sqlEscape($find)."%'
 					AND offensive_uploads.userid = users.userid
@@ -56,26 +56,26 @@
 		}
 
 		while( $row = mysql_fetch_assoc( $result ) ) {
-		  
-		  $row['filename'] = htmlEscape($row['filename']);
-			
 			$style = (isset($style) && $style == "") ? "background:#bbbbee;" : "";
 			$css = (isset($css) && $css == "evenfile") ? "oddfile" : "evenfile";
 			$type = $row['type'];
+			
+			$filename = htmlFilename($row, $type != 'image');
+			
 			$expired = $type == 'image' && getFile($row['id'], $row['filename'], $row['timestamp']) == '' ? "(expired)" : ""
 ?>
 	
 			<tr class="<? echo $css ?>" style="<?= $style ?>">
-				<? if( $type == 'image' ) { ?>
+				<? if( $type == 'image' || $type == 'avatar') { ?>
 					<td width="100px"><a class="<?echo $css ?>" href="./pages/pic.php?id=<? echo $row['id'] ?>"><?
 
-					if(hideImage($row['is_nsfw'], $row['is_tmbo'], $row['userid'])) {
+					if(hideImage($row['nsfw'], $row['tmbo'], $row['userid'])) {
 						?>[ filtered ]<?
 					} else {
 						?><img src="<?= getThumbURL($row['id'], $row['filename'], $row['timestamp']) ?>"/><?
 					}
 					?></a></td>
-					<td><a class="<?echo $css ?>" href="./pages/pic.php?id=<? echo $row['id'] ?>"><? echo $row['filename'] ?></a> <? echo  $expired ?></td>
+					<td><a class="<?echo $css ?>" href="./pages/pic.php?id=<? echo $row['id'] ?>"><?= $filename ?></a> (uploaded by <?= htmlEscape($row['username']) ?>)<? echo  $expired ?></td>
 					<td width="100px" align="center"><a class="<?echo $css ?>" href="./?c=comments&fileid=<? echo $row['id'] ?>"><?= 
 						($row['comments'] != '')?$row['comments']:0;
 					?> comments</a> <br />(+<?=
@@ -83,14 +83,13 @@
 					?> -<?=
 						($row['bad'] != '')?$row['bad']:0;
 					?> x<?=
-						($row['tmbo'] != '')?$row['tmbo']:0;
+						($row['is_tmbo'] != '')?$row['is_tmbo']:0;
 					?>)<br /><?=
 						date( "Y-m-d", strtotime( $row['timestamp'] ) )
 					?></td>
-				<? } ?>
-				<? if( $type == 'topic' ) { ?>
+				<? } else if( $type == 'topic' ) { ?>
 					<td width="100px"><? echo date( "Y-m-d", strtotime( $row['timestamp'] ) ) ?></td>
-					<td><a class="<?echo $css ?>" href="./?c=comments&fileid=<? echo $row['id'] ?>"><?= $type ?>: <? echo $row['filename'] ?></a></td>
+					<td><a class="<?echo $css ?>" href="./?c=comments&fileid=<? echo $row['id'] ?>"><?= $filename ?></a></td>
 					<td width="100px" align="center"><a class="<?echo $css ?>" href="./?c=comments&fileid=<? echo $row['id'] ?>"><?=
 						commentLabel($row['comments'], 0, 0, 0, false);
 						?></td>

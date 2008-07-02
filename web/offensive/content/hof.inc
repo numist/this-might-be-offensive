@@ -33,14 +33,14 @@
 			<tr class="<? $css = "evenfile"; echo $css ?>">
 				<td style="text-align:right"><b>rank</b></td>
 				<td><b>filename</b></td>
-				<td><b>uploaded by</b></td>
+				<td><b>uploaded&nbsp;by</b></td>
 				<td><b>comments</b></td>
 				<td><b>votes</b></td>
 				<td><b><? if($view=="today") { ?> hours <? } else { ?> weeks <? } ?></b></td> 
 			</tr>
 
 <?
-		$sql = "SELECT up.id as fileid, cache.good as votes, up.userid, up.filename, up.timestamp, users.username, up.nsfw FROM offensive_uploads up, users, offensive_count_cache cache WHERE up.id = cache.threadid AND users.userid = up.userid AND up.type = 'image'";
+		$sql = "SELECT up.id as fileid, cache.good as votes, up.userid, up.filename, up.timestamp, users.username, up.nsfw, up.tmbo, up.type, cache.comments FROM offensive_uploads up, users, offensive_count_cache cache WHERE up.id = cache.threadid AND users.userid = up.userid AND up.type = 'image'";
 		if($view == "today") $sql .= " AND up.timestamp > now() - INTERVAL 1 DAY";
 		if(isset($_REQUEST['nonsfw'])) $sql .= " AND up.nsfw = 0";
 		if(isset($_REQUEST['notmbo'])) $sql .= " AND up.tmbo = 0";
@@ -60,10 +60,10 @@
 ?>
 			<tr class="<? echo $cssw ?>">
 				<td style="text-align:right"><? echo ++$count ?>.</td>
-				<td><a class="<? echo $cssw ?>" href="pages/pic.php?id=<?= $row['fileid'] ?>"><? echo truncate( (($row['nsfw'] == 1) ? "[nsfw] " : "" ) . htmlEscape($row['filename']), 50 )
+				<td><a class="<? echo $cssw ?>" href="pages/pic.php?id=<?= $row['fileid'] ?>"><? echo htmlFilename($row)
 			    ?></a></td>
 				<td><a class="<? echo $cssw ?>" href="./?c=user&userid=<? echo $row['userid'] ?>"><? echo htmlEscape($row['username']) ?></a></td>
-				<td><a class="<? echo $cssw ?>" href="./?c=comments&fileid=<?= $row['fileid'] ?>">comments</a></td>
+				<td><a class="<? echo $cssw ?>" href="./?c=comments&fileid=<?= $row['fileid'] ?>"><?= $row['comments'] ?></a></td>
 				<td>(+<? echo $row['votes'] ?>)</td>
 				<td style="text-align:right"><?= $timeSince ?></td>
 			</tr>
@@ -77,16 +77,6 @@
 
 	</div>
 <?
-	}
-
-	function truncate( $input, $maxlength ) {
-	
-		if( strlen( $input ) <= $maxlength ) {
-			return $input;
-		}
-		
-		return substr( $input, 0, $maxlength ) . "...";
-
 	}
 
 	function weeksSince( $timestamp ) {

@@ -1,4 +1,20 @@
-<? header( "Content-type: text/xml" ); ?>
+<?
+set_include_path("..");
+require_once("offensive/assets/header.inc");
+
+// this file has been deprecated as part of the audio tab removal process.  sorry :(
+header('HTTP/1.0 410 Gone');
+exit;
+
+header( "Content-type: text/xml" ); 
+
+// Include, and check we've got a connection to the database.
+require_once( 'admin/mysqlConnectionInfo.inc' );
+$link = openDbConnection();
+
+mustLogIn("http");
+
+?>
 <rss version="2.0"
 	xmlns:itunes="http://www.itunes.com/DTDs/Podcast-1.0.dtd" 	
 >
@@ -8,9 +24,7 @@
 		<description>[ this might be offensive ]</description>
 		<lastBuildDate><? echo date("r"); ?></lastBuildDate>
 
-<?
-	require_once( '../admin/mysqlConnectionInfo.inc' ); $link = openDbConnection();
-	
+<?	
 	$sql = "select offensive_uploads.*, users.username
 			FROM offensive_uploads
 				LEFT JOIN users ON offensive_uploads.userid = users.userid

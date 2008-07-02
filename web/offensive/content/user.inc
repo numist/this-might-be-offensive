@@ -75,11 +75,11 @@
 			break;
 			
 			case "awaiting activation":
-				$accountMessage = "$name has not picked up his keys yet.";
+				$accountMessage = "$name has not picked up the keys yet.";
 			break;
 		
 			case "admin":
-				$accountMessage = "$name carries the keys to the short bus.";
+				$accountMessage = "$name carries keys to the short bus.";
 			break;
 
 			default:
@@ -254,11 +254,16 @@ function emitFileRow( $css, $row ) {
 	$good = $row['good'];
 	$bad = $row['bad'];
 	$offensive = $row['tmbo'];
+	$nsfw = $row['nsfw'];
 	$timestamp = $row['uploadtime'];
-	$type = $row['type'];
 ?>
 	<tr>
-		<td style="width:100%" class="<?php echo $css?>"><div class="clipper"><a href="pages/pic.php?id=<?php echo $id ?>" class="<?php echo $css?>"><?= maxString(htmlEscape($filename),45) ?></div></td>
+		<td style="width:100%" class="<?php echo $css?>"><div class="clipper"><a href="<?
+		if($type == "image" || $type == "avatar") 
+			echo "pages/pic.php?id=$id";
+		else
+			echo "/offensive/?c=comments&fileid=$id";
+		?>" class="<?php echo $css?>"><?= truncate(htmlFilename($row, true)) ?></div></td>
 		<td class="<?php echo $css?>" style="text-align:right;white-space:nowrap;width:100%"><a href="./?c=comments&fileid=<?php echo $id ?>" class="<?php echo $css?>"><?=
 			commentLabel($comments, $good, $bad, $offensive, !($type == 'topic'));
 		?></a></td>
@@ -271,7 +276,7 @@ function emitFileRow( $css, $row ) {
 function recentComments( $uid ) {
 	global $link;
 
-	$sql="SELECT up.id, up.filename, offensive_comments.timestamp, offensive_comments.id as commentid
+	$sql="SELECT up.*, offensive_comments.timestamp, offensive_comments.id as commentid
 			FROM offensive_uploads up, offensive_comments
 			WHERE offensive_comments.userid = $uid
 			AND up.id = offensive_comments.fileid
@@ -292,7 +297,7 @@ function recentComments( $uid ) {
 	while( $row = mysql_fetch_assoc( $result ) ) {
 		$css = isset($css) && $css == "evenfile" ? "oddfile" : "evenfile";
 ?>
-		<div><a class="<?= $css ?>" href="?c=comments&fileid=<?= $row['id'] ?>#<?= $row['commentid'] ?>"><?= $row['filename']?></a></div>
+		<div><a class="<?= $css ?>" href="?c=comments&fileid=<?= $row['id'] ?>#<?= $row['commentid'] ?>"><?= htmlFilename($row) ?></a></div>
 <?
 	}
 ?>

@@ -1,9 +1,5 @@
 <?php
-function getPreferences( $userid ) {
-	// Include, and check we've got a connection to the database.
-	require_once( '../admin/mysqlConnectionInfo.inc' );
-	if(!isset($link) || !$link) $link = openDbConnection();
-		
+function getPreferences( $userid ) {		
 	$sql = "SELECT names.value AS prefname, val.value AS prefvalue FROM user_preferences, preference_names_values names, preference_names_values val WHERE userid=$userid AND nameid=names.id AND val.id=valueid";
 
 	$result = tmbo_query($sql);
@@ -23,9 +19,6 @@ function getPreferences( $userid ) {
 	while( $row = mysql_fetch_array( $result ) ) {
 		array_push( $squelched, $row['squelched'] );
 	}
-
-	/* Closing connection */
-	mysql_close($link);
 
 	$prefs[ 'squelched' ] = implode( ",", $squelched );
 	

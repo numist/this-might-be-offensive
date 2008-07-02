@@ -343,7 +343,7 @@ $timelimit = 10;
 				<div class="blackbar"></div>
 					<div class="heading">contact:</div>
 					<div class="bluebox">
-						<a onClick="gochat()">chat</a><br>
+						<a href="#" onClick="gochat(); return false;">chat</a><br>
 						<a href="/contact/">email</a><br>
 						aim: <a href="aim:goim?screenname=themaxxcom">themaxxcom</a><br>
 					</div>
@@ -429,7 +429,7 @@ $timelimit = 10;
 			return;
 		}
 
-		$sql = "SELECT DISTINCT b.fileid, u.filename, b.commentid
+		$sql = "SELECT DISTINCT b.fileid, u.filename, u.nsfw, u.tmbo, u.type, b.commentid
 					FROM offensive_uploads u, offensive_subscriptions b
 					WHERE b.userid = $uid 
 						AND u.id = b.fileid
@@ -458,7 +458,7 @@ $timelimit = 10;
 			$css = isset($css) && $css == "evenfile" ? "oddfile" : "evenfile";
 	?>
 			<div class="clipper"><a class="<?= $css ?>" href="?c=comments&fileid=<?= $row['fileid'] ?>#<?= $row['commentid']?>"><?= 
-			    htmlEscape($row['filename']);
+			    htmlFilename($row);
 			?></a></div>
 	<?
 	

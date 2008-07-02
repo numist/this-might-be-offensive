@@ -1,189 +1,39 @@
 <?php
 	set_include_path("..");
-	require_once( 'offensive/assets/header.inc');
+	require_once('offensive/assets/header.inc');
+	require_once('offensive/assets/logn.inc');
 
-	$redirect = array_key_exists("redirect", $_REQUEST) ? 
-	    $_REQUEST['redirect'] : null;
-	if( $redirect == null ) {
-		$redirect = './';
+	/* there is always a redirect. 
+	 * the user can specify the redirect in the _REQUEST['redirect'] variable.
+	 * the location of the redirect defaults to /offensive/?c=main
+	 */
+	if(array_key_exists("redirect", $_REQUEST))
+		$redirect = $_REQUEST['redirect'];
+	else {
+		$c = (array_key_exists("thumbnails", $_COOKIE) && 
+		      $_COOKIE["thumbnails"] == "yes") ? 
+		      "thumbs" : "main";
+		$redirect = './?c='.$c;
 	}
 
-	if( array_key_exists("userid", $_SESSION) && is_numeric( $_SESSION['userid'] ) ) {
+	// if the user is logged in already, redirect.
+	if(loggedin()) {
 		header( "Location: " . $redirect );
 		exit;
 	}
 
-	// Include, and check we've got a connection to the database.
-	require_once( 'admin/mysqlConnectionInfo.inc' );
-	if(!isset($link) || !$link) $link = openDbConnection();
-
-	require_once( 'offensive/assets/getPrefs.inc' );
-	require_once( 'offensive/assets/activationFunctions.inc' );
-	require_once( 'offensive/assets/functions.inc' );
-
 	$login_message = "";
+	$prompt = true;
 
-
-	if( isset($_REQUEST['password']) ) {
-		$success = login( $_REQUEST['username'], $_REQUEST['password'] );
-		if( $success === true ) {
-			if( array_key_exists("rememberme", $_REQUEST) && 
-			    $_REQUEST['rememberme'] ) {
-				setcookie( "remember", tmbohash(
-				    $_SESSION['userid'], 
-				    $_SESSION['username'] . 
-				    $_SERVER['REMOTE_ADDR'] . $salt ), 
-				    time()+60*60*24*365*5, "/" );
-			}
-
-			header( "Location: " . $redirect );
-			exit;
-		}
-		else {
-			logAttempt();
-		}
-	}
-
-	if( ! isset( $_SESSION['userid'] ) ) {
-		if(isset($_COOKIE['remember'])) {
-			$rememberCookie = $_COOKIE['remember'];
-		}
-		if( isset( $rememberCookie ) ) {
-			if( loginFromCookie( $rememberCookie ) ) {
-				header( "Location: " . $redirect );
-				exit;
-			}
-		}
-	}
-
-	function logIp( $uid ) {
-		$link = openDbConnection();
-		$ip = $_SERVER['REMOTE_ADDR'];
-		$sql = "INSERT INTO ip_history (userid, ip) VALUES ( $uid, '$ip' )";
-		$result = tmbo_query( $sql );
-
-	}
-
-	function logAttempt() {
-		global $login_message;
-	
-		$uname = sqlEscape( $_REQUEST['username'] );
-		$pw = sqlEscape( $_REQUEST['password'] );
-		$ip = $_SERVER['REMOTE_ADDR'];
-		$sql = "insert into failed_logins (username,ip) VALUES ( '".sqlEscape($uname)."', '$ip' )";
-		tmbo_query( $sql );
-		
-		$sql = "select count(id) as thecount from failed_logins where ip='$ip' and timestamp > date_sub( now(), interval 1 day )";
-		$result = tmbo_query( $sql );
-		echo mysql_error();
-		$row = mysql_fetch_assoc( $result );
-		$count = $row['thecount'];
-		if( $count > 3 ) {
-			mail( "ray@sneakymeans.com", "[" . $_SERVER["REMOTE_ADDR"] . "] - $count FAILED LOGIN ATTEMPTS TODAY!!! ", requestDetail(), "From: offensive@themaxx.com (this might be offensive)\r\nPriority: urgent" );
-			$login_message = '<a href="./pwreset.php">forgot your password?</a>';
-		}	
-
+	$success = login($_REQUEST['username'], $_REQUEST['password']);
+	if($success === true) {
+		header( "Location: " . $redirect );
+		exit;
 	}
 	
-	function requestDetail() {
-		ob_start();
-		echo "Username on this attempt: " . $_REQUEST['username'] . "
-
-";
-		var_dump( $_SERVER );
-		var_dump( $_REQUEST );		
-		$string = ob_get_contents();
-		ob_end_clean();
-		return $string;
-	}
-
-
-	function loginFromCookie( $cookieValue ) {
-		
-		global $salt;
-	
-		$uid = id_from_hash( $cookieValue );
-		
-		if( is_numeric( $uid ) ) {
-
-			$link = openDbConnection();
-			$sql = "SELECT * from users where userid=$uid LIMIT 1";
-			$result = tmbo_query( $sql );
-			if( mysql_num_rows( $result ) == 1 ) {
-				$row = mysql_fetch_assoc( $result );
-				$cookiehash = tmbohash( $row['userid'], $row['username'] . $_SERVER['REMOTE_ADDR'] . $salt );
-				if( $cookiehash == $cookieValue ) {
-					$sql = "SELECT userid, username, account_status FROM users WHERE userid=$uid";
-					$result = tmbo_query( $sql );
-					return loginFromQueryResult( $result );
-				}
-			}
-			
-		}
-	
-	}
-
-	function loginFromQueryResult( $result ) {
-
-		global $login_message;
-
-		if( mysql_num_rows($result) > 0 ) {		
-			$row = mysql_fetch_assoc( $result );
-			$status = $row['account_status'];
-			$uid = $row['userid'];
-
-			if( is_numeric( $uid ) ) {
-				$sql = "UPDATE users SET last_login_ip='" . $_SERVER['REMOTE_ADDR'] . "', timestamp=now() WHERE userid=$uid LIMIT 1";
-				tmbo_query( $sql );
-			}
-
-			if( $status == 'normal' || $status == 'admin' ) {
-				$_SESSION['userid'] = $row['userid'];
-				$_SESSION['status'] = $status;
-				$_SESSION['username'] = $row['username'];
-				$prefs = getPreferences( $row['userid'] );
-				$_SESSION['prefs'] = $prefs;
-				logIp( $row['userid'] );
-				return true;
-			}
-			else if( $status == 'locked' ) {
-				$login_message = "<b>That account is locked.</b>";
-			} else if( $status == 'awaiting activation' ) {
-				$login_message = "<b>That account is awaiting activation.</b>";
-			}
-		}
-		else {
-			session_unset();
-		}
-	
-	}
-
-	function logIn( $name, $pw ) {
-		
-		// values defined in mysqlConnectionInfo.inc
-		global $db_url, $db_user, $db_pw;
-
-		$link = openDbConnection();
-		
-		$ip = $_SERVER['REMOTE_ADDR'];
-		$sql = "SELECT count( id ) as numFailed from failed_logins WHERE ip='$ip' AND timestamp > date_sub( now(), interval 30 minute )";
-		$result = tmbo_query( $sql );
-	
-		$row = @mysql_fetch_assoc( $result );
-		
-		if( $row['numFailed'] > 5 ) {
-			echo "give it a rest.";
-			exit;
-		}
-
-        $encrypted_pw = sha1( $pw );
-		
-		$query = "SELECT userid, username, account_status FROM users WHERE username = '" . sqlEscape($name) . "' AND password = '" . $encrypted_pw . "'";
-
-		$result = tmbo_query($query);
-	
-		return loginFromQueryResult( $result );
-
+	// login attempt was ignored on purpose, and included a password
+	if($success === null && array_key_exists('password', $_REQUEST)) {
+		$prompt = false;
 	}
 
 ?>
@@ -204,8 +54,6 @@
 		<tr>
 			<td valign="center" height="100%" align="center">
 	
-				<p>if you haven't <a href="pwreset.php">reset your password</a> yet, you won't be able to log in.</p>
-				<p>still having trouble logging in?  try nuking cookies for <?= $_SERVER['SERVER_NAME'] ?></p>
 				<p>
 
 				<span class="small">
@@ -213,25 +61,27 @@
 
 						<table>
 							<tr>
-								<td colspan="2"><?php echo $login_message ?></td>
+								<td colspan="2"><p><?php echo $login_message ?></p></td>
 							</tr>
+							<? if($prompt) { ?>
 							<tr>
-								<td class="label">user name:</td>
+								<td class="label"><p>user name:</p></td>
 								<td><input type="text" name="username" size="12"/></td>
 							</tr>
 							<tr>
-								<td class="label">password:</td>
+								<td class="label"><p>password:</p></td>
 								<td><input type="password" name="password" size="12"/></td>
 							</tr>
 							<tr>
 								<td class="label"></td>
-								<td><input type="checkbox" name="rememberme" id="rememberme" value="1"><label for="rememberme">remember me</label><br/></td>
+								<td><p><input type="checkbox" name="rememberme" id="rememberme" value="1"><label for="rememberme">remember me</label></p></td>
 							</tr>
 							<tr>
 								<td colspan="2" class="submitcell">
 									<input type="submit" class="button" value="log in"/>
 								</td>
 							</tr>
+							<? } ?>
 						</table>
 						<input type="hidden" name="redirect" value="<? echo array_key_exists("redirect", $_REQUEST) ? $_REQUEST['redirect'] : "./" ?>" />
 					</form>

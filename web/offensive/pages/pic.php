@@ -66,10 +66,12 @@
 		$day = date( "d", $time );
 		$timestamp = date( "Y-m-d h:i:s a", strtotime( $row['timestamp'] ) );
 		$type = $row['type'];
-
 	}
 
 	function fileNav( $nextid, $previousid, $uploader_id, $uploader_name, $type ) {
+		$nextname = htmlFilename($nextid);
+		$prevname = htmlFilename($previousid);
+		
 		if($type == 'avatar') {?>
 			<a href="../" id="next" style="visibility:hidden">newer</a> . <a id="index" href="/offensive/">index</a> . <a id="previous" href="../" style="visibility:hidden">older</a>
 		<?
@@ -77,14 +79,14 @@
 		}
 		if( isset( $nextid ) ) {
 		 ?>
-			<a id="next" href="<? echo $_SERVER['PHP_SELF']?>?id=<?= $nextid ?>">newer</a>
+			<a id="next" href="<? echo $_SERVER['PHP_SELF']?>?id=<?= $nextid ?>" title="<?= $nextname ?>">newer</a>
 		<? } 
 		else {
 			?><a href="../" id="next" style="visibility:hidden">newer</a>
 		<? } ?>
 		 . <a id="index" href="/offensive/">index</a> .
 		<? if( isset( $previousid ) ) { ?>
-			<a id="previous" href="<? echo $_SERVER['PHP_SELF']?>?id=<?= $previousid ?>">older</a>
+			<a id="previous" href="<? echo $_SERVER['PHP_SELF']?>?id=<?= $previousid ?>" title="<?= $prevname ?>">older</a>
 		<? } else { ?>
 			<a id="previous" href="../" style="visibility:hidden">older</a>
 		<?}

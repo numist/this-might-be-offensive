@@ -219,4 +219,56 @@ function box($message, $title="hmm:") {
 	<?
 }
 
+/* $id can be:
+ *  * numeric fileid (causes a round-trip to the database)
+ *  * array(filename, nsfw, tmbo, type) (numerically indexed)
+ *  * array containing keys filename, nsfw, tmbo, type (like a row from the db)
+ */
+function htmlFilename($id, $showtype=false) {
+	if(!is_numeric($id) && !is_array($id)) {
+		trigger_error("htmlFilename: ".var_info($id)." is not a number nor array!", E_USER_WARNING);
+		return false;
+	} else if (is_array($id)) {
+		if(isset($id[0])) {
+			list($filename, $nsfw, $tmbo, $type) = $id;
+		} else if(array_key_exists('filename', $id) && 
+				array_key_exists('nsfw', $id) && 
+				array_key_exists('tmbo', $id) && 
+				array_key_exists('type', $id)) {
+			$filename = $id['filename'];
+			$nsfw = (int)$id['nsfw'];
+			$tmbo = (int)$id['tmbo'];
+			$type = $id['type'];
+		} else {
+			var_dump($id);
+			trigger_error("could not make heads or tails of array", E_USER_ERROR);
+		}
+	} else {
+		$sql = "SELECT filename, nsfw, tmbo, type FROM offensive_uploads WHERE id = $id";
+		$result = tmbo_query($sql);
+		if(mysql_num_rows($result) === 0) {
+			return false;
+		}
+		list($filename, $nsfw, $tmbo, $type) = mysql_fetch_array($result);
+	}
+	$tags = "";
+	if($tmbo != 0) {
+		$tags = "[tmbo]$tags";
+	}
+	if($nsfw != 0) {
+		$tags = "[nsfw]$tags";
+	}
+	if($showtype) {
+		$tags = "$type: $tags";
+	}
+	
+	$filename = strlen($tags) > 0 ? "$tags $filename" : $filename;
+	
+	return $filename;
+}
+
+function truncate($str) {
+	return strlen($str) > 70 ? substr($str, 0, 67)."..." : $str;
+}
+
 ?>

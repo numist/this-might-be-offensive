@@ -26,6 +26,14 @@ if(false !== strpos(get_include_path(), PATH_SEPARATOR)) {
 	              get_include_path().")", E_USER_ERROR);
 }
 
+function var_info($var) {
+	ob_start();
+	var_dump($var);
+	$str=ob_get_contents();
+	ob_end_clean();
+	return $str;
+}
+
 function tmbo_error_handler($errno, $errstr, $errfile, $errline, $errcontext) {
         $errortype = array (
                 E_ERROR              => 'Error',
@@ -60,10 +68,15 @@ function tmbo_error_handler($errno, $errstr, $errfile, $errline, $errcontext) {
         // handle fatal errors by sending users to kaboom, don't bug admins
         if($errno & (E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR)) {
                 if(!array_key_exists("status", $_SESSION) ||
-                   $_SESSION['status'] != "admin") {
-		   	ob_end_clean();
-                        header("Location: /offensive/index.outoforder.php");
-		}
+				   $_SESSION['status'] != "admin") {
+					ob_end_clean();
+					header("Location: /offensive/index.outoforder.php");
+				} else if (array_key_exists("status", $_SESSION) &&
+					       $_SESSION['status'] == "admin") {
+					global $queries;
+					echo "$queries queries\n";
+					var_dump(debug_backtrace());
+				}
                 exit;
         }
 }
@@ -132,28 +145,80 @@ function tmbo_query($sql, $timeout=2) {
 
 /* accurate timekeeping */
 function record_hit() {
-	if(array_key_exists("userid", $_SESSION)) {
-		global $link;
-	
-		if(!isset($link) || !$link) {
-			require_once("admin/mysqlConnectionInfo.inc");
-			$link = openDbConnection();
-		}
-		
+	if(loggedin()) {
 		tmbo_query("UPDATE users SET timestamp=now() WHERE userid=".$_SESSION['userid']." LIMIT 1");
 	}
 }
 
-function mustLogIn() {
-	if(array_key_exists("userid", $_SESSION) && is_numeric($_SESSION['userid'])) {
+function loggedin($lite=true) {
+	if(!array_key_exists('userid', $_SESSION) || !is_numeric($_SESSION['userid'])) return false;
+	
+	/* lite checks do not make a round trip to the database.  this is good enough for code
+	 * sanity checks, but not good enough for authorization checks that may want to check
+	 * the user's status against the server.
+	 * for instance, in the event a user gets banned, the lite sanity check will pass (code
+	 * is ok to execute -- it will not break), but a heavy check will notice that the user
+	 * has been banned and fail (user is not ok to continue -- user has been banned)
+	 */
+	if($lite) {
+		return true;
+	}
+	
+	if(array_key_exists('level', $_SESSION) && $_SESSION['level'] == "weak") return false;
+	
+	$result = tmbo_query("SELECT * FROM users WHERE userid = ".$_SESSION['userid']);
+	if(mysql_num_rows($result) == 0) return false;
+	$row = mysql_fetch_assoc($result);
+	
+	if($row['account_status'] == 'locked' || $row['account_status'] == 'awaiting activation') return false;
+	
+	if(!$lite) {
+		if($_SESSION['username'] != $row['username']) $_SESSION['username'] = $row['username'];
+		if($_SESSION['status'] != $row['account_status']) $_SESSION['status'] = $row['account_status'];
+	}
+	
+	return true;
+}
+
+/* 
+ * this function ONLY returns if the user is logged in.  
+ * if the user is not logged in (or fails to authenticate, in the case of HTTP
+ * auth), mustLogIn will exit the script.
+ */
+function mustLogIn($type="logn") {
+	// login checks are authorization checks, so a heavy loggedin() request is required.
+	if(loggedin(false)) {
 		return;
 	}
 
-	session_unset();
-
 	ob_end_clean();
-	header("Location: /offensive/logn.php?redirect=".urlencode($_SERVER['REQUEST_URI']));
-	exit;
+	if($type == "logn") {
+		session_unset();
+		$redirect = (isset($_REQUEST['redirect']) ? $_REQUEST['redirect'] : urlencode($_SERVER['REQUEST_URI']));
+		header("Location: /offensive/logn.php?redirect=".$redirect);
+		exit;
+	} else if($type == "http") {
+		if (isset($_SERVER['PHP_AUTH_USER'])) {
+			require_once('offensive/assets/logn.inc');
+			global $login_message;
+			
+			if(login($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']) === true) return;
+
+			header('HTTP/1.0 401 Unauthorized');
+	    	echo $login_message;
+			exit;
+		}
+		// logout business, 403.
+		session_unset();
+		header('WWW-Authenticate: Basic realm="[this might be offensive]"');
+	    header('HTTP/1.0 401 Unauthorized');
+	    echo 'anon is not welcome here.';
+	    exit;
+	} else {
+		$redirect = (isset($_REQUEST['redirect']) ? $_REQUEST['redirect'] : urlencode($_SERVER['REQUEST_URI']));
+		header("Location: /offensive/logn.php?redirect=".$redirect);
+		exit;
+	}
 }
 
 function byte_format($size, $digits=0) {	
