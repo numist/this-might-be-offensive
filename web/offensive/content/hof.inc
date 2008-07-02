@@ -50,9 +50,9 @@
 		$count = 0;
 
 		while( $row = mysql_fetch_assoc( $result ) ) {
-			$css = $css == "evenfile" ? "oddfile" : "evenfile";
+			$css = strpos($css, "even") !== false ? "oddfile odd_row" : "evenfile even_row";
 			if( $row['userid'] == $_SESSION['userid'] ) {
-				$css = "odd_row";
+				$css = "my_hof ".(strpos($css, "even") !== false ? "even_row" : "odd_row");
 			}
 			if($view=="today") $timeSince=hoursSince($row['timestamp']);
 			if($view=="hof") $timeSince = weeksSince($row['timestamp']);
@@ -60,7 +60,7 @@
 ?>
 			<tr class="<? echo $cssw ?>">
 				<td style="text-align:right"><? echo ++$count ?>.</td>
-				<td><a class="<? echo $cssw ?>" href="pages/pic.php?id=<?= $row['fileid'] ?>"><? echo htmlFilename($row)
+				<td><a class="<? echo $cssw ?>" href="pages/pic.php?id=<?= $row['fileid'] ?>" style="white-space: nowrap; width:312px; overflow:hidden; display:block;"><? echo htmlFilename($row)
 			    ?></a></td>
 				<td><a class="<? echo $cssw ?>" href="./?c=user&userid=<? echo $row['userid'] ?>"><? echo htmlEscape($row['username']) ?></a></td>
 				<td><a class="<? echo $cssw ?>" href="./?c=comments&fileid=<?= $row['fileid'] ?>"><?= $row['comments'] ?></a></td>

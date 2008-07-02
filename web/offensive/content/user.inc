@@ -203,7 +203,7 @@
 						
 							<tr>
 								<td valign="top">
-								
+<div style="padding:8px;">								
 <table style="width:100%">
 									
 <?php
@@ -230,12 +230,13 @@
 
 	while( $row = mysql_fetch_assoc( $result ) ) {
 		$id = $row['fileid'];
-		$class = ($class == 'evenfile') ? 'oddfile' : 'evenfile';
-		emitFileRow( $class, $row );
+		$css = isset($css) && strpos($css, "even") !== false ? "oddfile odd_row" : "evenfile even_row";
+		emitFileRow( $css, $row );
 	}
 
 ?>
 </table>
+</div>
 
 								</td>
 							</tr>
@@ -253,6 +254,7 @@ function emitFileRow( $css, $row ) {
 	$offensive = $row['tmbo'];
 	$nsfw = $row['nsfw'];
 	$timestamp = $row['uploadtime'];
+	$type = $row['type'];
 ?>
 	<tr>
 		<td style="width:100%" class="<?php echo $css?>"><div class="clipper"><a href="<?
@@ -260,7 +262,7 @@ function emitFileRow( $css, $row ) {
 			echo "pages/pic.php?id=$id";
 		else
 			echo "/offensive/?c=comments&fileid=$id";
-		?>" class="<?php echo $css?>"><?= truncate(htmlFilename($row, true)) ?></div></td>
+		?>" class="<?php echo $css?>" style="white-space: nowrap; width:312px; overflow:hidden; display:block;"><?= htmlFilename($row, true) ?></div></td>
 		<td class="<?php echo $css?>" style="text-align:right;white-space:nowrap;width:100%"><a href="./?c=comments&fileid=<?php echo $id ?>" class="<?php echo $css?>"><?=
 			commentLabel($comments, $good, $bad, $offensive, !($type == 'topic'));
 		?></a></td>
@@ -288,9 +290,9 @@ function recentComments( $uid ) {
 <?
 
 	while( $row = mysql_fetch_assoc( $result ) ) {
-		$css = isset($css) && $css == "evenfile" ? "oddfile" : "evenfile";
+		$css = isset($css) && strpos($css, "even") !== false ? "oddfile odd_row" : "evenfile even_row";
 ?>
-		<div><a class="<?= $css ?>" href="?c=comments&fileid=<?= $row['id'] ?>#<?= $row['commentid'] ?>"><?= htmlFilename($row) ?></a></div>
+		<div><a class="<?= $css ?>" href="?c=comments&fileid=<?= $row['id'] ?>#<?= $row['commentid'] ?>" style="white-space: nowrap; width:540px; overflow:hidden; display:block;"><?= htmlFilename($row) ?></a></div>
 <?
 	}
 ?>

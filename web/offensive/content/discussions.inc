@@ -71,7 +71,7 @@
 
 			?>
 				<tr class="<?= $css ?>">
-					<td><a href="./?c=comments&fileid=<?= $row['fileid'] ?>"><?= $filename ?></a></td>
+					<td><a href="./?c=comments&fileid=<?= $row['fileid'] ?>" style="white-space: nowrap; width:340px; overflow:hidden; display:block;"><?= $filename ?></a></td>
 					<td style="text-align:right"><a href="./?c=comments&fileid=<?= $row['fileid'] ?>">(<?=
 						commentLabel($row['comments'], 0, 0, 0, false);
 						?>)</a></td>

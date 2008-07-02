@@ -82,7 +82,7 @@
 
 				<div style="text-align:center">
 					<div class="label">about:
-					<input type="text" name="topic" size="50" maxlength="50"/>
+					<input type="text" name="topic" size="50" />
 					<input type="hidden" name="c" value="newtopic"/>					
 					</div>
 					<textarea name="comment" style="width:80%;height:150px;"></textarea>

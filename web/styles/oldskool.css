@@ -144,6 +144,10 @@ table.thumbnails td {
 	background: #ccccff;
 }
 
+.my_hof {
+	background: #aaaadd;
+}
+
 .weeks_0, .weeks_1, .weeks_2 {
 	color:#660000;
 }

@@ -291,8 +291,7 @@
 ?>	
 
 
-		<div class="heading">
-<?
+		<div class="heading"><?
     // changeblog special header
 	if($_REQUEST['fileid'] == "211604") {
 		echo htmlFilename($row); 
@@ -317,9 +316,7 @@
 		?></a><br/><span style="color:#666699">uploaded by <a href="./?c=user&userid=<?echo $uploaderid ?>" style="color:#666699"><?php echo $uploader?></a></span><br/>
 <?
 	}	
-?>
-			
-		</div>
+?></div>
 	
 <?
 		global $activeTab;

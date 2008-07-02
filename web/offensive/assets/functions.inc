@@ -267,8 +267,4 @@ function htmlFilename($id, $showtype=false) {
 	return $filename;
 }
 
-function truncate($str) {
-	return strlen($str) > 70 ? substr($str, 0, 67)."..." : $str;
-}
-
 ?>
