@@ -408,9 +408,11 @@
 				}
 				?>
 				
-				&raquo; <a href="./?c=user&userid=<?= $row['userid'] ?>"><?= $username ?></a>
+				<div class="username">&raquo; <a href="./?c=user&userid=<?= $row['userid'] ?>"><?= $username ?></a></div>
 				
 				<div class="timestamp"><a href="#<?= $row['commentid'] ?>"><?= $row['comment_timestamp'] ?></a></div>
+				
+				<br />
 				<?
 							
 				if( $row['vote'] ) {

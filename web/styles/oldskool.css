@@ -192,6 +192,10 @@ table.thumbnails td a {
 	text-decoration:none;
 }
 
+.username {
+	float:left;
+}
+
 .clipper {
 	white-space:nowrap;
 	overflow:hidden;
