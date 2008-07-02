@@ -69,23 +69,23 @@
 	}
 
 	function fileNav( $nextid, $previousid, $uploader_id, $uploader_name, $type ) {
-		$nextname = htmlFilename($nextid);
-		$prevname = htmlFilename($previousid);
-		
 		if($type == 'avatar') {?>
 			<a href="../" id="next" style="visibility:hidden">newer</a> . <a id="index" href="/offensive/">index</a> . <a id="previous" href="../" style="visibility:hidden">older</a>
 		<?
 			return;
 		}
 		if( isset( $nextid ) ) {
-		 ?>
+			$nextname = htmlFilename($nextid);
+		 	?>
 			<a id="next" href="<? echo $_SERVER['PHP_SELF']?>?id=<?= $nextid ?>" title="<?= $nextname ?>">newer</a>
 		<? } 
 		else {
 			?><a href="../" id="next" style="visibility:hidden">newer</a>
 		<? } ?>
 		 . <a id="index" href="/offensive/">index</a> .
-		<? if( isset( $previousid ) ) { ?>
+		<? if( isset( $previousid ) ) { 
+			$prevname = htmlFilename($previousid);
+			?>
 			<a id="previous" href="<? echo $_SERVER['PHP_SELF']?>?id=<?= $previousid ?>" title="<?= $prevname ?>">older</a>
 		<? } else { ?>
 			<a id="previous" href="../" style="visibility:hidden">older</a>
