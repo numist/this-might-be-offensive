@@ -2,6 +2,8 @@
 	set_include_path("../..");
 	require_once("offensive/assets/header.inc");
 	require_once("offensive/assets/functions.inc");
+	require_once( 'admin/mysqlConnectionInfo.inc' );
+	if(!isset($link) || !$link) $link = openDbConnection();
 
 	mustLogIn();
 
@@ -18,8 +20,6 @@
 		setcookie( $cookiename, "$id", time()+3600 * 24 * 365, "/offensive/" );
 	}
 
-	require_once( 'admin/mysqlConnectionInfo.inc' );
-	if(!isset($link) || !$link) $link = openDbConnection();
 	require_once('offensive/assets/getPrefs.inc');
 	require_once('offensive/assets/functions.inc');
 	

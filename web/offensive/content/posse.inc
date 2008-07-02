@@ -2,6 +2,8 @@
 
 	require_once( 'offensive/assets/tabs.inc' );	
 	require_once( 'offensive/assets/getPrefs.inc' );	
+	require_once( 'admin/mysqlConnectionInfo.inc' );
+	if(!isset($link) || !$link) $link = openDbConnection();
 
 	function start() {
 		mustLogIn();
@@ -12,14 +14,8 @@
 	}
 	
 	function body() {
-		global $link;
-
 		$usrid = $_REQUEST['userid'];
 
-		// Include, and check we've got a connection to the database.
-		require_once( '../admin/mysqlConnectionInfo.inc' );
-		if(!isset($link) || !$link) $link = openDbConnection();
-				
 		$sql = "SELECT username
 					FROM users WHERE userid={$usrid}";
 		$result = tmbo_query( $sql );

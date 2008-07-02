@@ -1,4 +1,7 @@
 <?
+require_once( 'admin/mysqlConnectionInfo.inc' );
+if(!isset($link) || !$link) $link = openDbConnection();
+
 function start() {
 	mustLogIn();
 }

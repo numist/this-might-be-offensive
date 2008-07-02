@@ -1,6 +1,9 @@
 <?
 
 	require_once( 'offensive/assets/tabs.inc' );
+	require_once( 'admin/mysqlConnectionInfo.inc' );
+	if(!isset($link) || !$link) $link = openDbConnection();
+	
 
 	function start() {
 		mustLogIn();
@@ -37,9 +40,6 @@
 	}
 
 	function body() {
-		global $link;
-	
-	
 ?>
 		<div class="heading">we are duh world.</div>
 		<? tabs(); ?>
@@ -58,10 +58,6 @@
 	
 		$usrid = $_SESSION['userid'];
 
-		// Include, and check we've got a connection to the database.
-		include_once( 'admin/mysqlConnectionInfo.inc' );
-		if(!isset($link) || !$link) $link = openDbConnection();
-		
 		$sql = "select *, count( maxxer_locations.id ) from maxxer_locations, users
 				where users.userid=maxxer_locations.userid
 				group by users.userid

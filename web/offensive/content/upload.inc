@@ -5,6 +5,9 @@
 	require_once( "offensive/assets/functions.inc" );
 // XXX: the reliance on getid3 needs to be removed, the library has a lot of warnings
 	require_once( "offensive/getid3/getid3.php");
+	require_once( 'admin/mysqlConnectionInfo.inc' );
+	if(!isset($link) || !$link) $link = openDbConnection();
+	
 
 	$tmpdir = "quarantine";
 
@@ -73,11 +76,7 @@
 		return ($limit - $used ) > 0 ? ($limit - $used ) : 0;
 	}
 
-	function numUploadsToday( $uid ) {
-		global $link;
-
-		if(!isset($link) || !$link) $link = openDbConnection();
-	
+	function numUploadsToday( $uid ) {	
 		$sql = "SELECT count( id ) as thecount FROM offensive_uploads WHERE userid = " . $_SESSION['userid'] . " AND timestamp > DATE_SUB( NOW(), INTERVAL 1 DAY ) AND type='image'";
 		$result = tmbo_query( $sql );
 
@@ -88,14 +87,11 @@
 	}
 
 	function numAllowedUploads( $uid ) {
-		global $link;
 	
 		// Fipi Lele is allowed (effectively) unlimited uploads.
 		if($_SESSION['userid'] == 143) {
 			return 9999;
 		}
-	
-		if(!isset($link) || !$link) $link = openDbConnection();
 
 		$sql = "SELECT count( vote ) AS thecount, vote
 					FROM offensive_comments, offensive_uploads
@@ -155,8 +151,6 @@
 	}
 	
 	function updateStatus( $fileid, $newstatus ) {
-		global $link;
-		if(!isset($link) || !$link) $link = openDbConnection();
 		$sql = "update offensive_uploads set status='$newstatus' where id=$fileid limit 1";
 		tmbo_query( $sql );
 	}

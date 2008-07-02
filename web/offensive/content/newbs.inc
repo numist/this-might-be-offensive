@@ -1,6 +1,6 @@
 <?
 	// Include, and check we've got a connection to the database.
-	include_once( 'admin/mysqlConnectionInfo.inc' );
+	require_once( 'admin/mysqlConnectionInfo.inc' );
 	if(!isset($link) || !$link) $link = openDbConnection();
 
 	require_once( 'offensive/assets/tabs.inc' );

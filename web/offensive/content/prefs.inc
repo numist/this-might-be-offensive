@@ -1,5 +1,9 @@
 ﻿<?
 
+require_once( 'admin/mysqlConnectionInfo.inc' );
+if(!isset($link) || !$link) $link = openDbConnection();
+
+
 	function start() {
 		mustLogIn();
 	}
@@ -79,10 +83,6 @@
 		
 		$sql = "SELECT * FROM preference_names_values WHERE value like '%_KEY' ORDER BY id";
 		
-		// Include, and check we've got a connection to the database.
-		include_once( 'admin/mysqlConnectionInfo.inc' );
-		if(!isset($link) || !$link) $link = openDbConnection();
-
 		$result = tmbo_query( $sql );
 		while( $row = mysql_fetch_assoc( $result ) ) {
 			?>

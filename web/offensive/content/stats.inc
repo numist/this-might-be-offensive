@@ -10,10 +10,6 @@
 	}
 
 	function body() {
-		global $link;
-
-		if(!isset($link) || !$link) $link = openDbConnection();
-	
 		global $timestamp;
 ?>
 

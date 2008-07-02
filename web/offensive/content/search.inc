@@ -12,14 +12,11 @@
 	
 
 	function doSearch( $find ) {
-		global $link;
-		
 		$numPerPage = 100;
 		$page = isset($_REQUEST['p']) && is_numeric($_REQUEST['p']) ?
 			    $_REQUEST['p'] : 0;
 		$start = $page * $numPerPage;
 
-		if(!isset($link) || !$link) $link = openDbConnection();
 		$sql = "SELECT *, offensive_comments.timestamp AS comment_timestamp, offensive_comments.id as commentid
 					FROM offensive_comments, offensive_uploads, users
 					WHERE MATCH(comment) AGAINST('".sqlEscape($find)."' IN BOOLEAN MODE)

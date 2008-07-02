@@ -1,12 +1,11 @@
 <?
 	set_include_path("..");
 	require_once("offensive/assets/header.inc");
-
-	mustLogIn();
-
 	// Include, and check we've got a connection to the database.
 	require_once( 'admin/mysqlConnectionInfo.inc' );
 	if(!isset($link) || !$link) $link = openDbConnection();
+
+	mustLogIn();
 
 	$uid = array_key_exists("userid", $_SESSION) ? $_SESSION['userid'] : "";
 	$fileid = array_key_exists("fileid", $_REQUEST) ? $_REQUEST['fileid'] : "";
@@ -29,13 +28,11 @@
 		$sql = "SELECT * FROM offensive_subscriptions WHERE userid = $uid AND fileid = $fid";
 		if(mysql_num_rows(tmbo_query($sql)) > 0) return;
 
-		$link = openDbConnection();
 		$sql = "insert into offensive_subscriptions (userid, fileid) values ( $uid, $fid )";
 		tmbo_query( $sql );
 	}
 
 	function unsubscribe( $uid, $fid ) {
-		$link = openDbConnection();
 		$sql = "delete from offensive_subscriptions where userid=$uid and fileid=$fid";
 		tmbo_query( $sql );
 	}

@@ -1,6 +1,9 @@
 <?
 set_include_path("../..");
 require_once("offensive/assets/header.inc");
+require_once( 'admin/mysqlConnectionInfo.inc' );
+if(!isset($link) || !$link) $link = openDbConnection();
+
 mustLogIn();
 ?>
 <html>

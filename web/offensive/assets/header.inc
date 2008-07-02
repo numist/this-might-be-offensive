@@ -186,6 +186,10 @@ function loggedin($lite=true) {
  * auth), mustLogIn will exit the script.
  */
 function mustLogIn($type="logn") {
+	global $link;
+	require_once('admin/mysqlConnectionInfo.inc');
+	if(!isset($link) || !$link) $link = openDbConnection();
+	
 	// login checks are authorization checks, so a heavy loggedin() request is required.
 	if(loggedin(false)) {
 		return;

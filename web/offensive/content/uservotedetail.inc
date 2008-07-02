@@ -1,18 +1,16 @@
 <?
 
 	require_once( "offensive/assets/tabs.inc" );
+	require_once( 'admin/mysqlConnectionInfo.inc' );
+	if(!isset($link) || !$link) $link = openDbConnection();
+	
 
 	function start() {
 		mustLogIn();
 	}
 
 	function body() {
-		global $link;
 		$uid = $_REQUEST['userid'];
-	
-		// Include, and check we've got a connection to the database.
-		include_once( 'admin/mysqlConnectionInfo.inc' );
-		if(!isset($link) || !$link) $link = openDbConnection();
 
 		$sql = "SELECT count( c.id ) as thecount, u.username, c.vote 
 					FROM offensive_comments c, offensive_uploads up, users u

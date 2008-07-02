@@ -16,10 +16,7 @@
 	}
 
 	function body() {
-	
-	
 		$usrid = $_SESSION['userid'];
-		$link = openDbConnection();
 
 		$numPerPage = 100;
 		$page = isset($_REQUEST['p']) && is_numeric($_REQUEST['p']) ?
@@ -33,9 +30,6 @@
 				AND s.fileid=u.id
 			ORDER BY s.fileid DESC
 			LIMIT $start, $numPerPage";
-			
-			
-
 
 		$result = tmbo_query( $sql );
 ?>	

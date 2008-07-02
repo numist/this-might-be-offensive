@@ -91,7 +91,7 @@
 	}
 
 	function start() {
-		global $filename, $link, $expired;
+		global $filename, $expired;
 	
 		mustLogIn();
 
@@ -104,8 +104,6 @@
 		$fileid = $_REQUEST['fileid'];
 				
 		clearBookmarks( $usrid, $fileid );
-
-		if(!isset($link) || !$link) $link = openDbConnection();
 
 		$sql = "SELECT filename, nsfw, tmbo, timestamp, type FROM offensive_uploads WHERE id=$fileid";
 		$result = tmbo_query( $sql );
@@ -263,10 +261,8 @@
 	}
 
 	function body() {
-		global $link, $expired;
+		global $expired;
 	
-	if(!isset($link) || !$link) $link = openDbConnection();
-
 	$fid = $_REQUEST['fileid'];
 	$sql = "SELECT * FROM offensive_subscriptions
 		WHERE userid=" . $_SESSION['userid'] . " 

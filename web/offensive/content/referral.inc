@@ -8,12 +8,8 @@
 	require_once( 'offensive/assets/functions.inc' );
 
 	function start() {
-		global $link;
-
 		mustLogIn();
 
-		if(!isset($link) || !$link) $link = openDbConnection();
-		
 		if( array_key_exists("invite", $_REQUEST) &&
 		    isValidEmail( $_REQUEST['invite'] ) && 
 		    canInvite( $_SESSION['userid'] ) ) {
@@ -30,11 +26,8 @@
 	}
 
 	function canInvite( $uid ) {
-		global $link;
-		
 		$sql = "select (created < date_sub( now(), INTERVAL 1 MONTH )) as canInvite
 					FROM users where userid=$uid";
-		if(!isset($link) || !$link) $link = openDbConnection();
 		$result = tmbo_query( $sql );
 		$row = mysql_fetch_assoc( $result );
 

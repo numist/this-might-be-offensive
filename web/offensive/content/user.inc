@@ -3,6 +3,9 @@
 	require_once( 'offensive/assets/tabs.inc' );
 	require_once( 'offensive/assets/getPrefs.inc' );
 	require_once( 'offensive/assets/functions.inc' );
+	require_once( 'admin/mysqlConnectionInfo.inc' );
+	if(!isset($link) || !$link) $link = openDbConnection();
+	
 
 	function start() {
 		mustLogIn();
@@ -45,10 +48,6 @@
 		}
 
 		$usrid = $_REQUEST['userid'];
-
-		// Include, and check we've got a connection to the database.
-		require_once( 'admin/mysqlConnectionInfo.inc' );
-		if(!isset($link) || !$link) $link = openDbConnection();		
 		
 		$sql = "SELECT username, account_status, email, created,
 					(select username from users ref where users.referred_by=ref.userid) AS referredby,

@@ -12,8 +12,6 @@
 	}
 
 	function body() {
-		global $link;
-
 // XXX: _REQUEST['since'] gives a lower timestamp bound -- I forget why I wanted this...
 
 		$numPerPage = 100;
@@ -36,7 +34,6 @@
 					LIMIT $start, $numPerPage;
 				";
 
-		if(!isset($link) || !$link) $link = openDbConnection();
 		$result = tmbo_query($sql, 5);
 		
 		

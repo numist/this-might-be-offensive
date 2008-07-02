@@ -26,8 +26,6 @@
 	}
 
 	function addComment( $topicid, $comment, $uid ) {
-		global $link;
-		if(!isset($link) || !$link) $link = openDbConnection();
 		$sql = "insert into offensive_comments( userid, fileid, comment, user_ip )
 				values( $uid, $topicid, '".sqlEscape($comment)."', '" . $_SERVER['REMOTE_ADDR'] . "' )";
 		tmbo_query( $sql, $link );
@@ -43,9 +41,6 @@
 	}
 
 	function createTopic( $topic, $uid ) {
-		global $link;
-		
-		if(!isset($link) || !$link) $link = openDbConnection();
 		$sql = "insert into offensive_uploads ( userid, filename, ip, type )
 					VALUES ( $uid, '".sqlEscape($topic)."', '" . $_SERVER['REMOTE_ADDR'] . "', 'topic' )";
 					
@@ -58,9 +53,6 @@
 	}
 
 	function subscribe( $uid, $fileid ) {
-		global $link;
-		if(!isset($link) || !$link) $link = openDbConnection();
-		
 		$sql = "SELECT * FROM offensive_subscriptions WHERE userid = $uid AND fileid = $fileid";
 		if(mysql_num_rows(tmbo_query($sql)) > 0) return;
 
