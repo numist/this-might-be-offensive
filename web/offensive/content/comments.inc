@@ -400,9 +400,9 @@
 				}
 				
 				// see:  http://thismight.be/offensive/?c=comments&fileid=237653#274220091
-				if($username == "hork") {
-					$username = "H. Winthrop Nerdlington III";
-				}
+				// if($username == "hork") {
+				// 					$username = "H. Winthrop Nerdlington III";
+				// }
 				?>
 				
 				<div class="timestamp"><a href="#<?= $row['commentid'] ?>"><?= $row['comment_timestamp'] ?></a></div>

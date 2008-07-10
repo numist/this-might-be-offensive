@@ -85,21 +85,14 @@ $timelimit = 10;
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-	<title>
-	<?
+	<title><?
 		if( function_exists( 'title' ) ) {
 			echo title();
 		}
 		else {
 			echo "[ this might be offensive ]";
 		}
-	?>
-	</title>
-	<?
-		if(function_exists('head')) {
-			echo head();
-		}
-	?>
+	?></title>
 	<META NAME="ROBOTS" CONTENT="NOARCHIVE">
 	<link rel="icon" href="/favicon.ico" />
 	<link rel="shortcut icon" href="/favicon.ico" />

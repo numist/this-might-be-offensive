@@ -264,7 +264,7 @@ function htmlFilename($id, $showtype=false) {
 	
 	$filename = strlen($tags) > 0 ? "$tags $filename" : $filename;
 	
-	return $filename;
+	return htmlEscape($filename);
 }
 
 ?>
