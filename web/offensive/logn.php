@@ -24,11 +24,14 @@
 
 	$login_message = "";
 	$prompt = true;
-
-	$success = login($_REQUEST['username'], $_REQUEST['password']);
-	if($success === true) {
-		header( "Location: " . $redirect );
-		exit;
+	$success = false;
+	
+	if(array_key_exists('username', $_REQUEST) && strlen($_REQUEST['username']) > 0) { 
+		$success = login($_REQUEST['username'], $_REQUEST['password']);
+		if($success === true) {
+			header( "Location: " . $redirect );
+			exit;
+		}
 	}
 	
 	// login attempt was ignored on purpose, and included a password
