@@ -28,7 +28,7 @@
 
 ?>
 
-<table width="100%">
+<table width="100%" id="discussions">
 
 	<tr style="background:#bbbbee;text-align:center;">
 		<td><b><a href="./?c=discussions&order=up.timestamp">sort by thread creation date</a></b></td>
@@ -71,11 +71,11 @@
 
 			?>
 				<tr class="<?= $css ?>">
-					<td><a href="./?c=comments&fileid=<?= $row['fileid'] ?>" style="white-space: nowrap; width:340px; overflow:hidden; display:block;"><?= $filename ?></a></td>
-					<td style="text-align:right"><a href="./?c=comments&fileid=<?= $row['fileid'] ?>">(<?=
+					<td><div class="clipr"><a href="./?c=comments&fileid=<?= $row['fileid'] ?>"><?= $filename ?></a></div></td>
+					<td class="com_cnt"><a href="./?c=comments&fileid=<?= $row['fileid'] ?>">(<?=
 						commentLabel($row['comments'], 0, 0, 0, false);
 						?>)</a></td>
-					<td style="text-align:right"><?= $row['latest'] ?></td>
+					<td class="dater"><?= $row['latest'] ?></td>
 				</tr>
 			<?
 		}

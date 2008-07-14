@@ -202,6 +202,21 @@ table.thumbnails td a {
 	width:100%;
 }
 
+/* in the subject column on discussions page */
+#discussions .clipr {
+	float:left;
+	overflow:hidden;
+	white-space:nowrap;
+	width:340px;
+}
+
+/* date and timestamp columns on discussions page */
+#discussions .dater,
+#discussions .com_cnt {
+	text-align:right;
+	white-space:nowrap;
+}
+
 .adminControls {
 	background:#999999;
 	padding:1em;
