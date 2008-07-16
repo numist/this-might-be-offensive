@@ -196,7 +196,7 @@ function mustLogIn($type="logn") {
 		header("Location: /offensive/logn.php?redirect=".$redirect);
 		exit;
 	} else if($type == "http") {
-		if (isset($_SERVER['PHP_AUTH_USER'])) {
+		if (isset($_SERVER['PHP_AUTH_USER']) && strlen($_SERVER['PHP_AUTH_USER']) > 0) {
 			require_once('offensive/assets/logn.inc');
 			global $login_message;
 			

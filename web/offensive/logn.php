@@ -26,12 +26,11 @@
 	$prompt = true;
 	$success = false;
 	
-	if(array_key_exists('username', $_REQUEST) && strlen($_REQUEST['username']) > 0) { 
-		$success = login($_REQUEST['username'], $_REQUEST['password']);
-		if($success === true) {
-			header( "Location: " . $redirect );
-			exit;
-		}
+	$name = isset($_REQUEST['username']) ? $_REQUEST['username'] : null;
+	$pw = isset($_REQUEST['password']) ? $_REQUEST['password'] : null;
+	if(login($name, $pw)) {
+		header( "Location: " . $redirect );
+		exit;
 	}
 	
 	// login attempt was ignored on purpose, and included a password

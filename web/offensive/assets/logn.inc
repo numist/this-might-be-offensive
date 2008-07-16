@@ -71,35 +71,46 @@ function loginFromQueryResult( $result ) {
  *            (whether a login prompt should be shown)
  */
 function login( $name=null, $pw=null ) {
+	if(strlen($name) == 0) $name = null;
+	if(strlen($pw) == 0) $pw = null;
+	
 	global $login_message, $salt;
 	
 	// strict sanity check
 	if(loggedin(false)) return true;
-	
-	$ip = $_SERVER['REMOTE_ADDR'];
-	$sql = "SELECT count( id ) as numFailed from failed_logins WHERE ip='$ip' AND timestamp > date_sub( now(), interval 30 minute )";
-	$result = tmbo_query( $sql );
 
-	$row = @mysql_fetch_assoc( $result );
-	
-	if( $row['numFailed'] > 5 ) {
-		$login_message = "give it a rest.";
-		return null;
+	// extra braces for code collapsing for top-level logical blocks
+	// check to see if this person has had too many login attempts in the last 30 minutes already.
+	{
+		$ip = $_SERVER['REMOTE_ADDR'];
+		$sql = "SELECT count( id ) as numFailed from failed_logins WHERE ip='$ip' AND timestamp > date_sub( now(), interval 30 minute )";
+		$result = tmbo_query( $sql );
+
+		$row = @mysql_fetch_assoc( $result );
+
+		if( $row['numFailed'] > 5 ) {
+			$login_message = "give it a rest.";
+			return null;
+		}
 	}
 
-    $encrypted_pw = sha1( $pw );
-	$query = "SELECT userid, username, account_status FROM users WHERE username = '" . sqlEscape($name) . "' AND password = '" . $encrypted_pw . "'";
+	// attempt login using u/p, if available
+	if($name != null && $pw != null) {
+    	$encrypted_pw = sha1( $pw );
+		$query = "SELECT userid, username, account_status FROM users WHERE username = '" . sqlEscape($name) . "' AND password = '" . $encrypted_pw . "'";
 
-	$result = tmbo_query($query);
+		$result = tmbo_query($query);
 
-	if(mysql_num_rows($result) > 0 && loginFromQueryResult( $result ) === true) {
-		if(array_key_exists("rememberme", $_REQUEST) && $_REQUEST['rememberme'])
-			setcookie("remember", 
-			          tmbohash($_SESSION['userid'], 
-			                   $_SESSION['username'] . 
-			                   $_SERVER['REMOTE_ADDR'] . $salt ), 
-			                   time()+60*60*24*365*5, "/" );
-		return true;
+		// set rememberme cookie if the user requested it
+		if(mysql_num_rows($result) > 0 && loginFromQueryResult( $result ) === true) {
+			if(array_key_exists("rememberme", $_REQUEST) && $_REQUEST['rememberme'])
+				setcookie("remember", 
+				          tmbohash($_SESSION['userid'], 
+				                   $_SESSION['username'] . 
+				                   $_SERVER['REMOTE_ADDR'] . $salt ), 
+				                   time()+60*60*24*365*5, "/" );
+			return true;
+		}
 	}
 	
 	// log a failure if a username and password did not result in success
@@ -112,7 +123,7 @@ function login( $name=null, $pw=null ) {
 			$result = tmbo_query( $sql );
 			$row = mysql_fetch_assoc( $result );
 			$count = $row['thecount'];
-			if( $count > 3 ) {
+			if( $count > 3) {
 				ob_start();
 				echo "Username on this attempt: " . $_REQUEST['username'] . "\n\n";
 				var_dump( $_SERVER );
@@ -124,7 +135,7 @@ function login( $name=null, $pw=null ) {
 			}	
 	}
 	
-	// last chance -- log in using a cookie
+	// last chance -- log in using the user's cookie
 	if(isset($_COOKIE['remember'])) {
 		global $salt;
 
@@ -144,6 +155,7 @@ function login( $name=null, $pw=null ) {
 		}
 	}
 	
+	// if the login failed (as opposed to being snubbed) set a helpful message for the user
 	if($pw && strlen($login_message) == 0) {
 		$login_message = '<a href="/offensive/pwreset.php">tried resetting your password?</a>';
 	}
