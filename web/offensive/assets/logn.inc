@@ -123,7 +123,7 @@ function login( $name=null, $pw=null ) {
 			$result = tmbo_query( $sql );
 			$row = mysql_fetch_assoc( $result );
 			$count = $row['thecount'];
-			if( $count > 3) {
+			if( $count > 3 && isset( $_REQUEST['username'] ) && $_REQUEST['username'] != null && $_REQUEST['username'] != '') {
 				ob_start();
 				echo "Username on this attempt: " . $_REQUEST['username'] . "\n\n";
 				var_dump( $_SERVER );
