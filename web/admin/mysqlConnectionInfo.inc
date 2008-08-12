@@ -4,6 +4,7 @@
 // we'll grab the contents of the settings file, located in this directory and .config into an array
 if(!($config = parse_ini_file("admin/.config"))) {
 	trigger_error("No configuration file found", E_USER_ERROR);
+	exit;
 }
 
 // Set $link null
