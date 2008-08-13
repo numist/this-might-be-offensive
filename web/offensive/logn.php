@@ -4,7 +4,7 @@
 	require_once('offensive/assets/logn.inc');
 
 	if(!isset($_SERVER["HTTPS"]) || $_SERVER["HTTPS"] != "on") {
-		header("Location: https://".$_SERVER["SERVER_NAME"]."/offensive/pwreset.php", 301);
+		header("Location: https://".$_SERVER["SERVER_NAME"]."/offensive/logn.php", 301);
 		exit;
 	}
 

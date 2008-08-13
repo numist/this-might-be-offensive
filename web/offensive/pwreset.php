@@ -43,7 +43,7 @@
 			$code = hashFromUserRow( $row );
 			$message = "Someone (hopefully you) wants to reset your [this might be offensive] password. To reset your password, please visit the following link:
 
-http://".$_SERVER['SERVER_NAME']."/offensive/pwreset.php?x=$code
+https://".$_SERVER['SERVER_NAME']."/offensive/pwreset.php?x=$code
 
 			";
 			
