@@ -183,9 +183,15 @@ function loggedin($lite=true) {
  * if the user is not logged in (or fails to authenticate, in the case of HTTP
  * auth), mustLogIn will exit the script.
  */
+// logn.inc is needed for the call to login().
+require_once("offensive/assets/logn.inc");
 function mustLogIn($type="logn") {
 	// login checks are authorization checks, so a heavy loggedin() request is required.
 	if(loggedin(false)) {
+		return;
+	}
+	// check for rememberme cookie
+	if(login()) {
 		return;
 	}
 	
@@ -197,13 +203,10 @@ function mustLogIn($type="logn") {
 	$redirect = (isset($_REQUEST['redirect']) ? $_REQUEST['redirect'] : $server.urlencode($_SERVER['REQUEST_URI']));
 
 	ob_end_clean();
-	if($type == "logn") {
-		// XXX: we can check here if cookies are ok!
-		
-		session_unset();
-		header("Location: https://".$_SERVER["SERVER_NAME"]."/offensive/logn.php?redirect=".$redirect);
-		exit;
-	} else if($type == "http") {
+	
+	session_unset();
+	
+	if($type == "http") {
 		if (isset($_SERVER['PHP_AUTH_USER']) && strlen($_SERVER['PHP_AUTH_USER']) > 0) {
 			require_once('offensive/assets/logn.inc');
 			global $login_message;
@@ -215,7 +218,6 @@ function mustLogIn($type="logn") {
 			exit;
 		}
 		// logout business, 403.
-		session_unset();
 		header('WWW-Authenticate: Basic realm="[this might be offensive]"');
 	    header('HTTP/1.0 401 Unauthorized');
 	    echo 'anon is not welcome here.';

@@ -8,11 +8,6 @@
 	require_once( "offensive/assets/validationFunctions.inc" );
 	require_once( 'offensive/assets/functions.inc' );
 	
-	if(!isset($_SERVER["HTTPS"]) || $_SERVER["HTTPS"] != "on") {
-		header("Location: https://".$_SERVER["SERVER_NAME"]."/offensive/pwreset.php", 301);
-		exit;
-	}
-
 	if( isset($_REQUEST['x2']) ) {
 		$code = $_REQUEST['x2'];
 		$pw = $_REQUEST['password'];
@@ -167,13 +162,10 @@ https://".$_SERVER['SERVER_NAME']."/offensive/pwreset.php?x=$code
 						if( isset($_REQUEST['username']) ) {
 							sendResetEmail( $_REQUEST['username'] );
 						}
-						else {
-							if( isset( $_REQUEST['x'] ) && userRowFromCode( $_REQUEST['x'] ) ) {
-								emitResetForm( $_REQUEST['x'] );
-							}
-							else {
-								sendMessageForm( );
-							}
+						else if( isset( $_REQUEST['x'] ) && userRowFromCode( $_REQUEST['x'] ) ) {
+							emitResetForm( $_REQUEST['x'] );
+						} else {
+							sendMessageForm( );
 						}
 					?>
 					
