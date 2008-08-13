@@ -188,12 +188,20 @@ function mustLogIn($type="logn") {
 	if(loggedin(false)) {
 		return;
 	}
+	
+	if(!isset($_SERVER["HTTPS"]) || $_SERVER["HTTPS"] != "on") {
+		$server = "http://".$_SERVER["SERVER_NAME"];
+	} else {
+		$server = "https://".$_SERVER["SERVER_NAME"];
+	}
+	$redirect = (isset($_REQUEST['redirect']) ? $_REQUEST['redirect'] : $server.urlencode($_SERVER['REQUEST_URI']));
 
 	ob_end_clean();
 	if($type == "logn") {
+		// XXX: we can check here if cookies are ok!
+		
 		session_unset();
-		$redirect = (isset($_REQUEST['redirect']) ? $_REQUEST['redirect'] : urlencode($_SERVER['REQUEST_URI']));
-		header("Location: /offensive/logn.php?redirect=".$redirect);
+		header("Location: https://".$_SERVER["SERVER_NAME"]."/offensive/logn.php?redirect=".$redirect);
 		exit;
 	} else if($type == "http") {
 		if (isset($_SERVER['PHP_AUTH_USER']) && strlen($_SERVER['PHP_AUTH_USER']) > 0) {
@@ -213,8 +221,7 @@ function mustLogIn($type="logn") {
 	    echo 'anon is not welcome here.';
 	    exit;
 	} else {
-		$redirect = (isset($_REQUEST['redirect']) ? $_REQUEST['redirect'] : urlencode($_SERVER['REQUEST_URI']));
-		header("Location: /offensive/logn.php?redirect=".$redirect);
+		header("Location: https://".$_SERVER["SERVER_NAME"]."/offensive/logn.php?redirect=".$redirect);
 		exit;
 	}
 }

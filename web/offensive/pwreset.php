@@ -7,6 +7,11 @@
 	require_once( 'offensive/assets/activationFunctions.inc' );
 	require_once( "offensive/assets/validationFunctions.inc" );
 	require_once( 'offensive/assets/functions.inc' );
+	
+	if(!isset($_SERVER["HTTPS"]) || $_SERVER["HTTPS"] != "on") {
+		header("Location: https://".$_SERVER["SERVER_NAME"]."/offensive/pwreset.php", 301);
+		exit;
+	}
 
 	if( isset($_REQUEST['x2']) ) {
 		$code = $_REQUEST['x2'];

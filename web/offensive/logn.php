@@ -3,6 +3,11 @@
 	require_once('offensive/assets/header.inc');
 	require_once('offensive/assets/logn.inc');
 
+	if(!isset($_SERVER["HTTPS"]) || $_SERVER["HTTPS"] != "on") {
+		header("Location: https://".$_SERVER["SERVER_NAME"]."/offensive/pwreset.php", 301);
+		exit;
+	}
+
 	/* there is always a redirect. 
 	 * the user can specify the redirect in the _REQUEST['redirect'] variable.
 	 * the location of the redirect defaults to /offensive/?c=main
