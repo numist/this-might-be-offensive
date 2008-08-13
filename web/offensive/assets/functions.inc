@@ -5,7 +5,7 @@ function linkUrls( $input ) {
 	$p = "/(http[s]*:\/\/[w]*\.*)themaxx\.com/i";
 	$r = "\\1" . $_SERVER['SERVER_NAME'];
 	$domainSwapped = preg_replace( $p, $r, $input );
-	$pattern = "/(http[s]*:\/\/[^\s\)<>]+)/i";
+	$pattern = "/(http[s]*:\/\/[^\s<>]+)/i";
 	$replacement = "<a href=\"\\1\">\\1</a>";
 	return preg_replace( $pattern, $replacement, $domainSwapped );
 }
