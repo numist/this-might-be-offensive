@@ -94,7 +94,7 @@
 				}
 				break;
 			case "integer":
-				if(!is_numeric($method[$key]) || strpos($method[$key], ".") !== false)) {
+				if(!is_numeric($method[$key]) || strpos($method[$key], ".") !== false) {
 					$errors[] = "parameter '$key' must be of type $type.";
 					return false;
 				}					
@@ -851,7 +851,7 @@
 				send(true);
 			}
 			$sql = "SELECT * FROM offensive_uploads WHERE id = $threadid";
-			if(mysql_num_rows(tmbo_query($sql) == 0) {
+			if(mysql_num_rows(tmbo_query($sql)) == 0) {
 				send(false);
 			}
 
