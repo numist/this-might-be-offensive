@@ -31,7 +31,7 @@
 			<td valign="center" height="100%" align="center">
 	
 				<p>[ out of order ]</p>
-				<p>don't fret, someone's on it.</p>
+				<p>someone's under the hood, don't worry about it.</p>
 	
 			</td>
 		</tr>

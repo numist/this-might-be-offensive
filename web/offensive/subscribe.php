@@ -28,12 +28,12 @@
 		$sql = "SELECT * FROM offensive_subscriptions WHERE userid = $uid AND fileid = $fid";
 		if(mysql_num_rows(tmbo_query($sql)) > 0) return;
 
-		$sql = "insert into offensive_subscriptions (userid, fileid) values ( $uid, $fid )";
+		$sql = "INSERT INTO offensive_subscriptions (userid, fileid) VALUES ( $uid, $fid )";
 		tmbo_query( $sql );
 	}
 
 	function unsubscribe( $uid, $fid ) {
-		$sql = "delete from offensive_subscriptions where userid=$uid and fileid=$fid";
+		$sql = "DELETE FROM offensive_subscriptions WHERE userid=$uid AND fileid=$fid";
 		tmbo_query( $sql );
 	}
 
