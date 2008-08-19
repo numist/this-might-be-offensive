@@ -7,6 +7,9 @@
 	set_include_path("..");
 		
 	$errors = array();
+	// some output types (notably xml) like to know what kinds
+	// of objects you're returning (upload, user, comment, etc)
+	$objects = null;
 
 	// get function name and return type
 	$call = array_pop(explode("/", $_SERVER["REQUEST_URI"]));
@@ -54,6 +57,8 @@
 		ca.good as vote_good, ca.bad as vote_bad, ca.tmbo as vote_tmbo, ca.repost as vote_repost, ca.comments
 	FROM offensive_uploads up, offensive_count_cache ca, users u
 	WHERE ca.threadid = up.id AND u.userid = up.userid AND up.status = 'normal'";
+	
+	$commentsql = "SELECT com.fileid, com.id, com.comment, com.vote, com.offensive, com.repost, com.timestamp, u.userid, u.username FROM offensive_comments com, users u WHERE com.userid = u.userid";
 
 /**
 	Helper functions.
@@ -243,18 +248,18 @@
 		/* plists get a special date format as their output,
 		 * due to spec restrictions.
 		 */
-		} else if(strtotime($val) > 0 && $rtype == "plist") {
-			$data[$key] = date('c', strtotime($val));
-		} else if(is_numeric($val)) {
-			if(strpos($val, ".") === false) {
-				$data[$key] = (int)$val;
+		} else if(strtotime($data) > 0 && $rtype == "plist") {
+			$data = date('c', strtotime($data));
+		} else if(is_numeric($data)) {
+			if(strpos($data, ".") === false) {
+				$data = (int)$data;
 			} else {
-				$data[$key] = (double)$val;
+				$data = (double)$data;
 			}
-		} else if($val == "true") {
-			$data[$key] = true;
-		} else if($val == "false") {
-			$data[$key] = false;
+		} else if($data == "true") {
+			$data = true;
+		} else if($data == "false") {
+			$data = false;
 		}
 	}
 	
@@ -307,7 +312,7 @@
 				$rows[] = $row;
 		}
 		
-		format_data($row);
+		format_data($rows);
 		
 		return $rows;
 	}
@@ -381,6 +386,14 @@
 		}
 	}
 	
+	function format_commentrows(&$rows) {
+		for($i = 0; $i < count($rows); $i++) {
+			if($rows[$i]['vote'] == null) unset($rows[$i]['vote']);
+			if($rows[$i]['offensive'] == null) unset($rows[$i]['offensive']);
+			if($rows[$i]['repost'] == null) unset($rows[$i]['repost']);
+		}
+	}
+	
 /**
 	API functions
 **/	
@@ -448,6 +461,7 @@
 			format_uprow($rows[$i], false);
 		}
 		
+		global $objects; $objects = $type ? $type : "upload";
 		send($rows);
 	}
 	
@@ -518,6 +532,8 @@
 				format_uprow($rows[$i]);
 			}
 			
+			global $objects; $objects = "avatar";
+			
 			send($rows);
 		}
 	}
@@ -557,6 +573,8 @@
 		}
 		$sql .= " FROM users WHERE referred_by = $userid";
 		
+		global $objects; $objects = "user";
+		
 		send(get_rows($sql));
 	}
 	
@@ -588,6 +606,8 @@
 	}
 	
 	function api_getcomments() {
+		global $commentsql;
+		
 		$votefilter = check_arg("votefilter", "string", null, false);
 		$userfilter = check_arg("userfilter", "integer", null, false);
 		$after = check_arg("after", "date", null, false);
@@ -602,10 +622,7 @@
 		$limit = check_arg("limit", "limit", null, false);
 		handle_errors();
 		
-		$sql = "SELECT com.fileid, com.id, com.comment, com.vote, com.offensive, com.repost, com.timestamp,
-					   u.userid, u.username
-				FROM offensive_comments com, users u
-				WHERE com.userid = u.userid";
+		$sql = $commentsql;
 		
 		if(strpos($votefilter, "+") !== false) {
 			$sql .= " AND com.vote = 'this is good'";
@@ -669,11 +686,9 @@
 		
 		$rows = get_rows($sql);
 		
-		for($i = 0; $i < count($rows); $i++) {
-			if($rows[$i]['vote'] === null) unset($rows[$i]['vote']);
-			if($rows[$i]['offensive'] === null) unset($rows[$i]['offensive']);
-			if($rows[$i]['repost'] === null) unset($rows[$i]['repost']);
-		}
+		format_commentrows($rows);
+
+		global $objects; $objects = "comment";
 		
 		send($rows);
 	}
@@ -711,17 +726,19 @@
 	}
 	
 	function api_searchcomments() {
+		global $commentsql;
 		$q = check_arg("q", "string");
 		$limit = check_arg("limit", "limit", null, false);
 		handle_errors();
 		
-		$sql = "SELECT com.fileid, com.id, com.comment, com.vote, com.offensive, com.repost, com.timestamp,
-					   u.userid, u.username
-				FROM offensive_comments com, users u
-				WHERE com.userid = u.userid AND MATCH(com.comment) AGAINST('".sqlEscape($q)."' IN BOOLEAN MODE)
+		$sql = $commentsql." AND MATCH(com.comment) AGAINST('".sqlEscape($q)."' IN BOOLEAN MODE)
 				ORDER BY com.id LIMIT $limit";
 		
 		$rows = get_rows($sql);
+		
+		format_commentrows($rows);
+		
+		global $objects; $objects = "comment";
 		
 		send($rows);
 	}
@@ -756,6 +773,9 @@
 		for($i = 0; $i < count($rows); $i++) {
 			format_uprow($rows[$i], false);
 		}
+		
+		global $objects;
+		$objects = $type ? $type : "upload";
 		
 		send($rows);
 	}
@@ -803,6 +823,8 @@
 		$sql .= " ORDER BY timestamp DESC LIMIT $limit";
 		
 		$rows = get_rows($sql);
+		
+		global $objects; $objects = "location";
 		
 		send($rows);
 	}
@@ -869,6 +891,8 @@
 		for($i = 0; $i < count($rows); $i++) {
 			format_uprow($rows[$i], false);
 		}
+		
+		global $objects; $objects = "upload";
 		
 		send($rows);
 	}

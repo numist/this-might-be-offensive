@@ -21,6 +21,9 @@ function xml_gen_value($data) {
 		    }
 			$data = xml_gen_array($data);
 			break;
+		case "boolean":
+			$data = $data ? "true" : "false";
+			break;
 		case "resource":
 		case "object":
 			$data = serialize($data);
@@ -30,6 +33,8 @@ function xml_gen_value($data) {
 }
 
 function xml_gen_array($data, $tabs="\t") {
+	global $objects;
+	
 	$ret = "\n";
 	
 	$dict = false;
@@ -57,11 +62,19 @@ function xml_gen_array($data, $tabs="\t") {
 			}
 		}
 		
-		$ret .= "$tabs<element id=\"$key\" type=\"$type\">";
+		
+		if($dict) {
+			$element = "$key";
+		} else {
+			$element = $objects;
+		}
+		$ret .= "$tabs<$element type=\"$type\">";
 
 		// format our value
 		if(is_array($val)) {
 			$ret .= xml_gen_array($val, $tabs."\t");
+	 	} else if(is_bool($val)) {
+			$ret .= $val ? "true" : "false";
 		} else {
 			if($type == "string") {
 				$ret .= htmlEscape($val);
@@ -72,7 +85,7 @@ function xml_gen_array($data, $tabs="\t") {
 		
 		// closure!  at last!
 		if(substr($ret, -2) == ">\n") $ret .= $tabs;
-		$ret .= "</element>\n";
+		$ret .= "</$element>\n";
 	}
 	return $ret;
 }
