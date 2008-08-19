@@ -1,4 +1,9 @@
 <?
+	if(!isset($_SERVER["HTTPS"]) || $_SERVER["HTTPS"] != "on") {
+		header("Location: https://".$_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"], 301);
+		exit;
+	}
+
 	set_include_path("..");
 		
 	$errors = array();
@@ -10,15 +15,16 @@
 		$rtype = array_shift(explode("?", $rtype));
 	}
 	
-	// validate the return type
+	// return type validation and definitions:
+	function php_encode($data) { return serialize($data); }
+	require_once("offensive/assets/plist.inc");
+	
 	$rtype = strtolower($rtype);
-	if(!is_callable($rtype."_encode") ||
-	   ($rtype != 'json' && $rtype != 'plist')) {
+	if(!is_callable($rtype."_encode")) {
 		header("HTTP/1.0 400 Bad Request");
 		echo "unsupported return format $rtype.";
 		exit;
 	}
-	require_once("offensive/assets/plist.inc");
 	
 	// validate the function call is valid
 	if(!is_callable("api_".$func)) {
@@ -39,6 +45,7 @@
 		mustLogIn("http");
 	}
 	
+	// standardized sql query for getting uploads from the db. see: api_getupload(s)?
 	$userid = $_SESSION['userid'];
 	$uploadsql = "SELECT up.id, up.userid, up.filename, up.timestamp, up.nsfw, up.tmbo, up.type, u.username,
 		(SELECT COUNT(*) FROM offensive_subscriptions WHERE userid = $userid AND fileid = up.id) as subscribed,
@@ -212,6 +219,7 @@
 		if(count($errors) == 0) return true;
 		
 		header("400 Bad Request");
+		header("Content-type: text/plain");
 		
 		foreach($errors as $error) {
 			echo "$error\n";
@@ -251,8 +259,35 @@
 	/*
 	 * return php data to the caller in the format requested.
 	 */
+	require_once("offensive/assets/conditionalGet.inc");
 	function send($ret) {
 		global $rtype;
+		
+		// get the newest timestamp in the dataset (if possible) and conditional GET
+		if(is_array($ret)) {
+			if(array_key_exists("timestamp", $ret)) {
+				conditionalGet($ret['timestamp']);
+			} else {
+				$timestamp = 0;
+				foreach($ret as $val) {
+					if(is_array($val) && array_key_exists("timestamp", $val) && 
+					   // this line is silly, but it avoids an extra call to strtotime.
+					   ($tmpstamp = strtotime($val['timestamp'])) > $timestamp) {
+						$timestamp = $tmpstamp;
+					}
+				}
+				if($timestamp > 0) {
+					conditionalGet($timestamp);
+				}
+			}
+		}
+		
+		// send the data back
+		if(in_array($rtype, array("plist", "xml"))) {
+			header("Content-type: text/xml");
+		} else {
+			header("Content-type: text/plain");
+		}
 		echo call_user_func($rtype."_encode", $ret);
 		exit;
 	}

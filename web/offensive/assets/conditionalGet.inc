@@ -26,17 +26,13 @@ function conditionalGet($timestamp) {
 		return;
 	}
 
-	// etag
+	// etag check
 	if ($if_none_match && $if_none_match != $etag) {
 		return; // etag is there but doesn't match
 	}
 
-	// if-modified-since
-	if ($if_modified_since)
-		$clienttime = strtotime($if_modified_since);
-	else
-		$clienttime = 0;
-		
+	// if-modified-since check
+	$clienttime = $if_modified_since ? strtotime($if_modified_since) : 0;		
 	if ($clienttime < $timestamp) {
 			return;
 	}

@@ -162,8 +162,6 @@ function loggedin($lite=true) {
 		return true;
 	}
 	
-	if(array_key_exists('level', $_SESSION) && $_SESSION['level'] == "weak") return false;
-	
 	$result = tmbo_query("SELECT * FROM users WHERE userid = ".$_SESSION['userid']);
 	if(mysql_num_rows($result) == 0) return false;
 	$row = mysql_fetch_assoc($result);
