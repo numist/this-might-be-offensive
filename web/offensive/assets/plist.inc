@@ -120,7 +120,7 @@ function plist_gen_string($val) {
 	if($time !== false && date("c", $time) == $val) {
         return plist_gen_date($val);
     } else {
-        return "<string>".str_replace(array("&", "<", ">"), array("&amp;", "&lt;", "&gt;"), $val)."</string>\n";
+        return "<string>".htmlEscape($val)."</string>\n";
     }
 }
 

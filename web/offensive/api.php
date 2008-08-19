@@ -18,10 +18,11 @@
 	// return type validation and definitions:
 	function php_encode($data) { return serialize($data); }
 	require_once("offensive/assets/plist.inc");
-	
+	require_once("offensive/assets/xml.inc");
 	$rtype = strtolower($rtype);
 	if(!is_callable($rtype."_encode")) {
 		header("HTTP/1.0 400 Bad Request");
+		header("Content-type: text/plain");
 		echo "unsupported return format $rtype.";
 		exit;
 	}
@@ -29,6 +30,7 @@
 	// validate the function call is valid
 	if(!is_callable("api_".$func)) {
 		header("HTTP/1.0 404 Not Found");
+		header("Content-type: text/plain");
 		echo "the function you requested ($func) was not found on this server.";
 		exit;
 	}

@@ -19,8 +19,8 @@ function sqlEscape($string) {
 }
 
 function htmlEscape($string) {
-	return str_replace(array("<", ">", "\""), 
-	                   array("&lt;", "&gt;", "&quot;"),
+	return str_replace(array("<", ">", "\"", "'"), 
+	                   array("&lt;", "&gt;", "&quot;", "&apos;"),
 	                   preg_replace("/&(?!#)/", 
 	                                "&amp;", 
 	                                $string));
