@@ -1,22 +1,4 @@
 <?
-	/* if tmbo is down, and you're working on it,
-	 *          set this variable to true.
-	 * this will send non-admins to index.fixing.php,
-	 * helping to  prevent any further possible damage.
-	 */
-	$fixing = false;
-	// now, stay calm, let's do this thing.
-
-/*****************************************************************************/
-
-	/* if tmbo is going down for an upgrade, set this to true and get to work.
-	 * this will redirect users to an upgrading page, and will put a notice
-	 * at the top of all index pages notifying admins that the site is being
-	 * worked on.
-	 */
-	$upgrading = false;
-
-/*****************************************************************************/
 
 // how many users to display in the online list
 $userlimit = 20;
@@ -29,12 +11,12 @@ $timelimit = 10;
 	require_once("offensive/assets/header.inc");
 
 	time_start($ptime);
-
+	
 	// in an upgrade, break glass:
 	if( $upgrading &&
 	    (!array_key_exists("status", $_SESSION) ||
 	    $_SESSION['status'] != "admin") ) {
-		header("Location: ./index.upgrade.php");
+		require("offensive/index.upgrade.php");
 		exit;
 	}
 
@@ -42,7 +24,7 @@ $timelimit = 10;
 	if( $fixing && 
 	    (!array_key_exists("status", $_SESSION) ||
 	    $_SESSION['status'] != "admin") ) {
-		header("Location: ./index.fixing.php");
+		require("offensive/index.fixing.php");
 		exit;
 	}
 

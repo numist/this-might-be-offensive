@@ -20,7 +20,7 @@ function sqlEscape($string) {
 
 function htmlEscape($string) {
 	return str_replace(array("<", ">", "\"", "'"), 
-	                   array("&lt;", "&gt;", "&quot;", "&apos;"),
+	                   array("&lt;", "&gt;", "&quot;", "&#39;"),
 	                   preg_replace("/&(?!#)/", 
 	                                "&amp;", 
 	                                $string));

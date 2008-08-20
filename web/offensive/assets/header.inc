@@ -3,6 +3,23 @@
 /* make TMBO read-only */
 $readonly = false;
 
+/* if tmbo is down, and you're working on it, set this variable to true.
+ * this will display a fixing page to all users, and put a notice at the
+ * top of all index pages to notify admins, helping to  prevent any
+ * further possible damage.
+ */
+$fixing = false;
+// now, stay calm, let's do this thing.
+
+/* if tmbo is going down for an upgrade, set this to true and get to work.
+ * this will display an upgrading page to all users, and will put a notice
+ * at the top of all index pages notifying admins that the site is being
+ * worked on.
+ */
+$upgrading = false;
+
+/*****************************************************************************/
+
 /* all pages require an active session eventually */
 
 session_start();
@@ -70,7 +87,7 @@ function tmbo_error_handler($errno, $errstr, $errfile, $errline, $errcontext) {
                 if(!array_key_exists("status", $_SESSION) ||
 				   $_SESSION['status'] != "admin") {
 					ob_end_clean();
-					header("Location: /offensive/index.outoforder.php");
+					require("offensive/index.outoforder.php");
 				} else if (array_key_exists("status", $_SESSION) &&
 					       $_SESSION['status'] == "admin") {
 					global $queries;
