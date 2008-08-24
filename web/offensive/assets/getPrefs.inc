@@ -22,8 +22,7 @@ function getPreferences( $userid ) {
 
 	$prefs[ 'squelched' ] = implode( ",", $squelched );
 	
-	return $prefs;		
-
+	return $prefs;
 }
 
 

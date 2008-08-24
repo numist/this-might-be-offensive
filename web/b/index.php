@@ -8,7 +8,7 @@ if(!isset($link) || !$link) $link = openDbConnection();
 require_once('offensive/assets/functions.inc');
 mustLogIn();
 
-require("offensive/assets/getPrefs.inc");
+require_once("offensive/assets/getPrefs.inc");
 
 $p = array_key_exists("p", $_REQUEST) ? $_REQUEST['p'] : 0 ;
 
@@ -17,12 +17,6 @@ function poast($comment, $image) {
 
 	$com = $comment['comment'];
 	if( ! isSquelched( $comment['userid'] ) ) {
-		// remisser entrapment url gag
-		if($_SESSION['userid'] != 2935 && $comment['userid'] == 2935) {
-			$pattern = "/(http[s]*:\/\/[^\s<>]+)/i";
-                	$replacement = "http://preview.tinyurl.com/2tx";
-                	$com = preg_replace( $pattern, $replacement, $comment['comment'] );
-		}
 		$com = linkUrls( $com );
 		$com = explode("\n", $com);
 		if(count($com) <= 10) { 
@@ -177,12 +171,7 @@ LIMIT $page_limit_clause, 15";
 $result = tmbo_query($sql);
 while( $image = mysql_fetch_assoc( $result ) ) 
 {
-	$filename = rawurlencode($image['filename']);
-	$time = strtotime( $image['timestamp'] );
-	$year = date( "Y", $time );
-	$month = date( "m", $time );			
-	$day = date( "d", $time );
-	$filepath = "../offensive/uploads/$year/$month/$day/image/".$image['filename'];
+	$filepath = getFile($image['id'], $image['filename'], $image['timestamp'], $image['type']);
 ?>
 
 
@@ -218,9 +207,9 @@ echo $info[0]."x".$info[1];
 		echo "[blocked: nsfw]"; 
 	} else {
 ?>
-<a href="<?= "/offensive/uploads/$year/$month/$day/image/$filename" ?>"  target=_blank><img src="<?php
-	if(file_exists("../offensive/images/thumbs/th-".$image['filename'])) {
-		echo "/offensive/images/thumbs/th-$filename";
+<a href="<?= getFileURL($image['id'], $image['filename'], $image['timestamp'], $image['type']) ?>"  target=_blank><img src="<?php
+	if(getThumb($image['id'], $image['filename'], $image['timestamp'], $image['type']) != '') {
+		echo getThumbURL($image['id'], $image['filename'], $image['timestamp'], $image['type']);
 	} else {
 		echo "/offensive/graphics/previewNotAvailable.gif";
 	}
