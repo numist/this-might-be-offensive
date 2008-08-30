@@ -38,6 +38,8 @@ EOT;
 			    $_REQUEST['p'] : 0;
 		$start = $page * $numPerPage;
 
+		$userid = isset($_REQUEST['userid']) && is_numeric($_REQUEST['userid']) ? $_REQUEST['userid'] : 0;
+		$userid_sql = $userid ? " AND users.userid = '$userid' " : "";
     
 	/* adding the USE KEY statement seems to have resolved performance
 	 * issues with this query.  Why MySQL wasn't using the key to
@@ -67,6 +69,7 @@ AND
   offensive_uploads.status = 'normal'
 AND
   users.account_status != 'locked'
+  $userid_sql
 ORDER BY offensive_uploads.timestamp DESC, offensive_uploads.id DESC
 LIMIT $start, $numPerPage
 ";
