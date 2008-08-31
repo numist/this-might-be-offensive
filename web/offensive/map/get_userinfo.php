@@ -23,11 +23,14 @@ $sql = "SELECT up.id, up.userid, up.filename, up.timestamp, up.type FROM offensi
 $result = tmbo_query($sql);
 if(mysql_num_rows($result) == 0) {
 	// show a default image if there is no thumbnail
-	$thumb = "<img src='/tmbologo.gif' width='50' />";
+	$thumb = "<img src='/tmbologo.gif' width='50' height='33' />";
 } else {
 	$ret = mysql_fetch_assoc($result);
 	extract($ret);
-	$thumb = "<IMG SRC='" . getThumbURL($id,$filename,$timestamp,$type) . "' />";
+	
+	$info = getimagesize(getThumb($id, $filename, $timestamp, $type));
+	
+	$thumb = "<IMG SRC='" . getThumbURL($id,$filename,$timestamp,$type) . "' ".$info[3]." />";
 }
 
 
@@ -42,10 +45,6 @@ if(mysql_num_rows($result) == 0) {
 	$ret = mysql_fetch_assoc($result);
 	extract($ret);
 }
-if($referer != "" && $rfb != $user) {
-	$refer = "$username was invited by <a href='javascript:posse_click($rfb);'>$referer</a>";
-}
-
 
 // to be able to find which posse members are clickable, we need info
 // on the map markers. This could probably be done better, but for now this
@@ -60,7 +59,13 @@ if($result) {
 	}
 }
 
-
+if($referer != "" && $rfb != $user) {
+	if(isset($markers["$rfb"])) {
+		$refer = "$username was invited by <a href='javascript:posse_click($rfb);'>$referer</a>";
+	} else {
+		$refer = "$username was invited by $referer";
+	}
+}
 
 // get the posse info
 $sql = "SELECT userid,username as posse_user FROM users WHERE userid != '$user' AND referred_by = '$user' ORDER BY username";
@@ -71,15 +76,21 @@ if($num_rows == 0) {
 	$posse = "";
 	$overflow = "";
 } else {
-	$posse = "<p style='font-size: 11px; line-height: 10px; margin: 4px 0px 3px 0px;'><b><a style='text-decoration: none;' href='/offensive/?c=posse&amp;userid=$user'>$username has a posse</a></p>";
+	$posse = "<p style='font-size: 11px; line-height: 10px; margin: 4px 0px 3px 0px;'><b><a style='text-decoration: none;' href='/offensive/?c=posse&amp;userid=$user'>$username has a posse</a>";
+	
+	$posse_markers = 0;
 	while ($ret = @mysql_fetch_assoc($result)) {
 		extract($ret);
 		if(isset($markers["$userid"])) {
+			$posse_markers++;
 			$posse_list .= "<a style='text-decoration: none;' href='javascript:posse_click($userid);'>$posse_user</a><br />";
-		} else {
+		}/* else {
 			$posse_list .= "<a style='text-decoration: none; color: black;'><i>$posse_user</i><a><br />";
-		}
+		}*/
 	}
+	
+	if($num_rows != $posse_markers) $posse .= " ($num_rows, $posse_markers shown)</p>";
+	
 	$overflow = ($num_rows > 15) ? "height: 130px; overflow: auto;" : "";
 }
 
