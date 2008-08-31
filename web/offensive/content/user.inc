@@ -93,7 +93,7 @@
 						<? echo $accountMessage ?><br/>
 						<span style="color:#666699">
 							<? echo "$name has been around since $accountDateMessage."?>
-							<? if( is_numeric( $refid ) ) { ?>
+							<? if( is_numeric( $refid ) && $refid != $usrid ) { ?>
 								(thanks to <a href="./?c=<?= $_REQUEST['c'] ?>&userid=<?= $refid?>" style="color:#666699"><?= $referredby ?></a>.)
 							<? } ?>
 							<? if( isset( $ip ) ) { ?>

@@ -89,7 +89,7 @@ if($num_rows == 0) {
 		}*/
 	}
 	
-	if($num_rows != $posse_markers) $posse .= " ($num_rows, $posse_markers shown)</p>";
+	if($num_rows != $posse_markers && $posse_markers != 0) $posse .= " ($num_rows, $posse_markers shown)</p>";
 	
 	$overflow = ($num_rows > 15) ? "height: 130px; overflow: auto;" : "";
 }
@@ -98,7 +98,7 @@ if($num_rows == 0) {
 
 // we have all the info, render.
 ?><div>
-	<div style='<?= $posse == "" ?'': "border-bottom: 1px solid black; " ?>height: auto;'>
+	<div style='<?= $posse_markers == 0 ?'': "border-bottom: 1px solid black; " ?>height: auto;'>
 		<table>
 			<tr>
 				<td><?= $thumb ?></td>
