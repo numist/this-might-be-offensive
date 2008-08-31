@@ -76,9 +76,6 @@
 			break;
 		
 			case "admin":
-				$accountMessage = "$name carries keys to the short bus.";
-			break;
-
 			default:
 				$accountMessage = "$name is welcome here.";
 			break;

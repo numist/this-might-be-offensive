@@ -7,7 +7,8 @@
 	function start() {
 		mustLogIn();
 
-		setcookie( 'thumbnails', "yes", time()+3600*24*365*10, "/offensive/" );
+		if(!isset($_REQUEST['userid']))
+			setcookie( 'thumbnails', "yes", time()+3600*24*365*10, "/offensive/" );
 	}
 	
 	function head() {
@@ -140,13 +141,15 @@ LIMIT $start, $numPerPage
 		</tr>
 		<tr>
 			<td>
-				<? if( $page > 0 ) { ?>
-					<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'] ?>&p=<?= $page - 1 ?>">&laquo; <b>previous page</b></a></td>
+				<? 
+				$args = isset($_REQUEST['userid']) ? "&userid=".$_REQUEST['userid'] :'';
+				if( $page > 0 ) { ?>
+					<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'].$args ?>&p=<?= $page - 1 ?>">&laquo; <b>previous page</b></a></td>
 				<? } ?>
 			</td>
 			<td style="text-align:right">
 				<? if( mysql_num_rows( $result ) == $numPerPage ) { ?>
-					<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'] ?>&p=<?= $page + 1 ?>"><b>next page</b></a> &raquo;
+					<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'].$args ?>&p=<?= $page + 1 ?>"><b>next page</b></a> &raquo;
 				<? } ?>
 			</td>
 		</tr>

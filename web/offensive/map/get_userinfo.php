@@ -30,7 +30,7 @@ if(mysql_num_rows($result) == 0) {
 	
 	$info = getimagesize(getThumb($id, $filename, $timestamp, $type));
 	
-	$thumb = "<IMG SRC='" . getThumbURL($id,$filename,$timestamp,$type) . "' ".$info[3]." />";
+	$thumb = "<a href='/offensive/pages/pic.php?id=$id' target='_blank'><img src='" . getThumbURL($id,$filename,$timestamp,$type) . "' ".$info[3]." border='0' /></a>";
 }
 
 
@@ -68,7 +68,7 @@ if($referer != "" && $rfb != $user) {
 }
 
 // get the posse info
-$sql = "SELECT userid,username as posse_user FROM users WHERE userid != '$user' AND referred_by = '$user' ORDER BY username";
+$sql = "SELECT userid,username as posse_user FROM users WHERE userid != '$user' AND referred_by = '$user' AND account_status != 'locked' ORDER BY username";
 $posse_list = "";
 $result = tmbo_query($sql);
 $num_rows = mysql_num_rows($result);
@@ -76,22 +76,21 @@ if($num_rows == 0) {
 	$posse = "";
 	$overflow = "";
 } else {
-	$posse = "<p style='font-size: 11px; line-height: 10px; margin: 4px 0px 3px 0px;'><b><a style='text-decoration: none;' href='/offensive/?c=posse&amp;userid=$user'>$username has a posse</a>";
+	$posse = "<p style='line-height: 10px; margin: 4px 0px 3px 0px;'><a style='text-decoration: none;' href='/offensive/?c=posse&amp;userid=$user'>$username has a posse</a>";
 	
 	$posse_markers = 0;
 	while ($ret = @mysql_fetch_assoc($result)) {
 		extract($ret);
 		if(isset($markers["$userid"])) {
 			$posse_markers++;
-			$posse_list .= "<a style='text-decoration: none;' href='javascript:posse_click($userid);'>$posse_user</a><br />";
-		}/* else {
-			$posse_list .= "<a style='text-decoration: none; color: black;'><i>$posse_user</i><a><br />";
-		}*/
+			$posse_list .= "<li><a href='javascript:posse_click($userid);'>$posse_user</a></li>";
+		}
 	}
 	
-	if($num_rows != $posse_markers && $posse_markers != 0) $posse .= " ($num_rows, $posse_markers shown)</p>";
+	if($num_rows != $posse_markers && $posse_markers != 0) $posse .= " ($num_rows, $posse_markers shown)";
+	$posse .= "</p>";
 	
-	$overflow = ($num_rows > 15) ? "height: 130px; overflow: auto;" : "";
+	$overflow = ($posse_markers > 15) ? "height: 130px; overflow: auto;" : "";
 }
 
 
@@ -109,8 +108,10 @@ if($num_rows == 0) {
 		<? if($posse != "") {
 			echo $posse; ?>
 	</div>
-	<div style="margin: 5px 0 0 20px; font-size: 10px; line-height: 18px; text-decoration: none; <?= $overflow ?>">
+	<div style="margin: 5px 0 0 0; font-size: 10px; line-height: 18px; text-decoration: none; <?= $overflow ?>">
+		<ul>
 		<?= $posse_list ?>
+		</ul>
 		<? } ?>
 	</div>
 </div>
