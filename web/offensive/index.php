@@ -219,7 +219,7 @@ $timelimit = 10;
 				<div class="blackbar"></div>
 					<div class="heading">get info:</div>
 					<div class="bluebox">
-						<p><a href="./map/gmap.php">maxxer world map</a></p>
+						<p><a href="/offensive/?c=map">maxxer world map</a></p>
 						<p><a href="<? echo $_SERVER['PHP_SELF'] ?>?c=referral">invite a friend</a></p>						
 						<p><a href="<? echo $_SERVER['PHP_SELF'] ?>?c=faq">FAQ, rules, etc.</a></p>
 						<p><a href="http://tmboradio.com">tmboradio.com</a></p>
