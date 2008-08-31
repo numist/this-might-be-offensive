@@ -21,16 +21,6 @@ EOT;
 	}
 
 	function body() {
-		
-		if( file_exists( "./updating.txt" ) ) {
-			$updating_now = true;
-		}
-		
-		if( file_exists( "./log.txt" ) ) {
-			$last_update = filemtime( "log.txt" );
-		} else {
-			$last_update = -1;
-		}
 
 		$numPerPage = 100;
 		$page = isset($_REQUEST['p']) && is_numeric($_REQUEST['p']) ?

@@ -13,7 +13,7 @@
 	<div class="<?= cssFor('images') ?>"><a href="./">images</a></div>
 	<div class="<?= cssFor('discussions') ?>"><a href="./?c=discussions">discussions</a></div>
 	<div class="<?= cssFor('hof') ?>"><a href="./?c=hof">hall of fame</a></div>	
-	<div class="<?= cssFor('asshat') ?>"><a href="./?c=user&userid=499">asshat</a></div>	
+	<div class="<?= cssFor('map') ?>"><a href="./?c=map">map</a></div>	
 	<div class="<?= cssFor('yearbook') ?>"><a href="./?c=yearbook">yearbook</a></div>	
 	<div class="<?= cssFor('search') ?>"><a href="./?c=search">search</a></div>	
 

@@ -5,87 +5,52 @@
 	if(!isset($link) || !$link) $link = openDbConnection();
 	
 
-	function start() {
+	function start()
+	{
 		mustLogIn();
 	}
 
-	function head() {
+	function head()
+	{
 ?>
-		<script type="text/javascript">
-			function showLocation( xloc, yloc ) {
-				var x = xloc/10;
-				var y = yloc/10;
-
-				// offset for the size of the marker image
-				x -= 6;
-				y -= 6;
-
-				var map = document.getElementById( "map" );
-
-				if( map.getBoundingClientRect ) {
-					var bounds = map.getBoundingClientRect();
-					x += bounds.left;
-					y += bounds.top;
-				}
-
-				x += map.offsetLeft != 0 ? map.offsetLeft : document.documentElement.scrollLeft;
-				y += map.offsetTop != 0 ? map.offsetTop : document.documentElement.scrollTop;
-
-				var marker = document.getElementById( "marker" );
-				marker.style.left = x + "px";
-				marker.style.top = y + "px";				
+		<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAyBBXeWMcfhIUkB7pKzhc9xQjSqRAlqXjnjIvJJ9RLUDSqpvsZRTIaaZHx9vj_4c_8qVi_4wR2bZzqg" type="text/javascript"></script>
+		<script language="JavaScript1.2" src="/offensive/js/markermanager_packed.js" type="text/javascript"></script>
+		<script language="JavaScript1.2" src="/offensive/js/maps-0.1.js" type="text/javascript"></script>
+		<style type="text/css">
+			#sidebar a, #map_edit a {
+				text-decoration: none;
 			}
-		</script>
-<?
+		</style>
+<?php
 	}
 
-	function body() {
+	function body()
+	{
+		?><div class="heading">
+			long time no see. do YOU know where YOUR maxxers are?
+		</div><?
+		
+		global $activeTab;
+		$activeTab = "map";
+		tabs();
+		
+		$edit = (isset($_GET['action']) && ($_GET['action'] == 'edit')) ? true : false;
+		$userid = $_SESSION['userid'];
 ?>
-		<div class="heading">we are duh world.</div>
-		<? tabs(); ?>
-		<div class="bluebox">
-			<div>click the map to see the big picture or to set your location.</div>
-			<div style="padding:0px;margin-left:auto;margin-right:auto;width:500px">
-				<img src="map/marker.gif" id="marker" style="position:absolute"/>
-				<a href="map/"><img src="map/maxxer_map_tiny.jpg" id="map" width="500" height="300" style="margin:0px;"/></a>
-			</div>
-
-
-			<div style="padding:0px;margin-left:auto;margin-right:auto;width:500px;height:250px;overflow:auto">
-<table border="0" cellpadding="2" cellspacing="0" width="100%">
-
-<?
-	
-		$usrid = $_SESSION['userid'];
-
-		$sql = "select *, count( maxxer_locations.id ) from maxxer_locations, users
-				where users.userid=maxxer_locations.userid
-				group by users.userid
-				order by username";
-
-		$result = tmbo_query( $sql );
-		$count = 0;
-		$numPerRow = 4;
-		while( $row = mysql_fetch_assoc( $result ) ) {
-			if( ($count++ % $numPerRow) == 0 ) {
-				?><tr><?
-			}
-?>
-			<td><a href="./?c=user&userid=<?= $row['userid'] ?>" onmouseover="showLocation(<?= $row['x'] ?>,<?= $row['y'] ?>)"><?= $row['username'] ?></a></td>
-<?		
-			if( ($count % $numPerRow) == 0 ) {
-				?></tr><?
-			}		
-
-		}
-?>
-
-
-</table>
-			</div>
+		<div id="map" style="width: auto; height: 500px;"></div>
+<?php if(!$edit) {?>
+		<div id="sidebar" style="padding: 5px; width: auto; height: 250px; overflow: auto;"></div>
+<?php } else { ?>
+		<div id="sidebar" style="padding: 5px; width: auto; height: 250px; overflow: auto;">
+			<form action="#" onsubmit="showAddress(this.address.value); return false">
+				<input type="text" size="35" name="address" onfocus="this.value=''" value="eg: Main Street 1, Smallville, Ohio" />
+				<input type="submit" value="Search" />
+			</form>
 		</div>
-<?
-	
+<?php } ?>
+		<div id="map_edit" style="border: 1px solid black; padding: 0; margin: 0; text-align: center; background-color: #fff; width: 100px; height: 15px;"><b><a href="/offensive/?c=map<?php echo $edit ? '">Back' : '&action=edit">Add/Edit'?></a></b></div>
+		<script><?= ($edit ? "editmap($userid);" : "loadmap();") ?></script>
+<?php
 	}
 
 
