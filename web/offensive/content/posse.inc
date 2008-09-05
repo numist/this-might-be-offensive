@@ -47,7 +47,7 @@
 				
 			$sql = "SELECT username, account_status, created, userid, 
 						(select username from users where userid={$usrid}) AS referrer
-						FROM users WHERE referred_by={$usrid}
+						FROM users WHERE referred_by=$usrid AND userid != $usrid
 						ORDER BY username";
 			$result = tmbo_query( $sql );
 	

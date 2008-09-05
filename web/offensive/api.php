@@ -5,8 +5,9 @@
 	}
 
 	set_include_path("..");
+
+	require_once("offensive/assets/argvalidation.inc");
 		
-	$errors = array();
 	// some output types (notably xml) like to know what kinds
 	// of objects you're returning (upload, user, comment, etc)
 	$objects = null;
@@ -63,177 +64,6 @@
 /**
 	Helper functions.
 **/
-
-	/*
-	 * Checks an incoming argument (usually in $_REQUEST) for type and validity.
-	 * Arguments can be optional, or enforced to be one of a set of possibilities.
-	 * If an argument fails to check, an error message is added to the global
-	 * $errors array, and false is returned.  A false return value can be returned
-	 * if an argument is optional and not set (but no error will be registered).
-	 * Note that all arguments returned by this function that are not type "string"
-	 * (not including the false return value) are safe to use in a SQL query.
-	 */
-	function check_arg($key, $type, $method=null, $required=true, $set=null) {
-		global $errors;
-
-		// make sure a valid method is being used.
-		if($method == null) $method = $_REQUEST;
-		// if this is triggered, there is a code problem.  kaboom.
-		if(!is_array($method)) {
-			trigger_error("ASSERT: invalid method", E_USER_ERROR);
-			exit;
-		}
-		
-		// optional vs required variables
-		if(!array_key_exists($key, $method)) {
-			if($required) {
-				$errors[] = "required parameter '$key' is not set (needs: $type).";
-			}
-			if($type == "limit") return "0,200";
-			return false;
-		}
-		
-		// currently we don't accept arrays, which you can submit through POST
-		if(!is_string($method[$key])) {
-			$errors[] = "parameter '$key' must be of type $type.";
-		}
-		// this might change someday.  but not today.
-		
-		// general type enforcement
-		switch($type) {
-			case "string":
-				if(strlen($method[$key]) == 0 && $required) {
-					$errors[] = "parameter '$key' cannot be zero-length.";
-					return false;
-				}
-				break;
-			case "integer":
-				if(!is_numeric($method[$key]) || strpos($method[$key], ".") !== false) {
-					$errors[] = "parameter '$key' must be of type $type.";
-					return false;
-				}					
-				break;
-			case "float":
-				if(!is_numeric($method[$key])) {
-					$errors[] = "parameter '$key' must be of type $type.";
-					return false;
-				}
-				break;
-			/*
-			 * dates are not set matched (it doesn't make much sense to), so
-			 * we return the properly-formatted date representation of the argument
-			 * that can be used immediately in a query.
-			 */
-			case "date":
-				// unix timestamps, stop here.
-				if(is_numeric($method[$key]) && strpos($method[$key], ".") === false) {
-					return date("Y-m-d H:i:s", (int)$method[$key]);
-				}
-				// other date formats that we recognize, stop here.
-				if(strtotime($method[$key]) !== false) {
-					return date("Y-m-d H:i:s", strtotime($method[$key]));
-				}
-				$errors[] = "parameter '$key' is not a recognizable date string.";				
-				return;
-			/*
-			 * Limits are special types.  They are in the form %d or %d,%d, matching the MySQL syntax
-			 * for limits on queries.  This function detects if the argument is in the correct form, 
-			 * and returns a strictly-formatted %d,%d string back to the caller, after enforcing 
-			 * syntax and a maximum limit.
-			 */
-			case "limit":
-				// %d,%d or %d only.
-				$limit = $offset = false;
-
-				/*
-				 * Either the limit is a standalone integer...
-				 */
-				if(is_numeric($method[$key]) && strpos($method[$key], ".") === false) {
-					$limit = (int)$method[$key];
-					$offset = 0;
-				/*
-				 * Or it is in the format %d,%d, MySQL style.
-				 */
-				} else if(strpos($method[$key], ",") !== false) {
-					$arr = explode(",", $method[$key]);
-
-					/* only accept if there are two elements in the explosion, 
-					 * both of which are integers.
-					 */
-					if(count($arr) == 2 &&
-					   is_numeric($arr[0]) && strpos($arr[0], ".") === false &&
-					   is_numeric($arr[1]) && strpos($arr[1], ".") === false ) {
-						list($offset, $limit) = $arr;
-					}
-				}
-
-				// did we make it?  is there a limit and an offset?
-				if($limit === false || $offset === false) {
-					$errors[] = "parameter '$key' is not in the correct format.  ".
-					            "Accepted formats: '%d' and '%d,%d'.";
-					return false;
-				}
-
-				/* force-coerce in case there are chars that are non-numeric, 
-				 * but acceptable for php soft-coercion.
-				 */
-				$limit = (int)$limit;
-				$offset = (int)$offset;
-
-				// currently we enforce a limit of 200 elements per request.  just in case.
-				if($limit > 200) {
-					$errors[] = "the limit of parameter '$key' cannot exceed 200.  you requested: $limit.";
-					return false;
-				}
-
-				return "$offset,$limit";
-		}
-		
-		// check if a value is only allowed to be one in a limited set
-		if(is_array($set)) {
-			foreach($set as $example) {
-				if($example == $method[$key]) {
-					return $method[$key];
-				}
-			}
-			$err = "parameter '$key' must be one of: { ";
-			foreach($set as $example) {
-				$err .= "$example ";
-			}
-			$errors[] = $err."}";
-			return false;
-		}
-		
-		// coerce values to the appropriate php type on return.
-		switch($type) {
-			case "float":
-				return (double)$method[$key];
-			case "integer":
-				return (int)$method[$key];
-			default:
-				return $method[$key];
-		}
-	}
-
-	/*
-	 * Check the global $errors array for error messages.  If any exist, print them
-	 * out and exit with an error code.
-	 * This should always be called after the last argument is validated with
-	 * check_arg to ensure that execution stops on error.
-	 */
-	function handle_errors() {
-		global $errors;
-		if(count($errors) == 0) return true;
-		
-		header("400 Bad Request");
-		header("Content-type: text/plain");
-		
-		foreach($errors as $error) {
-			echo "$error\n";
-		}
-		
-		exit;
-	}
 
 	/*
 	 * coerce values of an array from strings to the appropriate PHP types.
@@ -399,17 +229,22 @@
 **/	
 	call_user_func("api_".$func);
 
-	function api_getuploads() {
+	function api_getuploads($args=null) {
 		global $uploadsql;
 		
-		$type = check_arg("type", "string", null, false, array("image", "topic", "avatar"));
-		$userid = check_arg("userid", "integer", null, false);
-		$after = check_arg("after", "date", null, false);
-		$before = check_arg("before", "date", null, false);
-		$max = check_arg("max", "integer", null, false);
-		$since = check_arg("since", "integer", null, false);
-		$sort = check_arg("sort", "string", null, false, array("date_desc", "date_asc", "votes_asc", "votes_desc"));
-		$limit = check_arg("limit", "limit", null, false);
+		if(is_array($args))
+			$method = $args;
+		else
+			$method = $_REQUEST;
+		
+		$type = check_arg("type", "string", $method, false, array("image", "topic", "avatar"));
+		$userid = check_arg("userid", "integer", $method, false);
+		$after = check_arg("after", "date", $method, false);
+		$before = check_arg("before", "date", $method, false);
+		$max = check_arg("max", "integer", $method, false);
+		$since = check_arg("since", "integer", $method, false);
+		$sort = check_arg("sort", "string", $method, false, array("date_desc", "date_asc", "votes_asc", "votes_desc"));
+		$limit = check_arg("limit", "limit", $method, false);
 		handle_errors();
 		
 		// sort order needs to always be set, even if only to default.
@@ -465,10 +300,15 @@
 		send($rows);
 	}
 	
-	function api_getupload() {
+	function api_getupload($args=null) {
 		global $uploadsql;
 		
-		$upload = check_arg("upload", "integer");
+		if(is_array($args))
+			$method = $args;
+		else
+			$method = $_REQUEST;
+		
+		$upload = check_arg("upload", "integer", $method);
 		handle_errors();
 		
 		$sql = $uploadsql;
@@ -484,12 +324,17 @@
 		send($row);
 	}
 	
-	function api_getyearbook() {
+	function api_getyearbook($args=null) {
 		global $uploadsql;
 		
-		$userid = check_arg("userid", "integer", null, false);
-		$limit = check_arg("limit", "limit", null, false);
-		$sort = check_arg("sort", "string", null, false, array("date_desc", "date_asc", "uname_asc", "uname_desc"));
+		if(is_array($args))
+			$method = $args;
+		else
+			$method = $_REQUEST;
+		
+		$userid = check_arg("userid", "integer", $method, false);
+		$limit = check_arg("limit", "limit", $method, false);
+		$sort = check_arg("sort", "string", $method, false, array("date_desc", "date_asc", "uname_asc", "uname_desc"));
 		handle_errors();
 		
 		$sql = $uploadsql." AND up.type = 'avatar' AND up.id = (SELECT MAX(upl.id) FROM offensive_uploads upl WHERE upl.type='avatar' AND upl.userid=u.userid)";
@@ -538,15 +383,20 @@
 		}
 	}
 	
-	function api_getuser() {
-		$userid = check_arg("userid", "integer", null, false);
+	function api_getuser($args=null) {
+		if(is_array($args))
+			$method = $args;
+		else
+			$method = $_REQUEST;
+			
+		$userid = check_arg("userid", "integer", $method, false);
 		handle_errors();
 
 		if(!$userid) {
 			$userid = $_SESSION['userid'];
 		}
 		
-		$sql = "SELECT (SELECT COUNT(*) FROM users WHERE referred_by = $userid) as posse, (SELECT COUNT(*) FROM offensive_uploads WHERE type = 'avatar' AND userid = $userid) as yearbook, userid, username, created, account_status, timestamp, referred_by";
+		$sql = "SELECT (SELECT COUNT(*) FROM users WHERE referred_by = $userid AND userid != $userid) as posse, (SELECT COUNT(*) FROM offensive_uploads WHERE type = 'avatar' AND userid = $userid) as yearbook, userid, username, created, account_status, timestamp, referred_by";
 		if($_SESSION['status'] == "admin") {
 			$sql .= ", email, last_login_ip";
 		}
@@ -555,10 +405,13 @@
 		send(get_row($sql));
 	}
 	
-	function api_getposse() {
-		global $rtype;
+	function api_getposse($args=null) {
+		if(is_array($args))
+			$method = $args;
+		else
+			$method = $_REQUEST;
 		
-		check_arg("userid", "integer", null, false);
+		check_arg("userid", "integer", $method, false);
 		handle_errors();
 		
 		if(isset($_REQUEST['userid'])) {
@@ -567,20 +420,25 @@
 			$userid = $_SESSION['userid'];
 		}
 		
-		$sql = "SELECT (SELECT COUNT(*) FROM users u WHERE referred_by = users.userid) as posse, (SELECT COUNT(*) FROM offensive_uploads WHERE type = 'avatar' AND userid = users.userid) as yearbook, userid, username, created, account_status, timestamp, referred_by";
+		$sql = "SELECT (SELECT COUNT(*) FROM users u WHERE referred_by = users.userid AND u.userid != users.userid) as posse, (SELECT COUNT(*) FROM offensive_uploads WHERE type = 'avatar' AND userid = users.userid) as yearbook, userid, username, created, account_status, timestamp, referred_by";
 		if($_SESSION['status'] == "admin") {
 			$sql .= ", email, last_login_ip";
 		}
-		$sql .= " FROM users WHERE referred_by = $userid";
+		$sql .= " FROM users WHERE referred_by = $userid AND userid != $userid";
 		
 		global $objects; $objects = "user";
 		
 		send(get_rows($sql));
 	}
 	
-	function api_login() {
-		check_arg("username", "string");
-		check_arg("password", "string");
+	function api_login($args=null) {
+		if(is_array($args))
+			$method = $args;
+		else
+			$method = $_REQUEST;
+			
+		check_arg("username", "string", $method);
+		check_arg("password", "string", $method);
 		handle_errors();
 		session_unset();
 		
@@ -600,26 +458,31 @@
 		api_getuser();
 	}
 	
-	function api_logout() {
+	function api_logout($args=null) {
 		session_unset();
 		send(true);
 	}
 	
-	function api_getcomments() {
+	function api_getcomments($args=null) {
 		global $commentsql;
 		
-		$votefilter = check_arg("votefilter", "string", null, false);
-		$userfilter = check_arg("userfilter", "integer", null, false);
-		$after = check_arg("after", "date", null, false);
-		$before = check_arg("before", "date", null, false);
-		$idmin = check_arg("idmin", "integer", null, false);
-		$idmax = check_arg("idmax", "integer", null, false);
-		$id = check_arg("id", "integer", null, false);
-		$threadmin = check_arg("threadmin", "integer", null, false);
-		$threadmax = check_arg("threadmax", "integer", null, false);
-		$thread = check_arg("thread", "integer", null, false);
-		$sort = check_arg("sort", "string", null, false, array("date_desc", "date_asc"));
-		$limit = check_arg("limit", "limit", null, false);
+		if(is_array($args))
+			$method = $args;
+		else
+			$method = $_REQUEST;
+		
+		$votefilter = check_arg("votefilter", "string", $method, false);
+		$userfilter = check_arg("userfilter", "integer", $method, false);
+		$after = check_arg("after", "date", $method, false);
+		$before = check_arg("before", "date", $method, false);
+		$idmin = check_arg("idmin", "integer", $method, false);
+		$idmax = check_arg("idmax", "integer", $method, false);
+		$id = check_arg("id", "integer", $method, false);
+		$threadmin = check_arg("threadmin", "integer", $method, false);
+		$threadmax = check_arg("threadmax", "integer", $method, false);
+		$thread = check_arg("thread", "integer", $method, false);
+		$sort = check_arg("sort", "string", $method, false, array("date_desc", "date_asc"));
+		$limit = check_arg("limit", "limit", $method, false);
 		handle_errors();
 		
 		$sql = $commentsql;
@@ -693,18 +556,24 @@
 		send($rows);
 	}
 	
-	function api_postcomment() {
-		$fileid = check_arg("fileid", "integer");
-		$comment = check_arg("comment", "string", $_POST, false);
-		$vote = check_arg("vote", "string", $_POST, false, array("this is good", "this is bad"));
-		$offensive = check_arg("offensive", "integer", $_POST, false, array("1", "0"));
-		$repost = check_arg("repost", "integer", $_POST, false, array("1", "0"));
+	function api_postcomment($args=null) {
+		if(is_array($args))
+			$method = $args;
+		else
+			$method = $_POST;
+			
+		$fileid = check_arg("fileid", "integer", $methd);
+		$comment = check_arg("comment", "string", $method, false);
+		$vote = check_arg("vote", "string", $method, false, array("this is good", "this is bad"));
+		$offensive = check_arg("offensive", "integer", $method, false, array("1", "0"));
+		$repost = check_arg("repost", "integer", $method, false, array("1", "0"));
 		handle_errors();
 		
 		send(false);
 	}
 	
-	function api_postupload() {
+	// XXX: to upload a file from within, do not call this function directly!
+	function api_postupload($args=null) {
 		$type = check_arg("type", "string", null, true, array("avatar", "image"));
 		// FIX THIS TO WORK RIGHT!
 		check_arg("filename", "string", $_FILE);
@@ -714,21 +583,34 @@
 		$tmbo = check_arg("tmbo", "integer", $_POST, false, array("0", "1"));
 		handle_errors();
 		
+		// XXX: this will have to call some uploader helper functions to cooperate with the upload page.
+		
 		send(false);
 	}
 	
-	function api_posttopic() {
-		$title = check_arg("title", "string", $_POST);
-		$comment = check_arg("comment", "string", $_POST, false);
+	function api_posttopic($args=null) {
+		if(is_array($args))
+			$method = $args;
+		else
+			$method = $_POST;
+			
+		$title = check_arg("title", "string", $method);
+		$comment = check_arg("comment", "string", $method, false);
 		handle_errors();
 		
 		send(false);
 	}
 	
-	function api_searchcomments() {
+	function api_searchcomments($args=null) {
 		global $commentsql;
-		$q = check_arg("q", "string");
-		$limit = check_arg("limit", "limit", null, false);
+		
+		if(is_array($args))
+			$method = $args;
+		else
+			$method = $_REQUEST;
+			
+		$q = check_arg("q", "string", $method);
+		$limit = check_arg("limit", "limit", $method, false);
 		handle_errors();
 		
 		$sql = $commentsql." AND MATCH(com.comment) AGAINST('".sqlEscape($q)."' IN BOOLEAN MODE)
@@ -743,8 +625,13 @@
 		send($rows);
 	}
 	
-	function api_searchuser() {
-		$q = check_arg("q", "string");
+	function api_searchuser($args=null) {
+		if(is_array($args))
+			$method = $args;
+		else
+			$method = $_REQUEST;
+			
+		$q = check_arg("q", "string", $method);
 		handle_errors();
 		$q = sqlEscape($q);
 		
@@ -752,15 +639,20 @@
 		$row = get_row($sql);
 		if($row === false) send(false);
 
-		$_REQUEST['userid'] = (string)$row['userid'];
-		api_getuser();
+		api_getuser(array('userid' => $row['userid']));
 	}
 	
-	function api_searchuploads() {
+	function api_searchuploads($args=null) {
 		global $uploadsql;
-		$q = check_arg("q", "string");
-		$limit = check_arg("limit", "limit", null, false);
-		$type = check_arg("type", "string", null, false, array("image", "topic", "avatar"));
+		
+		if(is_array($args))
+			$method = $args;
+		else
+			$method = $_REQUEST;
+			
+		$q = check_arg("q", "string", $method);
+		$limit = check_arg("limit", "limit", $method, false);
+		$type = check_arg("type", "string", $method, false, array("image", "topic", "avatar"));
 		handle_errors();
 		
 		$sql = $uploadsql;
@@ -780,24 +672,34 @@
 		send($rows);
 	}
 	
-	function api_invite() {
-		$email = check_arg("email", "string");
+	function api_invite($args=null) {
+		if(is_array($args))
+			$method = $args;
+		else
+			$method = $_REQUEST;
+			
+		$email = check_arg("email", "string", $method);
 		handle_errors();
 		
 		send(false);
 	}
 	
-	function api_faq() {
+	function api_faq($args=null) {
 		send("<ul><li>Don't be retarded.</li></ul>");
 	}
 	
-	function api_getlocation() {
-		$userid = check_arg("userid", "integer", null, false);
-		$minlat = check_arg("minlat", "float", null, false);
-		$maxlat = check_arg("maxlat", "float", null, false);
-		$minlong = check_arg("minlong", "float", null, false);
-		$maxlong = check_arg("maxlong", "float", null, false);
-		$limit = check_arg("limit", "limit", null, false);
+	function api_getlocation($args=null) {
+		if(is_array($args))
+			$method = $args;
+		else
+			$method = $_REQUEST;
+			
+		$userid = check_arg("userid", "integer", $method, false);
+		$minlat = check_arg("minlat", "float", $method, false);
+		$maxlat = check_arg("maxlat", "float", $method, false);
+		$minlong = check_arg("minlong", "float", $method, false);
+		$maxlong = check_arg("maxlong", "float", $method, false);
+		$limit = check_arg("limit", "limit", $method, false);
 		handle_errors();
 		
 		$sql = "SELECT loc.x as latitude, loc.y as longitude, loc.timestamp, u.username, loc.userid
@@ -829,9 +731,14 @@
 		send($rows);
 	}
 
-	function api_setlocation() {
-		$lat = check_arg("lat", "float");
-		$long = check_arg("long", "float");
+	function api_setlocation($args=null) {
+		if(is_array($args))
+			$method = $args;
+		else
+			$method = $_REQUEST;
+			
+		$lat = check_arg("lat", "float", $method);
+		$long = check_arg("long", "float", $method);
 		$userid = $_SESSION['userid'];
 		handle_errors();
 		
@@ -840,16 +747,21 @@
 		send(true);
 	}
 	
-	function api_pickupid() {
+	function api_pickupid($args=null) {
 		send(false);
 	}
 	
 	
-	function api_unreadcomments() {
+	function api_unreadcomments($args=null) {
 		global $uploadsql;
 		
-		$sort = check_arg("sort", "string", null, false, array("comment_desc", "comment_asc", "file_asc", "file_desc"));
-		$limit = check_arg("limit", "limit", null, false);
+		if(is_array($args))
+			$method = $args;
+		else
+			$method = $_REQUEST;
+		
+		$sort = check_arg("sort", "string", $method, false, array("comment_desc", "comment_asc", "file_asc", "file_desc"));
+		$limit = check_arg("limit", "limit", $method, false);
 		handle_errors();
 		
 		if($sort === false) $sort = "file_asc";
@@ -898,9 +810,14 @@
 	}
 	
 	
-	function api_subscribe() {
-		$threadid = check_arg("threadid", "integer");
-		$subscribe = check_arg("subscribe", "integer", null, false, array("1", "0"));
+	function api_subscribe($args=null) {
+		if(is_array($args))
+			$method = $args;
+		else
+			$method = $_REQUEST;
+			
+		$threadid = check_arg("threadid", "integer", $method);
+		$subscribe = check_arg("subscribe", "integer", $method, false, array("1", "0"));
 		handle_errors();
 		
 		if($subscribe === false) $subscribe = 1;
@@ -926,4 +843,4 @@
 		send(true);
 	}
 
-?>
+?>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              

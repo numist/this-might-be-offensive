@@ -60,8 +60,8 @@
 ?>
 			<tr class="<? echo $cssw ?>">
 				<td style="text-align:right"><? echo ++$count ?>.</td>
-				<td><a class="<? echo $cssw ?>" href="pages/pic.php?id=<?= $row['fileid'] ?>" style="white-space: nowrap; width:312px; overflow:hidden; display:block;"><? echo htmlFilename($row)
-			    ?></a></td>
+				<td><div style="white-space:nowrap;width:312px;overflow:hidden;"><a class="<? echo $cssw ?>" href="pages/pic.php?id=<?= $row['fileid'] ?>"><? echo htmlFilename($row)
+			    ?></a></td></div>
 				<td><a class="<? echo $cssw ?>" href="./?c=user&userid=<? echo $row['userid'] ?>"><? echo htmlEscape($row['username']) ?></a></td>
 				<td><a class="<? echo $cssw ?>" href="./?c=comments&fileid=<?= $row['fileid'] ?>"><?= $row['comments'] ?></a></td>
 				<td>(+<? echo $row['votes'] ?>)</td>

@@ -210,9 +210,17 @@ table.thumbnails td a {
 	width:338px;
 }
 
+/* in the filename column on main page */
+#main .clipr {
+	float:left;
+	overflow:hidden;
+	white-space:nowrap;
+	width:420px;
+}
+
 /* date and timestamp columns on discussions page */
-#discussions .dater,
-#discussions .com_cnt {
+.dater,
+.com_cnt {
 	text-align:right;
 	white-space:nowrap;
 }

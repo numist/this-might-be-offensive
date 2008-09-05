@@ -95,7 +95,7 @@ LIMIT $start, $numPerPage";
 		</tr>
 		<tr>
 			<td valign="top" colspan="2">
-				<table width="100%">
+				<table width="100%" id="main">
             <?php
             $result = tmbo_query($sql);
             while( $row = mysql_fetch_assoc( $result ) ) 
@@ -105,10 +105,10 @@ LIMIT $start, $numPerPage";
 	      
               ?>
                   <tr class="<?= $css ?>">
-                    <td class="<?= $css ?>">
-							<a href="pages/pic.php?id=<?= $row['id'] ?>" class="<?= $css ?>" title="uploaded by <?= htmlEscape($row['username']) ?>" style="white-space: nowrap; width:400px; overflow:hidden; display:block;"><?= $filename ?></a>
+                    <td>
+							<div class="clipr"><a href="pages/pic.php?id=<?= $row['id'] ?>" class="<?= $css ?>" title="uploaded by <?= htmlEscape($row['username']) ?>"><?= $filename ?></a></div>
 					</td>
-					<td class="<?= $css ?>" style="text-align:right;white-space:nowrap">
+					<td class="<?= $css ?> com_cnt" style="text-align:right;white-space:nowrap">
 						<a href="./?c=comments&fileid=<?= $row['id'] ?>" class="<?= $css ?>"><?= 
 				commentLabel($row['comments'], $row['good'], $row['bad'], $row['tmbo_vote']);
 			?></a>

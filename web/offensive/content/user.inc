@@ -159,7 +159,7 @@
 							
 							
 							$sql = "SELECT count(*) as thecount FROM users
-										WHERE referred_by={$usrid}";
+										WHERE referred_by=$usrid AND userid != $usrid";
 							$res = tmbo_query( $sql );
 							list( $possecount ) = mysql_fetch_array( $res );
 							
@@ -204,15 +204,6 @@
 <table style="width:100%">
 									
 <?php
-#		$sql = "SELECT up. * , up.id AS fileid, up.timestamp as uploadtime, users.username, comments.vote, count( comments.id ) AS thecount, sum( offensive ) AS offensive
-#				FROM offensive_uploads up, users
-#				LEFT JOIN offensive_comments comments ON up.id = comments.fileid
-#			WHERE up.userid = users.userid AND users.userid = $usrid AND (type='image' OR type='audio')
-#			GROUP BY up.id, vote
-#			ORDER BY up.timestamp DESC 
-#			LIMIT 300
-#";
-
 		$sql = "SELECT up.*, up.id AS fileid, up.timestamp as uploadtime, counts.*
 				FROM offensive_uploads up
 				LEFT JOIN offensive_count_cache counts ON up.id = counts.threadid
@@ -253,13 +244,13 @@ function emitFileRow( $css, $row ) {
 	$timestamp = $row['uploadtime'];
 	$type = $row['type'];
 ?>
-	<tr>
-		<td style="width:100%" class="<?php echo $css?>"><div class="clipper"><a href="<?
+	<tr class="<?= $css ?>">
+		<td style="width:100%"><div style="overflow:hidden;white-space:nowrap;width:285px;"><a class="<?= $css ?>" href="<?
 		if($type == "image" || $type == "avatar") 
 			echo "pages/pic.php?id=$id";
 		else
 			echo "/offensive/?c=comments&fileid=$id";
-		?>" class="<?php echo $css?>" style="white-space: nowrap; width:312px; overflow:hidden; display:block;"><?= htmlFilename($row, true) ?></div></td>
+		?>"><?= htmlFilename($row, true) ?></div></td>
 		<td class="<?php echo $css?>" style="text-align:right;white-space:nowrap;width:100%"><a href="./?c=comments&fileid=<?php echo $id ?>" class="<?php echo $css?>"><?=
 			commentLabel($comments, $good, $bad, $offensive, !($type == 'topic'));
 		?></a></td>
@@ -282,18 +273,18 @@ function recentComments( $uid ) {
 	
 ?>
 	<div class="piletitle">the smartypants' most recent remarks:</div>
-	<div style="padding:8px;">
+	<div style="padding:8px;"><table width="535px">
 
 <?
 
 	while( $row = mysql_fetch_assoc( $result ) ) {
 		$css = isset($css) && strpos($css, "even") !== false ? "oddfile odd_row" : "evenfile even_row";
 ?>
-		<div><a class="<?= $css ?>" href="?c=comments&fileid=<?= $row['id'] ?>#<?= $row['commentid'] ?>" style="white-space: nowrap; width:540px; overflow:hidden; display:block;"><?= htmlFilename($row) ?></a></div>
+		<tr class="<?= $css ?>"><td><div style="white-space:nowrap; width:535px; overflow:hidden;"><a class="<?= $css ?>" href="?c=comments&fileid=<?= $row['id'] ?>#<?= $row['commentid'] ?>"><?= htmlFilename($row) ?></a></div></td></tr>
 <?
 	}
 ?>
-	</div>
+	</table></div>
 <?
 
 }
