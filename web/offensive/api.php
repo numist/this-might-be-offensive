@@ -1,11 +1,23 @@
 <?
-	if(!isset($_SERVER["HTTPS"]) || $_SERVER["HTTPS"] != "on") {
+	set_include_path("..");
+	// set up the normal TMBO environment
+	require_once( 'offensive/assets/header.inc' );
+	require_once( "offensive/assets/activationFunctions.inc" );
+	require_once( 'admin/mysqlConnectionInfo.inc' );
+	if(!isset($link) || !$link) $link = openDbConnection();
+	require_once("offensive/assets/functions.inc");
+
+	// if not logged in, force a switch to ssl.
+	if(!loggedin() && (!isset($_SERVER["HTTPS"]) || $_SERVER["HTTPS"] != "on")) {
 		header("Location: https://".$_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"], 301);
 		exit;
 	}
 
-	set_include_path("..");
-
+	// XXX: calls into the API should probably update ip_history.
+	// XXX: trigger_error should be overloaded in the API so it does the right thing.
+	
+	define("E_USER_*", E_USER_ERROR | E_USER_WARNING | E_USER_NOTICE); //??
+	
 	require_once("offensive/assets/argvalidation.inc");
 		
 	// some output types (notably xml) like to know what kinds
@@ -13,10 +25,12 @@
 	$objects = null;
 
 	// get function name and return type
-	$call = array_pop(explode("/", $_SERVER["REQUEST_URI"]));
+	$broken = explode("/", $_SERVER["REQUEST_URI"]);
+	$call = array_pop($broken);
 	list($func, $rtype) = explode(".", $call);
 	if(strpos($rtype, "?") !== false) {
-		$rtype = array_shift(explode("?", $rtype));
+		$broken = explode("?", $rtype);
+		$rtype = array_shift($broken);
 	}
 	
 	// return type validation and definitions:
@@ -38,13 +52,6 @@
 		echo "the function you requested ($func) was not found on this server.";
 		exit;
 	}
-
-	// set up the normal TMBO environment
-	require_once( 'offensive/assets/header.inc' );
-	require_once( "offensive/assets/activationFunctions.inc" );
-	require_once( 'admin/mysqlConnectionInfo.inc' );
-	if(!isset($link) || !$link) $link = openDbConnection();
-	require_once("offensive/assets/functions.inc");
 	
 	// authentication
 	if($func != "login" && !loggedin(false)) {
@@ -223,7 +230,7 @@
 			if($rows[$i]['repost'] == null) unset($rows[$i]['repost']);
 		}
 	}
-	
+
 /**
 	API functions
 **/	
@@ -299,7 +306,7 @@
 		global $objects; $objects = $type ? $type : "upload";
 		send($rows);
 	}
-	
+
 	function api_getupload($args=null) {
 		global $uploadsql;
 		
@@ -323,7 +330,7 @@
 		
 		send($row);
 	}
-	
+
 	function api_getyearbook($args=null) {
 		global $uploadsql;
 		
@@ -382,7 +389,7 @@
 			send($rows);
 		}
 	}
-	
+
 	function api_getuser($args=null) {
 		if(is_array($args))
 			$method = $args;
@@ -404,7 +411,7 @@
 
 		send(get_row($sql));
 	}
-	
+
 	function api_getposse($args=null) {
 		if(is_array($args))
 			$method = $args;
@@ -430,7 +437,7 @@
 		
 		send(get_rows($sql));
 	}
-	
+
 	function api_login($args=null) {
 		if(is_array($args))
 			$method = $args;
@@ -457,12 +464,12 @@
 		$_REQUEST['userid'] = $_SESSION['userid'];
 		api_getuser();
 	}
-	
+
 	function api_logout($args=null) {
 		session_unset();
 		send(true);
 	}
-	
+
 	function api_getcomments($args=null) {
 		global $commentsql;
 		
@@ -555,23 +562,80 @@
 		
 		send($rows);
 	}
-	
+
+	// XXX: factor this out
 	function api_postcomment($args=null) {
 		if(is_array($args))
 			$method = $args;
 		else
 			$method = $_POST;
 			
-		$fileid = check_arg("fileid", "integer", $methd);
+		$fileid = check_arg("fileid", "integer", $method);
 		$comment = check_arg("comment", "string", $method, false);
 		$vote = check_arg("vote", "string", $method, false, array("this is good", "this is bad"));
 		$offensive = check_arg("offensive", "integer", $method, false, array("1", "0"));
 		$repost = check_arg("repost", "integer", $method, false, array("1", "0"));
 		handle_errors();
+		$userid = $_SESSION['userid'];
 		
-		send(false);
+		// if no comment, vote, offensive, or repost, then why are you here?
+		if(!($comment || $vote || $offensive || $repost)) {
+			trigger_error("nothing to do!", E_USER_WARNING);
+			send(false);
+		}
+		
+		// check to see if the fileid is valid
+		$sql = "SELECT filename, nsfw, tmbo, timestamp, type FROM offensive_uploads WHERE id=$fileid";
+		$result = tmbo_query( $sql );
+		if(mysql_num_rows($result) == 0) {
+			trigger_error("invalid fileid ($fileid)", E_USER_ERROR);
+		}
+		
+		// prevent double-votes and self-voting
+		// XXX: call to alreadyVoted
+		$sql = "SELECT count( vote ) AS thecount FROM offensive_comments WHERE fileid=$fileid AND userid=$userid AND vote LIKE 'this%'";
+		if(mysql_num_rows(tmbo_query($sql)) && $vote)
+			trigger_error("no double voting, I don't care how good/bad it is!", E_USER_ERROR);
+		$sql = "SELECT userid FROM offensive_uploads WHERE id = $fileid";
+		if(mysql_num_rows(tmbo_query($sql)) && $vote)
+			trigger_error("you can't vote on your own images.", E_USER_ERROR);
+		
+		// protect the changeblog
+		if($fileid == "211604" && $_SESSION['status'] != "admin") return;
+		
+		// update the offensive_count_cache
+		$good_count = ($vote == "this is good") ? 1 : 0;
+		$bad_count = ($vote == "this is bad") ? 1 : 0;
+		$comment_count = (strlen( $comment ) > 0 ? 1 : 0 );
+
+		$sql = "INSERT INTO offensive_count_cache ( threadid, good, bad, repost, tmbo, comments ) 
+		        VALUES ( $fileid, $good_count, $bad_count, $repost, $offensive, $comment_count )
+		        ON DUPLICATE KEY UPDATE good = good + $good_count,
+                                        bad = bad + $bad_count,
+                                        repost = repost + $repost,
+                                        tmbo = tmbo + $offensive,
+                                        comments = comments + $comment_count";
+		tmbo_query($sql);
+
+		// sanitize the comment
+		if($comment) $comment = trim(sqlEscape($comment));
+		
+		$sql = "INSERT INTO offensive_comments ( userid, fileid, comment, vote, offensive, repost, user_ip ) 
+		        VALUES ( $userid, $fileid, '$comment', '$vote', $offensive, $repost, '".sqlEscape($_SERVER['REMOTE_ADDR'])."')";
+		tmbo_query($sql);
+		
+		if($comment != false || $vote == "this is bad") {
+			// XXX: call to subscribe! sigh.
+			$sql = "SELECT * FROM offensive_subscriptions WHERE userid = $userid AND fileid = $fileid";
+			if(!mysql_num_rows(tmbo_query($sql))) {
+				$sql = "INSERT INTO offensive_subscriptions (userid, fileid) VALUES ( $userid, $fileid )";
+				tmbo_query( $sql );
+			}
+		}
+		
+		send(true);
 	}
-	
+
 	// XXX: to upload a file from within, do not call this function directly!
 	function api_postupload($args=null) {
 		$type = check_arg("type", "string", null, true, array("avatar", "image"));
@@ -587,7 +651,7 @@
 		
 		send(false);
 	}
-	
+
 	function api_posttopic($args=null) {
 		if(is_array($args))
 			$method = $args;
@@ -600,7 +664,7 @@
 		
 		send(false);
 	}
-	
+
 	function api_searchcomments($args=null) {
 		global $commentsql;
 		
@@ -624,7 +688,7 @@
 		
 		send($rows);
 	}
-	
+
 	function api_searchuser($args=null) {
 		if(is_array($args))
 			$method = $args;
@@ -641,7 +705,7 @@
 
 		api_getuser(array('userid' => $row['userid']));
 	}
-	
+
 	function api_searchuploads($args=null) {
 		global $uploadsql;
 		
@@ -671,7 +735,7 @@
 		
 		send($rows);
 	}
-	
+
 	function api_invite($args=null) {
 		if(is_array($args))
 			$method = $args;
@@ -683,11 +747,11 @@
 		
 		send(false);
 	}
-	
+
 	function api_faq($args=null) {
 		send("<ul><li>Don't be retarded.</li></ul>");
 	}
-	
+
 	function api_getlocation($args=null) {
 		if(is_array($args))
 			$method = $args;
@@ -746,12 +810,11 @@
 		$result = tmbo_query( $sql );
 		send(true);
 	}
-	
+
 	function api_pickupid($args=null) {
 		send(false);
 	}
-	
-	
+
 	function api_unreadcomments($args=null) {
 		global $uploadsql;
 		
@@ -809,7 +872,7 @@
 		send($rows);
 	}
 	
-	
+	// XXX: factor this out
 	function api_subscribe($args=null) {
 		if(is_array($args))
 			$method = $args;
@@ -824,7 +887,7 @@
 		$userid = $_SESSION['userid'];
 		
 		if($subscribe == 1) {
-			$sql = "SELECT * FROM offensive_subscriptions WHERE userid = $user AND fileid = $threadid";
+			$sql = "SELECT * FROM offensive_subscriptions WHERE userid = $userid AND fileid = $threadid";
 			if(mysql_num_rows(tmbo_query($sql)) > 0) {
 				send(true);
 			}

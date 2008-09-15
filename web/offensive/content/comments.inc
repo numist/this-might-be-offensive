@@ -27,7 +27,7 @@
 	}
 
 
-	
+	// XXX: this needs to be factored out.
 	function subscribe( $fileid, $uid ) {
 		if( ! is_numeric( $uid ) || ! is_numeric( $fileid ) ) {
 			return;
@@ -200,33 +200,21 @@
 
 	function head() {
 ?>
+	<script type="text/javascript" src="/offensive/js/jquery-1.2.6.min.js"></script>
+
+	<script type="text/javascript" src="/offensive/js/subscriptions.js"></script>
+
 	<script type="text/javascript">
-		
-		function handleKeyDown( e ) {
-
-			if( e == null || e.which == null ) {
-				return true;
-			}
-			
-			var id;
-			
-			switch( e.which ) {
-			
-				case 38:
-					id = "pic";
-				break;
-
-			}
-			
-			if( id ) {
-				document.location.href = document.getElementById( id ).href;
-			}
-			return false;
-		
-		}
-		
+		$(document).ready(function() {
+			$("#subscribeLink").click(function(e) {
+				handle_subscribe($(this),e,$("#fileid").attr("value"));
+			});
+			$("#unsubscribeLink").click(function(e) {
+				handle_subscribe($(this),e,$("#fileid").attr("value"));
+			});
+		});
 	</script>
-	
+		
 <?
 	}
 	
@@ -476,12 +464,12 @@
 
 			</div>
 			<div class="heading">
-				<div style="float:right">
+				<div style="float:right">					
 					<? if( $subscribed ) { ?>
-						<b><a href="subscribe.php?un=1&fileid=<?= $fid ?>" title="take this thread off my 'unread comments' watch list." class="orange">unsubscribe</a></b>
+						<b><a id="unsubscribeLink" href="subscribe.php?un=1&fileid=<?= $fid ?>" title="take this thread off my 'unread comments' watch list." class="orange">unsubscribe</a></b>
 					<? }
 						else { ?>
-						<b><a href="subscribe.php?fileid=<?= $fid ?>" title="watch this thread for new comments." class="orange">subscribe</a></b>
+						<b><a id="subscribeLink" href="subscribe.php?fileid=<?= $fid ?>" title="watch this thread for new comments." class="orange">subscribe</a></b>
 					<?	}
 					?>
 				</div>
@@ -518,7 +506,7 @@
 
 			
 				<p>
-					<input type="hidden" name="fileid" value="<?php echo $_REQUEST['fileid']?>"/>
+					<input type="hidden" id="fileid" name="fileid" value="<?php echo $_REQUEST['fileid']?>"/>
 					<input type="hidden" name="c" value="comments"/>
 					<textarea name="comment" rows="12" cols="64"></textarea>
 				</p>

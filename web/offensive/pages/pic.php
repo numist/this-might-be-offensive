@@ -7,7 +7,7 @@
 
 	mustLogIn();
 
-	$id = $_REQUEST['id'];
+	$id = (isset($_REQUEST['random'])) ? get_random_id() : $_REQUEST['id'];
 	if( ! is_numeric( $id ) ) {
 		header( "Location: ../" );
 	}
@@ -21,14 +21,22 @@
 	}
 
 	require_once('offensive/assets/getPrefs.inc');
-	require_once('offensive/assets/functions.inc');
+	//require_once('offensive/assets/functions.inc');
 	
-	$id = $_REQUEST['id'];
+	//$id = $_REQUEST['id'];
 
 	function thisOrZero( $value ) {
 		return (is_numeric( $value ) ? $value : 0);
 	}
 
+
+	function get_random_id()
+	{
+		$sql = "select id from offensive_uploads where type='image' and status='normal' order by RAND() limit 1";
+		$res = tmbo_query($sql);
+		$row = mysql_fetch_assoc( $res );
+		return($row['id']);
+	}
 
 	function writeNav( $id ) {
 	
@@ -90,6 +98,7 @@
 		<? } else { ?>
 			<a id="previous" href="../" style="visibility:hidden">older</a>
 		<?}
+		?>&nbsp;<a href="/offensive/pages/pic.php?random=1">random</a><?
 	}
 
 	function getFileSize( $fpath ) {
@@ -137,26 +146,41 @@
 				top.location.href = window.location.href;
 			}
 		</script>
-		<script type="text/javascript" src="offensive.js"></script>
+		<script type="text/javascript" src="/offensive/js/jquery-1.2.6.min.js"></script>
+		<script type="text/javascript" src="/offensive/js/picui.js"></script>
+		<script type="text/javascript" src="/offensive/js/subscriptions.js"></script>
+		<script type="text/javascript" src="/offensive/js/jqModal.js"></script>
+		<script type="text/javascript" src="/offensive/js/jqDnR.js"></script>
 
 	</head>
-	<body onload="doOnloadStuff()" onkeydown="return handleKeyDown( event );">
+	<body>
 	<!-- message -->
 	<div style="white-space:nowrap;overflow:hidden;padding:3px;margin-bottom:0px;background:#000033;color:#ff6600;font-size:10px;font-weight:bold;padding-left:4px;">
-		<div style="float:right;"><a href="#" style="color:#ff6600" onclick="toggleVisibility( document.getElementById( 'instructions' ) ); return false">?</a></div>
+		<div id="instruction_link" style="float:right;"><a href="#" style="color:#ff6600">?</a></div>
 		<div>consciousness doesn't really exist. it's just another one of our ideas.</div>
 	</div>
-	<div id="instructions" style="display:none;white-space:nowrap;overflow:hidden;padding:3px;margin-bottom:6px;background:#cccccc;color:#333333">left arrow = newer . up arrow = index . right arrow = older . down arrow = comments . plus key = [ this is good ] . minus key = [ this is bad ] . (because clicking is too hard.)</div>
+	<div id="instructions" style="display:none;white-space:nowrap;overflow:hidden;padding:3px;margin-bottom:6px;background:#cccccc;color:#333333">← = newer. ↑ = index. → = older. ↓ = comments . + or = votes [ this is good ]. - votes [ this is bad ] .<br />
+q = quick comment, Esc closes quick comment box, ? = random image.<br />
+(because clicking is too hard.)</div>
 
+	<!-- this window is not visible unless you do a quick comment -->
+	<!-- data is fetched using ajax in js and put in #qc_bluebox  -->
+	<div class="jqmWindow" id="dialog">
+		<div class="blackbar"></div>
+		<div class="heading"><table style="width: 100%;"><tr>
+			<td align="left">and then you came along and were all:</td>
+			<td class="qc_close" align="right"><a href="#" class="jqmClose">Close</a></td>
+		</tr></table></div>
+		<div class="bluebox" id="qc_bluebox" style="text-align: center">
+		</div>
+	</div> <!-- end quickcomment -->
 	<div id="content">
 		<div id="heading">
 
 			&nbsp;&nbsp;
 
 				<? fileNav( $nextid, $previd, $uploaderid, $uploader, $type); ?>
-				 <a style="margin-left:48px;" id="comments" href="/offensive/?c=comments&fileid=<? echo $id?>">comments</a> (<?php 
-// XXX: this might be a good place for commentLabel($comments, $good, $bad, $tmbo)?  that <span> doesn't jibe.
-					echo "{$comments}c +$good -$bad"; if( $tmbo > 0 ) { echo " <span style=\"color:#990000\">x$tmbo</span>"; }?>)	
+				<a style="margin-left:48px;" id="comments" href="/offensive/?c=comments&fileid=<? echo $id?>">comments</a> (<span id="count_comment"><?= $comments ?></span>c +<span id="count_good"><?= $good ?></span> -<span id="count_bad"><?= $bad ?></span><?php if( $tmbo > 0 ) { echo " <span style=\"color:#990000\">x$tmbo</span>"; }?>)&nbsp;&nbsp(<a id="quickcomment" class="jqModal" href="#">quick</a>)
 
 						<span style="margin-left:48px;">
 						<?
@@ -284,8 +308,8 @@
 		$class = $enabled ? "on" : "off";
 	?>
 		<span id="votelinks" class="<?= $class ?>">
-		vote: <a id="good" class="votelink" <?= $good_href ?>>[ this is good ]</a> . 
-			  <a id="bad" class="votelink" <?= $bad_href ?>>[ this is bad ]</a>
+		vote: <a name="<?= $id ?>" id="good" class="votelink" <?= $good_href ?>>[ this is good ]</a> .
+			<a name="<?= $id ?>" id="bad" class="votelink" <?= $bad_href ?>>[ this is bad ]</a>
 		</span>
 	<?
 	}

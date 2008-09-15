@@ -37,3 +37,79 @@ body {
 		}
 	?>
 }
+
+.jqmWindow {
+    display: none;
+    position: fixed;
+    top: 50px;
+    left: 0px;
+    margin-left: 250px;
+    width: 600px;
+    background: #ccccff none repeat scroll 0 0;
+    color: #333;
+    border: 2px solid black;
+}
+
+.jqmOverlay { background-color: #000; }
+
+/* Fixed posistioning emulation for IE6
+     Star selector used to hide definition from browsers other than IE6
+     For valid CSS, use a conditional include instead */
+/*
+* html .jqmWindow {
+     position: absolute;
+     top: expression((document.documentElement.scrollTop || document.body.scrollTop) + Math.round(17 * (document.documentElement.offsetHeight || document.body.clientHeight) / 100) + 'px');
+}
+*/
+
+.blackbar {
+        background: #000000;
+        height: 11px;
+        border-top: 1px solid #666699;
+        border-left: 1px solid #333333;
+}
+
+.heading {
+        background: #000033;
+        padding: 5px;
+        font-family: verdana;
+        font-size: 10px;
+        font-weight: bold;
+        color: #ccccff;
+}
+
+.qc_close a:link, qc_close a:visited, qc_close a:active, .qc_close a {
+	color: #ccccff;
+}
+
+#qc_comments {
+	text-align: left;
+	margin: 25px 45px 25px 45px;
+}
+
+#qc_commentrows {
+	margin-top: 10px;
+	height: 250px;
+	overflow: auto;
+}
+
+.qc_comment {
+	background: #ccccff;
+	padding: 10px;
+	font-size: 10px;
+	line-height:15px;
+}
+
+#qc_vote {
+}
+
+#qc_vote ul li {
+	display: inline;
+}
+
+.timestamp {
+	float: right;
+	padding-left: 8px;
+	font-size: 9px;
+	color: #9999cc;
+}
