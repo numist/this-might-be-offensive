@@ -224,8 +224,8 @@ function get_comments(hash) {
 				$("#dialog").jqmHide();
 				vote = $("#dialog input[@type=radio][@checked]").val();
 				comment = $("#qc_comment").val();
-				tmbo = $("#tmbo").attr("checked");
-				repost = $("#repost").attr("checked");
+				tmbo = $("#tmbo").attr("checked") ? "1" : "0";
+				repost = $("#repost").attr("checked") ? "1" : "0";
 
 				if(vote == "this is good" || vote == "this is bad") {
 					disable_voting();

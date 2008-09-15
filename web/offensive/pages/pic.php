@@ -98,7 +98,6 @@
 		<? } else { ?>
 			<a id="previous" href="../" style="visibility:hidden">older</a>
 		<?}
-		?>&nbsp;<a href="/offensive/pages/pic.php?random=1">random</a><?
 	}
 
 	function getFileSize( $fpath ) {
