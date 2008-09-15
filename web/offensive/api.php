@@ -593,10 +593,10 @@
 		
 		// prevent double-votes and self-voting
 		// XXX: call to alreadyVoted
-		$sql = "SELECT count( vote ) AS thecount FROM offensive_comments WHERE fileid=$fileid AND userid=$userid AND vote LIKE 'this%'";
+		$sql = "SELECT vote AS thecount FROM offensive_comments WHERE fileid=$fileid AND userid=$userid AND vote LIKE 'this%'";
 		if(mysql_num_rows(tmbo_query($sql)) && $vote)
 			trigger_error("no double voting, I don't care how good/bad it is!", E_USER_ERROR);
-		$sql = "SELECT userid FROM offensive_uploads WHERE id = $fileid";
+		$sql = "SELECT userid FROM offensive_uploads WHERE id = $fileid AND userid = $userid";
 		if(mysql_num_rows(tmbo_query($sql)) && $vote)
 			trigger_error("you can't vote on your own images.", E_USER_ERROR);
 		
@@ -607,6 +607,8 @@
 		$good_count = ($vote == "this is good") ? 1 : 0;
 		$bad_count = ($vote == "this is bad") ? 1 : 0;
 		$comment_count = (strlen( $comment ) > 0 ? 1 : 0 );
+		if(!$repost) $repost = 0;
+		if(!$offensive) $offensive = 0;
 
 		$sql = "INSERT INTO offensive_count_cache ( threadid, good, bad, repost, tmbo, comments ) 
 		        VALUES ( $fileid, $good_count, $bad_count, $repost, $offensive, $comment_count )
