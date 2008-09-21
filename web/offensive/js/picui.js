@@ -64,7 +64,6 @@ function handle_keypress(o,e)
 {
 	var id;
 	if(e == null)  return true;
-	if(e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return true;
 
 	var keycode = (e.which == null) ? e.keyCode : e.which;
 	switch( keycode ) {
@@ -171,6 +170,8 @@ function handle_quickcomment()
 			$(document).keydown(function(e) {
 				handle_keypress($(this),e);
 			});
+			if($.browser.opera)
+				$("body div:first").removeClass('jqmOverlay');
 			hash.w.fadeOut('fast',function() {
 				hash.o.remove();
 				// empty the form 
@@ -260,6 +261,8 @@ function handle_comment_post(fileid, comment, vote, tmbo, repost) {
 		  vote: vote,
 		  offensive: tmbo,
 		  repost: repost
+		}, function(data) {
+			greyout_voting();
 		}
 	);
 	// if you made a comment or you voted 'this is bad', you have auto-subscribed to the thread
@@ -270,9 +273,13 @@ function handle_comment_post(fileid, comment, vote, tmbo, repost) {
 
 function disable_voting() {
 	o = $("#good");
+        o.parent().find("a").removeAttr("href");        // remove all hrefs from the a links inside that div
+}
+
+function greyout_voting() {
+	o = $("#good");
         o.parent().removeClass("on");                   // switch the class from on to off
         o.parent().addClass("off");
-        o.parent().find("a").removeAttr("href");        // remove all hrefs from the a links inside that div
 }
 
 function increase_count(id) {
