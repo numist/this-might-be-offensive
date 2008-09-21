@@ -63,9 +63,8 @@ function do_vote(o) {
 function handle_keypress(o,e)
 {
 	var id;
-	if(e == null)  {
-		return true;
-	}
+	if(e == null)  return true;
+	if(e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return true;
 
 	var keycode = (e.which == null) ? e.keyCode : e.which;
 	switch( keycode ) {
@@ -144,6 +143,8 @@ function handle_keypress(o,e)
 // handle a keybased event. this code was incorporated from offensive.js, which has now been deprecated
 function handle_qc_keypress(o,e)
 {
+	if(e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return true;
+
 	var id;
 	if(e == null)  {
 		return true;
