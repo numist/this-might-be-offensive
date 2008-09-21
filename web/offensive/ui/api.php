@@ -104,7 +104,7 @@ function api_getquickcommentbox() {
 ?>
 			<br />
 			<div class="timestamp"><?= $comment_timestamp ?></div>
-			&raquo; <a href="./?c=user&userid=<?= $userid ?>"><?= $username ?></a>
+			&raquo; <a href="/offensive/?c=user&userid=<?= $userid ?>"><?= $username ?></a>
 <?php
 			if($vote != '') {
 				echo '<span class="vote">[ ' . $vote .' ]</span>';

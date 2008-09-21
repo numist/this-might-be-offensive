@@ -73,6 +73,7 @@ function handle_keypress(o,e)
 		case 107: // + (numpad)
 		case 187: // =
 		case 174: // Wii +
+			e.preventDefault();
 			id = $("#good");
 			if(id.parent().hasClass('on')) {
 				do_vote(id);
@@ -83,6 +84,7 @@ function handle_keypress(o,e)
 		case 109: // - (numpad)
 		case 189: // -
 		case 170: // Wii -
+			e.preventDefault();
 			id = $("#bad");
 			if(id.parent().hasClass('on')) {
 				do_vote(id);
@@ -97,7 +99,7 @@ function handle_keypress(o,e)
 			break;
 
 		case 191: // ?
-		case 0:   // XXX: what.
+			e.preventDefault();
 			document.location.href = "/offensive/pages/pic.php?random";	
 			return;
 			break;
@@ -105,21 +107,25 @@ function handle_keypress(o,e)
 	// following not ajaxified
 		case 39:  // →
 		case 177: // Wii Right
+			e.preventDefault();
 			id = "previous";
 			break;
 
 		case 37:  // ←
 		case 178: // Wii Left
+			e.preventDefault();
 			id = "next";
 			break;
 
 		case 38:  // ↑
 		case 175: // Wii Up
+			e.preventDefault();
 			id = "index";
 			break;
 	
 		case 40:  // ↓
 		case 176: // Wii Down
+			e.preventDefault();
 			id = "comments";
 			break;
 	
@@ -146,6 +152,7 @@ function handle_qc_keypress(o,e)
 	var keycode = (e.which == null) ? e.keyCode : e.which;
 	switch( keycode ) {
 		case 27:  // Esc
+			e.preventDefault();
 			$("#dialog").jqmHide();
 			return;
 			break;
