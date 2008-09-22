@@ -56,7 +56,7 @@
 		
 		// if the file does not at all exist not even a little bit, 404.
 		if(mysql_num_rows($result) == 0) {
-			header("Location: ../ ");
+			require("offensive/404.php");
 		}
 		
 		$row = mysql_fetch_assoc( $result );

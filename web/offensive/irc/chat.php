@@ -38,10 +38,10 @@ mustLogIn();
 			<div class="blackbar"></div>
 			<div class="heading">welcome to #themaxx on EFnet</div>
 			<div class="bluebox">
-				<applet code=IRCApplet.class archive="../assets/irc.jar,../assets/pixx.jar" width=100% height=500>
-					<param name="CABINETS" value="../assets/irc.cab,../assets/securedirc.cab,../assets/pixx.cab">
-					<param name="language" value="../assets/english">
-					<param name="pixx:language" value="../assets/pixx-english">
+				<applet code=IRCApplet.class archive="irc.jar,pixx.jar" width=100% height=500>
+					<param name="CABINETS" value="irc.cab,securedirc.cab,pixx.cab">
+					<param name="language" value="english">
+					<param name="pixx:language" value="pixx-english">
 							
 					<param name="nick" value="<?= $_SESSION['username'] ?>">
 					<param name="alternatenick" value="tmb<?= $_SESSION['userid']?>">

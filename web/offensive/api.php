@@ -230,6 +230,8 @@
 			if($rows[$i]['repost'] == null) unset($rows[$i]['repost']);
 		}
 	}
+	
+	require_once("offensive/assets/comments.inc");
 
 /**
 	API functions
@@ -563,18 +565,12 @@
 		send($rows);
 	}
 
-	// XXX: factor this out
-	function api_postcomment($args=null) {
-		if(is_array($args))
-			$method = $args;
-		else
-			$method = $_POST;
-			
-		$fileid = check_arg("fileid", "integer", $method);
-		$comment = check_arg("comment", "string", $method, false);
-		$vote = check_arg("vote", "string", $method, false, array("this is good", "this is bad"));
-		$offensive = check_arg("offensive", "integer", $method, false, array("1", "0"));
-		$repost = check_arg("repost", "integer", $method, false, array("1", "0"));
+	function api_postcomment() {
+		$fileid = check_arg("fileid", "integer", $_POST);
+		$comment = check_arg("comment", "string", $_POST, false);
+		$vote = check_arg("vote", "string", $_POST, false, array("this is good", "this is bad"));
+		$offensive = check_arg("offensive", "integer", $_POST, false, array("1", "0"));
+		$repost = check_arg("repost", "integer", $_POST, false, array("1", "0"));
 		handle_errors();
 		$userid = $_SESSION['userid'];
 		
@@ -584,56 +580,12 @@
 			send(false);
 		}
 		
-		// check to see if the fileid is valid
-		$sql = "SELECT filename, nsfw, tmbo, timestamp, type FROM offensive_uploads WHERE id=$fileid";
-		$result = tmbo_query( $sql );
-		if(mysql_num_rows($result) == 0) {
-			trigger_error("invalid fileid ($fileid)", E_USER_ERROR);
-		}
+		if($comment === false) $comment = "";
+		if($vote === false) $vote = "";
+		if($offensive === false) $offensive = 0;
+		if($repost === false) $repost = 0;
 		
-		// prevent double-votes and self-voting
-		// XXX: call to alreadyVoted
-		$sql = "SELECT vote AS thecount FROM offensive_comments WHERE fileid=$fileid AND userid=$userid AND vote LIKE 'this%'";
-		if(mysql_num_rows(tmbo_query($sql)) && $vote)
-			trigger_error("no double voting, I don't care how good/bad it is!", E_USER_ERROR);
-		$sql = "SELECT userid FROM offensive_uploads WHERE id = $fileid AND userid = $userid";
-		if(mysql_num_rows(tmbo_query($sql)) && $vote)
-			trigger_error("you can't vote on your own images.", E_USER_ERROR);
-		
-		// protect the changeblog
-		if($fileid == "211604" && $_SESSION['status'] != "admin") return;
-		
-		// update the offensive_count_cache
-		$good_count = ($vote == "this is good") ? 1 : 0;
-		$bad_count = ($vote == "this is bad") ? 1 : 0;
-		$comment_count = (strlen( $comment ) > 0 ? 1 : 0 );
-		if(!$repost) $repost = 0;
-		if(!$offensive) $offensive = 0;
-
-		$sql = "INSERT INTO offensive_count_cache ( threadid, good, bad, repost, tmbo, comments ) 
-		        VALUES ( $fileid, $good_count, $bad_count, $repost, $offensive, $comment_count )
-		        ON DUPLICATE KEY UPDATE good = good + $good_count,
-                                        bad = bad + $bad_count,
-                                        repost = repost + $repost,
-                                        tmbo = tmbo + $offensive,
-                                        comments = comments + $comment_count";
-		tmbo_query($sql);
-
-		// sanitize the comment
-		if($comment) $comment = trim(sqlEscape($comment));
-		
-		$sql = "INSERT INTO offensive_comments ( userid, fileid, comment, vote, offensive, repost, user_ip ) 
-		        VALUES ( $userid, $fileid, '$comment', '$vote', $offensive, $repost, '".sqlEscape($_SERVER['REMOTE_ADDR'])."')";
-		tmbo_query($sql);
-		
-		if($comment != false || $vote == "this is bad") {
-			// XXX: call to subscribe! sigh.
-			$sql = "SELECT * FROM offensive_subscriptions WHERE userid = $userid AND fileid = $fileid";
-			if(!mysql_num_rows(tmbo_query($sql))) {
-				$sql = "INSERT INTO offensive_subscriptions (userid, fileid) VALUES ( $userid, $fileid )";
-				tmbo_query( $sql );
-			}
-		}
+		postComment($fileid, $vote, $repost, $offensive, $comment);
 		
 		send(true);
 	}
@@ -874,38 +826,15 @@
 		send($rows);
 	}
 	
-	// XXX: factor this out
-	function api_subscribe($args=null) {
-		if(is_array($args))
-			$method = $args;
-		else
-			$method = $_REQUEST;
-			
-		$threadid = check_arg("threadid", "integer", $method);
-		$subscribe = check_arg("subscribe", "integer", $method, false, array("1", "0"));
+	function api_subscribe() {	
+		$threadid = check_arg("threadid", "integer", $_REQUEST);
+		$subscribe = check_arg("subscribe", "integer", $_REQUEST, false, array("1", "0"));
 		handle_errors();
 		
-		if($subscribe === false) $subscribe = 1;
-		$userid = $_SESSION['userid'];
-		
-		if($subscribe == 1) {
-			$sql = "SELECT * FROM offensive_subscriptions WHERE userid = $userid AND fileid = $threadid";
-			if(mysql_num_rows(tmbo_query($sql)) > 0) {
-				send(true);
-			}
-			$sql = "SELECT * FROM offensive_uploads WHERE id = $threadid";
-			if(mysql_num_rows(tmbo_query($sql)) == 0) {
-				send(false);
-			}
-
-			$sql = "INSERT INTO offensive_subscriptions (userid, fileid) VALUES ( $userid, $threadid )";
-			tmbo_query( $sql );
-			send(true);
+		if($subscribe == 0) {
+			send(unsubscribe($threadid));
 		}
-		
-		$sql = "DELETE FROM offensive_subscriptions WHERE userid=$userid AND fileid=$threadid";
-		tmbo_query( $sql );
-		send(true);
+		send(subscribe($threadid));
 	}
 
 ?>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              

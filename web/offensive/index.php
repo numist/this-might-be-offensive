@@ -112,7 +112,7 @@ $timelimit = 10;
 		l = (screen.width-w)/2;
 		t = (screen.height-h)/2;
 		widthHeight = "width="+w+",height="+h+",left="+l+",top="+t+",menubar=no,resizable=yes,scrollbars=no,status=no,toolbar=no,location=no";
-		window.open("/offensive/pages/chat.php","tmbo_chat",widthHeight);
+		window.open("/offensive/irc/chat.php","tmbo_chat",widthHeight);
 		return true
 	}
 </script>

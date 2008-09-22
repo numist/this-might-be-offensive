@@ -1,80 +1,17 @@
 <?php
 	// Include, and check we've got a connection to the database.
-	require_once( 'admin/mysqlConnectionInfo.inc' );
+	require_once("admin/mysqlConnectionInfo.inc");
 	if(!isset($link) || !$link) $link = openDbConnection();
-	require_once( 'offensive/assets/functions.inc' );
-	require_once( 'offensive/assets/getPrefs.inc' );
-	require_once( 'offensive/assets/tabs.inc' );
+	require_once("offensive/assets/functions.inc");
+	require_once("offensive/assets/getPrefs.inc");
+	require_once("offensive/assets/tabs.inc");
+	require_once("offensive/assets/comments.inc");
 
 // XXX: [tpg] — allow current winner to vote current image as new winner if [tpg] tag exists
 
-	function addBookmarks( $fileid, $commentid ) {		
-		$sql = "UPDATE offensive_subscriptions SET commentid = $commentid WHERE fileid = $fileid && commentid IS NULL";
-		$result = tmbo_query( $sql );
-	}
-
-	function additionalCssFor( $vote ) {
-		
-		if( strpos( $vote, 'bad' ) > 0 ) {
-			return " bad";
-		}
-
-		if( strpos( $vote, 'good' ) > 0 ) {
-			return " good";
-		}
-		
-		return "";
-	}
-
-
-	// XXX: this needs to be factored out.
-	function subscribe( $fileid, $uid ) {
-		if( ! is_numeric( $uid ) || ! is_numeric( $fileid ) ) {
-			return;
-		}
-		$sql = "SELECT * FROM offensive_subscriptions WHERE userid = $uid AND fileid = $fileid";
-		if(mysql_num_rows(tmbo_query($sql)) > 0) return;
-
-		$sql = "INSERT INTO offensive_subscriptions (userid, fileid) VALUES ($uid, $fileid)";
-		$result = tmbo_query( $sql );
-	}
-
-	function alreadyVoted( $uid, $fid ) {
-		$sql = "SELECT count( vote ) AS thecount FROM offensive_comments WHERE fileid=$fid AND userid=$uid AND vote LIKE 'this%'";
-		$result = tmbo_query( $sql );
-		$row = mysql_fetch_assoc( $result );
-		
-		$voted = ( $row[ 'thecount' ] > 0 );
-		return $voted;
-	}
-
-	function clearBookmarks( $userid, $fileid ) {
-		if(!loggedin()) {
-			return;
-		}
-		$sql = "UPDATE offensive_subscriptions SET commentid = NULL WHERE userid=$userid and fileid=$fileid";
-		$result = tmbo_query( $sql );
-
-	}
-	
 	function title() {
 		global $filename;
 		return "[ tmbo ] : " . $filename;
-	}
-	
-	function updateCommentCount( $threadid, $good, $bad, $repost, $tmbo, $comment ) {
-		$usrid = $_SESSION['userid'];
-		$sql = "INSERT INTO offensive_count_cache ( threadid, good, bad, repost, tmbo, comments )
-					VALUES ( $threadid, $good, $bad, $repost, $tmbo, $comment )
-					ON DUPLICATE KEY UPDATE
-							good = good + $good,
-							bad = bad + $bad,
-							repost = repost + $repost,
-							tmbo = tmbo + $tmbo,
-							comments = comments + $comment";
-		
-		$result = tmbo_query( $sql );
-
 	}
 
 	function start() {
@@ -90,13 +27,13 @@
 		$usrid = $_SESSION['userid'];
 		$fileid = $_REQUEST['fileid'];
 				
-		clearBookmarks( $usrid, $fileid );
+		clearSubscription($fileid, $usrid);
 
 		$sql = "SELECT filename, nsfw, tmbo, timestamp, type FROM offensive_uploads WHERE id=$fileid";
 		$result = tmbo_query( $sql );
 		
 		if(mysql_num_rows($result) == 0) {
-			header("Location: ./404.php");
+			require("offensive/404.php");
 			exit;
 		}
 		
@@ -122,7 +59,7 @@
 	        return;
 	    }
 	    
-	    // also quietly snub them if they are not an admin and they are trying to post to the changeblog
+	    // quietly snub them if they are not an admin and they are trying to post to the changeblog
 	    if(array_key_exists("submit", $_REQUEST) && $fileid == "211604" && $_SESSION['status'] != "admin") {
 	        return;
 	    }
@@ -169,7 +106,7 @@
 				$commentid = mysql_insert_id();
 				subscribe( $fileid, $_SESSION['userid'] );
 				if( strlen( $comment ) > 0 ) {
-					addBookmarks( $fileid, $commentid );
+					updateSubscriptions( $fileid, $commentid );
 				}
 			}
 			
@@ -239,10 +176,7 @@
 		global $expired;
 	
 	$fid = $_REQUEST['fileid'];
-	$sql = "SELECT * FROM offensive_subscriptions
-		WHERE userid=" . $_SESSION['userid'] . " 
-		&& fileid=$fid";
-	$subscribed = mysql_num_rows( tmbo_query($sql) ) > 0 ? true : false;
+	$subscribed = subscribed($fid);
 
 	$sql = "SELECT users.username, users.userid, users.account_status, offensive_uploads.filename, nsfw, tmbo, offensive_uploads.timestamp as upload_timestamp, offensive_uploads.type
 				FROM users, offensive_uploads
@@ -344,29 +278,7 @@
 				
 					$comment = htmlEscape($row['comment']);
     	
-/*					
-					// darkstalker and zetsumei drama queen gag
-					if( (! isset( $_REQUEST['dsgag'] ) )
-						&& ($_SESSION['userid'] != 1613 && $_SESSION['userid'] != 3940)
-						&& ($row['userid'] == 1613 || $row['userid'] == 3940 )
-						&& strlen( $comment ) > 0 )  {
-						$comment = "Hey everybody! Look at me! Look at me! I'm leaving! See? Here I go! Don't try to stop me!";
-					}
-					
- 
-*/
-// XXX: no, but we need a pink/rainbow one for when someone says "RHIIIIIIIIIIIIIIIIIIIIIIII!" 
-    	
 					if( ! isSquelched( $row['userid'] ) ) {
-						
-						//// remisser entrapping url gag
-						//-now that there's a fix in place, this isn't necessary.  plus it's been long enough
-						//if($_SESSION['userid'] != 2935 && $row['userid'] == 2935) {
-						//    $pattern = "/(http[s]*:\/\/[^\s<>]+)/i";
-						//                    	$replacement = "http://preview.tinyurl.com/2tx";
-						//                    	$comment = preg_replace( $pattern, $replacement, $comment );
-						//}
-					    
 						echo nl2br( linkUrls( $comment ) );
 					}
 					else {
