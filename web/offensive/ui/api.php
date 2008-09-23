@@ -82,7 +82,7 @@ function api_getquickcommentbox() {
 		</form>
 		<div id="qc_comments">
 <?php	// now fetch all the comments so you can see the comments in the quickcomment box
-	$sql = "SELECT offensive_comments.*, offensive_comments.id as commentid, offensive_comments.timestamp AS comment_timestamp, users.* FROM offensive_uploads, offensive_comments, users WHERE users.userid = offensive_comments.userid AND offensive_uploads.id=fileid AND fileid = '$fileid' AND offensive_comments.comment != '' ORDER BY offensive_comments.timestamp DESC";
+	$sql = "SELECT offensive_comments.*, offensive_comments.id as commentid, offensive_comments.timestamp AS comment_timestamp, users.* FROM offensive_uploads, offensive_comments, users WHERE users.userid = offensive_comments.userid AND offensive_uploads.id=fileid AND fileid = '$fileid' AND offensive_comments.comment != '' ORDER BY offensive_comments.timestamp ASC";
 	$result = tmbo_query( $sql );
 	$comments_exist = mysql_num_rows( $result ) > 0;
 

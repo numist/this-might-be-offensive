@@ -42,7 +42,7 @@ function subscribe($fileid, $userid=null) {
 	if(mysql_num_rows(tmbo_query($sql)) > 0) return true;
 
 	// ensure file exists
-	$sql = "SELECT * FROM offensive_uploads WHERE id = $threadid";
+	$sql = "SELECT * FROM offensive_uploads WHERE id = $fileid";
 	if(mysql_num_rows(tmbo_query($sql)) == 0) send(false);
 
     // finally, subscribe
