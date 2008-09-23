@@ -231,7 +231,7 @@
     	
 				<?php
 				
-					$commenttext = htmlEscape($comment->comment());
+					$commenttext = htmlEscape($comment->text());
     	
 					if( ! isSquelched( $commenter->id() ) ) {
 						echo nl2br( linkUrls( $commenttext ) );

@@ -102,12 +102,12 @@ class Upload {
 	
 	public function is_tmbo() {
 		return ($this->getUploadRow("tmbo") == 1 ||
-		        strpos(strtolower($this->getUploadRow("filename")), "[tmbo]") !== false);
+		        strpos(strtolower($this->filename()), "[tmbo]") !== false);
 	}
 	
 	public function is_nsfw() {
 		return ($this->getUploadRow("nsfw") == 1 ||
-		        strpos(strtolower($this->getUploadRow("filename")), "[nsfw]") !== false);
+		        strpos(strtolower($this->filename()), "[nsfw]") !== false);
 	}
 	
 	public function type() {
@@ -394,10 +394,12 @@ class Comment {
 	}
 	
 	public function tmbo() {
+		// XXX: this should eventually return a boolean
 		return $this->getCommentRow("offensive");
 	}
 	
 	public function tiar() {
+		// XXX: this should eventually return a boolean
 		return $this->getCommentRow("repost");
 	}
 	
@@ -405,7 +407,7 @@ class Comment {
 		return $this->getCommentRow("timestamp");
 	}
 	
-	public function comment() {
+	public function text() {
 		return $this->getCommentRow("comment");
 	}
 	
