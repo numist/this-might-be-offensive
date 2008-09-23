@@ -17,8 +17,8 @@
 	}
 
 	function title() {
-		global $filename;
-		return "[ tmbo ] : " . $filename;
+		global $upload;
+		return "[discuss] : " . $upload->filename();
 	}
 
 	function start() {

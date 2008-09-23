@@ -56,7 +56,7 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 		<META NAME="ROBOTS" CONTENT="NOARCHIVE" />
-		<title>[ <?= $upload->type() ?> ]<?= $upload->filename() ? " : ".$upload->filename(): ""; ?> </title>
+		<title>[<?= $upload->type() ?>] : <?= $upload->filename() ?> </title>
 		<link rel="stylesheet" type="text/css" href="styles.php"/>
 		<script type="text/javascript">
 			self.file_id = "";
