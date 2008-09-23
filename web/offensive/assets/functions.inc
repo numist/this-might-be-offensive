@@ -281,9 +281,7 @@ function htmlFilename($id, $showtype=false) {
 		$tags = "$type: $tags";
 	}
 	
-	$filename = strlen($tags) > 0 ? "$tags $filename" : $filename;
-	
-	return htmlEscape($filename);
+	return $tags.($tags?" ":"").htmlEscape($filename);
 }
 
 ?>
