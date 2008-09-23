@@ -102,12 +102,12 @@ class Upload {
 	
 	public function is_tmbo() {
 		return ($this->getUploadRow("tmbo") == 1 ||
-		        strpos(strtolower($filename), "[tmbo]"));
+		        strpos(strtolower($this->getUploadRow("filename")), "[tmbo]") !== false);
 	}
 	
 	public function is_nsfw() {
 		return ($this->getUploadRow("nsfw") == 1 ||
-		        strpos(strtolower($filename), "[nsfw]"));
+		        strpos(strtolower($this->getUploadRow("filename")), "[nsfw]") !== false);
 	}
 	
 	public function type() {
