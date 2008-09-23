@@ -330,7 +330,7 @@ $timelimit = 10;
 				<div class="blackbar"></div>
 					<? 
 					if($_REQUEST['c'] != "comments") whosOn(); 
-					else subscribed();
+					else whosubscribed();
 					?>
 				<div class="blackbar"></div>
 			</div>
@@ -485,7 +485,7 @@ $timelimit = 10;
 		echo "\t\t\t\t\t\t</table>\n\t\t\t\t\t</div>\n";
 	}
 
-	function subscribed() {
+	function whosubscribed() {
 		if(!is_numeric($_REQUEST['fileid'])) trigger_error("non-numeric fileid!", E_USER_ERROR);
 
 		$sql = "SELECT DISTINCT u.userid, u.username FROM offensive_subscriptions sub JOIN users u ON sub.userid = u.userid WHERE fileid = ".$_REQUEST['fileid']." ORDER BY u.username ASC";

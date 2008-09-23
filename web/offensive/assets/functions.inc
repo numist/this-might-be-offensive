@@ -1,10 +1,24 @@
 <?
+
+
+
 function linkUrls( $input ) {
 
 	// replace urls with 'themaxx.com' in them with the current server name.
 	$p = "/(http[s]*:\/\/[w]*\.*)themaxx\.com/i";
 	$r = "\\1" . $_SERVER['SERVER_NAME'];
 	$domainSwapped = preg_replace( $p, $r, $input );
+	
+	// to prevent weird navigation things, do the same for tmbo.org
+	$p = "/(http[s]*:\/\/[w]*\.*)tmbo\.org/i";
+	$r = "\\1" . $_SERVER['SERVER_NAME'];
+	$domainSwapped = preg_replace( $p, $r, $domainSwapped );
+	
+	// aand thismight.be
+	$p = "/(http[s]*:\/\/[w]*\.*)thismight\.be/i";
+	$r = "\\1" . $_SERVER['SERVER_NAME'];
+	$domainSwapped = preg_replace( $p, $r, $domainSwapped );
+	
 	$pattern = "/(http[s]*:\/\/[^\s<>]+)/i";
 	$replacement = "<a href=\"\\1\">\\1</a>";
 	return preg_replace( $pattern, $replacement, $domainSwapped );
@@ -45,6 +59,7 @@ function basePath($timestamp, $type, $nopath=false) {
 	return ($nopath ? "" : get_include_path()."/")."offensive/uploads/$year/$month/$day/$type/";
 }
 
+// XXX: to be deprecated!
 function getThumb($id, $filename, $timestamp, $type='image') {
 	if($id == null || $filename == '' || $timestamp == "" || $type == "") return "";
 	
@@ -92,6 +107,7 @@ function getThumb($id, $filename, $timestamp, $type='image') {
 	return $retname;
 }
 
+// XXX: to be deprecated!
 function getThumbURL($id, $filename, $timestamp, $type='image') {
 	if($id == null || $filename == '' || $timestamp == "" || $type == "") return "";
 	
@@ -100,6 +116,7 @@ function getThumbURL($id, $filename, $timestamp, $type='image') {
 	return "/offensive/graphics/previewNotAvailable.gif";
 }
 
+// XXX: to be deprecated!
 function getFile($id, $filename, $timestamp, $type='image') {
 	if($id == null || $filename == '' || $timestamp == "" || $type == "") return "";
 	
@@ -125,6 +142,7 @@ function getFile($id, $filename, $timestamp, $type='image') {
 	return $retname;
 }
 
+// XXX: to be deprecated!
 function getFileURL($id, $filename, $timestamp, $type='image') {
 	if($id == null || $filename == '' || $timestamp == "" || $type == "") return "";
 	
@@ -196,6 +214,7 @@ function hideImage($is_nsfw, $is_tmbo, $uploaderid) {
 		|| ( in_array( $uploaderid, explode( ',', $_SESSION['prefs']['squelched'] ) ) ) );
 }
 
+// XXX: to be deprecated!
 function commentLabel($comments, $good, $bad, $tmbo, $votes=true) {
 	if(!is_numeric($comments)) $comments = 0;
 	

@@ -6,8 +6,15 @@
 	require_once("offensive/assets/getPrefs.inc");
 	require_once("offensive/assets/tabs.inc");
 	require_once("offensive/assets/comments.inc");
+	require_once("offensive/assets/classes.inc");
 
 // XXX: [tpg] — allow current winner to vote current image as new winner if [tpg] tag exists
+
+	function additionalCssFor($vote) {
+		if(strpos($vote, 'bad') > 0) return " bad";
+		if(strpos($vote, 'good') > 0) return " good";
+		return "";
+	}
 
 	function title() {
 		global $filename;
@@ -15,7 +22,7 @@
 	}
 
 	function start() {
-		global $filename, $expired;
+		global $upload, $uploader, $expired;
 	
 		mustLogIn();
 
@@ -26,20 +33,19 @@
 		
 		$usrid = $_SESSION['userid'];
 		$fileid = $_REQUEST['fileid'];
+		
 				
 		clearSubscription($fileid, $usrid);
-
-		$sql = "SELECT filename, nsfw, tmbo, timestamp, type FROM offensive_uploads WHERE id=$fileid";
-		$result = tmbo_query( $sql );
 		
-		if(mysql_num_rows($result) == 0) {
+		$upload = new Upload($fileid);
+		$uploader = $upload->uploader();
+
+		if(!$upload->exists()) {
 			require("offensive/404.php");
 			exit;
 		}
 		
-		list($filename, $nsfw, $tmbo, $uploadstamp, $type) = mysql_fetch_array( $result );
-		
-		$expired = getFile($_REQUEST['fileid'], $filename, $uploadstamp, $type) == ''? true : false;
+		$expired = $upload->file() == ''? true : false;
 	
 	    // check to see if someone's posting.  
 	    /* check if someone is being hoodwinked by a link in comments
@@ -48,7 +54,7 @@
 		 * NNBB: this code will allow cheater-voting on discussions, since 
 		 * that's an easter egg anyway.
 	     */
-	    if($type != 'topic' &&
+	    if($upload->type() != 'topic' &&
 		   array_key_exists("submit", $_GET) && array_key_exists("HTTP_REFERER", $_SERVER) && 
 	       trim($_SERVER['HTTP_REFERER']) !== "" &&
 	       (strpos($_SERVER['HTTP_REFERER'], $_SERVER['SERVER_NAME']."/offensive/?c=comments&fileid=") !== false ||
@@ -60,14 +66,14 @@
 	    }
 	    
 	    // quietly snub them if they are not an admin and they are trying to post to the changeblog
-	    if(array_key_exists("submit", $_REQUEST) && $fileid == "211604" && $_SESSION['status'] != "admin") {
+	    if(array_key_exists("submit", $_REQUEST) && $upload->id() == "211604" && $_SESSION['status'] != "admin") {
 	        return;
 	    }
 	    
 		if( array_key_exists("submit", $_REQUEST)) {		    
 			$comment = isset($_REQUEST['comment']) ? trim($_REQUEST['comment']) : "";
 			
-			// prevent doubleposts, but only content doubleposts
+			// prevent doubleposts, but only content doubleposts within 30 seconds
 			$sql = "SELECT id, fileid, timestamp, comment, NOW() as curtime FROM offensive_comments WHERE userid = ".$_SESSION['userid'].
 			       " ORDER BY timestamp DESC LIMIT 1";
 			$res = tmbo_query($sql);
@@ -75,20 +81,16 @@
 			if($row['fileid'] == $fileid &&
 			   $row['comment'] == $comment && 
 			   $comment != "" &&
-			   strtotime($row['curtime']) - strtotime($row['timestamp']) < 3000) {
+			   strtotime($row['curtime']) - strtotime($row['timestamp']) < 30) {
 				header("Location: ./?c=comments&fileid=".$fileid."#".$row['id']);
 				exit;
 			}
 			
 			$already_voted = alreadyVoted( $_SESSION['userid'], $_REQUEST['fileid'] );
-						
-			$sql = "SELECT userid FROM offensive_uploads WHERE id=" . $_REQUEST['fileid'];
-			$res = tmbo_query( $sql );
-			$row = mysql_fetch_assoc( $res );
-			if( $already_voted || $row['userid'] == $_SESSION['userid'] || (isset($expired) && $expired) ) {
+			
+			if( $already_voted || $uploader->id() == $_SESSION['userid'] || $upload->file() == "" ) {
 				$vote = null;
-			}
-			else {
+			} else {
 				$vote = array_key_exists("vote", $_REQUEST) ? $_REQUEST['vote'] : null;
 			}
 
@@ -117,11 +119,6 @@
 								strlen( $comment ) > 0 ? 1 : 0 );
 
 			if( array_key_exists("redirect", $_REQUEST) ) {
-				if( isset($_SERVER['HTTP_REFERER']) && 
-				    strpos( $_SERVER['HTTP_REFERER'], 'audio' ) !== false ) {
-					header( "Location: " . $_SERVER['HTTP_REFERER'] );
-					exit;
-				}
 				header( "Location: /offensive/pages/pic.php?id=" . $_REQUEST['fileid'] );
 				exit;
 			}
@@ -129,10 +126,7 @@
 			// redirecting to the same place prevents 'reload' from reposting the comment.
 			header( "Location: " . $_SERVER['PHP_SELF'] . "?c=comments&fileid=" . $_REQUEST['fileid'] . (isset($commentid) ? "#".$commentid : "") );
 			exit;
-
-		
 		}
-		
 	}
 
 	function head() {
@@ -173,69 +167,38 @@
 	}
 
 	function body() {
-		global $expired;
+		global $expired, $upload, $uploader;
 	
-	$fid = $_REQUEST['fileid'];
-	$subscribed = subscribed($fid);
+		$subscribed = subscribed($upload->id());
 
-	$sql = "SELECT users.username, users.userid, users.account_status, offensive_uploads.filename, nsfw, tmbo, offensive_uploads.timestamp as upload_timestamp, offensive_uploads.type
-				FROM users, offensive_uploads
-				WHERE users.userid = offensive_uploads.userid
-				AND offensive_uploads.id = " . $_REQUEST['fileid'];
-	$result = tmbo_query( $sql );
-		
-	$row = mysql_fetch_assoc( $result );
-	$uploader = $row['username'];
-	$filename = $row['filename'];
-	$uploaderid = $row['userid'];
-	$uploaderstatus = $row['account_status'];
-	$uploadstamp = $row['upload_timestamp'];
-	$nsfw = $row['nsfw'];
-	$tmbo = $row['tmbo'];	
-	$type = $row['type'];
+		$comments_exist = count($upload->getComments()) > 0;
+	
+		$comments_heading = "the dorks who came before you said:";
+		$add_comment_heading = $comments_exist ? "and then you came along and were all:" : "you were first on the scene and were all:";
 
-	$already_voted = $_SESSION['userid'] == $row['userid'];
-	
-	$sql = "SELECT offensive_uploads.filename AS filename, offensive_comments.*, offensive_comments.id as commentid, offensive_comments.timestamp AS comment_timestamp, users.*
-				FROM offensive_uploads, offensive_comments, users
-				WHERE users.userid = offensive_comments.userid
-				AND offensive_uploads.id=fileid AND fileid = " . $_REQUEST['fileid'] . " 
-				ORDER BY offensive_comments.timestamp";
-	
-	$result = tmbo_query( $sql );
-	
-	$comments_exist = mysql_num_rows( $result ) > 0;
-	
-	$comments_heading = "the dorks who came before you said:";
-	$add_comment_heading = $comments_exist ? "and then you came along and were all:" : "you were first on the scene and were all:";
-
-	$href = "/offensive/pages/pic.php?id=".$_REQUEST['fileid'];
+		$href = "/offensive/pages/pic.php?id=".$upload->id();
 ?>	
 
 
 		<div class="heading"><?
     // changeblog special header
-	if($_REQUEST['fileid'] == "211604") {
+	if($upload->id() == "211604") {
 		echo htmlFilename($row); 
 		?>
 		<br/><span style="color:#666699">beat to fit. paint to match.</span><br/>
 		<?
-	} else if( $type == 'topic' ) {
-		$prefix = $uploaderstatus == "admin" ? "" : "don't blame me,";
+	} else if( $upload->type() == 'topic' ) {
+		$prefix = $uploader->status() == "admin" ? "" : "don't blame me,";
 
-		echo htmlEscape($filename);
+		echo htmlEscape($upload->filename());
 
-		?><br/><span style="color:#666699"><?= $prefix ?> <a href="./?c=user&userid=<?echo $uploaderid ?>" style="color:#666699"><?php echo $uploader?></a> started it.</span><br/>
+		?><br/><span style="color:#666699"><?= $prefix ?> <a href="./?c=user&userid=<?= $uploader->id() ?>" style="color:#666699"><?= $uploader->username() ?></a> started it.</span><br/>
 <?
-	} else if( $type == 'audio' ) {
-		?><a class="heading" id="pic" href="images/audio/<?= $filename ?>"><?php 
-		    echo htmlFilename($row);
-		?></a><br/><span style="color:#666699">uploaded by <a href="./?c=user&userid=<?echo $uploaderid ?>" style="color:#666699"><?php echo $uploader?></a></span><br/><?
+	} else if( $upload->type() == 'audio' ) {
+		?><a class="heading" id="pic" href="images/audio/<?= $upload->filename() ?>"><?= $upload->htmlFilename() ?></a><br/><span style="color:#666699">uploaded by <a href="./?c=user&userid=<?= $uploader->id() ?>" style="color:#666699"><?= $uploader->username() ?></a></span><br/><?
 	} else {
 ?>
-		<a class="heading" id="pic" href="<?= $href ?>"><?php 
-		    echo htmlFilename($row);
-		?></a><br/><span style="color:#666699">uploaded by <a href="./?c=user&userid=<?echo $uploaderid ?>" style="color:#666699"><?php echo $uploader?></a></span><br/>
+		<a class="heading" id="pic" href="<?= $href ?>"><?= $upload->htmlFilename() ?></a><br/><span style="color:#666699">uploaded by <a href="./?c=user&userid=<?= $uploader->id() ?>" style="color:#666699"><?= $uploader->username() ?></a></span><br/>
 <?
 	}	
 ?></div>
@@ -251,35 +214,27 @@
 <?php 
 
 	$commentnum = 0;
-	if( $comments_exist ) { 
+	if( $comments_exist > 0) { 
         // changeblog doesn't say anything demeaning about the people who posted.
-        if($_REQUEST['fileid'] != "211604") { 
+        if($upload->id() != "211604") { 
 			echo "<b>$comments_heading</b>";
         }
 
 		global $warudo;
 		$numgood = 0;
 		$numbad = 0;
-		while( $row = mysql_fetch_assoc( $result ) ) {
-    	
-			/*
-			 * to disable warudo comment hack, comment out the next line of code.
-			 * inspiration from: http://thismight.be/offensive/?c=comments&fileid=229329#6340701
-			 */
-			// Nicker(1765) is not allowed to warudo anymore.
-		        $warudo = strpos($row['comment'], "ZA WARUDO") !== false && 
-				          $row['userid'] != 1765;
-    	
+		foreach($upload->getComments() as $comment) {
+			$commenter = $comment->commenter();
 		?>
-		<a name="<?= $row['commentid'] ?>"></a>
-		<div class="entry u<?= $row['userid'] ?>" style="<?php echo nextStyle($commentnum++)?>">
+		<a name="<?= $comment->id() ?>"></a>
+		<div class="entry u<?= $commenter->id() ?>" style="<?= nextStyle($commentnum++)?>">
     	
 				<?php
 				
-					$comment = htmlEscape($row['comment']);
+					$commenttext = htmlEscape($comment->comment());
     	
-					if( ! isSquelched( $row['userid'] ) ) {
-						echo nl2br( linkUrls( $comment ) );
+					if( ! isSquelched( $commenter->id() ) ) {
+						echo nl2br( linkUrls( $commenttext ) );
 					}
 					else {
 						echo "<div class='squelched'>[ squelched ]</div>";
@@ -287,49 +242,31 @@
 					?>
     	            <br/>
 
-				<?php
-  
-  				$username = $row['username'];
-				/* if the filename contains charlie, with any of the letters repeated any number of times
-				 * (and in any case), replace "banana" in the poster's username with "boonana".
-				 * this easter egg provided by: http://thismight.be/offensive/?c=comments&fileid=231407#6464287
-				 */
-				if(strpos($username, "banana") !== false && 
-				   preg_match("/[Cc]+[Hh]+[Aa]+[Rr]+[Ll]+[Ii]+[Ee]+/", $filename) > 0) {
-					$username = str_replace("banana", "boonana", $username);
-				}
+				<div class="timestamp"><a href="#<?= $comment->id() ?>"><?= $comment->timestamp() ?></a></div>
 				
-				// see:  http://thismight.be/offensive/?c=comments&fileid=237653#274220091
-				// if($username == "hork") {
-				// 					$username = "H. Winthrop Nerdlington III";
-				// }
-				?>
-				
-				<div class="timestamp"><a href="#<?= $row['commentid'] ?>"><?= $row['comment_timestamp'] ?></a></div>
-				
-				&raquo; <a href="./?c=user&userid=<?= $row['userid'] ?>"><?= $username ?></a>
+				&raquo; <a href="./?c=user&userid=<?= $commenter->id() ?>"><?= $commenter->username() ?></a>
 				
 				<?
 							
-				if( $row['vote'] ) {
-					$thevote = $row['vote'];
+				if( $comment->vote() ) {
+					$thevote = $comment->vote();
     	
 					$numgood += ($thevote == 'this is good') ? 1 : 0;
 					$numbad += ($thevote == 'this is bad') ? 1 : 0;
     	
 					echo "<span title=\"+$numgood -$numbad\" class='vote" . additionalCssFor( $thevote ) . "'> [ " . $thevote . " ]</span>";
 					
-					if( $row['userid'] == $_SESSION['userid'] ) {
+					if( $commenter->id() == $_SESSION['userid'] ) {
 						$already_voted = true;
 					}
 				}
 				
 				
-				if( $row['offensive'] == 1 ) {
+				if( $comment->tmbo() == 1 ) {
 					?><span class="vote"> [ this might be offensive ]</span><?php
 				}
 				
-				if( $row['repost'] == 1 ) {
+				if( $comment->tiar() == 1 ) {
 					?><span class="vote"> [ this is a repost ]</span><?php
 				}
     	
@@ -337,29 +274,33 @@
 		</div>
 		
 		<?php 
+		// end of comments loop
 		} 
 	
+	// end of "are there any comments"
 	}
 	
-		if( $type == 'image' || $type == 'avatar' ) {
+	$already_voted = $uploader->id() == $_SESSION["userid"] ? true : $already_voted;
+	
+		if( $upload->type() == 'image' || $upload->type() == 'avatar' ) {
 			?>
 				<div style="<?= nextStyle($commentnum++) ?>; border-top:1px solid #000033">
 					<div style="float:right"><? toggleThumbnailLink() ?></div>
 					<?
 						if( showThumbnails() ) {
-							if( ( isSquelched( $uploaderid ) ) || 
+							if( ( isSquelched( $uploader->id() ) ) || 
 							    array_key_exists("prefs", $_SESSION) &&
 							    is_array($_SESSION['prefs']) &&
-							    ($nsfw == 1 && 
+							    ($upload->is_nsfw() == 1 && 
 							    array_key_exists("hide nsfw", $_SESSION['prefs']) &&
 							    $_SESSION['prefs']['hide nsfw'] == 1) || 
-							    ($tmbo == 1 && 
+							    ($upload->is_tmbo() == 1 && 
 							    array_key_exists("hide tmbo", $_SESSION['prefs']) &&
 							    $_SESSION['prefs']['hide tmbo'] == 1) ) {
 								?><div style="padding:40px;">[ thumbnail filtered ]</div><?
 							}
 							else {
-								?><a href="<?= $href ?>"><img style="margin:12px;" src="<?= getThumbURL($_REQUEST['fileid'], $filename, $uploadstamp, $type); ?>"/></a><?
+								?><a href="<?= $href ?>"><img style="margin:12px;" src="<?= $upload->thumbURL() ?>"/></a><?
 							}
 						}
 					?>
@@ -378,22 +319,17 @@
 			<div class="heading">
 				<div style="float:right">					
 					<? if( $subscribed ) { ?>
-						<b><a id="unsubscribeLink" href="subscribe.php?un=1&fileid=<?= $fid ?>" title="take this thread off my 'unread comments' watch list." class="orange">unsubscribe</a></b>
+						<b><a id="unsubscribeLink" href="subscribe.php?un=1&fileid=<?= $upload->id() ?>" title="take this thread off my 'unread comments' watch list." class="orange">unsubscribe</a></b>
 					<? }
 						else { ?>
-						<b><a id="subscribeLink" href="subscribe.php?fileid=<?= $fid ?>" title="watch this thread for new comments." class="orange">subscribe</a></b>
+						<b><a id="subscribeLink" href="subscribe.php?fileid=<?= $upload->id() ?>" title="watch this thread for new comments." class="orange">subscribe</a></b>
 					<?	}
 					?>
 				</div>
 
 					<div>
-					<? if ( $type == 'image' ) { ?>
-						<a class="heading" id="pic" href="pages/pic.php?id=<?php echo $_REQUEST['fileid']?>"><?php 
-						
-						// TODO: easy optimization -- find the data in this file so we don't go to the db in this call
-						echo htmlFilename($fid);
-						
-						?></a><br/>
+					<? if ( $upload->type() == "image" || $upload->type() == "avatar" ) { ?>
+						<a class="heading" id="pic" href="pages/pic.php?id=<?= $upload->id() ?>"><?= $upload->htmlFilename(); ?></a><br/>
 					<? }
 						else {
 						 ?>&nbsp;<?
@@ -406,19 +342,19 @@
 
 <?php
     // changeblog shouldn't tease the users with a comment field
-    if($_REQUEST['fileid'] != "211604" || $_SESSION['status'] == "admin") {
+    if($upload->id() != "211604" || $_SESSION['status'] == "admin") {
 ?>
 
 	<div class="contentbox">
 		<div class="blackbar"></div>
-			<div class="heading"><?php echo $add_comment_heading?></div>
+			<div class="heading"><?= $add_comment_heading?></div>
 			<div class="bluebox" style="text-align:center">			
 			<a name="form"></a>
 			<form method="POST" action="<?php echo $_SERVER['PHP_SELF']?>">
 
 			
 				<p>
-					<input type="hidden" id="fileid" name="fileid" value="<?php echo $_REQUEST['fileid']?>"/>
+					<input type="hidden" id="fileid" name="fileid" value="<?= $upload->id() ?>"/>
 					<input type="hidden" name="c" value="comments"/>
 					<textarea name="comment" rows="12" cols="64"></textarea>
 				</p>
@@ -427,7 +363,7 @@
 
 <?php 
 
-	if( !$already_voted && !$expired && $type != 'topic' ) {
+	if( !$already_voted && $upload->file() && $type != 'topic' ) {
 	
 	?>	<div style="text-align:left;margin-left:10%">
 			<input type="radio" name="vote" value="" checked="checked" id="novote"/>
@@ -435,7 +371,7 @@
 	<?php
 
 		// show vote options	
-		
+		// oh jesus why are we doing this /o\
 		$sql = "SHOW COLUMNS FROM offensive_comments LIKE 'vote'";
 		$result = tmbo_query( $sql );
 		$row = mysql_fetch_row($result);
@@ -485,12 +421,8 @@
 }
 
 	function nextStyle($i) {
-		global $style, $warudo;
-		if($warudo) {
-		    $style = $i % 2 ? "background:#444411;" : "background:#333300";
-		} else {
-		    $style = $i % 2 ? "background:#bbbbee;" : "background:#ccccff";
-		}
+		global $style;
+	    $style = $i % 2 ? "background:#bbbbee;" : "background:#ccccff";
 		return $style;
 	}
 

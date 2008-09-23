@@ -38,7 +38,7 @@ function subscribe($fileid, $userid=null) {
 	if($userid == null) $userid = $_SESSION['userid'];
 	
 	// check if the user is already subscribed
-	$sql = "SELECT * FROM offensive_subscriptions WHERE userid = $userid AND fileid = $threadid";
+	$sql = "SELECT * FROM offensive_subscriptions WHERE userid = $userid AND fileid = $fileid";
 	if(mysql_num_rows(tmbo_query($sql)) > 0) return true;
 
 	// ensure file exists
@@ -46,7 +46,7 @@ function subscribe($fileid, $userid=null) {
 	if(mysql_num_rows(tmbo_query($sql)) == 0) send(false);
 
     // finally, subscribe
-	$sql = "INSERT INTO offensive_subscriptions (userid, fileid) VALUES ( $userid, $threadid )";
+	$sql = "INSERT INTO offensive_subscriptions (userid, fileid) VALUES ( $userid, $fileid )";
 	tmbo_query( $sql );
 	return true;
 }
@@ -57,7 +57,7 @@ function subscribe($fileid, $userid=null) {
 function unsubscribe($fileid, $userid=null) {
 	if($userid == null) $userid = $_SESSION['userid'];
 	
-	$sql = "DELETE FROM offensive_subscriptions WHERE userid=$userid AND fileid=$threadid";
+	$sql = "DELETE FROM offensive_subscriptions WHERE userid=$userid AND fileid=$fileid";
 	tmbo_query($sql);
 
 	return true;
