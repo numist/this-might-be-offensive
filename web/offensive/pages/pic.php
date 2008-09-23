@@ -110,13 +110,13 @@ q = quick comment, Esc closes quick comment box, ? = random image.<br />
 				<?
 				} else {
 					if($upload->next()) { ?>
-						<a id="next" href="<?= $_SERVER['PHP_SELF'] ?>?id=<?= $upload->next()->id() ?>" title="<?= $upload->next()->htmlFilename() ?>">newer</a>
+						<a id="next" href="<?= $_SERVER['PHP_SELF'] ?>?id=<?= $upload->next()->id() ?>">newer</a>
 					<? } else { ?>
 						<a href="../" id="next" style="visibility:hidden">newer</a>
 					<? } ?>
 					. <a id="index" href="/offensive/">index</a> .
 					<? if($upload->prev()) {?>
-						<a id="previous" href="<?= $_SERVER['PHP_SELF'] ?>?id=<?= $upload->prev()->id() ?>" title="<?= $upload->prev()->htmlFilename() ?>">older</a>
+						<a id="previous" href="<?= $_SERVER['PHP_SELF'] ?>?id=<?= $upload->prev()->id() ?>">older</a>
 					<? } else { ?>
 						<a id="previous" href="../" style="visibility:hidden">older</a>
 					<?}
