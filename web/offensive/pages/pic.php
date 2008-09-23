@@ -4,100 +4,39 @@
 	require_once("offensive/assets/functions.inc");
 	require_once( 'admin/mysqlConnectionInfo.inc' );
 	if(!isset($link) || !$link) $link = openDbConnection();
+	require_once("offensive/assets/classes.inc");
+	require_once("offensive/assets/comments.inc");
 
 	mustLogIn();
 
-	$id = (isset($_REQUEST['random'])) ? get_random_id() : $_REQUEST['id'];
-	if( ! is_numeric( $id ) ) {
+	$id = "";
+	if(array_key_exists("random", $_REQUEST)) {
+		$id = get_random_id();
+	}
+	if(array_key_exists("id", $_REQUEST)) {
+		$id = $_REQUEST["id"];
+	}
+	
+	if(!is_numeric($id)) {
 		header( "Location: ../" );
 	}
 
+	// XXX: pickup cookie needs to be merged into prefs
 	$cookiename = $_SESSION['userid'] . "lastpic";
-
 	$lastpic = array_key_exists($cookiename, $_COOKIE) ? $_COOKIE[ $cookiename ] : "";
-	
 	if(!$readonly && (!is_numeric( $lastpic ) || $id > $lastpic)) {
 		setcookie( $cookiename, "$id", time()+3600 * 24 * 365, "/offensive/" );
 	}
-
-	require_once('offensive/assets/getPrefs.inc');
-	//require_once('offensive/assets/functions.inc');
 	
-	//$id = $_REQUEST['id'];
+	$upload = new Upload($id);
+	
+	require_once('offensive/assets/getPrefs.inc');
 
-	function thisOrZero( $value ) {
-		return (is_numeric( $value ) ? $value : 0);
-	}
-
-
-	function get_random_id()
-	{
-		$sql = "select id from offensive_uploads where type='image' and status='normal' order by RAND() limit 1";
+	function get_random_id() {
+		$sql = "SELECT id FROM offensive_uploads WHERE type='image' AND status='normal' ORDER BY RAND() LIMIT 1";
 		$res = tmbo_query($sql);
 		$row = mysql_fetch_assoc( $res );
 		return($row['id']);
-	}
-
-	function writeNav( $id ) {
-	
-		global $filename, $is_nsfw, $is_tmbo, $uploader, $uploaderid, $timestamp, $year, $month, $day, $nextid, $previd, $type;
-		
-// XXX: nextid and previd should account for expired images once q26 gets the DVDs to me and they're all restored.
-		$sql = "SELECT offensive_uploads.*, users.username, users.userid,
-					(select min( id ) from offensive_uploads where id > $id AND type='image' and status='normal') as nextid,
-					(select max( id ) from offensive_uploads where id < $id AND type='image' and status='normal') as previd
-				FROM offensive_uploads, users
-				WHERE id = $id 
-					AND offensive_uploads.userid = users.userid
-					AND (type = 'image' OR type = 'avatar')
-				LIMIT 1";
-					
-		$result = tmbo_query( $sql );
-		
-		// if the file does not at all exist not even a little bit, 404.
-		if(mysql_num_rows($result) == 0) {
-			require("offensive/404.php");
-		}
-		
-		$row = mysql_fetch_assoc( $result );
-			
-		$filename = $row['filename'];
-		$nextid = $row['nextid'];
-		$is_nsfw = ( $row['nsfw'] == 1 || strpos( $filename, "nsfw" ) || strpos( $filename, "NSFW" ) );
-		$previd = $row['previd'];		
-		$is_tmbo = $row['tmbo'];
-		$uploader = $row['username'];
-		$uploaderid = $row['userid'];
-		$time = strtotime( $row['timestamp'] );
-		$year = date( "Y", $time );
-		$month = date( "m", $time );			
-		$day = date( "d", $time );
-		$timestamp = date( "Y-m-d h:i:s a", strtotime( $row['timestamp'] ) );
-		$type = $row['type'];
-	}
-
-	function fileNav( $nextid, $previousid, $uploader_id, $uploader_name, $type ) {
-		if($type == 'avatar') {?>
-			<a href="../" id="next" style="visibility:hidden">newer</a> . <a id="index" href="/offensive/">index</a> . <a id="previous" href="../" style="visibility:hidden">older</a>
-		<?
-			return;
-		}
-		if( isset( $nextid ) ) {
-			$nextname = htmlFilename($nextid);
-		 	?>
-			<a id="next" href="<? echo $_SERVER['PHP_SELF']?>?id=<?= $nextid ?>" title="<?= $nextname ?>">newer</a>
-		<? } 
-		else {
-			?><a href="../" id="next" style="visibility:hidden">newer</a>
-		<? } ?>
-		 . <a id="index" href="/offensive/">index</a> .
-		<? if( isset( $previousid ) ) { 
-			$prevname = htmlFilename($previousid);
-			?>
-			<a id="previous" href="<? echo $_SERVER['PHP_SELF']?>?id=<?= $previousid ?>" title="<?= $prevname ?>">older</a>
-		<? } else { ?>
-			<a id="previous" href="../" style="visibility:hidden">older</a>
-		<?}
 	}
 
 	function getFileSize( $fpath ) {
@@ -109,24 +48,6 @@
 		return $k;
 	}
 
-	$good = 0;
-	$bad = 0;
-	$tmbo = 0;
-	$repost = 0;
-	$comments = 0;
-
-	$sql = "SELECT good, bad, tmbo, repost, comments from offensive_count_cache c
-			WHERE threadid=$id";
-	
-	$result = tmbo_query( $sql );
-	if( mysql_num_rows( $result ) > 0 ) {
-		list( $good, $bad, $tmbo, $repost, $comments  ) = mysql_fetch_array( $result );
-	}
-
-
-	writeNav( $id );
-
-	$filepath = getFile($id, $filename, $timestamp, $type);
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
    "http://www.w3.org/TR/html4/loose.dtd">
@@ -135,7 +56,7 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 		<META NAME="ROBOTS" CONTENT="NOARCHIVE" />
-		<title>[ this might be offensive ]<?= $filename ? " : ".$filename: ""; ?> </title>
+		<title>[ <?= $upload->type() ?> ]<?= $upload->filename() ? " : ".$upload->filename(): ""; ?> </title>
 		<link rel="stylesheet" type="text/css" href="styles.php"/>
 		<script type="text/javascript">
 			self.file_id = "";
@@ -146,6 +67,7 @@
 			}
 		</script>
 		<script type="text/javascript" src="/offensive/js/jquery-1.2.6.min.js"></script>
+		<!-- XXX: a lot of this picui stuff is going to have to move into this header so it can be customized -->
 		<script type="text/javascript" src="/offensive/js/picui.js"></script>
 		<script type="text/javascript" src="/offensive/js/subscriptions.js"></script>
 		<script type="text/javascript" src="/offensive/js/jqModal.js"></script>
@@ -178,142 +100,148 @@ q = quick comment, Esc closes quick comment box, ? = random image.<br />
 
 			&nbsp;&nbsp;
 
-				<? fileNav( $nextid, $previd, $uploaderid, $uploader, $type); ?>
-				<a style="margin-left:48px;" id="comments" href="/offensive/?c=comments&fileid=<? echo $id?>">comments</a> (<span id="count_comment"><?= $comments ?></span>c +<span id="count_good"><?= $good ?></span> -<span id="count_bad"><?= $bad ?></span><?php if( $tmbo > 0 ) { echo " <span style=\"color:#990000\">x$tmbo</span>"; }?>)&nbsp;&nbsp(<a id="quickcomment" class="jqModal" href="#">quick</a>)
+				<?
+				
+				/*
+				 * navigation buttons, prev index next are dependant on type
+				 */
+				if($upload->type() == 'avatar') {?>
+					<a href="../" id="next" style="visibility:hidden">newer</a> . <a id="index" href="/offensive/">index</a> . <a id="previous" href="../" style="visibility:hidden">older</a>
+				<?
+				} else {
+					if($upload->next()) { ?>
+						<a id="next" href="<?= $_SERVER['PHP_SELF'] ?>?id=<?= $upload->next()->id() ?>" title="<?= $upload->next()->htmlFilename() ?>">newer</a>
+					<? } else { ?>
+						<a href="../" id="next" style="visibility:hidden">newer</a>
+					<? } ?>
+					. <a id="index" href="/offensive/">index</a> .
+					<? if($upload->prev()) {?>
+						<a id="previous" href="<?= $_SERVER['PHP_SELF'] ?>?id=<?= $upload->prev()->id() ?>" title="<?= $upload->prev()->htmlFilename() ?>">older</a>
+					<? } else { ?>
+						<a id="previous" href="../" style="visibility:hidden">older</a>
+					<?}
+				} ?>
+				
+				<!--
+					comment block
+				-->
+				<a style="margin-left:48px;"
+				   id="comments"
+				   href="/offensive/?c=comments&fileid=<?= $upload->id() ?>">comments</a>
+				(<span id="count_comment"><?= $upload->comments() ?></span>c
+				+<span id="count_good"><?= $upload->goods() ?></span>
+				-<span id="count_bad"><?= $upload->bads() ?></span><?
+				if($tmbo > 0) { ?>
+					<span style=\"color:#990000\">x<?= $upload->tmbos ?></span>";
+				<? } ?>)
+				&nbsp;(<a id="quickcomment" class="jqModal" href="#">quick</a>)
 
-						<span style="margin-left:48px;">
-						<?
-							$votelinks_enabled = false;
-							if($uploaderid != $_SESSION['userid']) {
-								$sql = "SELECT *
-								          FROM offensive_comments
-									 WHERE userid = ".$_SESSION['userid']."
-									   AND fileid = $id
-									   AND vote != ''";
-								$res = tmbo_query($sql);
-								if(mysql_num_rows($res) == 0) {
-									$votelinks_enabled = true;
-								}
-							}
-							votelinks( $id, $votelinks_enabled );
-						?>
-						</span>
-
-						<span style="margin-left:48px;">
-						<?	// subscriptions
-							$sql = "SELECT * FROM offensive_subscriptions WHERE userid=" . $_SESSION['userid'] . " AND fileid=$id";
-							$res = tmbo_query( $sql );
-							$subscribed = mysql_num_rows( $res ) > 0 ? true : false;
-							if( $subscribed ) { ?>
-								<a id="unsubscribeLink" href="/offensive/subscribe.php?un=1&fileid=<?= $id ?>" title="take this file off my 'unread comments' watch list.">unsubscribe</a>
-						<?	} else { ?>
-								<a id="subscribeLink" href="/offensive/subscribe.php?fileid=<?= $id ?>" title="watch this thread for new comments.">subscribe</a>
-						<?	} ?>
-						</span>
-						<span style="margin-left:48px;">nsfw filter: <?php
-							if( array_key_exists("prefs", $_SESSION) &&
-							    is_array($_SESSION['prefs']) &&
-							    array_key_exists("hide nsfw", $_SESSION['prefs']) &&
-							    $_SESSION['prefs']['hide nsfw'] == 1 ) {
-								?>
-									<a href="/offensive/setPref.php?p=1&v=">off</a> on
-								<?php
-							}
-							else {
-								?>
-									off <a href="/offensive/setPref.php?p=1&v=2">on</a>
-								<?php
-							}
-						?></span>
+				<!--
+					voting block
+				-->
+				<span style="margin-left:48px;">
+					<?
+					if(canVote($upload->id())) {
+						$good_href = "href=\"/offensive/?c=comments&submit=submit&fileid=$id&vote=this%20is%20good&redirect=true\"";	
+						$bad_href = "href=\"/offensive/?c=comments&submit=submit&fileid=$id&vote=this%20is%20bad&redirect=true\"";
+						$class = "on";
+					} else {
+						$good_href = $bad_href = "";
+						$class = "off";
+					}
 						
-						<span style="margin-left:48px;">tmbo filter: <?php
-							if( array_key_exists("prefs", $_SESSION) &&
-							    is_array($_SESSION['prefs']) &&
-							    array_key_exists("hide tmbo", $_SESSION['prefs']) &&
-							    $_SESSION['prefs']['hide tmbo'] == 1 ) {
-								?>
-									<a href="/offensive/setPref.php?p=3&v=">off</a> on
-								<?php
-							}
-							else {
-								?>
-									off <a href="/offensive/setPref.php?p=3&v=2">on</a>
-								<?php
-							}
-						?></span>
+					?>
+					<span id="votelinks" class="<?= $class ?>">
+						vote: <a name="<?= $upload->id() ?>" id="good" class="votelink" <?= $good_href ?>>[ this is good ]</a> .
+						<a name="<?= $upload->id() ?>" id="bad" class="votelink" <?= $bad_href ?>>[ this is bad ]</a>
+					</span>
+				</span>
+
+				<!--
+					subscribe block
+				-->
+				<span style="margin-left:48px;">
+				<?	
+					if(subscribed($upload->id())) { ?>
+						<a id="unsubscribeLink" href="/offensive/subscribe.php?un=1&fileid=<?= $id ?>" title="take this file off my 'unread comments' watch list.">unsubscribe</a>
+					<?	} else { ?>
+						<a id="subscribeLink" href="/offensive/subscribe.php?fileid=<?= $id ?>" title="watch this thread for new comments.">subscribe</a>
+					<?	} ?>
+				</span>
+				
+				<!--
+					filter block
+				-->
+				<!-- XXX: these are going away soon -->
+				<span style="margin-left:48px;">nsfw filter: <?
+					if( array_key_exists("prefs", $_SESSION) &&
+					    is_array($_SESSION['prefs']) &&
+					    array_key_exists("hide nsfw", $_SESSION['prefs']) &&
+					    $_SESSION['prefs']['hide nsfw'] == 1 ) { ?>
+						<a href="/offensive/setPref.php?p=1&v=">off</a> on
+					<? } else { ?>
+						off <a href="/offensive/setPref.php?p=1&v=2">on</a>
+					<? } ?>
+				</span>
+						
+				<span style="margin-left:48px;">tmbo filter: <?
+					if( array_key_exists("prefs", $_SESSION) &&
+					    is_array($_SESSION['prefs']) &&
+					    array_key_exists("hide tmbo", $_SESSION['prefs']) &&
+					    $_SESSION['prefs']['hide tmbo'] == 1 ) { ?>
+							<a href="/offensive/setPref.php?p=3&v=">off</a> on
+					<? } else { ?>
+							off <a href="/offensive/setPref.php?p=3&v=2">on</a>
+					<? } ?>
+				</span>
 			</div>
 
-			<?
-
-				$imgfilename = "$filename";
-
-			?>
-
+			<!--
+				filename/size block
+			-->
 			<br /><br />
-			<?
-				echo $is_nsfw == 1 ? "<span style=\"color:#990000\">[nsfw]</span>" : "";
-				echo $is_tmbo == 1 ? "<span style=\"color:#990000\">[tmbo]</span>" : "";
-				echo " ".htmlEscape($filename); ?> <span style="color:#999999"><?= getFileSize( $filepath ) ?></span>
+			<?= $upload->htmlFilename() ?> <span style="color:#999999"><? 
+				if($upload->file() != "")
+					echo getFileSize($upload->file());
+			?></span>
 			<br/>
+			
+			<!--
+				username/time block
+			-->
 			<span style="color:#999999">
-				uploaded by <a id="userLink" href="../?c=user&userid=<? echo $uploaderid ?>"><? echo htmlEscape($uploader); ?></a> @ <?= $timestamp ?>
-			</span>	
+				uploaded by <a id="userLink" href="../?c=user&userid=<?= $upload->uploader()->id() ?>"><?= $upload->uploader()->username() ?></a> @ <?= $upload->timestamp() ?>
+			</span>
+			
+			<!--
+				squelch block
+			-->
 			<span style="margin-left:48px">
 				<?
-				if( isSquelched( $uploaderid ) ) {
-					?><a id="unsquelchLink" style="color:#999999" href="/offensive/setPref.php?unsq=<?= $uploaderid ?>">unsquelch <?= $uploader ?></a><?
-				}
-				else {
-					?><a id="squelchLink" style="color:#999999" href="/offensive/setPref.php?sq=<?= $uploaderid ?>">squelch <?= $uploader ?></a><?
+				if(isSquelched($uploaderid)) {
+					?><a id="unsquelchLink" style="color:#999999" href="/offensive/setPref.php?unsq=<?= $upload->uploader()->id() ?>">unsquelch <?= $upload->uploader()->username() ?></a><?
+				} else {
+					?><a id="squelchLink" style="color:#999999" href="/offensive/setPref.php?sq=<?= $upload->uploader()->id() ?>">squelch <?= $upload->uploader()->username() ?></a><?
 				}
 				?>
 			</span>
 			<br/><br/>
-			<?
-					if( hideImage($is_nsfw, $is_tmbo, $uploaderid) ) {
-						?><div style="padding:128px;">[ filtered ] <!-- <?= $uploaderid ?> --></div><?
-					} else {
-						?>
-						<div class="<?php echo $is_nsfw == 1 ? 'nsfw' : 'image' ?> u<?= $uploaderid ?>">
-							<? 
-								$imgurl = '';
-								if($filepath != '')
-									$imgurl = getFileURL($id, $filename, $timestamp, $type);
-								if($imgurl != '') {
-							?>
-							<a id="imageLink" href="<?= $imgurl ?>" target="_blank"><img src="<?= $imgurl ?>" style="border:none"/></a>
-							<? } else echo "got nothin' for ya."; ?>
-						</div>
-	
-						<?						
-					}
-					
-			?>
-			<br/><br/>
 			
-			<?
-	
-	function DateCmp($a, $b) {
-		return ($a[1] < $b[1]) ? -1 : 1;
-	}
-
-	function SortByDate(&$files) {
-		usort($files, 'DateCmp');
-	}
-	
-	function votelinks( $id, $enabled ) {
-		$good_href = $enabled ? "href=\"/offensive/?c=comments&submit=submit&fileid=$id&vote=this%20is%20good&redirect=true\"" : "";
-		$bad_href = $enabled ? "href=\"/offensive/?c=comments&submit=submit&fileid=$id&vote=this%20is%20bad&redirect=true\"" : "";
-		$class = $enabled ? "on" : "off";
-	?>
-		<span id="votelinks" class="<?= $class ?>">
-		vote: <a name="<?= $id ?>" id="good" class="votelink" <?= $good_href ?>>[ this is good ]</a> .
-			<a name="<?= $id ?>" id="bad" class="votelink" <?= $bad_href ?>>[ this is bad ]</a>
-		</span>
-	<?
-	}
-
-		?>
+			<!--
+				image block
+			-->
+			<? if(hideImage($upload->is_nsfw(), $upload->is_tmbo(), $upload->uploader()->id())) {
+				?><div style="padding:128px;">[ filtered ] <!-- <?= $uploaderid ?> --></div><?
+			} else { ?>
+				<div class="<?php echo $is_nsfw == 1 ? 'nsfw' : 'image' ?> u<?= $uploaderid ?>">
+					<? if($upload->file() != "") { ?>
+						<a id="imageLink" href="<?= $upload->URL() ?>" target="_blank"><img src="<?= $upload->URL() ?>" style="border:none"/></a>
+					<? } else { ?>
+						<div style="padding:128px;">[ got nothin' for ya ]</div>
+					<? } ?>
+				</div>
+			<? } ?>
+			<br/><br/>
 		</div>
 
 <? 

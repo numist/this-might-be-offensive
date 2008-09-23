@@ -101,11 +101,13 @@ class Upload {
 	}
 	
 	public function is_tmbo() {
-		return $this->getUploadRow("tmbo");
+		return ($this->getUploadRow("tmbo") == 1 ||
+		        strpos(strtolower($filename), "[tmbo]"));
 	}
 	
 	public function is_nsfw() {
-		return $this->getUploadRow("nsfw");
+		return ($this->getUploadRow("nsfw") == 1 ||
+		        strpos(strtolower($filename), "[nsfw]"));
 	}
 	
 	public function type() {
@@ -224,6 +226,39 @@ class Upload {
 		}
 		
 		return $this->data["comments"];
+	}
+	
+	/*
+	 * upload slinging code
+	 */
+	public function next() {
+		if(!array_key_exists("next", $this->data)) {
+			$sql = "SELECT MIN( id ) AS next FROM offensive_uploads 
+		        	WHERE id > ".$this->id()." AND type='".$this->type()."' AND status='normal'";
+			$result = tmbo_query($sql);
+			$row = mysql_fetch_assoc($result);
+			if($row["next"] == null)
+				$this->data["next"] = false;
+			else
+				$this->data["next"] = new Upload($row["next"]);
+		}
+		
+		return $this->data["next"];
+	}
+	
+	public function prev() {
+		if(!array_key_exists("prev", $this->data)) {
+			$sql = "SELECT MAX( id ) AS prev FROM offensive_uploads
+		        	WHERE id < ".$this->id()." AND type='".$this->type()."' AND status='normal'";
+			$result = tmbo_query($sql);
+			$row = mysql_fetch_assoc($result);
+			if($row["prev"] == null)
+				$this->data["prev"] = false;
+			else
+				$this->data["prev"] = new Upload($row["prev"]);
+		}
+		
+		return $this->data["prev"];
 	}
 	
 	/*

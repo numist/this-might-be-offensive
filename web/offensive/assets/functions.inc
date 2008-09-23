@@ -272,10 +272,10 @@ function htmlFilename($id, $showtype=false) {
 	}
 	$tags = "";
 	if($tmbo != 0) {
-		$tags = "[tmbo]$tags";
+		$tags = "<span style=\"color:#990000\">[tmbo]</span>$tags";
 	}
 	if($nsfw != 0) {
-		$tags = "[nsfw]$tags";
+		$tags = "<span style=\"color:#990000\">[nsfw]</span>$tags";
 	}
 	if($showtype) {
 		$tags = "$type: $tags";
