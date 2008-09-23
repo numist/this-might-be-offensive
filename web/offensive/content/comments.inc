@@ -86,7 +86,7 @@
 				exit;
 			}
 			
-			$already_voted = alreadyVoted( $_SESSION['userid'], $_REQUEST['fileid'] );
+			$already_voted = alreadyVoted( $_REQUEST['fileid'], $_SESSION['userid'] );
 			
 			if( $already_voted || $uploader->id() == $_SESSION['userid'] || $upload->file() == "" ) {
 				$vote = null;
