@@ -218,7 +218,7 @@ q = quick comment, Esc closes quick comment box, ? = random image.<br />
 			-->
 			<span style="margin-left:48px">
 				<?
-				if(isSquelched($uploaderid)) {
+				if(isSquelched($upload->uploader()->id())) {
 					?><a id="unsquelchLink" style="color:#999999" href="/offensive/setPref.php?unsq=<?= $upload->uploader()->id() ?>">unsquelch <?= $upload->uploader()->username() ?></a><?
 				} else {
 					?><a id="squelchLink" style="color:#999999" href="/offensive/setPref.php?sq=<?= $upload->uploader()->id() ?>">squelch <?= $upload->uploader()->username() ?></a><?
@@ -231,9 +231,9 @@ q = quick comment, Esc closes quick comment box, ? = random image.<br />
 				image block
 			-->
 			<? if(hideImage($upload->is_nsfw(), $upload->is_tmbo(), $upload->uploader()->id())) {
-				?><div style="padding:128px;">[ filtered ] <!-- <?= $uploaderid ?> --></div><?
+				?><div style="padding:128px;">[ filtered ] <!-- <?= $upload->uploader()->id() ?> --></div><?
 			} else { ?>
-				<div class="<?php echo $is_nsfw == 1 ? 'nsfw' : 'image' ?> u<?= $uploaderid ?>">
+				<div class="<?php echo $is_nsfw == 1 ? 'nsfw' : 'image' ?> u<?= $upload->uploader()->id() ?>">
 					<? if($upload->file() != "") { ?>
 						<a id="imageLink" href="<?= $upload->URL() ?>" target="_blank"><img src="<?= $upload->URL() ?>" style="border:none"/></a>
 					<? } else { ?>
