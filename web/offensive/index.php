@@ -11,6 +11,17 @@ $timelimit = 10;
 	require_once("offensive/assets/header.inc");
 
 	time_start($ptime);
+
+	// if we're logged in, we'll want access to the user object for the logged in user
+	require_once("offensive/assets/classes.inc");
+	$me = false;
+	// XXX: eventually the entire index purple pages should all be members only!
+	if(loggedin()) {
+		$me = new User(array(
+			"userid" => $_SESSION["userid"],
+			"username" => $_SESSION["username"],
+			));
+	}
 	
 	// in an upgrade, break glass:
 	if( $upgrading &&
@@ -33,33 +44,34 @@ $timelimit = 10;
 	if(!isset($link) || !$link) $link = openDbConnection();
 	require_once('offensive/assets/functions.inc');
 
+	if($me && array_key_exists("thumbnails", $_COOKIE) && 
+	    $_COOKIE["thumbnails"] === "yes") {
+		$me->setPref("index", "thumbs");
+		setcookie( 'thumbnails', "no", time()-3600, "/offensive/" );
+	}
+	
 	// set our target to any of the requested content page...
-	if( isset( $_REQUEST['c'] ) ) {
+	if(isset($_REQUEST['c']) &&
+		// if it exists
+		file_exists("content/".$_REQUEST["c"].".inc") &&
+		// prevent someone from doing something like c="../../../../../etc/passwd"
+		strpos($_REQUEST['c'], ".") === false) {
+		
 		$c = $_REQUEST['c'];
+		
 	} else {
-	// or the default landing page for this session.
-		$c = (array_key_exists("thumbnails", $_COOKIE) && 
-		      $_COOKIE["thumbnails"] == "yes") ? 
+		// or the default landing page for this session.
+		// if not logged in, force it.
+		// XXX: eventually the entire index purple pages should all be members only!
+		if(!$me) {
+			mustLogIn();
+			$me = new User($_SESSION["userid"]);
+		}
+		
+		$c = ($me->getPref("index") == "thumbs") ? 
 		      "thumbs" : "main";
 		header("Location: ./?c=$c");
 		exit;
-	}
-
-	// if no content page exists, redirect to the default landing page for this session.
-	if(!file_exists("content/$c.inc")) {
-		header("Location: ./?c=".(
-			array_key_exists("thumbnails", $_COOKIE) && $_COOKIE["thumbnails"] == "yes" ? 
-				"thumbs" : "main"));
-		exit;
-	}
-
-	// if we're logged in, we'll want access to the user object for the logged in user
-	require_once("offensive/assets/classes.inc");
-	if(loggedin()) {
-		$me = new User(array(
-			"userid" => $_SESSION["userid"],
-			"username" => $_SESSION["username"],
-			));
 	}
 
 	// source the content
@@ -67,6 +79,8 @@ $timelimit = 10;
 
 	if( function_exists( 'start' ) ) {
 		start();
+		// XXX: eventually the entire index purple pages should all be members only!
+		if(loggedin() && !$me) $me = new User($_SESSION['userid']);
 	}
 
 ?>

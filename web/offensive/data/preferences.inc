@@ -10,6 +10,8 @@ $prefnames = array(
 	
 	// sorting for discussions
 	"disc_sortorder",
+	// type of frontpage, "thumbs" or blank
+	"index",
 	
 	// key commands:
 	// vote good

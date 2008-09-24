@@ -6,9 +6,11 @@
 	require_once( 'offensive/assets/tabs.inc' );
 	
 	function start() {
+		global $me;
 		mustLogIn();
 
-		setcookie( 'thumbnails', "no", time()-3600, "/offensive/" );
+		if(!$me) $me = new User($_SESSION["userid"]);
+		$me->setPref("index", "");
 	}
 	
 	function head() {

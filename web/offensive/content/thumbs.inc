@@ -7,8 +7,8 @@
 	function start() {
 		mustLogIn();
 
-		if(!isset($_REQUEST['userid']))
-			setcookie( 'thumbnails', "yes", time()+3600*24*365*10, "/offensive/" );
+		if(!$me) $me = new User($_SESSION["userid"]);
+		$me->setPref("index", "thumbs");
 	}
 	
 	function head() {
