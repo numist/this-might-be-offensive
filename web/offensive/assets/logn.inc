@@ -9,7 +9,6 @@ require_once( 'admin/mysqlConnectionInfo.inc' );
 if(!isset($link) || !$link) $link = openDbConnection();
 require_once( 'offensive/assets/functions.inc' );
 require_once('offensive/assets/activationFunctions.inc');
-require_once('offensive/assets/getPrefs.inc');
 
 /*
  * loginFromQueryResult logs in a user from a mysql resource containing a row from the users table.
@@ -38,9 +37,6 @@ function loginFromQueryResult( $result ) {
 			$_SESSION['userid'] = $row['userid'];
 			$_SESSION['status'] = $status;
 			$_SESSION['username'] = $row['username'];
-			
-			// XXX: getPreferences is on its way out.  as is the rest of this stuff.
-			$_SESSION['prefs'] = getPreferences( $row['userid'] );
 			
 			$sql = "INSERT INTO ip_history (userid, ip) VALUES ( ".$row['userid'].", '".$_SERVER['REMOTE_ADDR']."' )";
 			tmbo_query( $sql );

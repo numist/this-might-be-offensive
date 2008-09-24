@@ -8,15 +8,17 @@ if(!isset($link) || !$link) $link = openDbConnection();
 require_once('offensive/assets/functions.inc');
 mustLogIn();
 
-require_once("offensive/assets/getPrefs.inc");
+require_once("offensive/assets/classes.inc");
+$me = new User($_SESSION["userid"]);
 
 $p = array_key_exists("p", $_REQUEST) ? $_REQUEST['p'] : 0 ;
 
 
 function poast($comment, $image) {
-
+	global $me;
+	
 	$com = $comment['comment'];
-	if( ! isSquelched( $comment['userid'] ) ) {
+	if(!$me->squelched($comment['userid'])) {
 		$com = linkUrls( $com );
 		$com = explode("\n", $com);
 		if(count($com) <= 10) { 
@@ -186,24 +188,14 @@ echo $info[0]."x".$info[1];
 </span>
 <br>
 <?
-	if(isSquelched($image['userid'])) { 
+	if($me->squelched($image['userid'])) {
 		echo "[squelched]";
-	} else if( array_key_exists("prefs", $_SESSION) &&
-					    is_array($_SESSION['prefs']) &&
-					    (array_key_exists("hide tmbo", $_SESSION['prefs']) &&
-					    $_SESSION['prefs']['hide tmbo'] == 1 && $image['tmbo'] == 1) &&
-					    (array_key_exists("hide nsfw", $_SESSION['prefs']) &&
-					    $_SESSION['prefs']['hide nsfw'] == 1 && $image['nsfw'] == 1)) { 
+	} else if(($me->getPref("hide_tmbo") == 1 && $image['tmbo'] == 1) &&
+			  ($me->getPref("hide_nsfw") == 1 && $image['nsfw'] == 1)) { 
 		echo "[blocked: nsfw &amp; tmbo]";
-	} else if( array_key_exists("prefs", $_SESSION) &&
-					    is_array($_SESSION['prefs']) &&
-					    (array_key_exists("hide tmbo", $_SESSION['prefs']) &&
-					    $_SESSION['prefs']['hide tmbo'] == 1 && $image['tmbo'] == 1)) { 
+	} else if($me->getPref("hide_tmbo") == 1 && $image['tmbo'] == 1) { 
 		echo "[blocked: tmbo]";
-	} else if( array_key_exists("prefs", $_SESSION) &&
-					    is_array($_SESSION['prefs']) &&
-					    (array_key_exists("hide nsfw", $_SESSION['prefs']) && 
-					    $_SESSION['prefs']['hide nsfw'] == 1 && $image['nsfw'] == 1)) {
+	} else if($me->getPref("hide_nsfw") == 1 && $image['nsfw'] == 1) {
 		echo "[blocked: nsfw]"; 
 	} else {
 ?>

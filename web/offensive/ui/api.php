@@ -8,7 +8,6 @@ require_once( 'admin/mysqlConnectionInfo.inc' );
 if(!isset($link) || !$link) $link = openDbConnection();
 require_once("offensive/assets/functions.inc");
 require_once("offensive/assets/xml.inc");
-require_once("offensive/assets/getPrefs.inc");
 require_once("offensive/assets/argvalidation.inc");
 require_once("offensive/assets/classes.inc");
 
@@ -45,7 +44,7 @@ function alreadyVoted( $uid, $fid ) {
 
 // this gets all the HTML for the quickcomment box.
 function api_getquickcommentbox() {
-	global $userid;
+	global $userid, $me;
 
 	$fileid = check_arg("fileid", "integer", $method);
 	handle_errors();
@@ -99,7 +98,7 @@ function api_getquickcommentbox() {
 			extract($row);
 			$comment = htmlEscape($comment);
 			echo '<div class="qc_comment">';
-			if( !$me->squelched($userid) ) {	
+			if(!$me->squelched($userid)) {	
 				echo nl2br( linkUrls( $comment ) );
 			} else {
 				echo "<div class='squelched'>[ squelched ]</div>";

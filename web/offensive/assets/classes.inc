@@ -1,5 +1,7 @@
 <?
 
+require_once("offensive/assets/functions.inc");
+
 /*
 The purpose in creating a bunch of classes to handle users, uploads, and comments is to try and
 alleviate the number of queries existing in display code, and to give the code a logical way
@@ -553,6 +555,8 @@ class User {
 	 * guaranteed that the data requested will be immediately available — it may
 	 * require a round-trip to the database to get the information requested.
 	 */
+	// id() is guaranteed to work for all User objects.
+	// whether or not the data it returns is good can be determined with exists().
 	public function id() {
 		return $this->data["userid"];
 	}
@@ -646,6 +650,9 @@ class User {
 		return $this->data["yearbook"];
 	}
 
+	/*
+	 * squelching
+	 */
 	// has this user squelched the target?
 	public function squelched($target) {
 		if(is_object($target)) {
@@ -665,6 +672,107 @@ class User {
 		}
 		
 		return in_array($target, $this->data["squelched"]);
+	}
+
+	// squelch a user
+	public function squelch($target) {
+		// populate our local squelch cache
+		$this->squelched(0);
+		// make sure user exists and all that
+		if(is_object($target)) {
+			$target = $target->id();
+		} else if(!is_numeric($target) || strpos($target, ".") !== false) {
+			trigger_error("target must be a userid or User object", E_USER_ERROR);
+		} else {
+			$obj = new User($target);
+			if(!$obj->exists()) {
+				trigger_error("target($target) does not exist", E_USER_ERROR);
+			}
+		}
+		
+		$sql = "INSERT INTO offensive_squelch(userid, squelched) VALUES ( ".$this->id().", $target )";
+		tmbo_query( $sql );
+		
+		foreach($this->data["squelched"] as $squelchee) {
+			if($squelchee == $target) return;
+		}
+		$this->data["squelched"][] = $target;
+	}
+	
+	// unsquelch a user
+	public function unsquelch($target) {
+		// populate our local squelch cache
+		$this->squelched(0);
+		// make sure user exists and all that
+		if(is_object($target)) {
+			$target = $target->id();
+		} else if(!is_numeric($target) || strpos($target, ".") !== false) {
+			trigger_error("target must be a userid or User object", E_USER_ERROR);
+		} else {
+			$obj = new User($target);
+			if(!$obj->exists()) {
+				trigger_error("target($target) does not exist", E_USER_ERROR);
+			}
+		}
+		
+		$sql = "DELETE FROM offensive_squelch WHERE userid=".$this->id()." AND squelched=$target";
+		tmbo_query($sql);
+		
+		foreach($this->data["squelched"] as $key => $squelchee) {
+			if($squelchee == $target) unset($this->data["squelched"][$key]);
+		}
+	}
+	
+	/*
+	 * preferences
+	 */
+	public function getPref($name) {
+		if(!array_key_exists("prefs", $this->data)) {
+			$this->data["prefs"] = array();
+			$sql = "SELECT prefname, value FROM user_preferences WHERE userid = ".$this->id();
+			$result = tmbo_query($sql);
+			
+			while(false !== ($row = mysql_fetch_assoc($result))) {
+				trigger_error("$prefname has value $value");
+				$this->data["prefs"][$row["prefname"]] = $row["value"];
+			}
+		}
+		
+		if(!array_key_exists("$name", $this->data["prefs"]))
+			return false;
+		return $this->data["prefs"]["$name"];
+	}
+	
+	public function setPref($name, $value) {
+		require("offensive/data/preferences.inc");
+		if(!in_array($name, $prefnames))
+			trigger_error("$name is not a valid preference name!", E_USER_ERROR);
+		if(!$this->exists())
+			trigger_error("user(".$this->id().") does not exist", E_USER_ERROR);
+		
+		if(strlen($value) > 0) {
+			// check if preference is already set
+			if($this->getPref($name) === false) {
+				$sql = "INSERT INTO user_preferences(userid, prefname, value)
+			        	VALUES(".$this->id().", '$name', '".sqlEscape($value)."')";
+			} else {
+				$sql = "UPDATE user_preferences SET value = '".sqlEscape($value)."'
+			        	WHERE userid = ".$this->id()." AND prefname = '$name'";
+			}
+		} else {
+			// if we're deleting, and the pref doesn't exist anyway, we're done.
+			if($this->getPref($name) === false) {
+				return;
+			}
+			// if the value is blank, we're deleting
+			$sql = "DELETE FROM user_preferences WHERE prefname = '$name' AND userid = ".$this->id();
+		}
+		
+		// write to cache
+		$this->data["prefs"]["$name"] = $value;
+		
+		// write through cache
+		tmbo_query($sql);
 	}
 }
 

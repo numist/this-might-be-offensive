@@ -1,7 +1,6 @@
 <?
 
 	require_once( 'offensive/assets/tabs.inc' );	
-	require_once( 'offensive/assets/getPrefs.inc' );	
 	require_once( 'admin/mysqlConnectionInfo.inc' );
 	if(!isset($link) || !$link) $link = openDbConnection();
 

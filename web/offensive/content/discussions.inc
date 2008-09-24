@@ -10,6 +10,7 @@
 	}
 
 	function body() {
+		global $me;
 ?>
 	<div class="heading">we need to talk.</div>
 <?
@@ -25,6 +26,7 @@
 	}
 
 	function discussionList() {
+		global $me;
 
 ?>
 
@@ -38,13 +40,16 @@
 
 <?
 
-		$defaultSort = isset( $_SESSION['prefs']['sortorder'] ) ? $_SESSION['prefs']['sortorder'] : "up.timestamp";
-
+		$defaultSort = $me->getPref("disc_sortorder") ? $me->getPref("disc_sortorder") : "up.timestamp";
+		
 		$order = isset($_REQUEST['order']) ? sqlEscape( $_REQUEST['order'] ) : $defaultSort;
+		
+		if(!in_array(strtolower($order), array("up.timestamp", "thecount", "latest"))) {
+			$order = "up.timestamp";
+		}
 
 		if( $order != $defaultSort ) {
-			// should make this persistent
-			$_SESSION['prefs']['sortorder'] = $order;
+			$me->setPref("disc_sortorder", $order);
 		}
 
 		$numPerPage = 100;

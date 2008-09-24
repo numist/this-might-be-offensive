@@ -34,8 +34,6 @@
 	if(!$readonly && (!is_numeric( $lastpic ) || $id > $lastpic)) {
 		setcookie( $cookiename, "$id", time()+3600 * 24 * 365, "/offensive/" );
 	}
-	
-	require_once('offensive/assets/getPrefs.inc');
 
 	function get_random_id() {
 		$sql = "SELECT id FROM offensive_uploads WHERE type='image' AND status='normal' ORDER BY RAND() LIMIT 1";
@@ -179,24 +177,18 @@ q = quick comment, Esc closes quick comment box, ? = random image.<br />
 				-->
 				<!-- XXX: these are going away soon -->
 				<span style="margin-left:48px;">nsfw filter: <?
-					if( array_key_exists("prefs", $_SESSION) &&
-					    is_array($_SESSION['prefs']) &&
-					    array_key_exists("hide nsfw", $_SESSION['prefs']) &&
-					    $_SESSION['prefs']['hide nsfw'] == 1 ) { ?>
-						<a href="/offensive/setPref.php?p=1&v=">off</a> on
+					if($me->getPref("hide_nsfw") == 1) { ?>
+						<a href="/offensive/setPref.php?p=hide_nsfw&v=">off</a> on
 					<? } else { ?>
-						off <a href="/offensive/setPref.php?p=1&v=2">on</a>
+						off <a href="/offensive/setPref.php?p=hide_nsfw&v=1">on</a>
 					<? } ?>
 				</span>
 						
 				<span style="margin-left:48px;">tmbo filter: <?
-					if( array_key_exists("prefs", $_SESSION) &&
-					    is_array($_SESSION['prefs']) &&
-					    array_key_exists("hide tmbo", $_SESSION['prefs']) &&
-					    $_SESSION['prefs']['hide tmbo'] == 1 ) { ?>
-							<a href="/offensive/setPref.php?p=3&v=">off</a> on
+					if($me->getPref("hide_tmbo") == 1) { ?>
+							<a href="/offensive/setPref.php?p=hide_tmbo&v=">off</a> on
 					<? } else { ?>
-							off <a href="/offensive/setPref.php?p=3&v=2">on</a>
+							off <a href="/offensive/setPref.php?p=hide_tmbo&v=1">on</a>
 					<? } ?>
 				</span>
 			</div>
@@ -235,7 +227,9 @@ q = quick comment, Esc closes quick comment box, ? = random image.<br />
 			<!--
 				image block
 			-->
-			<? if(hideImage($upload->is_nsfw(), $upload->is_tmbo(), $upload->uploader()->id())) {
+			<? if($me->squelched($upload->uploader()) || 
+			    ($upload->is_nsfw() == 1 && $me->getPref("hide_nsfw") == 1) || 
+			    ($upload->is_tmbo() == 1 && $me->getPref("hide_tmbo") == 1)) {
 				?><div style="padding:128px;">[ filtered ] <!-- <?= $upload->uploader()->id() ?> --></div><?
 			} else { ?>
 				<div class="<?php echo $is_nsfw == 1 ? 'nsfw' : 'image' ?> u<?= $upload->uploader()->id() ?>">

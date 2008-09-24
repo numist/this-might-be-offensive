@@ -204,16 +204,6 @@ function ensureDirExists( $path ) {
 	}
 }
 
-function hideImage($is_nsfw, $is_tmbo, $uploaderid) {
-	return ( array_key_exists("prefs", $_SESSION) &&
-	    is_array($_SESSION['prefs']) &&
-	    (array_key_exists("hide nsfw", $_SESSION['prefs']) && 
-	    $_SESSION['prefs']['hide nsfw'] == 1 && $is_nsfw == 1) || 
-	    (array_key_exists("hide tmbo", $_SESSION['prefs']) &&
-	    $_SESSION['prefs']['hide tmbo'] == 1 && $is_tmbo == 1) 
-		|| ( in_array( $uploaderid, explode( ',', $_SESSION['prefs']['squelched'] ) ) ) );
-}
-
 // XXX: to be deprecated!
 function commentLabel($comments, $good, $bad, $tmbo, $votes=true) {
 	if(!is_numeric($comments)) $comments = 0;

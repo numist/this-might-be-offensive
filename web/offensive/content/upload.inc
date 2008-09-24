@@ -477,7 +477,7 @@ function uploadForm($fileuploaded=false) {
 }
 
 function checkRepost($postdata) {
-	global $hash, $tmpdir;
+	global $hash, $tmpdir, $me;
 	
 	// avatars are exempt
 	if(isAvatarUpload($postdata)) return false;
@@ -511,7 +511,9 @@ function checkRepost($postdata) {
 		$repdate = strtotime($row['timestamp']);
 		?><tr class="<?= $css ?>">
 		<td><a href="/offensive/pages/pic.php?id=<?= $row['id'] ?>" target="_blank"><?
-		if(hideImage($row['nsfw'], $row['tmbo'], $row['userid'])) {
+		if($me->squelched($row['userid']) || 
+		    ($row["nsfw"] == 1 && $me->getPref("hide_nsfw") == 1) || 
+		    ($row["tmbo"] == 1 && $me->getPref("hide_tmbo") == 1)) {
 			?>[ filtered ]<?
 		} else {
 			?><img src="<?= getThumbURL($row['id'], $row['filename'], $row['timestamp'], $row['type']) ?>"><?

@@ -12,6 +12,7 @@
 	}
 
 	function body() {
+		global $me;
 // XXX: _REQUEST['since'] gives a lower timestamp bound -- I forget why I wanted this...
 
 		$numPerPage = 100;
@@ -66,10 +67,12 @@
 				<? if( $type == 'image' || $type == 'avatar') { ?>
 					<td width="100px"><a class="<?echo $css ?>" href="./pages/pic.php?id=<? echo $row['id'] ?>"><?
 
-					if(hideImage($row['nsfw'], $row['tmbo'], $row['userid'])) {
+					if($me->squelched($row["userid"]) || 
+					    ($row["nsfw"] == 1 && $me->getPref("hide_nsfw") == 1) || 
+					    ($row["tmbo"] == 1 && $me->getPref("hide_tmbo") == 1) ) {
 						?>[ filtered ]<?
 					} else {
-						?><img src="<?= getThumbURL($row['id'], $row['filename'], $row['timestamp']) ?>"/><?
+						?><img src="<?= getThumbURL($row['id'], $row['filename'], $row['timestamp'], $row['type']) ?>"/><?
 					}
 					?></a></td>
 					<td><a class="<?echo $css ?>" href="./pages/pic.php?id=<? echo $row['id'] ?>"><?= $filename ?></a> (uploaded by <?= htmlEscape($row['username']) ?>)<? echo  $expired ?></td>

@@ -3,7 +3,6 @@
 	require_once("admin/mysqlConnectionInfo.inc");
 	if(!isset($link) || !$link) $link = openDbConnection();
 	require_once("offensive/assets/functions.inc");
-	require_once("offensive/assets/getPrefs.inc");
 	require_once("offensive/assets/tabs.inc");
 	require_once("offensive/assets/comments.inc");
 	require_once("offensive/assets/classes.inc");
@@ -147,18 +146,15 @@
 <?
 	}
 	
-	function showThumbnails() {
-		return ((! isset( $_SESSION['prefs']['thumbnails_in_comments'] )) || $_SESSION['prefs']['thumbnails_in_comments'] == 1);
-	}
-	
 	function toggleThumbnailLink() {
+		global $me;
 
 		?><div style="margin:4px;font-weight:bold"><?
-			if( showThumbnails() ) {
-				?><a href="setPref.php?p=9&v=10">hide thumbnail</a><?
+			if($me->getPref("thumbnails_in_comments") == 1 || $me->getPref("thumbnails_in_comments") === false) {
+				?><a href="setPref.php?p=thumbnails_in_comments&v=0">hide thumbnail</a><?
 			}
 			else {
-				?><a href="setPref.php?p=9&v=">show thumbnail</a><?
+				?><a href="setPref.php?p=thumbnails_in_comments&v=1">show thumbnail</a><?
 			}
 		?></div><?
 
@@ -284,16 +280,10 @@
 				<div style="<?= nextStyle($commentnum++) ?>; border-top:1px solid #000033">
 					<div style="float:right"><? toggleThumbnailLink() ?></div>
 					<?
-						if( showThumbnails() ) {
+						if($me->getPref("thumbnails_in_comments") == 1 || $me->getPref("thumbnails_in_comments") === false) {
 							if($me->squelched($uploader) || 
-							    array_key_exists("prefs", $_SESSION) &&
-							    is_array($_SESSION['prefs']) &&
-							    ($upload->is_nsfw() == 1 && 
-							    array_key_exists("hide nsfw", $_SESSION['prefs']) &&
-							    $_SESSION['prefs']['hide nsfw'] == 1) || 
-							    ($upload->is_tmbo() == 1 && 
-							    array_key_exists("hide tmbo", $_SESSION['prefs']) &&
-							    $_SESSION['prefs']['hide tmbo'] == 1) ) {
+							    ($upload->is_nsfw() == 1 && $me->getPref("hide_nsfw") == 1) || 
+							    ($upload->is_tmbo() == 1 && $me->getPref("hide_tmbo") == 1) ) {
 								?><div style="padding:40px;">[ thumbnail filtered ]</div><?
 							}
 							else {
