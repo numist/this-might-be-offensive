@@ -180,23 +180,23 @@ class Upload {
 	}
 	
 	public function goods() {
-		return $this->getCacheRow("goods");
+		return is_numeric($this->getCacheRow("goods")) ? $this->getCacheRow("goods") : 0;
 	}
 	
 	public function bads() {
-		return $this->getCacheRow("bads");
+		return is_numeric($this->getCacheRow("bads")) ? $this->getCacheRow("bads") : 0;
 	}
 	
 	public function tmbos() {
-		return $this->getCacheRow("tmbos");
+		return is_numeric($this->getCacheRow("tmbos")) ? $this->getCacheRow("tmbos") : 0;
 	}
 	
 	public function tiars() {
-		return $this->getCacheRow("tiars");
+		return is_numeric($this->getCacheRow("tiars")) ? $this->getCacheRow("tiars") : 0;
 	}
 	
 	public function comments() {
-		return $this->getCacheRow("comments");
+		return is_numeric($this->getCacheRow("comments")) ? $this->getCacheRow("comments") : 0;
 	}
 	
 	public function last_active() {
