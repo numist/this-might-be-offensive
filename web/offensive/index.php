@@ -54,7 +54,9 @@ $timelimit = 10;
 	// LEGACY: moves from cookie-based pickuplink to DB-based pickuplink for images.
 	$cookiename = $_SESSION['userid'] . "lastpic";
 	if(array_key_exists($cookiename, $_COOKIE) && is_numeric($_COOKIE[$cookiename])) {
-		$me->setPref("ipickup", $_COOKIE[$cookiename]);
+		if($me->getPref("ipickup") === false || $me->getPref("ipickup") < $_COOKIE[$cookiename]) {
+			$me->setPref("ipickup", $_COOKIE[$cookiename]);
+		}
 		setcookie( $cookiename, "", time()-3600, "/offensive/" );
 	}
 	
@@ -185,13 +187,15 @@ $timelimit = 10;
 			<? if (loggedin()) { // log in --> get info restricted block ?>
 				<div class="contentbox">
 					<div class="blackbar"></div>
-						<div class="heading">log in</div>
+						<div class="heading">your stuff:</div>
 						<div class="bluebox">
 							<p>you are logged in as <b><a href="index.php?c=user&userid=<?php echo $_SESSION['userid'] ?>"><?php echo $_SESSION['username'] ?></a>.</b></p>
 							
 							<p><a href="index.php?c=upload">upload</a></p>
 							
 							<p><a href="./?c=subscriptions">subscribed threads</a></p>
+							
+							<!--<p><a href="./?c=settings">settings</a></p>-->
             	
 							<p><a href="logout.php">log out</a></p>
 						</div>
