@@ -7,8 +7,11 @@
 	function start() {
 		mustLogIn();
 
-		if(!$me) $me = new User($_SESSION["userid"]);
-		$me->setPref("index", "thumbs");
+		if(!$me)
+			$me = new User($_SESSION["userid"]);
+		
+		if(!array_key_exists("userid", $_REQUEST))
+			$me->setPref("index", "thumbs");
 	}
 	
 	function head() {
@@ -23,16 +26,6 @@ EOT;
 	function body() {
   
 		$THUMBS_PER_ROW = 4;
-    
-		if( file_exists( "./updating.txt" ) ) {
-			$updating_now = true;
-		}
-		
-		if( file_exists( "./log.txt" ) ) {
-			$last_update = filemtime( "log.txt" );
-		} else {
-			$last_update = -1;
-		}
 
 		$numPerPage = 100;
 		$page = isset($_REQUEST['p']) && is_numeric($_REQUEST['p']) ?
