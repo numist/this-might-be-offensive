@@ -10,8 +10,11 @@ require_once("offensive/assets/functions.inc");
 require_once("offensive/assets/xml.inc");
 require_once("offensive/assets/getPrefs.inc");
 require_once("offensive/assets/argvalidation.inc");
+require_once("offensive/assets/classes.inc");
 
 mustLogIn("http");
+
+$me = new User($_SESSION["userid"]);
 
 $userid = $_SESSION['userid'];
 $uri = $_SERVER["REQUEST_URI"];
@@ -96,7 +99,7 @@ function api_getquickcommentbox() {
 			extract($row);
 			$comment = htmlEscape($comment);
 			echo '<div class="qc_comment">';
-			if( ! isSquelched( $userid) ) {	
+			if( !$me->squelched($userid) ) {	
 				echo nl2br( linkUrls( $comment ) );
 			} else {
 				echo "<div class='squelched'>[ squelched ]</div>";

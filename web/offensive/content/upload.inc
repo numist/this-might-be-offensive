@@ -22,6 +22,15 @@
 		
 	}
 	
+	function requestDetail() {
+		ob_start();
+		var_dump( $_SERVER );
+		var_dump( $_REQUEST );		
+		$string = ob_get_contents();
+		ob_end_clean();
+		return $string;
+	}
+	
 	function isAvatarUpload($postdata) {
 		if(!array_key_exists('avatar', $postdata)) return false;
 		return $postdata['avatar'];

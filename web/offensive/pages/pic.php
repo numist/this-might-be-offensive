@@ -8,6 +8,8 @@
 	require_once("offensive/assets/comments.inc");
 
 	mustLogIn();
+	
+	$me = new User($_SESSION["userid"]);
 
 	$id = "";
 	if(array_key_exists("random", $_REQUEST)) {
@@ -18,7 +20,12 @@
 	}
 	
 	if(!is_numeric($id)) {
-		header( "Location: ../" );
+		header( "Location: /offensive/" );
+	}
+
+	$upload = new Upload($id);
+	if($upload->type() == "topic") {
+		header("Location: /offensive/?c=comments&fileid=".$id);
 	}
 
 	// XXX: pickup cookie needs to be merged into prefs
@@ -27,8 +34,6 @@
 	if(!$readonly && (!is_numeric( $lastpic ) || $id > $lastpic)) {
 		setcookie( $cookiename, "$id", time()+3600 * 24 * 365, "/offensive/" );
 	}
-	
-	$upload = new Upload($id);
 	
 	require_once('offensive/assets/getPrefs.inc');
 
@@ -218,7 +223,7 @@ q = quick comment, Esc closes quick comment box, ? = random image.<br />
 			-->
 			<span style="margin-left:48px">
 				<?
-				if(isSquelched($upload->uploader()->id())) {
+				if($me->squelched($upload->uploader()->id())) {
 					?><a id="unsquelchLink" style="color:#999999" href="/offensive/setPref.php?unsq=<?= $upload->uploader()->id() ?>">unsquelch <?= $upload->uploader()->username() ?></a><?
 				} else {
 					?><a id="squelchLink" style="color:#999999" href="/offensive/setPref.php?sq=<?= $upload->uploader()->id() ?>">squelch <?= $upload->uploader()->username() ?></a><?
@@ -244,10 +249,7 @@ q = quick comment, Esc closes quick comment box, ? = random image.<br />
 			<br/><br/>
 		</div>
 
-<? 
-	record_hit();
-	include_once("analytics.inc"); 
-?>
-
+		<? record_hit();
+		include_once("analytics.inc"); ?>
 	</body>
 </html>

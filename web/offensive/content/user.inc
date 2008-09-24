@@ -39,7 +39,8 @@
 	}
 	
 	function body() {
-		if( isAdmin() && 
+		global $me;
+		if( $me->status() == "admin" && 
 		    array_key_exists("set_account_status", $_REQUEST) && 
 		    $_REQUEST['set_account_status'] ) {
 			handleSetStatusSubmission();
@@ -130,10 +131,9 @@
 						
 						<div style="float:right">
 							<?
-								if( isSquelched( $usrid ) ) {
+								if($me->squelched($usrid)) {
 									?><a href="/offensive/setPref.php?unsq=<?= $usrid ?>">unsquelch</a><?
-								}
-								else {
+								} else {
 									?><a href="/offensive/setPref.php?sq=<?= $usrid ?>">squelch</a><?
 								}
 							?>

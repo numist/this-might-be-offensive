@@ -25,9 +25,4 @@ function getPreferences( $userid ) {
 	return $prefs;
 }
 
-
-function isSquelched( $squelchedId ) {
-	return in_array( $squelchedId, explode( ",", $_SESSION['prefs']['squelched'] ) );
-}
-
 ?>

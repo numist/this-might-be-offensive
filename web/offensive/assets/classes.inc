@@ -1,7 +1,31 @@
 <?
 
+/*
+The purpose in creating a bunch of classes to handle users, uploads, and comments is to try and
+alleviate the number of queries existing in display code, and to give the code a logical way
+to traverse related datas.
+
+From a usability perspective, it's completely possible to take an upload and find a commenter's
+yearbook image by traversing $upload->getComments()[0]->commenter()->yearbook(); aside from PHP's
+inability to execute the getComments()[0] portion of the code, this will work perfectly well.
+
+From a performance perspective, this code does a lot of caching, and reduces the number of database
+calls necessary to fetch data.  All public functions should not incur a database call after the
+first call.  for example, $upload->exists() might go to the database the first time it is called,
+but afterwards the result is cached, so all future calls to $upload->exists() will complete
+immediately.  As a bonus, whenever a function goes to the database, it uses a generic query, which
+gives us a few additional benefits.  First, this query returns a complete row, so the cache
+contains additional information (in the case of $upload->exists(), you would also now have
+filename, is_tmbo, is_nsfw, timestamp, etc cached).  Second, this increases the likelihood of
+MySQL experiencing a database cache hit, which also speeds things up considerably.
+
+XXX: In the future, these objects may also be stored globally, so if there are multiple objects
+representing the same user (for example) they will all share the same data.
+*/
+
 class Upload {
 	private $data = array();
+	private $exists = null;
 	
 	public function __construct($info) {
 		/*
@@ -53,22 +77,27 @@ class Upload {
 	}
 	
 	private function getUploadRow($element=false) {
-		// try to close requests immediately if they are simple element queries
+		// try to close requests via cache immediately if possible
 		if($element && array_key_exists($element, $this->data))
 			return $this->data[$element];
 		
-		// get information we need from the database.
-		$sql = "SELECT * FROM offensive_uploads WHERE id = ".$this->data["id"];
-		$result = tmbo_query($sql);
-		
-		// if the upload doesn't exist...  well what can we do?
-		if(mysql_num_rows($result) != 1) return false;
-		
-		$row = mysql_fetch_assoc($result);
-		foreach($row as $key => $val) {
-			$this->data[$key] = $val;
+		// if we haven't hit the db for this upload already, do it
+		if($this->exists === null) {
+			// get information we need from the database.
+			$sql = "SELECT * FROM offensive_uploads WHERE status = 'normal' AND id = ".$this->data["id"];
+			$result = tmbo_query($sql);
+			
+			// if the upload doesn't exist...  well what can we do?
+			if(mysql_num_rows($result) != 1) {
+				$this->exists = false;
+			} else {
+				$row = mysql_fetch_assoc($result);
+				foreach($row as $key => $val) {
+					$this->data[$key] = $val;
+				}
+				$this->exists = true;
+			}
 		}
-		
 		// now we should have enough information for element queries
 		if($element) {
 			if(array_key_exists($element, $this->data))
@@ -77,7 +106,7 @@ class Upload {
 			trigger_error("$element requested from offensive_uploads table, but was not available",
 			              E_USER_WARNING);
 		}
-		return true;
+		return $this->exists;
 	}
 	
 	public function exists() {
@@ -122,34 +151,30 @@ class Upload {
 	/*
 	 * functions that deal with comments and votes
 	 */
-	private function getCacheRow($element=false) {
+	// this function will error the entire script if you make a bad call against it!
+	private function getCacheRow($element) {
 		// try to close requests immediately if they are simple element queries
-		if($element && array_key_exists($element, $this->data))
+		if(!array_key_exists($element, $this->data)) {
+			// get information we need from the database.
+			$sql = "SELECT good AS goods, bad AS bads, tmbo AS tmbos, repost AS tiars, comments,
+			        timestamp AS last_active
+			        FROM offensive_count_cache WHERE threadid = ".$this->data["id"];
+			$result = tmbo_query($sql);
+        	
+			// if the upload doesn't exist...  well what can we do?
+			if(mysql_num_rows($result) != 1) return false;
+        	
+			$row = mysql_fetch_assoc($result);
+			foreach($row as $key => $val) {
+				$this->data[$key] = $val;
+			}
+		}
+        
+		if(array_key_exists($element, $this->data))
 			return $this->data[$element];
-        
-		// get information we need from the database.
-		$sql = "SELECT good AS goods, bad AS bads, tmbo AS tmbos, repost AS tiars, comments,
-		        timestamp AS last_active
-		        FROM offensive_count_cache WHERE threadid = ".$this->data["id"];
-		$result = tmbo_query($sql);
-        
-		// if the upload doesn't exist...  well what can we do?
-		if(mysql_num_rows($result) != 1) return false;
-        
-		$row = mysql_fetch_assoc($result);
-		foreach($row as $key => $val) {
-			$this->data[$key] = $val;
-		}
-        
-		// now we should have enough information for element queries
-		if($element) {
-			if(array_key_exists($element, $this->data))
-				return $this->data[$element];
-			// if not, register an error.
-			trigger_error("$element requested from offensive_count_cache table, but was not available",
-			              E_USER_WARNING);
-		}
-		return true;
+		// if not, register an error.
+		trigger_error("$element requested from offensive_count_cache table, but was not available",
+		              E_USER_WARNING);
 	}
 	
 	public function goods() {
@@ -303,6 +328,7 @@ class Upload {
 
 class Comment {
 	private $data = array();
+	private $exists = null;
 	
 	public function __construct($info) {
 		/*
@@ -354,22 +380,27 @@ class Comment {
 	}
 	
 	private function getCommentRow($element=false) {
-		// try to close requests immediately if they are simple element queries
+		// try to close requests via cache immediately if possible
 		if($element && array_key_exists($element, $this->data))
 			return $this->data[$element];
 		
-		// get information we need from the database.
-		$sql = "SELECT * FROM offensive_comments WHERE id = ".$this->data["id"];
-		$result = tmbo_query($sql);
-		
-		// if the comment doesn't exist...  well what can we do?
-		if(mysql_num_rows($result) != 1) return false;
-		
-		$row = mysql_fetch_assoc($result);
-		foreach($row as $key => $val) {
-			$this->data[$key] = $val;
+		// if we haven't hit the db for this upload already, do it
+		if($this->exists === null) {
+			// get information we need from the database.
+			$sql = "SELECT * FROM offensive_comments WHERE id = ".$this->data["id"];
+			$result = tmbo_query($sql);
+			
+			// if the upload doesn't exist...  well what can we do?
+			if(mysql_num_rows($result) != 1) {
+				$this->exists = false;
+			} else {
+				$row = mysql_fetch_assoc($result);
+				foreach($row as $key => $val) {
+					$this->data[$key] = $val;
+				}
+				$this->exists = true;
+			}
 		}
-		
 		// now we should have enough information for element queries
 		if($element) {
 			if(array_key_exists($element, $this->data))
@@ -378,7 +409,7 @@ class Comment {
 			trigger_error("$element requested from offensive_comments table, but was not available",
 			              E_USER_WARNING);
 		}
-		return true;
+		return $this->exists;
 	}
 	
 	public function id() {
@@ -457,6 +488,7 @@ class Comment {
 
 class User {
 	private $data = array();
+	private $exists = null;
 	
 	public function __construct($info) {
 		if(is_array($info)) {
@@ -479,30 +511,36 @@ class User {
 	 * in the users table belonging to this user.
 	 */
 	private function getUserRow($element=false) {
-		// try to close requests immediately if they are simple element queries
+		// try to close requests via cache immediately if possible
 		if($element && array_key_exists($element, $this->data))
 			return $this->data[$element];
 		
-		// get information we need from the database.
-		$sql = "SELECT * FROM users WHERE userid = ".$this->data["userid"];
-		$result = tmbo_query($sql);
-		
-		// if the user doesn't exist...  well what can we do?
-		if(mysql_num_rows($result) != 1) return false;
-		
-		$row = mysql_fetch_assoc($result);
-		foreach($row as $key => $val) {
-			$this->data[$key] = $val;
+		// if we haven't hit the db for this upload already, do it
+		if($this->exists === null) {
+			// get information we need from the database.
+			$sql = "SELECT * FROM users WHERE userid = ".$this->data["userid"];
+			$result = tmbo_query($sql);
+			
+			// if the upload doesn't exist...  well what can we do?
+			if(mysql_num_rows($result) != 1) {
+				$this->exists = false;
+			} else {
+				$row = mysql_fetch_assoc($result);
+				foreach($row as $key => $val) {
+					$this->data[$key] = $val;
+				}
+				$this->exists = true;
+			}
 		}
-		
 		// now we should have enough information for element queries
 		if($element) {
 			if(array_key_exists($element, $this->data))
 				return $this->data[$element];
 			// if not, register an error.
-			trigger_error("$element requested from user table, but was not available", E_USER_WARNING);
+			trigger_error("$element requested from offensive_comments table, but was not available",
+			              E_USER_WARNING);
 		}
-		return true;
+		return $this->exists;
 	}
 	
 	public function exists() {
@@ -593,7 +631,7 @@ class User {
 	
 	public function yearbook() {
 		if(!array_key_exists("yearbook", $this->data)) {
-			$sql = "SELECT id FROM offensive_uploads WHERE type = 'avatar' AND userid = ".$this->data["userid"].
+			$sql = "SELECT id FROM offensive_uploads WHERE type = 'avatar' AND status = 'normal' AND userid = ".$this->data["userid"].
 			       " ORDER BY timestamp DESC LIMIT 1";
 			$result = tmbo_query($sql);
 			
@@ -606,6 +644,27 @@ class User {
 		}
 		
 		return $this->data["yearbook"];
+	}
+
+	// has this user squelched the target?
+	public function squelched($target) {
+		if(is_object($target)) {
+			$target = $target->id();
+		} else if(!is_numeric($target) || strpos($target, ".") !== false) {
+			trigger_error("target must be a userid or User object", E_USER_ERROR);
+		}
+		
+		if(!array_key_exists("squelched", $this->data)) {
+			$this->data["squelched"] = array();
+			$sql = "SELECT squelched FROM offensive_squelch WHERE userid=".$this->id();
+			$result = tmbo_query($sql);
+
+			while($row = mysql_fetch_array($result)) {
+				$this->data["squelched"][] = $row["squelched"];
+			}
+		}
+		
+		return in_array($target, $this->data["squelched"]);
 	}
 }
 

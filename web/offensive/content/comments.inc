@@ -22,7 +22,7 @@
 	}
 
 	function start() {
-		global $upload, $uploader, $expired;
+		global $upload, $uploader;
 	
 		mustLogIn();
 
@@ -44,8 +44,6 @@
 			require("offensive/404.php");
 			exit;
 		}
-		
-		$expired = $upload->file() == ''? true : false;
 	
 	    // check to see if someone's posting.  
 	    /* check if someone is being hoodwinked by a link in comments
@@ -86,7 +84,7 @@
 				exit;
 			}
 			
-			$already_voted = alreadyVoted( $_REQUEST['fileid'], $_SESSION['userid'] );
+			$already_voted = alreadyVoted( $_SESSION['userid'], $_REQUEST['fileid'] );
 			
 			if( $already_voted || $uploader->id() == $_SESSION['userid'] || $upload->file() == "" ) {
 				$vote = null;
@@ -167,7 +165,7 @@
 	}
 
 	function body() {
-		global $expired, $upload, $uploader;
+		global $upload, $uploader, $me;
 	
 		$subscribed = subscribed($upload->id());
 
@@ -230,11 +228,10 @@
 		<div class="entry u<?= $commenter->id() ?>" style="<?= nextStyle($commentnum++)?>">
     	
 				<?php
-				
-					$commenttext = htmlEscape($comment->text());
     	
-					if( ! isSquelched( $commenter->id() ) ) {
-						echo nl2br( linkUrls( $commenttext ) );
+					// XXX: this output stuff all gets to change.
+					if(!$me->squelched($commenter)) {
+						echo nl2br(linkUrls(htmlEscape($comment->text())));
 					}
 					else {
 						echo "<div class='squelched'>[ squelched ]</div>";
@@ -288,7 +285,7 @@
 					<div style="float:right"><? toggleThumbnailLink() ?></div>
 					<?
 						if( showThumbnails() ) {
-							if( ( isSquelched( $uploader->id() ) ) || 
+							if($me->squelched($uploader) || 
 							    array_key_exists("prefs", $_SESSION) &&
 							    is_array($_SESSION['prefs']) &&
 							    ($upload->is_nsfw() == 1 && 
