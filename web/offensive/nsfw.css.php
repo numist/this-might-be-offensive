@@ -4,8 +4,8 @@ session_start();
 <?php
 	if( array_key_exists("prefs", $_SESSION) &&
 	    is_array($_SESSION['prefs']) &&
-	    array_key_exists("hide nsfw", $_SESSION["prefs"]) &&
-	    $_SESSION['prefs']['hide nsfw'] == 1 ) {
+	    array_key_exists("hide_nsfw", $_SESSION["prefs"]) &&
+	    $_SESSION['prefs']['hide_nsfw'] == 1 ) {
 	?>		
 
 	.nsfw {
