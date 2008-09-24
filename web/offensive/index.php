@@ -44,10 +44,18 @@ $timelimit = 10;
 	if(!isset($link) || !$link) $link = openDbConnection();
 	require_once('offensive/assets/functions.inc');
 
+	// LEGACY: moves from cookie-based landing page to db-based
 	if($me && array_key_exists("thumbnails", $_COOKIE) && 
 	    $_COOKIE["thumbnails"] === "yes") {
 		$me->setPref("index", "thumbs");
 		setcookie( 'thumbnails', "no", time()-3600, "/offensive/" );
+	}
+	
+	// LEGACY: moves from cookie-based pickuplink to DB-based pickuplink for images.
+	$cookiename = $_SESSION['userid'] . "lastpic";
+	if(array_key_exists($cookiename, $_COOKIE) && is_numeric($_COOKIE[$cookiename])) {
+		$me->setPref("ipickup", $_COOKIE[$cookiename]);
+		setcookie( $cookiename, "", time()-3600, "/offensive/" );
 	}
 	
 	// set our target to any of the requested content page...

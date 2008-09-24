@@ -12,17 +12,19 @@
 	 * the user can specify the redirect in the _REQUEST['redirect'] variable.
 	 * the location of the redirect defaults to /offensive/?c=main
 	 */
-	if(array_key_exists("redirect", $_REQUEST))
+	if(array_key_exists("redirect", $_REQUEST)) {
 		$redirect = $_REQUEST['redirect'];
-	else {
-		$c = (array_key_exists("thumbnails", $_COOKIE) && 
-		      $_COOKIE["thumbnails"] == "yes") ? 
-		      "thumbs" : "main";
-		$redirect = './?c='.$c;
+	} else {
+	
 	}
 
 	// if the user is logged in already, redirect.
 	if(loggedin()) {
+		if(!isset($redirect)) {
+			$me = new User($_SESSION["userid"]);
+			$redirect = './?c='.($me->getPref("index") == "thumbs") ? 
+			      "thumbs" : "main";
+		}
 		header( "Location: " . $redirect );
 		exit;
 	}

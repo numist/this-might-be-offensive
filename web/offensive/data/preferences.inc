@@ -12,6 +12,8 @@ $prefnames = array(
 	"disc_sortorder",
 	// type of frontpage, "thumbs" or blank
 	"index",
+	// pickup id for images
+	"ipickup",
 	
 	// key commands:
 	// vote good
