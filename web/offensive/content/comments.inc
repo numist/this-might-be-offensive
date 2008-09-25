@@ -83,9 +83,7 @@
 				exit;
 			}
 			
-			$already_voted = alreadyVoted( $_SESSION['userid'], $_REQUEST['fileid'] );
-			
-			if( $already_voted || $uploader->id() == $_SESSION['userid'] || $upload->file() == "" ) {
+			if( !canVote($upload->id()) || $uploader->id() == $_SESSION['userid'] || $upload->file() == "" ) {
 				$vote = null;
 			} else {
 				$vote = array_key_exists("vote", $_REQUEST) ? $_REQUEST['vote'] : null;
@@ -248,10 +246,6 @@
 					$numbad += ($thevote == 'this is bad') ? 1 : 0;
     	
 					echo "<span title=\"+$numgood -$numbad\" class='vote" . additionalCssFor( $thevote ) . "'> [ " . $thevote . " ]</span>";
-					
-					if( $commenter->id() == $_SESSION['userid'] ) {
-						$already_voted = true;
-					}
 				}
 				
 				
@@ -272,8 +266,6 @@
 	
 	// end of "are there any comments"
 	}
-	
-	$already_voted = $uploader->id() == $_SESSION["userid"] ? true : $already_voted;
 	
 		if( $upload->type() == 'image' || $upload->type() == 'avatar' ) {
 			?>
@@ -350,7 +342,7 @@
 
 <?php 
 
-	if( !$already_voted && $upload->file() && $type != 'topic' ) {
+	if( canVote($upload->id()) && $upload->file() && $type != 'topic' ) {
 	
 	?>	<div style="text-align:left;margin-left:10%">
 			<input type="radio" name="vote" value="" checked="checked" id="novote"/>

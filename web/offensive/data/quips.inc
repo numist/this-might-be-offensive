@@ -12,7 +12,10 @@
 		"DON'T post your findings when you search for tubgirl",
 		"holy shit, I just about killed myself! where's my camera?",
 		"there's no shame in getting the fuck away from a pissed off armadillo",
-		"you do not want vodka getting into your urethra. you really, really, don't."
+		"you do not want vodka getting into your urethra. you really, really, don't.",
+		"consciousness doesn't really exist. it's just another one of our ideas.",
+		"time flies like an arrow, but fruit flies like a banana.",
+		"bow chicka wow-wow"
 	
 		);
 	$quip = $quips[rand(0, count($quips) - 1)];

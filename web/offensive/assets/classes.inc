@@ -733,7 +733,6 @@ class User {
 			$result = tmbo_query($sql);
 			
 			while(false !== ($row = mysql_fetch_assoc($result))) {
-				trigger_error("$prefname has value $value");
 				$this->data["prefs"][$row["prefname"]] = $row["value"];
 			}
 		}
