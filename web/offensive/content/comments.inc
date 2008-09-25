@@ -342,7 +342,7 @@
 
 <?php 
 
-	if( canVote($upload->id()) && $upload->file() && $type != 'topic' ) {
+	if( canVote($upload->id()) && $upload->file() && $upload->type() != 'topic' ) {
 	
 	?>	<div style="text-align:left;margin-left:10%">
 			<input type="radio" name="vote" value="" checked="checked" id="novote"/>

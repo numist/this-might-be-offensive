@@ -30,8 +30,9 @@
 				$n++;
 			}
 		
+			$prefnames = array_keys($options);
 			if(count($choices) > 0) {
-				foreach($options as $prefname => $val) {
+				foreach($prefnames as $prefname) {
 					if($prefname == "noselect") continue;
 					
 					if(array_key_exists($prefname, $choices)) {
@@ -41,7 +42,7 @@
 					}
 				}
 			} else {
-				foreach($options as $prefname => $val) {
+				foreach($prefnames as $prefname) {
 					if($prefname == "noselect") continue;
 					
 					$me->setPref($prefname, "");
@@ -125,9 +126,11 @@
 					
 					// has the user customized their key layout?
 					$custom = false;
-                	
+
+                	$prefnames = array_keys($options);
+
 					// desc is unused, but required to get the key in a foreach loop.
-					foreach($options as $prefname => $desc) {
+					foreach($prefnames as $prefname) {
 						$values = $me->getPref($prefname);
 						
 						// possible false values here are false or "", so not checking types.
