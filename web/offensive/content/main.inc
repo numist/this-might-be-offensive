@@ -9,7 +9,7 @@
 		global $me;
 		mustLogIn();
 
-		if(!$me) $me = new User($_SESSION["userid"]);
+		if(!isset($me)) $me = new User($_SESSION["userid"]);
 		$me->setPref("index", "");
 	}
 	

@@ -473,7 +473,7 @@
 					}
 				?> ]</div><?
 			} else { ?>
-				<div class="<?php echo $is_nsfw == 1 ? 'nsfw' : 'image' ?> u<?= $upload->uploader()->id() ?>">
+				<div class="<?php echo $upload->is_nsfw() == 1 ? 'nsfw' : 'image' ?> u<?= $upload->uploader()->id() ?>">
 					<? if($upload->file() != "") { ?>
 						<a id="imageLink" href="<?= $upload->URL() ?>" target="_blank"><img src="<?= $upload->URL() ?>" style="border:none"/></a>
 					<? } else { ?>

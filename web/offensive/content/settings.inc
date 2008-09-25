@@ -10,7 +10,7 @@
 		global $options, $me;
 		
 		mustLogIn();
-		if(!$me) $me = new User($_SESSION["userid"]);
+		if(!isset($me)) $me = new User($_SESSION["userid"]);
 		
 		if(array_key_exists("submit", $_POST)) {
 			// check for post for keys
@@ -29,7 +29,7 @@
 				$choices[$_POST["key$n"]][] = $_POST["keycode$n"];
 				$n++;
 			}
-
+		
 			if(count($choices) > 0) {
 				foreach($options as $prefname => $val) {
 					if($prefname == "noselect") continue;
@@ -127,13 +127,7 @@
 					$custom = false;
                 	
 					// desc is unused, but required to get the key in a foreach loop.
-
-					/*
-					 * we don't want to get affected by the foreach in emitRow clobbering the options array
-					 * so we jank the keys here.
-					 */
-					$prefs = array_keys($options);
-					foreach($prefs as $prefname) {
+					foreach($options as $prefname => $desc) {
 						$values = $me->getPref($prefname);
 						
 						// possible false values here are false or "", so not checking types.

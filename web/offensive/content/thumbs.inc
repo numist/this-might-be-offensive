@@ -7,7 +7,7 @@
 	function start() {
 		mustLogIn();
 
-		if(!$me)
+		if(!isset($me))
 			$me = new User($_SESSION["userid"]);
 		
 		if(!array_key_exists("userid", $_REQUEST))
