@@ -74,6 +74,12 @@
 		<META NAME="ROBOTS" CONTENT="NOARCHIVE" />
 		<title>[<?= $upload->type() ?>] : <?= $upload->filename() ?> </title>
 		<link rel="stylesheet" type="text/css" href="styles.php"/>
+		<script type="text/javascript" src="/offensive/js/jquery-1.2.6.min.js"></script>
+		<!-- XXX: a lot of this picui stuff is going to have to move into this header so it can be customized -->
+		<script type="text/javascript" src="/offensive/js/picui.js"></script>
+		<script type="text/javascript" src="/offensive/js/subscriptions.js"></script>
+		<script type="text/javascript" src="/offensive/js/jqModal.js"></script>
+		<script type="text/javascript" src="/offensive/js/jqDnR.js"></script>
 		<script type="text/javascript">
 			self.file_id = "";
 			
@@ -306,12 +312,6 @@
 			}
 
 		</script>
-		<script type="text/javascript" src="/offensive/js/jquery-1.2.6.min.js"></script>
-		<!-- XXX: a lot of this picui stuff is going to have to move into this header so it can be customized -->
-		<script type="text/javascript" src="/offensive/js/picui.js"></script>
-		<script type="text/javascript" src="/offensive/js/subscriptions.js"></script>
-		<script type="text/javascript" src="/offensive/js/jqModal.js"></script>
-		<script type="text/javascript" src="/offensive/js/jqDnR.js"></script>
 		<style type="text/css">
 			a {
 				text-decoration:none;
@@ -417,11 +417,34 @@
 					<?	} ?>
 				</span>
 			</div>
-    	
+    		<br />
+
+	    	<!--
+	    	    filter block
+	    	-->
+	    	<span style="margin-left:400px;">filters:</span>
+			<span style="margin-left:10px;"><?
+	    	        if($me->getPref("hide_nsfw") == 1) { ?>
+	    	                <a href="/offensive/setPref.php?p=hide_nsfw&v=">nsfw (hiding)</a>
+	    	        <? } else { ?>
+	    	                <a href="/offensive/setPref.php?p=hide_nsfw&v=1">nsfw (showing)</a>
+	    	        <? } ?>
+	    	</span>
+
+	    	<span style="margin-left:10px;"><?
+	    	        if($me->getPref("hide_tmbo") == 1) { ?>
+	    	                        <a href="/offensive/setPref.php?p=hide_tmbo&v=">tmbo (hiding)</a>
+	    	        <? } else { ?>
+	    	                        <a href="/offensive/setPref.php?p=hide_tmbo&v=1">tmbo (showing)</a>
+	    	        <? } ?>
+	    	</span>
+
+
+
 			<!--
 				filename/size block
 			-->
-			<br /><br />
+			<br />
 			<?
 				if($upload->is_nsfw()) { ?>
 					<a style="color:#990000" href="/offensive/setPref.php?p=hide_nsfw&v=<?= $me->getPref("hide_nsfw") == 1 ? "" : "1" ?>" title="<?= $me->getPref("hide_nsfw") == 1 ? "show" : "hide" ?> images that are not safe for work">[nsfw]</a><?
@@ -487,25 +510,6 @@
 			<br/><br/>
 		</div>
     	
-    	
-    	<!--
-    	    filter block
-    	-->
-    	<span style="margin-left:48px;">nsfw filter: <?
-    	        if($me->getPref("hide_nsfw") == 1) { ?>
-    	                <a href="/offensive/setPref.php?p=hide_nsfw&v=">off</a> on
-    	        <? } else { ?>
-    	                off <a href="/offensive/setPref.php?p=hide_nsfw&v=1">on</a>
-    	        <? } ?>
-    	</span>
-    	
-    	<span style="margin-left:48px;">tmbo filter: <?
-    	        if($me->getPref("hide_tmbo") == 1) { ?>
-    	                        <a href="/offensive/setPref.php?p=hide_tmbo&v=">off</a> on
-    	        <? } else { ?>
-    	                        off <a href="/offensive/setPref.php?p=hide_tmbo&v=1">on</a>
-    	        <? } ?>
-    	</span>
 		<br />&nbsp;
     	
 		<? record_hit();
