@@ -14,7 +14,10 @@
 	function start() {
 		global $readonly;
 		
+		global $me;
 		mustLogIn();
+		
+		$me = new User($_SESSION["userid"]);
 
 		if($readonly) {
 			header("Location: ./");

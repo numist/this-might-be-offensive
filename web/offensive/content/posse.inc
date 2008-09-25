@@ -5,7 +5,10 @@
 	if(!isset($link) || !$link) $link = openDbConnection();
 
 	function start() {
+		global $me;
 		mustLogIn();
+		
+		$me = new User($_SESSION["userid"]);
 	}
 	
 	function isAdmin() {

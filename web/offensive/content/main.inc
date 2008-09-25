@@ -4,12 +4,13 @@
 	if(!isset($link) || !$link) $link = openDbConnection();
   
 	require_once( 'offensive/assets/tabs.inc' );
+	require_once("offensive/assets/classes.inc");
 	
 	function start() {
 		global $me;
 		mustLogIn();
 
-		if(!isset($me)) $me = new User($_SESSION["userid"]);
+		$me = new User($_SESSION["userid"]);
 		$me->setPref("index", "");
 	}
 	

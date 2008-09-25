@@ -11,7 +11,10 @@
 	}
 
 	function start() {
+		global $me;
 		mustLogIn();
+		
+		$me = new User($_SESSION["userid"]);
 	}
 
 	function body() {

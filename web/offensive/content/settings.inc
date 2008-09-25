@@ -2,6 +2,7 @@
 	require_once( 'offensive/assets/tabs.inc' );
 	require_once( 'admin/mysqlConnectionInfo.inc' );
 	if(!isset($link) || !$link) $link = openDbConnection();
+	require_once("offensive/assets/classes.inc");
 
 	require("offensive/data/keynav.inc");
 
@@ -10,7 +11,7 @@
 		global $options, $me;
 		
 		mustLogIn();
-		if(!isset($me)) $me = new User($_SESSION["userid"]);
+		$me = new User($_SESSION["userid"]);
 		
 		if(array_key_exists("submit", $_POST)) {
 			// check for post for keys

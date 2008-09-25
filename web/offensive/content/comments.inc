@@ -23,7 +23,10 @@
 	function start() {
 		global $upload, $uploader;
 	
+		global $me;
 		mustLogIn();
+		
+		$me = new User($_SESSION["userid"]);
 
 		if( ! is_numeric( $_REQUEST['fileid'] ) ){
 			header( "Location: ./" );

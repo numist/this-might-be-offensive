@@ -8,7 +8,10 @@ if(!isset($_SERVER["HTTPS"]) || $_SERVER["HTTPS"] != "on") {
 }
 
 	function start() {
+		global $me;
 		mustLogIn();
+		
+		$me = new User($_SESSION["userid"]);
 	}
 
 

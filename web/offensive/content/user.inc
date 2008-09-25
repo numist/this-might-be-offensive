@@ -7,9 +7,16 @@
 	
 
 	function start() {
+		global $me;
 		mustLogIn();
 		
-		if(!isset($_REQUEST['userid']) || $_REQUEST['userid'] == "0") { header("Location: ./"); }
+		$me = new User($_SESSION["userid"]);
+		
+		if(!isset($_REQUEST['userid']) ||
+		   $_REQUEST['userid'] == "0" ||
+		   !is_numeric($_REQUEST['userid'])) {
+			header("Location: ./");
+		}
 	}
 	
 	function isAdmin() {

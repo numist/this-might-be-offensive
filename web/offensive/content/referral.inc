@@ -8,7 +8,10 @@
 	require_once( 'offensive/assets/functions.inc' );
 
 	function start() {
+		global $me;
 		mustLogIn();
+		
+		$me = new User($_SESSION["userid"]);
 
 		if( array_key_exists("invite", $_REQUEST) &&
 		    isValidEmail( $_REQUEST['invite'] ) && 

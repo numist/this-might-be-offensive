@@ -7,7 +7,10 @@
 	require_once( 'offensive/assets/tabs.inc' );
 
 	function start() {
+		global $me;
 		mustLogIn();
+		
+		$me = new User($_SESSION["userid"]);
 	}
 	
 

@@ -3,13 +3,14 @@
 	include_once( 'admin/mysqlConnectionInfo.inc' );
 	if(!isset($link) || !$link) $link = openDbConnection();  
 	require_once( 'offensive/assets/tabs.inc' );
+	require_once("offensive/assets/classes.inc");
 
 	function start() {
+		global $me;
 		mustLogIn();
-
-		if(!isset($me))
-			$me = new User($_SESSION["userid"]);
 		
+		$me = new User($_SESSION["userid"]);
+
 		if(!array_key_exists("userid", $_REQUEST))
 			$me->setPref("index", "thumbs");
 	}
