@@ -129,7 +129,7 @@ function key_value(keycode) {
 		case 38:	return "↑";
 		case 39:	return "→";
 		case 40:	return "↓";
-		case 61: return  "+", 
+		case 61:  return "+";
 		case 106: return "* (num)";
 		case 107: return "+ (num)";
 		case 109: return "- (num)";
