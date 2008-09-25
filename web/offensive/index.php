@@ -195,7 +195,7 @@ $timelimit = 10;
 							
 							<p><a href="./?c=subscriptions">subscribed threads</a></p>
 							
-							<!--<p><a href="./?c=settings">settings</a></p>-->
+							<p><a href="./?c=settings">settings</a></p>
             	
 							<p><a href="logout.php">log out</a></p>
 						</div>

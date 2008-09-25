@@ -63,9 +63,10 @@ LIMIT $start, $numPerPage";
 ?>
 <div class="heading">
 
-	welcome back. we missed you. oh, and don't use apostrophes for plurals. ever.
-
-	<!-- if you don't understand, upload a picture of yer mom and we'll do a little experiment. -->
+	<?
+	require("offensive/data/quips.inc");
+	echo $quip;
+	?>
 
 <?
 // XXX: [tpg] — instead of eom, put current tpg winner here.  

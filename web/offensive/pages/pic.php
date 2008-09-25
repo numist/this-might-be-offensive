@@ -74,6 +74,230 @@
 			if( window != top ) {
 				top.location.href = window.location.href;
 			}
+			
+			// handle a keybased event. this code was incorporated from offensive.js, which has now been deprecated
+			function handle_keypress(o,e)
+			{
+				var id;
+				if(e == null)  return true;
+
+				var keycode = (e.which == null) ? e.keyCode : e.which;
+				switch( keycode ) {
+					<?
+					require("offensive/data/keynav.inc");
+					// get the user's keyboard navigation preferences
+					$prefs = array();
+					foreach($options as $option => $foo) {
+						if($option == "noselect") continue;
+						$val = $me->getPref($option);
+						if($val) {
+							$prefs[$option] = unserialize($val);
+						}
+					}
+			    	
+					if(count($prefs) == 0) {
+						// use the default keybindings, the user has set nothing special.
+						?>
+						case 61:  // +
+						case 107: // + (numpad)
+						case 187: // =
+						case 174: // Wii +
+							e.preventDefault();
+							id = $("#good");
+							if(id.parent().hasClass('on')) {
+								do_vote(id);
+							}
+							return;
+							break;
+                	
+						case 109: // - (numpad)
+						case 189: // -
+						case 170: // Wii -
+							e.preventDefault();
+							id = $("#bad");
+							if(id.parent().hasClass('on')) {
+								do_vote(id);
+							}
+							return;
+							break;
+                	
+						case 81:  // q
+							e.preventDefault();
+							$("#dialog").jqmShow();
+							return;
+							break;
+                	
+						case 191: // ?
+							e.preventDefault();
+							document.location.href = "/offensive/pages/pic.php?random";	
+							return;
+							break;
+                	
+					// following not ajaxified
+						case 39:  // →
+						case 177: // Wii Right
+							e.preventDefault();
+							id = "previous";
+							break;
+                	
+						case 37:  // ←
+						case 178: // Wii Left
+							e.preventDefault();
+							id = "next";
+							break;
+                	
+						case 38:  // ↑
+						case 175: // Wii Up
+							e.preventDefault();
+							id = "index";
+							break;
+                	
+						case 40:  // ↓
+						case 176: // Wii Down
+							e.preventDefault();
+							id = "comments";
+							break;
+						<?
+						$escape = array("27");
+					} else {
+						if(array_key_exists("key_good", $prefs)) {
+							foreach($prefs["key_good"] as $code) {
+								echo "case $code:\n";
+							}
+							?>
+							e.preventDefault();
+							id = $("#good");
+							if(id.parent().hasClass('on')) {
+								do_vote(id);
+							}
+							return;
+							break;
+							<?
+						}
+						
+						if(array_key_exists("key_bad", $prefs)) {
+							foreach($prefs["key_bad"] as $code) {
+								echo "case $code:\n";
+							}
+							?>
+							e.preventDefault();
+							id = $("#bad");
+							if(id.parent().hasClass('on')) {
+								do_vote(id);
+							}
+							return;
+							break;
+							<?
+						}
+                	
+						if(array_key_exists("key_quick", $prefs)) {
+							foreach($prefs["key_quick"] as $code) {
+								echo "case $code:\n";
+							}
+							?>
+							e.preventDefault();
+							$("#dialog").jqmShow();
+							return;
+							break;
+							<?
+						}
+						
+						if(array_key_exists("key_random", $prefs)) {
+							foreach($prefs["key_random"] as $code) {
+								echo "case $code:\n";
+							}
+							?>
+							e.preventDefault();
+							document.location.href = "/offensive/pages/pic.php?random";	
+							return;
+							break;
+							<?
+						}
+						
+						if(array_key_exists("key_prev", $prefs)) {
+							foreach($prefs["key_prev"] as $code) {
+								echo "case $code:\n";
+							}
+							?>
+							e.preventDefault();
+							id = "previous";
+							break;
+							<?
+						}
+						
+						if(array_key_exists("key_next", $prefs)) {
+							foreach($prefs["key_next"] as $code) {
+								echo "case $code:\n";
+							}
+							?>
+							e.preventDefault();
+							id = "next";
+							break;
+							<?
+						}
+						
+						if(array_key_exists("key_index", $prefs)) {
+							foreach($prefs["key_index"] as $code) {
+								echo "case $code:\n";
+							}
+							?>
+							e.preventDefault();
+							id = "index";
+							break;
+							<?
+						}
+						
+						if(array_key_exists("key_comments", $prefs)) {
+							foreach($prefs["key_comments"] as $code) {
+								echo "case $code:\n";
+							}
+							?>
+							e.preventDefault();
+							id = "comments";
+							break;
+							<?
+						}
+
+						if(array_key_exists("key_escape", $prefs)) {
+							$escape = $prefs["key_escape"];
+						} else {
+							$escape = array();
+						}
+					}
+					?>
+				}
+				if( id && document.getElementById( id ) ) {
+					document.location.href = document.getElementById( id ).href;
+					return false;
+				}
+				return true;
+			}
+
+			// handle a keybased event. this code was incorporated from offensive.js, which has now been deprecated
+			function handle_qc_keypress(o,e)
+			{
+				if(e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return true;
+
+				var id;
+				if(e == null)  {
+					return true;
+				}
+
+				var keycode = (e.which == null) ? e.keyCode : e.which;
+				switch( keycode ) {
+					<?
+					foreach($escape as $keycode) {
+						echo "case $keycode:\n";
+					}
+					?>
+						e.preventDefault();
+						$("#dialog").jqmHide();
+						return;
+						break;
+				}
+				return true;
+			}
+
 		</script>
 		<script type="text/javascript" src="/offensive/js/jquery-1.2.6.min.js"></script>
 		<!-- XXX: a lot of this picui stuff is going to have to move into this header so it can be customized -->
@@ -84,39 +308,43 @@
 
 	</head>
 	<body>
-	<!-- message -->
-	<div style="white-space:nowrap;overflow:hidden;padding:3px;margin-bottom:0px;background:#000033;color:#ff6600;font-size:10px;font-weight:bold;padding-left:4px;">
-		<div id="instruction_link" style="float:right;"><a href="#" style="color:#ff6600">?</a></div>
-		<div>consciousness doesn't really exist. it's just another one of our ideas.</div>
-	</div>
-	<div id="instructions" style="display:none;white-space:nowrap;overflow:hidden;padding:3px;margin-bottom:6px;background:#cccccc;color:#333333">← = newer. ↑ = index. → = older. ↓ = comments . + or = votes [ this is good ]. - votes [ this is bad ] .<br />
-q = quick comment, Esc closes quick comment box, ? = random image.<br />
-(because clicking is too hard.)</div>
-
-	<!-- this window is not visible unless you do a quick comment -->
-	<!-- data is fetched using ajax in js and put in #qc_bluebox  -->
-	<div class="jqmWindow" id="dialog">
-		<div class="blackbar"></div>
-		<div class="heading"><table style="width: 100%;"><tr>
-			<td align="left">and then you came along and were all:</td>
-			<td class="qc_close" align="right"><a href="#" class="jqmClose">Close</a></td>
-		</tr></table></div>
-		<div class="bluebox" id="qc_bluebox" style="text-align: center">
+		<!-- message -->
+		<div style="white-space:nowrap;overflow:hidden;padding:3px;margin-bottom:0px;background:#000033;color:#ff6600;font-size:10px;font-weight:bold;padding-left:4px;">
+			<? if(count($prefs) == 0) { ?>
+				<div id="instruction_link" style="float:right;"><a href="#" style="color:#ff6600">?</a></div>
+			<? } ?>
+			<div>consciousness doesn't really exist. it's just another one of our ideas.</div>
 		</div>
-	</div> <!-- end quickcomment -->
-	<div id="content">
-		<div id="heading">
-
-			&nbsp;&nbsp;
-
+		<? if(count($prefs) == 0) { ?>
+			<div id="instructions" style="display:none;white-space:nowrap;overflow:hidden;padding:3px;margin-bottom:6px;background:#cccccc;color:#333333">
+				because clicking is too hard:<br />
+				← = newer. ↑ = index. → = older. ↓ = comments . + or = votes [ this is good ]. - votes [ this is bad ] .<br />
+				q = quick comment, Esc closes quick comment box, ? = random image.<br />
+				( change 'em at your <a href="/offensive/?c=settings">settings</a> page. )
+			</div>
+		<? } ?>
+    	
+		<!-- this window is not visible unless you do a quick comment -->
+		<!-- data is fetched using ajax in js and put in #qc_bluebox  -->
+		<div class="jqmWindow" id="dialog">
+			<div class="blackbar"></div>
+			<div class="heading"><table style="width: 100%;"><tr>
+				<td align="left">and then you came along and were all:</td>
+				<td class="qc_close" align="right"><a href="#" class="jqmClose">Close</a></td>
+			</tr></table></div>
+			<div class="bluebox" id="qc_bluebox" style="text-align: center">
+			</div>
+		</div> <!-- end quickcomment -->
+		<div id="content">
+			<div id="heading">
+				&nbsp;&nbsp;
 				<?
-				
 				/*
 				 * navigation buttons, prev index next are dependant on type
 				 */
 				if($upload->type() == 'avatar') {?>
 					<a href="../" id="next" style="visibility:hidden">newer</a> . <a id="index" href="/offensive/">index</a> . <a id="previous" href="../" style="visibility:hidden">older</a>
-				<?
+					<?
 				} else {
 					if($upload->next()) { ?>
 						<a id="next" href="<?= $_SERVER['PHP_SELF'] ?>?id=<?= $upload->next()->id() ?>">newer</a>
@@ -130,7 +358,7 @@ q = quick comment, Esc closes quick comment box, ? = random image.<br />
 						<a id="previous" href="../" style="visibility:hidden">older</a>
 					<?}
 				} ?>
-				
+					
 				<!--
 					comment block
 				-->
@@ -144,7 +372,7 @@ q = quick comment, Esc closes quick comment box, ? = random image.<br />
 					<span style=\"color:#990000\">x<?= $upload->tmbos ?></span>";
 				<? } ?>)
 				&nbsp;(<a id="quickcomment" class="jqModal" href="#">quick</a>)
-
+    	
 				<!--
 					voting block
 				-->
@@ -165,40 +393,20 @@ q = quick comment, Esc closes quick comment box, ? = random image.<br />
 						<a name="<?= $upload->id() ?>" id="bad" class="votelink" <?= $bad_href ?>>[ this is bad ]</a>
 					</span>
 				</span>
-
+    	
 				<!--
 					subscribe block
 				-->
 				<span style="margin-left:48px;">
-				<?	
+					<?	
 					if(subscribed($upload->id())) { ?>
 						<a id="unsubscribeLink" href="/offensive/subscribe.php?un=1&fileid=<?= $id ?>" title="take this file off my 'unread comments' watch list.">unsubscribe</a>
 					<?	} else { ?>
 						<a id="subscribeLink" href="/offensive/subscribe.php?fileid=<?= $id ?>" title="watch this thread for new comments.">subscribe</a>
 					<?	} ?>
 				</span>
-				
-				<!--
-					filter block
-				-->
-				<!-- XXX: these are going away soon -->
-				<span style="margin-left:48px;">nsfw filter: <?
-					if($me->getPref("hide_nsfw") == 1) { ?>
-						<a href="/offensive/setPref.php?p=hide_nsfw&v=">off</a> on
-					<? } else { ?>
-						off <a href="/offensive/setPref.php?p=hide_nsfw&v=1">on</a>
-					<? } ?>
-				</span>
-						
-				<span style="margin-left:48px;">tmbo filter: <?
-					if($me->getPref("hide_tmbo") == 1) { ?>
-							<a href="/offensive/setPref.php?p=hide_tmbo&v=">off</a> on
-					<? } else { ?>
-							off <a href="/offensive/setPref.php?p=hide_tmbo&v=1">on</a>
-					<? } ?>
-				</span>
 			</div>
-
+    	
 			<!--
 				filename/size block
 			-->
@@ -208,7 +416,7 @@ q = quick comment, Esc closes quick comment box, ? = random image.<br />
 					echo getFileSize($upload->file());
 			?></span>
 			<br/>
-			
+				
 			<!--
 				username/time block
 			-->
@@ -236,7 +444,17 @@ q = quick comment, Esc closes quick comment box, ? = random image.<br />
 			<? if($me->squelched($upload->uploader()) || 
 			    ($upload->is_nsfw() == 1 && $me->getPref("hide_nsfw") == 1) || 
 			    ($upload->is_tmbo() == 1 && $me->getPref("hide_tmbo") == 1)) {
-				?><div style="padding:128px;">[ filtered ] <!-- <?= $upload->uploader()->id() ?> --></div><?
+				?><div style="padding:128px;">[ <a id="imageLink" href="<?= $upload->URL() ?>" target="_blank">filtered</a>:<?
+					if($me->squelched($upload->uploader())) {
+						?> squelched <!-- <?= $upload->uploader()->id() ?> --><?
+					}
+					if($upload->is_nsfw() == 1 && $me->getPref("hide_nsfw") == 1) {
+						echo " nsfw";
+					}
+					if($upload->is_tmbo() == 1 && $me->getPref("hide_tmbo") == 1) {
+						echo " tmbo";
+					}
+				?> ]</div><?
 			} else { ?>
 				<div class="<?php echo $is_nsfw == 1 ? 'nsfw' : 'image' ?> u<?= $upload->uploader()->id() ?>">
 					<? if($upload->file() != "") { ?>
@@ -248,7 +466,28 @@ q = quick comment, Esc closes quick comment box, ? = random image.<br />
 			<? } ?>
 			<br/><br/>
 		</div>
-
+    	
+    	
+    	<!--
+    	    filter block
+    	-->
+    	<span style="margin-left:48px;">nsfw filter: <?
+    	        if($me->getPref("hide_nsfw") == 1) { ?>
+    	                <a href="/offensive/setPref.php?p=hide_nsfw&v=">off</a> on
+    	        <? } else { ?>
+    	                off <a href="/offensive/setPref.php?p=hide_nsfw&v=1">on</a>
+    	        <? } ?>
+    	</span>
+    	
+    	<span style="margin-left:48px;">tmbo filter: <?
+    	        if($me->getPref("hide_tmbo") == 1) { ?>
+    	                        <a href="/offensive/setPref.php?p=hide_tmbo&v=">off</a> on
+    	        <? } else { ?>
+    	                        off <a href="/offensive/setPref.php?p=hide_tmbo&v=1">on</a>
+    	        <? } ?>
+    	</span>
+		<br />&nbsp;
+    	
 		<? record_hit();
 		include_once("analytics.inc"); ?>
 	</body>

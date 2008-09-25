@@ -31,7 +31,9 @@ $prefnames = array(
 	// open the quick reply window
 	"key_quick",
 	// close modal dialogues
-	"key_escape"
+	"key_escape",
+	// random image jump
+	"key_random"
     );
 
 ?>

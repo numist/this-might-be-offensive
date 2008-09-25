@@ -569,7 +569,7 @@ function checkDim($postdata) {
 			<input type=\"submit\" name=\"resize\" value=\"Resize it for me.\"/>
 			<input type=\"submit\" name=\"noresize\" value=\"Post it anyway.\"/>
 		</form>";
-		box($message, "whoa, nelly");
+		box($message, "good pic, but is there any reason why I need to view it on the Jumbotron?");
 		$_SESSION['postdata'] = serialize($postdata);
 		return true;
 	}
