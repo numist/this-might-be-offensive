@@ -10,6 +10,7 @@ require_once("offensive/assets/functions.inc");
 require_once("offensive/assets/xml.inc");
 require_once("offensive/assets/argvalidation.inc");
 require_once("offensive/assets/classes.inc");
+require_once("offensive/assets/comments.inc");
 
 mustLogIn("http");
 
@@ -32,21 +33,11 @@ if(!is_callable("api_".$func)) {
 
 call_user_func("api_".$func);
 
-// XXX: this function is due for factoring.
-function alreadyVoted( $uid, $fid ) {
-	$sql = "SELECT count( vote ) AS thecount FROM offensive_comments WHERE fileid=$fid AND userid=$uid AND vote LIKE 'this%'";
-	$result = tmbo_query( $sql );
-	$row = mysql_fetch_assoc( $result );
-                
-	$voted = ( $row[ 'thecount' ] > 0 );
-	return $voted;
-}
-
 // this gets all the HTML for the quickcomment box.
 function api_getquickcommentbox() {
 	global $userid, $me;
 
-	$fileid = check_arg("fileid", "integer", $method);
+	$fileid = check_arg("fileid", "integer", $_REQUEST);
 	handle_errors();
 
 	// first find out of this is our own posting, which will limit what we can do
@@ -54,9 +45,6 @@ function api_getquickcommentbox() {
 	$result = tmbo_query( $sql );
 	$row = mysql_fetch_assoc( $result );
 	$my_posting = ($userid == $row['userid']) ? 1 : 0;
-
-	// check if we've already voted
-	$already_voted = alreadyVoted( $userid, $fileid );
 
 	// start building the HTML that will be inserted into the quick comment box directly
 ?>
@@ -66,7 +54,7 @@ function api_getquickcommentbox() {
 				<textarea cols="64" rows="6" name="comment" id="qc_comment"></textarea>
 			</p>
 			<div id="qc_vote">
-<?php 			if(!$my_posting && !$already_voted) {  // show the vote buttons   ?>
+<?php 			if(canVote($fileid)) {  // show the vote buttons   ?>
 				<ul style="margin-left: -10px; list-style: none;">
 					<li><input class="qc_tigtib" style="position: relative; top: 3px;" id="qc_novote" type="radio" value="novote" name="vote"/></li>
                     			<li>[<input class="qc_tigtib" style="position: relative; top: 3px;" id="qc_tig" type="radio" value="this is good" name="vote"/><label for="qc_tig"> this is good </label>]</li>

@@ -39,7 +39,7 @@ header("HTTP/1.0 502 Bad Gateway");
 		</tr>
 	</table>
 	
-<? include '../includes/footer.txt' ?>
+<? include 'includes/footer.txt' ?>
 
 </body>
 </html>

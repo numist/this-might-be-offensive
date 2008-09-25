@@ -39,7 +39,7 @@ header("HTTP/1.0 500 Internal Server Error");
 		</tr>
 	</table>
 	
-<? include '../includes/footer.txt' ?>
+<? include 'includes/footer.txt' ?>
 
 </body>
 </html>

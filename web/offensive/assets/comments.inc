@@ -119,7 +119,16 @@ function postComment($fileid, $vote, $repost, $offensive, $comment) {
 	if(mysql_num_rows(tmbo_query( $sql )) == 0) trigger_error("invalid fileid ($fileid)", E_USER_ERROR);
 	
 	// prevent double-votes and self-voting
-	if(!canVote($fileid)) return false;
+	if(!canVote($fileid)) {
+		$vote = "";
+		$repost = 0;
+		$tmbo = 0;
+	}
+	
+	// prevent empty comments from being inserted
+	if(!($comment || $vote || $offensive || $repost)) {
+		return;
+	}
 	
 	// protect the changeblog
 	if($fileid == "211604" && $_SESSION['status'] != "admin") return;

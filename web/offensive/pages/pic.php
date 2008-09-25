@@ -31,6 +31,9 @@
 	   !is_numeric($_COOKIE[$cookiename]) ||
 	   $_COOKIE[$cookiename] < $upload->id()) {
 		setcookie( $cookiename, $upload->id(), time() + 3600*24*365*10, "/offensive/");
+		$cookiepic = $upload->id();
+	} else {
+		$cookiepic = $_COOKIE[$cookiename];
 	}
 				
 	// update the pickup db entry
@@ -39,14 +42,14 @@
 	}
 
 	function get_random_id() {
-		global $cookiename, $me;
+		global $cookiepic, $me;
 		
 		/*
 		 * since pic.php sets the ipickup db preference and the pickupid in the cookie
 		 * at the beginning of execution if they are invalid, it's safe to skip
 		 * existence and type checks at this point.
 		 */
-		$sql = "SELECT id FROM offensive_uploads WHERE type='image' AND status='normal' AND id < ".min($me->getPref('ipickup'), $_COOKIE[$cookiename])." ORDER BY RAND() LIMIT 1";
+		$sql = "SELECT id FROM offensive_uploads WHERE type='image' AND status='normal' AND id < ".min($me->getPref('ipickup'), $cookiepic)." ORDER BY RAND() LIMIT 1";
 		$res = tmbo_query($sql);
 		$row = mysql_fetch_assoc( $res );
 		return($row['id']);
@@ -377,7 +380,7 @@
 				+<span id="count_good"><?= $upload->goods() ?></span>
 				-<span id="count_bad"><?= $upload->bads() ?></span><?
 				if($upload->tmbos() > 0) { ?>
-					<span style=\"color:#990000\">x<?= $upload->tmbos() ?></span>";
+					<span style=\"color:#990000\">x<?= $upload->tmbos() ?></span>
 				<? } ?>)
 				&nbsp;(<a id="quickcomment" class="jqModal" href="#">quick</a>)
     	
