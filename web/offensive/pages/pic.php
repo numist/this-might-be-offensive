@@ -309,7 +309,11 @@
 		<script type="text/javascript" src="/offensive/js/subscriptions.js"></script>
 		<script type="text/javascript" src="/offensive/js/jqModal.js"></script>
 		<script type="text/javascript" src="/offensive/js/jqDnR.js"></script>
-
+		<style type="text/css">
+			a {
+				text-decoration:none;
+			}
+		</style>
 	</head>
 	<body>
 		<!-- message -->
@@ -415,7 +419,16 @@
 				filename/size block
 			-->
 			<br /><br />
-			<?= $upload->htmlFilename() ?> <span style="color:#999999"><? 
+			<?
+				if($upload->is_nsfw()) { ?>
+					<a style="color:#990000" href="/offensive/setPref.php?p=hide_nsfw&v=<?= $me->getPref("hide_nsfw") == 1 ? "" : "1" ?>">[nsfw]</a><?
+				}
+				if($upload->is_tmbo()) { ?>
+					<a style="color:#990000" href="/offensive/setPref.php?p=hide_tmbo&v=<?= $me->getPref("hide_tmbo") == 1 ? "" : "1" ?>">[tmbo]</a><?
+				}
+				echo htmlEscape($upload->filename()) 
+			?>
+			<span style="color:#999999"><? 
 				if($upload->file() != "")
 					echo getFileSize($upload->file());
 			?></span>
@@ -434,9 +447,9 @@
 			<span style="margin-left:48px">
 				<?
 				if($me->squelched($upload->uploader()->id())) {
-					?><a id="unsquelchLink" style="color:#999999" href="/offensive/setPref.php?unsq=<?= $upload->uploader()->id() ?>">unsquelch <?= $upload->uploader()->username() ?></a><?
+					?><a id="unsquelchLink" style="color:#999999; text-decoration:underline" href="/offensive/setPref.php?unsq=<?= $upload->uploader()->id() ?>">unsquelch <?= $upload->uploader()->username() ?></a><?
 				} else {
-					?><a id="squelchLink" style="color:#999999" href="/offensive/setPref.php?sq=<?= $upload->uploader()->id() ?>">squelch <?= $upload->uploader()->username() ?></a><?
+					?><a id="squelchLink" style="color:#999999; text-decoration:underline" href="/offensive/setPref.php?sq=<?= $upload->uploader()->id() ?>">squelch <?= $upload->uploader()->username() ?></a><?
 				}
 				?>
 			</span>
