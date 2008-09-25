@@ -29,7 +29,7 @@ CREATE TABLE `failed_logins` (
   PRIMARY KEY  (`id`),
   KEY `ip_timestamp` (`ip`,`timestamp`),
   KEY `username` (`username`,`timestamp`)
-) ENGINE=MyISAM AUTO_INCREMENT=22612 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=24483 DEFAULT CHARSET=latin1;
 
 --
 -- Table structure for table `hall_of_fame`
@@ -57,7 +57,7 @@ CREATE TABLE `ip_history` (
   `timestamp` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   PRIMARY KEY  (`id`),
   KEY `userid_ip` (`userid`,`ip`)
-) ENGINE=MyISAM AUTO_INCREMENT=2956237 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=3081297 DEFAULT CHARSET=latin1;
 
 --
 -- Table structure for table `maxxer_locations`
@@ -67,15 +67,15 @@ DROP TABLE IF EXISTS `maxxer_locations`;
 CREATE TABLE `maxxer_locations` (
   `id` int(11) NOT NULL auto_increment,
   `userid` int(11) NOT NULL default '0',
-  `x` float NOT NULL default '0',
-  `y` float NOT NULL default '0',
+  `y` float default '0',
+  `x` float default '0',
   `mapversion` varchar(10) default NULL,
   `timestamp` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   PRIMARY KEY  (`id`),
   UNIQUE KEY `userid_2` (`userid`),
   KEY `userid` (`userid`),
   KEY `mapversion_userid` (`mapversion`,`userid`)
-) ENGINE=MyISAM AUTO_INCREMENT=5640 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=7230 DEFAULT CHARSET=latin1;
 
 --
 -- Table structure for table `merch_buyers`
@@ -177,7 +177,7 @@ CREATE TABLE `offensive_comments` (
   KEY `userid_fileid` (`userid`,`fileid`),
   KEY `userid_timestamp` (`userid`,`timestamp`),
   FULLTEXT KEY `comments_search` (`comment`)
-) ENGINE=MyISAM AUTO_INCREMENT=274453505 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=274646177 DEFAULT CHARSET=latin1;
 
 --
 -- Table structure for table `offensive_count_cache`
@@ -196,7 +196,7 @@ CREATE TABLE `offensive_count_cache` (
   PRIMARY KEY  (`id`),
   UNIQUE KEY `threadid_2` (`threadid`),
   KEY `good` (`good`)
-) ENGINE=MyISAM AUTO_INCREMENT=351723 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=354697 DEFAULT CHARSET=latin1;
 
 --
 -- Table structure for table `offensive_messages`
@@ -225,7 +225,7 @@ CREATE TABLE `offensive_squelch` (
   `squelched` int(11) NOT NULL default '0',
   PRIMARY KEY  (`id`),
   KEY `userid` (`userid`,`squelched`)
-) ENGINE=MyISAM AUTO_INCREMENT=4519 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=4628 DEFAULT CHARSET=latin1;
 
 --
 -- Table structure for table `offensive_subscriptions`
@@ -265,18 +265,32 @@ CREATE TABLE `offensive_uploads` (
   KEY `type_userid` (`type`,`userid`),
   KEY `status_type_id` (`status`,`type`,`id`),
   KEY `t_t_id` (`type`,`timestamp`,`id`,`status`)
-) ENGINE=MyISAM AUTO_INCREMENT=241399 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=244025 DEFAULT CHARSET=latin1;
 
 --
--- Table structure for table `preference_names_values`
+-- Table structure for table `old_preference_names_values`
 --
 
-DROP TABLE IF EXISTS `preference_names_values`;
-CREATE TABLE `preference_names_values` (
+DROP TABLE IF EXISTS `old_preference_names_values`;
+CREATE TABLE `old_preference_names_values` (
   `id` int(11) NOT NULL auto_increment,
   `value` varchar(255) NOT NULL default '',
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
+
+--
+-- Table structure for table `old_user_preferences`
+--
+
+DROP TABLE IF EXISTS `old_user_preferences`;
+CREATE TABLE `old_user_preferences` (
+  `id` int(11) NOT NULL auto_increment,
+  `userid` int(11) NOT NULL default '0',
+  `nameid` int(11) NOT NULL default '0',
+  `valueid` int(11) NOT NULL default '0',
+  PRIMARY KEY  (`id`),
+  KEY `userid_nameid` (`userid`,`nameid`)
+) ENGINE=MyISAM AUTO_INCREMENT=36983 DEFAULT CHARSET=latin1;
 
 --
 -- Table structure for table `referrals`
@@ -291,7 +305,7 @@ CREATE TABLE `referrals` (
   `email` varchar(50) NOT NULL default '',
   PRIMARY KEY  (`id`),
   KEY `userid` (`userid`)
-) ENGINE=MyISAM AUTO_INCREMENT=4370 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=4499 DEFAULT CHARSET=latin1;
 
 --
 -- Table structure for table `user_notes`
@@ -313,12 +327,12 @@ CREATE TABLE `user_notes` (
 DROP TABLE IF EXISTS `user_preferences`;
 CREATE TABLE `user_preferences` (
   `id` int(11) NOT NULL auto_increment,
-  `userid` int(11) NOT NULL default '0',
-  `nameid` int(11) NOT NULL default '0',
-  `valueid` int(11) NOT NULL default '0',
+  `userid` varchar(50) NOT NULL default '',
+  `prefname` varchar(50) NOT NULL default '',
+  `value` text NOT NULL,
   PRIMARY KEY  (`id`),
-  KEY `userid_nameid` (`userid`,`nameid`)
-) ENGINE=MyISAM AUTO_INCREMENT=35876 DEFAULT CHARSET=latin1;
+  KEY `userid_id` (`userid`,`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=1781 DEFAULT CHARSET=latin1;
 
 --
 -- Table structure for table `user_profile_attrs`
@@ -366,7 +380,7 @@ CREATE TABLE `users` (
   KEY `referred_by` (`referred_by`),
   KEY `id_status` (`userid`,`account_status`),
   KEY `account_status` (`account_status`)
-) ENGINE=MyISAM AUTO_INCREMENT=5772 DEFAULT CHARSET=latin1 PACK_KEYS=1;
+) ENGINE=MyISAM AUTO_INCREMENT=5866 DEFAULT CHARSET=latin1 PACK_KEYS=1;
 
 --
 -- Table structure for table `vote_count_for_export`
@@ -408,4 +422,4 @@ CREATE TABLE `vote_stats` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2008-08-12 19:38:19
+-- Dump completed on 2008-09-25  6:57:59
