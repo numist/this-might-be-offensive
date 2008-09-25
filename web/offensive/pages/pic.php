@@ -12,9 +12,6 @@
 	$me = new User($_SESSION["userid"]);
 
 	$id = "";
-	if(array_key_exists("random", $_REQUEST)) {
-		$id = get_random_id();
-	}
 	if(array_key_exists("id", $_REQUEST)) {
 		$id = $_REQUEST["id"];
 	}
@@ -42,7 +39,14 @@
 	}
 
 	function get_random_id() {
-		$sql = "SELECT id FROM offensive_uploads WHERE type='image' AND status='normal' ORDER BY RAND() LIMIT 1";
+		global $cookiename, $me;
+		
+		/*
+		 * since pic.php sets the ipickup db preference and the pickupid in the cookie
+		 * at the beginning of execution if they are invalid, it's safe to skip
+		 * existence and type checks at this point.
+		 */
+		$sql = "SELECT id FROM offensive_uploads WHERE type='image' AND status='normal' AND id < ".min($me->getPref('ipickup'), $_COOKIE[$cookiename])." ORDER BY RAND() LIMIT 1";
 		$res = tmbo_query($sql);
 		$row = mysql_fetch_assoc( $res );
 		return($row['id']);
@@ -129,7 +133,7 @@
                 	
 						case 191: // ?
 							e.preventDefault();
-							document.location.href = "/offensive/pages/pic.php?random";	
+							document.location.href = "/offensive/pages/pic.php?id=<?= get_random_id() ?>";
 							return;
 							break;
                 	
@@ -208,7 +212,7 @@
 							}
 							?>
 							e.preventDefault();
-							document.location.href = "/offensive/pages/pic.php?random";	
+							document.location.href = "/offensive/pages/pic.php?id=<?= get_random_id() ?>";
 							return;
 							break;
 							<?

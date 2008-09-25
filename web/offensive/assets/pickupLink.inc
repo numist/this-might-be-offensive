@@ -19,10 +19,8 @@
 			(<a href="pages/pic.php?id=<?= $cookiepic ?>" id="pickUp">on this computer</a> | 
 			<a href="pages/pic.php?id=<?= $dbpic ?>" id="pickUp">on this account</a>)</b></div><?
 	} else if ($cookiepic) {
-		?><div><b>pick up where you left off 
-			<a href="pages/pic.php?id=<?= $cookiepic ?>" id="pickUp">on this computer</a></b></div><?
+		?><div><b><a href="pages/pic.php?id=<?= $cookiepic ?>" id="pickUp">pick up where you left off on this computer</a></b></div><?
 	} else if ($dbpic) {
-		?><div><b>pick up where you left off 
-			<a href="pages/pic.php?id=<?= $dbpic ?>" id="pickUp">on this account</a></b></div><?
+		?><div><b><a href="pages/pic.php?id=<?= $dbpic ?>" id="pickUp">pick up where you left off on this account</a></b></div><?
 	}
 ?>
