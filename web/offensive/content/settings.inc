@@ -199,7 +199,7 @@
 			</td>
 			<td><input size='8' class="keycode" min="1" id="" name="" value="<?= $keycode ?>" /></td>
 			<td><span class="key_notification"></span></td>
-			<td><input type="hidden" class="registered_key" value="<?= $keycode ?>"></span></td>
+			<td><input type="hidden" class="registered_key" value="<?= $keycode ?>" /></td>
 		</tr>
 	<? }
 ?>
