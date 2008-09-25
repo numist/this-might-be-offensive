@@ -302,11 +302,12 @@
 					foreach($escape as $keycode) {
 						echo "case $keycode:\n";
 					}
-					?>
+					if(count($escape) > 0) { ?>
 						e.preventDefault();
 						$("#dialog").jqmHide();
 						return;
 						break;
+					<? } ?>
 				}
 				return true;
 			}
