@@ -177,8 +177,8 @@
 		<div class="heading"><?
     // changeblog special header
 	if($upload->id() == "211604") {
-		echo htmlFilename($row); 
 		?>
+		changeblog
 		<br/><span style="color:#666699">beat to fit. paint to match.</span><br/>
 		<?
 	} else if( $upload->type() == 'topic' ) {
