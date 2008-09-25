@@ -51,15 +51,6 @@ $timelimit = 10;
 		setcookie( 'thumbnails', "no", time()-3600, "/offensive/" );
 	}
 	
-	// LEGACY: moves from cookie-based pickuplink to DB-based pickuplink for images.
-	$cookiename = $_SESSION['userid'] . "lastpic";
-	if(array_key_exists($cookiename, $_COOKIE) && is_numeric($_COOKIE[$cookiename])) {
-		if($me->getPref("ipickup") === false || $me->getPref("ipickup") < $_COOKIE[$cookiename]) {
-			$me->setPref("ipickup", $_COOKIE[$cookiename]);
-		}
-		setcookie( $cookiename, "", time()-3600, "/offensive/" );
-	}
-	
 	// set our target to any of the requested content page...
 	if(isset($_REQUEST['c']) &&
 		// if it exists

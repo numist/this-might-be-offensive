@@ -28,17 +28,17 @@
 		header("Location: /offensive/?c=comments&fileid=".$id);
 	}
 
-	// LEGACY: moves from cookie-based pickuplink to DB-based pickuplink for images.
-	$cookiename = $_SESSION['userid'] . "lastpic";
-	if(array_key_exists($cookiename, $_COOKIE) && is_numeric($_COOKIE[$cookiename])) {
-		if($me->getPref("ipickup") === false || $me->getPref("ipickup") < $_COOKIE[$cookiename]) {
-			$me->setPref("ipickup", $_COOKIE[$cookiename]);
-		}
-		setcookie( $cookiename, "", time()-3600, "/offensive/" );
+	// update the pickup cookie
+	$cookiename = $me->id()."lastpic";
+	if(!array_key_exists($cookiename, $_COOKIE) ||
+	   !is_numeric($_COOKIE[$cookiename]) ||
+	   $_COOKIE[$cookiename] < $upload->id()) {
+		setcookie( $cookiename, $upload->id(), time() + 3600*24*365*10, "/offensive/");
 	}
-	
-	if($me->getPref("ipickup") < $id) {
-		$me->setPref("ipickup", $id);
+				
+	// update the pickup db entry
+	if($me->getPref("ipickup") == false || $me->getPref("ipickup") < $upload->id()) {
+		$me->setPref("ipickup", $upload->id());
 	}
 
 	function get_random_id() {
