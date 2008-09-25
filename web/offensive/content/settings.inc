@@ -29,7 +29,7 @@
 				$choices[$_POST["key$n"]][] = $_POST["keycode$n"];
 				$n++;
 			}
-		
+
 			if(count($choices) > 0) {
 				foreach($options as $prefname => $val) {
 					if($prefname == "noselect") continue;
@@ -127,7 +127,13 @@
 					$custom = false;
                 	
 					// desc is unused, but required to get the key in a foreach loop.
-					foreach($options as $prefname => $desc) {
+
+					/*
+					 * we don't want to get affected by the foreach in emitRow clobbering the options array
+					 * so we jank the keys here.
+					 */
+					$prefs = array_keys($options);
+					foreach($prefs as $prefname) {
 						$values = $me->getPref($prefname);
 						
 						// possible false values here are false or "", so not checking types.
@@ -146,8 +152,8 @@
 						emitRow("key_prev", 39);		// →
 						emitRow("key_prev", 177);       // Wii →
 						
-						emitRow("key_comment", 40);		// ↓
-						emitRow("key_comment", 176);    // Wii ↓
+						emitRow("key_comments", 40);		// ↓
+						emitRow("key_comments", 176);    // Wii ↓
 						
 						emitRow("key_index", 38);		// ↑
 						emitRow("key_index", 175);      // Wii ↑
