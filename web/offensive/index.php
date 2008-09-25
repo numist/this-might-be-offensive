@@ -64,7 +64,7 @@ $timelimit = 10;
 		// or the default landing page for this session.
 		// if not logged in, force it.
 		// XXX: eventually the entire index purple pages should all be members only!
-		if(!isset($me)) {
+		if(!isset($me) || !is_object($me)) {
 			mustLogIn();
 			$me = new User($_SESSION["userid"]);
 		}

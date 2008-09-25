@@ -2,6 +2,7 @@
 	set_include_path("..");
 	require_once('offensive/assets/header.inc');
 	require_once('offensive/assets/logn.inc');
+	require_once("offensive/assets/classes.inc");
 
 	if(!isset($_SERVER["HTTPS"]) || $_SERVER["HTTPS"] != "on") {
 		header("Location: https://".$_SERVER["SERVER_NAME"]."/offensive/logn.php", 301);
@@ -12,10 +13,8 @@
 	 * the user can specify the redirect in the _REQUEST['redirect'] variable.
 	 * the location of the redirect defaults to /offensive/?c=main
 	 */
-	if(array_key_exists("redirect", $_REQUEST)) {
+	if(array_key_exists("redirect", $_REQUEST) && strlen($_REQUEST["redirect"]) > 0) {
 		$redirect = $_REQUEST['redirect'];
-	} else {
-	
 	}
 
 	// if the user is logged in already, redirect.

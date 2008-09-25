@@ -390,7 +390,7 @@
 				-->
 				<span style="margin-left:48px;">
 					<?
-					if(canVote($upload->id())) {
+					if(canVote($upload->id()) && $upload->file()) {
 						$good_href = "href=\"/offensive/?c=comments&submit=submit&fileid=$id&vote=this%20is%20good&redirect=true\"";	
 						$bad_href = "href=\"/offensive/?c=comments&submit=submit&fileid=$id&vote=this%20is%20bad&redirect=true\"";
 						$class = "on";
