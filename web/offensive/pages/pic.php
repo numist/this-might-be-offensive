@@ -376,8 +376,8 @@
 				(<span id="count_comment"><?= $upload->comments() ?></span>c
 				+<span id="count_good"><?= $upload->goods() ?></span>
 				-<span id="count_bad"><?= $upload->bads() ?></span><?
-				if($tmbo > 0) { ?>
-					<span style=\"color:#990000\">x<?= $upload->tmbos ?></span>";
+				if($upload->tmbos() > 0) { ?>
+					<span style=\"color:#990000\">x<?= $upload->tmbos() ?></span>";
 				<? } ?>)
 				&nbsp;(<a id="quickcomment" class="jqModal" href="#">quick</a>)
     	
