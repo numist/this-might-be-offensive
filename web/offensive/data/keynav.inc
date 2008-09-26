@@ -8,6 +8,7 @@ $options = array(
 	"key_index" => "index",
 	"key_good" => "vote [this is good]",
 	"key_bad" => "vote [this is bad]",
+	"key_subscribe" => "(un)subscribe to thread",
 	// XXX: pending comment joining
 	// key_tmbo
 	// key_tiar

@@ -271,6 +271,18 @@
 							<?
 						}
 
+						if(array_key_exists("key_subscribe", $prefs)) {
+							foreach($prefs["key_subscribe"] as $code) {
+								echo "case $code:\n";
+							}
+							?>
+							sub=$('.subscribe_toggle:visible');
+							handle_subscribe(sub,e,$("#good").attr("name"));
+							return;
+							break;
+							<?
+						}
+
 						if(array_key_exists("key_escape", $prefs)) {
 							$escape = $prefs["key_escape"];
 						} else {
@@ -412,9 +424,9 @@
 				<span style="margin-left:48px;">
 					<?	
 					if(subscribed($upload->id())) { ?>
-						<a id="unsubscribeLink" href="/offensive/subscribe.php?un=1&fileid=<?= $id ?>" title="take this file off my 'unread comments' watch list.">unsubscribe</a>
+						<a class="subscribe_toggle" id="unsubscribeLink" href="/offensive/subscribe.php?un=1&fileid=<?= $id ?>" title="take this file off my 'unread comments' watch list.">unsubscribe</a>
 					<?	} else { ?>
-						<a id="subscribeLink" href="/offensive/subscribe.php?fileid=<?= $id ?>" title="watch this thread for new comments.">subscribe</a>
+						<a class="subscribe_toggle" id="subscribeLink" href="/offensive/subscribe.php?fileid=<?= $id ?>" title="watch this thread for new comments.">subscribe</a>
 					<?	} ?>
 				</span>
 			</div>

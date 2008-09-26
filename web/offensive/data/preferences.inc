@@ -33,7 +33,9 @@ $prefnames = array(
 	// close modal dialogues
 	"key_escape",
 	// random image jump
-	"key_random"
+	"key_random",
+	// subscription toggle
+	"key_subscribe"
     );
 
 ?>
