@@ -1,4 +1,5 @@
 var template;
+var old_key;
 $(document).ready(function() {
 	// set the template var to the template from the HTML
 	template = $("#template").val();
@@ -74,13 +75,20 @@ function check_delete_link() {
 }
 
 function clear_recording(o,e) {
-	$('#keynav').find('.key_notification').each(function(i) {
-		$(this).html('');
+	$('.key_notification').each(function(i) {
+		if($(this).html() == "recording") {
+			$(this).parent().parent().find('.keycode').val(old_key);
+			$(this).html('');
+		}
 	});
 }
 
 function record_key(o,e) {
+	clear_recording(o,e);
 	o.parent().parent().find('.key_notification').html('recording');
+
+	// save the previous value 
+	old_key = o.val();
 
 	// wipe any existing value
 	o.val('');

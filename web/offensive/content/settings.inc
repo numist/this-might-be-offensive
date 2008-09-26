@@ -120,7 +120,7 @@
 			<form id="keynav_form" action="/offensive/?c=settings" method="post">
 				<p>choose your own special keyboard nav settings. pick an action from the dropdown, choose a key to make it happen. </p><p>if you see a number in the box instead of a letter, the number is the keycode for the pressed key, which sometimes varies based on keyboard layout.</p><p>if the box has a letter, but the letter is wrong, please let someone know.</p><p>if you try to use the same key for multiple things, I can't help you.  it probably won't work correctly, so don't bother.</p>
 			
-				<center><table>
+				<table style="margin-left: 140px;">
 					<!-- this should be changed to PHP with data from the backend -->
 					<!-- you can forget about the name/id, that'll be set on submit  -->
 					<?/*LOOPY LOOP*/
@@ -174,13 +174,14 @@
 					?>
 					<!-- end of data from database -->
 				</table>
-				<div id="key_add">
-					<a href="#">
-						<span>add row</span>
-					</a>
-				</div>
-				<input id="keynav_submit" type="submit" value="Save" name="submit">
-				<p>to reset to default, delete all rows and set the last one to "<?= $options["noselect"] ?>".</p>
+				<center>
+					<div id="key_add">
+						<a href="#">
+							<span>add row</span>
+						</a>
+					</div>
+					<input id="keynav_submit" type="submit" value="Save" name="submit">
+					<p>to reset to default, delete all rows and set the last one to "<?= $options["noselect"] ?>".</p>
 				</center>
 			</form>
 		</div>
