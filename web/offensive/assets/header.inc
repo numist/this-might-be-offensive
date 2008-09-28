@@ -223,7 +223,7 @@ function mustLogIn($type="logn") {
 	
 	if($type == "http") {
 		if (isset($_SERVER['PHP_AUTH_USER']) && strlen($_SERVER['PHP_AUTH_USER']) > 0) {
-			require_once('offensive/assets/logn.inc');
+			require_once('https://'.$_SERVER["SERVER_NAME"].'offensive/assets/logn.inc');
 			global $login_message;
 			
 			if(login($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']) === true) return;

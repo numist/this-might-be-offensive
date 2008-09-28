@@ -5,23 +5,43 @@
 	require_once("offensive/assets/classes.inc");
 
 	if(!isset($_SERVER["HTTPS"]) || $_SERVER["HTTPS"] != "on") {
-		header("Location: https://".$_SERVER["SERVER_NAME"]."/offensive/logn.php", 301);
-		exit;
+		$server = "http://".$_SERVER["SERVER_NAME"];
+	} else {
+		$server = "https://".$_SERVER["SERVER_NAME"];
 	}
-
+	
 	/* there is always a redirect. 
 	 * the user can specify the redirect in the _REQUEST['redirect'] variable.
 	 * the location of the redirect defaults to /offensive/?c=main
 	 */
 	if(array_key_exists("redirect", $_REQUEST) && strlen($_REQUEST["redirect"]) > 0) {
-		$redirect = $_REQUEST['redirect'];
+		if(strpos($_REQUEST['redirect'], "//") === false) {
+			$redirect = $server.$_REQUEST['redirect'];
+		} else {
+			$redirect = $_REQUEST['redirect'];
+		}
+	} else {
+		$redirect = "";
+	}
+
+	if(!isset($_SERVER["HTTPS"]) || $_SERVER["HTTPS"] != "on") {
+		if($redirect) {
+			$redirect = "?redirect=".urlencode($redirect);
+		}
+
+		header("Location: https://".$_SERVER["SERVER_NAME"]."/offensive/logn.php$redirect", 301);
+		exit;
 	}
 
 	// if the user is logged in already, redirect.
 	if(loggedin()) {
-		if(!isset($redirect)) {
+		/*
+		 * if no redirect was requested, use the correct one from the
+		 * user's preferences.
+		 */
+		if(!$redirect) {
 			$me = new User($_SESSION["userid"]);
-			$redirect = './?c='.($me->getPref("index") == "thumbs") ? 
+			$redirect = '/offensive/?c='.($me->getPref("index") == "thumbs") ? 
 			      "thumbs" : "main";
 		}
 		header( "Location: " . $redirect );
@@ -35,6 +55,15 @@
 	$name = isset($_REQUEST['username']) ? $_REQUEST['username'] : null;
 	$pw = isset($_REQUEST['password']) ? $_REQUEST['password'] : null;
 	if(login($name, $pw)) {
+		/*
+		 * if no redirect was requested, use the correct one from the
+		 * user's preferences.
+		 */
+		if(!$redirect) {
+			$me = new User($_SESSION["userid"]);
+			$redirect = '/offensive/?c='.($me->getPref("index") == "thumbs") ? 
+			      "thumbs" : "main";
+		}
 		header( "Location: " . $redirect );
 		exit;
 	}
