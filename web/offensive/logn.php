@@ -39,10 +39,10 @@
 		 * if no redirect was requested, use the correct one from the
 		 * user's preferences.
 		 */
-		if(!$redirect) {
+		if($redirect == "") {
 			$me = new User($_SESSION["userid"]);
-			$redirect = '/offensive/?c='.($me->getPref("index") == "thumbs") ? 
-			      "thumbs" : "main";
+			$redirect = '/offensive/?c='.(($me->getPref("index") == "thumbs") ? 
+			      "thumbs" : "main");
 		}
 		header( "Location: " . $redirect );
 		exit;
