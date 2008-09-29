@@ -63,7 +63,6 @@
 			$redirect = '/offensive/?c='.(($me->getPref("index") == "thumbs") ? 
 			      "thumbs" : "main");
 		}
-		trigger_error("$redirect time\n\n\n", E_USER_ERROR);
 		header( "Location: " . $redirect );
 		exit;
 	}
