@@ -10,9 +10,8 @@
 		$server = "https://".$_SERVER["SERVER_NAME"];
 	}
 	
-	/* there is always a redirect. 
-	 * the user can specify the redirect in the _REQUEST['redirect'] variable.
-	 * the location of the redirect defaults to /offensive/?c=main
+	/* the user can specify the redirect in the $_REQUEST['redirect'] variable.
+	 * the location the redirect defaults to is /offensive/?c=main
 	 */
 	if(array_key_exists("redirect", $_REQUEST) && strlen($_REQUEST["redirect"]) > 0) {
 		if(strpos($_REQUEST['redirect'], "//") === false) {
@@ -61,9 +60,10 @@
 		 */
 		if(!$redirect) {
 			$me = new User($_SESSION["userid"]);
-			$redirect = '/offensive/?c='.($me->getPref("index") == "thumbs") ? 
-			      "thumbs" : "main";
+			$redirect = '/offensive/?c='.(($me->getPref("index") == "thumbs") ? 
+			      "thumbs" : "main");
 		}
+		trigger_error("$redirect time\n\n\n", E_USER_ERROR);
 		header( "Location: " . $redirect );
 		exit;
 	}
@@ -120,7 +120,9 @@
 							</tr>
 							<? } ?>
 						</table>
-						<input type="hidden" name="redirect" value="<? echo array_key_exists("redirect", $_REQUEST) ? $_REQUEST['redirect'] : "./" ?>" />
+						<? if($redirect) { ?>
+							<input type="hidden" name="redirect" value="<?= $redirect ?>" />
+						<? } ?>
 					</form>
 				
 				</span>
