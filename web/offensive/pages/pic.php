@@ -457,12 +457,15 @@
 			<br />
 			<?
 				if($upload->is_nsfw()) { ?>
-					<a style="color:#990000;margin-right:.5em;" href="/offensive/setPref.php?p=hide_nsfw&v=<?= $me->getPref("hide_nsfw") == 1 ? "" : "1" ?>" title="<?= $me->getPref("hide_nsfw") == 1 ? "show" : "hide" ?> images that are not safe for work">[nsfw]</a><?
+					<a style="color:#990000;" href="/offensive/setPref.php?p=hide_nsfw&v=<?= $me->getPref("hide_nsfw") == 1 ? "" : "1" ?>" title="<?= $me->getPref("hide_nsfw") == 1 ? "show" : "hide" ?> images that are not safe for work">[nsfw]</a><?
 				}
 				if($upload->is_tmbo()) { ?>
-					<a style="color:#990000;margin-right:.5em;" href="/offensive/setPref.php?p=hide_tmbo&v=<?= $me->getPref("hide_tmbo") == 1 ? "" : "1" ?>" title="<?= $me->getPref("hide_tmbo") == 1 ? "show" : "hide" ?> images that might be offensive">[tmbo]</a><?
+					<a style="color:#990000;" href="/offensive/setPref.php?p=hide_tmbo&v=<?= $me->getPref("hide_tmbo") == 1 ? "" : "1" ?>" title="<?= $me->getPref("hide_tmbo") == 1 ? "show" : "hide" ?> images that might be offensive">[tmbo]</a><?
 				}
-				echo htmlEscape($upload->filename()) 
+				
+				$style = ($upload->is_tmbo() || $upload->is_nsfw()) ? "style=\"margin-left:.3em\"" : "";
+				
+				echo "<span $style>" . htmlEscape($upload->filename()) . "</span>" ;
 			?>
 			<span style="color:#999999"><? 
 				if($upload->file() != "")
