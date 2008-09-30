@@ -355,7 +355,7 @@
 			</div>
 		</div> <!-- end quickcomment -->
 		<div id="content">
-			<div id="heading">
+			<div id="heading" style="white-space:nowrap;">
 				&nbsp;&nbsp;
 				<?
 				/*
@@ -424,28 +424,29 @@
 						<a class="subscribe_toggle" id="subscribeLink" href="/offensive/subscribe.php?fileid=<?= $id ?>" title="watch this thread for new comments.">subscribe</a>
 					<?	} ?>
 				</span>
+				
+		    	<!--
+					filter block
+				-->
+				<span style="margin-left:48px;">filters:</span>
+				<span style="margin-left:10px;"><?
+						if($me->getPref("hide_nsfw") == 1) { ?>
+								<a href="/offensive/setPref.php?p=hide_nsfw&v=">nsfw (hiding)</a>
+						<? } else { ?>
+								<a href="/offensive/setPref.php?p=hide_nsfw&v=1">nsfw (showing)</a>
+						<? } ?>
+				</span>
+	
+				<span style="margin-left:10px;"><?
+						if($me->getPref("hide_tmbo") == 1) { ?>
+										<a href="/offensive/setPref.php?p=hide_tmbo&v=">tmbo (hiding)</a>
+						<? } else { ?>
+										<a href="/offensive/setPref.php?p=hide_tmbo&v=1">tmbo (showing)</a>
+						<? } ?>
+				</span>
+
 			</div>
     		<br />
-
-	    	<!--
-	    	    filter block
-	    	-->
-	    	<span style="margin-left:400px;">filters:</span>
-			<span style="margin-left:10px;"><?
-	    	        if($me->getPref("hide_nsfw") == 1) { ?>
-	    	                <a href="/offensive/setPref.php?p=hide_nsfw&v=">nsfw (hiding)</a>
-	    	        <? } else { ?>
-	    	                <a href="/offensive/setPref.php?p=hide_nsfw&v=1">nsfw (showing)</a>
-	    	        <? } ?>
-	    	</span>
-
-	    	<span style="margin-left:10px;"><?
-	    	        if($me->getPref("hide_tmbo") == 1) { ?>
-	    	                        <a href="/offensive/setPref.php?p=hide_tmbo&v=">tmbo (hiding)</a>
-	    	        <? } else { ?>
-	    	                        <a href="/offensive/setPref.php?p=hide_tmbo&v=1">tmbo (showing)</a>
-	    	        <? } ?>
-	    	</span>
 
 
 
