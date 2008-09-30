@@ -45,38 +45,55 @@ function api_getquickcommentbox() {
 	$result = tmbo_query( $sql );
 	$row = mysql_fetch_assoc( $result );
 	$my_posting = ($userid == $row['userid']) ? 1 : 0;
+	$upload = new Upload($fileid);
 
 	// start building the HTML that will be inserted into the quick comment box directly
-?>
-		<form id="qc_form">
+	?>
+	<a name="form"></a>
+	<form id="qc_form">
+		<p>
+			<input type="hidden" value="<?= $fileid ?>" name="fileid" id="qc_fileid" />
+			<input type="hidden" name="c" value="comments"/>
+			<textarea cols="64" rows="6" name="comment" id="qc_comment"></textarea>
+		</p>
+					
+		<? if( canVote($upload->id()) && $upload->file() && $upload->type() != 'topic' ) { ?>
+			<div id="qc_vote" style="text-align:left;margin-left:14%">
+				<table><tr><td width="200px">
+				<input class="qc_tigtib" id="qc_novote" type="radio" value="novote" name="vote" checked />
+				<br />
+				
+				<input class="qc_tigtib" type="radio" name="vote" value="this is good" id="qc_tig"/>
+				<label for="qc_tig">[ this is good ]</label><br/>
+					
+				<input class="qc_tigtib" type="radio" name="vote" value="this is bad" id="qc_tib"/>
+				<label for="qc_tib">[ this is bad ]</label><br/>
+				</td>
+				<td>
+				<input type="checkbox" name="offensive" value="omg" id="tmbo"/>
+				<label for="tmbo">[ this might be offensive ]</label><br/>
+			
+				<input type="checkbox" name="repost" value="police" id="repost"/>
+				<label for="repost">[ this is a repost ]</label><br/>
+				<input type="checkbox" name="subscribe" value="subscribe" id="subscribe"/>
+				<label for="subscribe">[ subscribe ]</label><br/>
+				</td></tr></table>
+	
+			</div>
+		<? } ?>
+		<div id="qc_go" style="text-align: center">
 			<p>
-				<input type="hidden" value="<?= $fileid ?>" name="fileid" id="qc_fileid" />
-				<textarea cols="64" rows="6" name="comment" id="qc_comment"></textarea>
+				<input type="submit" name="submit" value="go"/>
 			</p>
-			<div id="qc_vote">
-<?php 			if(canVote($fileid)) {  // show the vote buttons   ?>
-				<ul style="margin-left: -10px; list-style: none;">
-					<li><input class="qc_tigtib" style="position: relative; top: 3px;" id="qc_novote" type="radio" value="novote" name="vote"/></li>
-                    			<li>[<input class="qc_tigtib" style="position: relative; top: 3px;" id="qc_tig" type="radio" value="this is good" name="vote"/><label for="qc_tig"> this is good </label>]</li>
-                  			<li>[<input class="qc_tigtib" style="position: relative; top: 3px;" id="qc_tib" type="radio" value="this is bad" name="vote"/><label for="qc_tib"> this is bad </label>]</li>
-         		                <li>[<input style="position: relative; top: 3px;" id="tmbo" type="checkbox" value="omg" name="offensive"/><label for="tmbo"> tmbo </label>]</li>
-                  		      	<li>[<input style="position: relative; top: 3px;" id="repost" type="checkbox" value="police" name="repost"/><label for="repost"> tiar </label>]</li>
-				</ul>
-<?php			} ?>
-			</div>
-			<div id="qc_go" style="text-align: center">
-				<p>
-					<input type="submit" value="go" name="submit"/>
-				</p>
-			</div>
-		</form>
-		<div id="qc_comments">
-<?php	// now fetch all the comments so you can see the comments in the quickcomment box
+		</div>
+	</form>
+	<div id="qc_comments">
+	<?php	// now fetch all the comments so you can see the comments in the quickcomment box
 	$sql = "SELECT offensive_comments.*, offensive_comments.id as commentid, offensive_comments.timestamp AS comment_timestamp, users.* FROM offensive_uploads, offensive_comments, users WHERE users.userid = offensive_comments.userid AND offensive_uploads.id=fileid AND fileid = '$fileid' AND offensive_comments.comment != '' ORDER BY offensive_comments.timestamp ASC";
 	$result = tmbo_query( $sql );
 	$comments_exist = mysql_num_rows( $result ) > 0;
 
-	if( $comments_exist ) { 
+	if( $comments_exist ) {
 		$comments_heading = "the dorks who came before you said: ";
 		if($fileid != "211604") {
 			echo "<b>$comments_heading</b>";

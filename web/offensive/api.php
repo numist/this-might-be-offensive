@@ -568,7 +568,7 @@
 	function api_postcomment() {
 		$fileid = check_arg("fileid", "integer", $_POST);
 		$comment = check_arg("comment", "string", $_POST, false);
-		$vote = check_arg("vote", "string", $_POST, false, array("this is good", "this is bad"));
+		$vote = check_arg("vote", "string", $_POST, false, array("this is good", "this is bad", "novote"));
 		$offensive = check_arg("offensive", "integer", $_POST, false, array("1", "0"));
 		$repost = check_arg("repost", "integer", $_POST, false, array("1", "0"));
 		handle_errors();
@@ -580,6 +580,7 @@
 			send(false);
 		}
 		
+		if($vote == "novote") $vote = "";
 		if($comment === false) $comment = "";
 		if($vote === false) $vote = "";
 		if($offensive === false) $offensive = 0;

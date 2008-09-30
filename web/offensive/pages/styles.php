@@ -46,7 +46,7 @@ body {
     margin-left: 250px;
     width: 600px;
     background: #ccccff none repeat scroll 0 0;
-    color: #333;
+    color: #000033;
     border: 2px solid black;
 }
 
@@ -104,7 +104,6 @@ body {
 }
 
 #qc_vote ul li {
-	display: inline;
 }
 
 .timestamp {

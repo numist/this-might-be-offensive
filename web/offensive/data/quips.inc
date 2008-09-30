@@ -15,7 +15,8 @@
 		"you do not want vodka getting into your urethra. you really, really, don't.",
 		"consciousness doesn't really exist. it's just another one of our ideas.",
 		"time flies like an arrow, but fruit flies like a banana.",
-		"bow chicka wow-wow"
+		"bow chicka wow-wow",
+		"DON'T TOUCH THIS - IT WORKS"
 	
 		);
 	$quip = $quips[rand(0, count($quips) - 1)];

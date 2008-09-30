@@ -336,7 +336,7 @@
 		</div>
 		<? if(count($prefs) == 0) { ?>
 			<div id="instructions" style="display:none;white-space:nowrap;overflow:hidden;padding:3px;margin-bottom:6px;background:#cccccc;color:#333333">
-				because clicking is too hard:<br />
+				keyboard commands:<br />
 				← = newer. ↑ = index. → = older. ↓ = comments . + or = votes [ this is good ]. - votes [ this is bad ] .<br />
 				q = quick comment, Esc closes quick comment box, ? = random image.<br />
 				( change 'em at your <a href="/offensive/?c=settings">settings</a> page. )
@@ -348,12 +348,13 @@
 		<div class="jqmWindow" id="dialog">
 			<div class="blackbar"></div>
 			<div class="heading"><table style="width: 100%;"><tr>
-				<td align="left">and then you came along and were all:</td>
+				<td align="left">let's hear it</td>
 				<td class="qc_close" align="right"><a href="#" class="jqmClose">Close</a></td>
 			</tr></table></div>
 			<div class="bluebox" id="qc_bluebox" style="text-align: center">
 			</div>
 		</div> <!-- end quickcomment -->
+		
 		<div id="content">
 			<div id="heading" style="white-space:nowrap;">
 				&nbsp;&nbsp;
@@ -395,7 +396,7 @@
 				<!--
 					voting block
 				-->
-				<span style="margin-left:48px;">
+				<span style="margin-left:40px;">
 					<?
 					if(canVote($upload->id()) && $upload->file()) {
 						$good_href = "href=\"/offensive/?c=comments&submit=submit&fileid=$id&vote=this%20is%20good&redirect=true\"";	
@@ -424,29 +425,29 @@
 						<a class="subscribe_toggle" id="subscribeLink" href="/offensive/subscribe.php?fileid=<?= $id ?>" title="watch this thread for new comments.">subscribe</a>
 					<?	} ?>
 				</span>
-				
-		    	<!--
-					filter block
-				-->
-				<span style="margin-left:48px;">filters:</span>
-				<span style="margin-left:10px;"><?
-						if($me->getPref("hide_nsfw") == 1) { ?>
-								<a href="/offensive/setPref.php?p=hide_nsfw&v=">nsfw (hiding)</a>
-						<? } else { ?>
-								<a href="/offensive/setPref.php?p=hide_nsfw&v=1">nsfw (showing)</a>
-						<? } ?>
-				</span>
-	
-				<span style="margin-left:10px;"><?
-						if($me->getPref("hide_tmbo") == 1) { ?>
-										<a href="/offensive/setPref.php?p=hide_tmbo&v=">tmbo (hiding)</a>
-						<? } else { ?>
-										<a href="/offensive/setPref.php?p=hide_tmbo&v=1">tmbo (showing)</a>
-						<? } ?>
-				</span>
 
+	    		<!--
+	    		    filter block
+	    		-->
+	    		<span style="margin-left:48px;">filters:</span>
+				<span style="margin-left:5px;"><?
+	    		        if($me->getPref("hide_nsfw") == 1) { ?>
+	    		                <a href="/offensive/setPref.php?p=hide_nsfw&v=">nsfw(on)</a>
+	    		        <? } else { ?>
+	    		                <a href="/offensive/setPref.php?p=hide_nsfw&v=1">nsfw(off)</a>
+	    		        <? } ?>
+	    		</span>
+            	
+	    		<span style="margin-left:5px;"><?
+	    		        if($me->getPref("hide_tmbo") == 1) { ?>
+	    		                        <a href="/offensive/setPref.php?p=hide_tmbo&v=">tmbo(on)</a>
+	    		        <? } else { ?>
+	    		                        <a href="/offensive/setPref.php?p=hide_tmbo&v=1">tmbo(off)</a>
+	    		        <? } ?>
+	    		</span>
 			</div>
-    		<br />
+	
+			<br />
 
 
 

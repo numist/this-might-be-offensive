@@ -140,7 +140,7 @@ function get_comments(hash) {
 				if(vote == "this is good" || vote == "this is bad") {
 					disable_voting();
 					if(vote == "this is good") increase_count("#count_good");
-					else increase_count("#count_bad");
+					else if(vote == "this is bad") increase_count("#count_bad");
 				}
 				if(comment != "") increase_count("#count_comment");
 
