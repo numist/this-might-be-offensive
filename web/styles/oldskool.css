@@ -242,3 +242,8 @@ table.thumbnails td a {
 .votecount .good, .votecount .bad {
 	padding-left:5px;
 }
+
+a .tags {
+	text-decoration:none;
+	color:#990000;
+}

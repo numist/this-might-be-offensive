@@ -260,18 +260,25 @@ function htmlFilename($id, $showtype=false) {
 		}
 		list($filename, $nsfw, $tmbo, $type) = mysql_fetch_array($result);
 	}
-	$tags = "";
-	if($tmbo != 0) {
-		$tags = "<span style=\"color:#990000\">[tmbo]</span>$tags";
-	}
-	if($nsfw != 0) {
-		$tags = "<span style=\"color:#990000\">[nsfw]</span>$tags";
-	}
+	$tags = array();
+
 	if($showtype) {
-		$tags = "$type: $tags";
+		$tags[] = "$type:";
+	}
+
+	if($nsfw != 0) {
+		$tags[] = "[nsfw]";
 	}
 	
-	return $tags.($tags?" ":"").htmlEscape($filename);
+	if($tmbo != 0) {
+		$tags[] = "[tmbo]";
+	}
+
+	return tagsHtml( $tags ) . htmlEscape($filename);
+}
+
+function tagsHtml( $tags ) {
+	return count( $tags ) > 0 ? "<span class=\"tags\">" . implode( "", $tags ) . "</span> " : "";
 }
 
 ?>
