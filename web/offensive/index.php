@@ -180,7 +180,7 @@ $timelimit = 10;
 					<div class="blackbar"></div>
 						<div class="heading">your stuff:</div>
 						<div class="bluebox">
-							<p>you are logged in as <b><a href="index.php?c=user&userid=<?php echo $_SESSION['userid'] ?>"><?php echo $_SESSION['username'] ?></a>.</b></p>
+							<p>hi <b><a href="index.php?c=user&userid=<?= $me->id() ?>"><?= $me->username() ?></a></b>!</p>
 							
 							<p><a href="index.php?c=upload">upload</a></p>
 							
@@ -204,8 +204,8 @@ $timelimit = 10;
 						<div class="heading">get info:</div>
 						<div class="bluebox">
 							<p><a href="/offensive/?c=map">maxxer world map</a></p>
-							<p><a href="<? echo $_SERVER['PHP_SELF'] ?>?c=referral">invite a friend</a></p>						
-							<p><a href="<? echo $_SERVER['PHP_SELF'] ?>?c=faq">FAQ, rules, etc.</a></p>
+							<p><a href="<?= $_SERVER['PHP_SELF'] ?>?c=referral">invite a friend</a></p>						
+							<p><a href="<?= $_SERVER['PHP_SELF'] ?>?c=faq">FAQ, rules, etc.</a></p>
 							<p><a href="http://tmboradio.com">tmboradio.com</a></p>
 							<!-- <p><a href="./?c=stats">stats</a></p> -->						
 						</div>

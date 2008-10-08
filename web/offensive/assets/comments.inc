@@ -151,6 +151,9 @@ function postComment($fileid, $vote, $repost, $offensive, $comment) {
 	
 	if($comment != false || $vote == "this is bad") {
 		subscribe($fileid);
+		if($comment != false) {
+			updateSubscriptions($fileid, mysql_insert_id());
+		}
 	}
 }
 
