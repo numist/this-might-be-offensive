@@ -65,7 +65,7 @@ function unsubscribe($fileid, $userid=null) {
 
 function updateSubscriptions( $fileid, $commentid ) {
 	$sql = "UPDATE offensive_subscriptions SET commentid = $commentid 
-	        WHERE fileid = $fileid AND commentid IS NULL";
+	        WHERE fileid = $fileid AND commentid IS NULL AND userid != ".$_SESSION['userid'];
 	$result = tmbo_query( $sql );
 }
 
@@ -148,11 +148,14 @@ function postComment($fileid, $vote, $repost, $offensive, $comment) {
 	$sql = "INSERT INTO offensive_comments ( userid, fileid, comment, vote, offensive, repost, user_ip ) 
 	        VALUES ( $userid, $fileid, '$comment', '$vote', $offensive, $repost, '".sqlEscape($_SERVER['REMOTE_ADDR'])."')";
 	tmbo_query($sql);
+	$commentid = mysql_insert_id();
 	
 	if($comment != false || $vote == "this is bad") {
 		subscribe($fileid);
-		if($comment != false) {
-			updateSubscriptions($fileid, mysql_insert_id());
+		if($comment != false && $commentid != 0) {
+			updateSubscriptions($fileid, $commentid);
+		} else if ($commentid == 0) {
+			trigger_error("commentid was 0?", E_USER_ERROR);
 		}
 	}
 }
