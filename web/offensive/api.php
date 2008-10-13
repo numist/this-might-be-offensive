@@ -6,16 +6,19 @@
 	require_once( 'admin/mysqlConnectionInfo.inc' );
 	if(!isset($link) || !$link) $link = openDbConnection();
 	require_once("offensive/assets/functions.inc");
+	require_once("offensive/assets/classes.inc");
 
 	// if not logged in, force a switch to ssl.
 	if(!loggedin() && (!isset($_SERVER["HTTPS"]) || $_SERVER["HTTPS"] != "on")) {
 		header("Location: https://".$_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"], 301);
 		exit;
 	}
+	
+	$me = new User($_SESSION['userid']);
 
 	// XXX: calls into the API should probably update ip_history.
 	// XXX: trigger_error should be overloaded in the API so it does the right thing.
-	
+
 	define("E_USER_*", E_USER_ERROR | E_USER_WARNING | E_USER_NOTICE); //??
 	
 	require_once("offensive/assets/argvalidation.inc");
@@ -585,10 +588,8 @@
 		if($vote === false) $vote = "";
 		if($offensive === false) $offensive = 0;
 		if($repost === false) $repost = 0;
-		
-		postComment($fileid, $vote, $repost, $offensive, $comment);
-		
-		send(true);
+
+		send(postComment($fileid, $vote, $repost, $offensive, $comment));
 	}
 
 	// XXX: to upload a file from within, do not call this function directly!

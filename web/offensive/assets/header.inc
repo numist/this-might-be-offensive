@@ -90,14 +90,17 @@ function tmbo_error_handler($errno, $errstr, $errfile, $errline, $errcontext) {
 					require("offensive/index.outoforder.php");
 				} else if (array_key_exists("status", $_SESSION) &&
 					       $_SESSION['status'] == "admin") {
-					global $queries;
-					echo "$queries queries\n";
+					ob_start();
 					var_dump(debug_backtrace());
+					$trace = nl2br(ob_get_contents());
+					ob_end_clean();
+					echo $trace;
 				}
                 exit;
         }
 }
 set_error_handler("tmbo_error_handler");
+error_reporting(E_STRICT);
 
 /* timezone error fix applies to all pages */
 date_default_timezone_set("America/Los_Angeles");

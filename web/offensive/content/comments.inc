@@ -71,50 +71,20 @@
 	    }
 	    
 		if( array_key_exists("submit", $_REQUEST)) {		    
-			$comment = isset($_REQUEST['comment']) ? trim($_REQUEST['comment']) : "";
+			$fileid		 = array_key_exists("fileid", $_REQUEST) ?
+							$_REQUEST['fileid'] : '';
+			$comment	 = array_key_exists("comment", $_REQUEST) ?
+							trim($_REQUEST['comment']) : "";
+			$vote		 = array_key_exists("vote", $_REQUEST) ?
+							$_REQUEST['vote'] : null;
+			$offensive	 = array_key_exists("offensive", $_REQUEST) && $_REQUEST['offensive'] != "" ?
+							1 : 0;
+			$repost		 = array_key_exists("repost", $_REQUEST) 	&& $_REQUEST['repost'] != "" ?
+							1 : 0;
+			$subscribe	 = array_key_exists("subscribe", $_REQUEST) && $_REQUEST['subscribe'] != "" ?
+							1 : 0;
 			
-			// prevent doubleposts, but only content doubleposts within 30 seconds
-			$sql = "SELECT id, fileid, timestamp, comment, NOW() as curtime FROM offensive_comments WHERE userid = ".$_SESSION['userid'].
-			       " ORDER BY timestamp DESC LIMIT 1";
-			$res = tmbo_query($sql);
-			$row = mysql_fetch_assoc($res);
-			if($row['fileid'] == $fileid &&
-			   $row['comment'] == $comment && 
-			   $comment != "" &&
-			   strtotime($row['curtime']) - strtotime($row['timestamp']) < 30) {
-				header("Location: ./?c=comments&fileid=".$fileid."#".$row['id']);
-				exit;
-			}
-			
-			if( !canVote($upload->id()) || $uploader->id() == $_SESSION['userid'] || $upload->file() == "" ) {
-				$vote = null;
-			} else {
-				$vote = array_key_exists("vote", $_REQUEST) ? $_REQUEST['vote'] : null;
-			}
-
-			$offensive = array_key_exists("offensive", $_REQUEST) && $_REQUEST['offensive'] != "" ? 1 : 0;
-			$repost = array_key_exists("repost", $_REQUEST) && $_REQUEST['repost'] != "" ? 1 : 0;
-			$subscribe = array_key_exists("subscribe", $_REQUEST) && $_REQUEST['subscribe'] != "" ? 1 : 0;
-			$sql = "INSERT INTO offensive_comments ( userid, fileid, comment, vote, offensive, repost, user_ip )";
-			$sql .= " VALUES ( $usrid, $fileid, '".sqlEscape($comment)."', '$vote', $offensive, $repost, '" . sqlEscape($_SERVER['REMOTE_ADDR']) . "')";
-		
-			if( ! ($comment == "" && $vote == null && $offensive == 0 && $repost == 0) ) {
-				$result = tmbo_query( $sql );
-			}
-
-			if( strlen( $comment ) > 0 || $vote == 'this is bad' || $subscribe ) {
-				$commentid = mysql_insert_id();
-				subscribe( $fileid, $_SESSION['userid'] );
-				if( strlen( $comment ) > 0 ) {
-					updateSubscriptions( $fileid, $commentid );
-				}
-			}
-			
-			updateCommentCount( $fileid, ($vote === 'this is good') ? 1 : 0,
-								($vote == 'this is bad') ? 1 : 0,
-								$repost,
-								$offensive,
-								strlen( $comment ) > 0 ? 1 : 0 );
+			postComment($fileid, $vote, $repost, $offensive, $comment, $subscribe);
 
 			if( array_key_exists("redirect", $_REQUEST) ) {
 				header( "Location: /offensive/pages/pic.php?id=" . $_REQUEST['fileid'] );

@@ -7,6 +7,7 @@
 	require_once( "offensive/getid3/getid3.php");
 	require_once( 'admin/mysqlConnectionInfo.inc' );
 	if(!isset($link) || !$link) $link = openDbConnection();
+	require_once('offensive/assets/uploads.inc');
 	
 
 	$tmpdir = "quarantine";
@@ -72,11 +73,7 @@
 		$filedata = fread ( $file, min( 4096, filesize( $filePath ) ) );
 		fclose( $file );
 		return md5( $filedata );
-	}
-
-	function requiresLogin() {
-		return true;
-	}
+   	}
 
 	function exceededUploadLimit($uid) {
 		return (numUploadsRemaining( $uid ) === 0 && $_SESSION['status'] != 'admin');
@@ -182,7 +179,7 @@
 	}
 
 	function body() {
-		global $hash, $tmpdir;
+		global $hash, $tmpdir, $me;
 		$postdata = array();
 		
 		// is there an incoming file?
@@ -199,8 +196,11 @@
 			chmod($tmpdir."/".$postdata['tmpname'], 0644);
 			
 			// determine filetype
+			// XXX: for now, shut up the error reporting -- this library needs replacement.
+			$errno = error_reporting(0);
 			$getID3 = new getID3;
 			$fileinfo = $getID3->analyze( $tmpdir."/".$postdata['tmpname'] );
+			error_reporting($errno);
 
 			if(!preg_match( "/(jpg|jpeg|gif|png)/i", $fileinfo["fileformat"])) {
 				box("acceptable file types: jpg, gif, png.", "sorry.");
@@ -343,13 +343,6 @@
 
 		if(strlen($postdata['hash']) < 15) trigger_error("no hash!", E_USER_ERROR);
 
-/* XXX: UPDATE tablename SET new_unix_big_int_field = UNIX_TIMESTAMP(old_datetime) 
- * we should be using epoch seconds in the database.  this gives us flexibility in maths,
- * manipulation, but requires a complete rescan of the code to change every place where 
- * timestamps are set (usually implicitly), compared (DATE_SUB() is the most common call),
- * or updates (usually implicitly).
- */
-
 		$sql = "INSERT INTO offensive_uploads ( userid,filename,ip,nsfw,tmbo,hash,type,status )
 				   VALUES ( " . $_SESSION['userid'] . ", '" . 
 				                sqlEscape( $postdata['filename'] ) . "', '" . 
@@ -394,6 +387,7 @@
 		$sql = "UPDATE offensive_uploads SET status = 'normal' where id = $fileid";
 		tmbo_query($sql);
 		
+		indexUpload($fileid, $postdata['filename'], $me->username());
 
 		$message = "<p>
 			Thanks. Your upload can be viewed <a href=\"./pages/pic.php?id=$fileid\">here</a>.
@@ -410,7 +404,7 @@
 
 	} 
 
-function uploadForm($fileuploaded=false) {
+	function uploadForm($fileuploaded=false) {
 		$uploadsRemaining = numUploadsRemaining( $_SESSION['userid'] );
 
 		?>
@@ -477,145 +471,145 @@ function uploadForm($fileuploaded=false) {
 		
 		<?
 
-}
-
-function checkRepost($postdata) {
-	global $hash, $tmpdir, $me;
-	
-	// avatars are exempt
-	if(isAvatarUpload($postdata)) return false;
-	
-	// not to be confused with the hash() function in activationFunctions
-	$hash = getHash($tmpdir."/".$postdata['tmpname']);
-
-    
-	if( strlen( $hash ) < 15 ) {
-		trigger_error("hash was < 15 chars!  how?!\n".var_dump($postdata), E_USER_ERROR);
 	}
 
-	$sql = "SELECT id, filename, timestamp, type, nsfw, tmbo, userid
-			FROM offensive_uploads 
-			WHERE hash = '$hash' AND type != 'avatar'
-			ORDER by timestamp DESC";
-	$result = tmbo_query( $sql );
-	if( mysql_num_rows( $result ) == 0 ) return false;
-	
-	$filePath=dirname(realpath($_SERVER['SCRIPT_FILENAME']));
-	
-	?><div class="heading">poster child:</div>
-	<div class="bluebox">
-	<div style="text-align:center">
-	Your file appears to be a repost of:
-	<br /><center>
-	<table><?
-	while($row = mysql_fetch_assoc($result)) {
-		$css = (isset($css) && $css == "even_row") ? "odd_row" : "even_row";
+	function checkRepost($postdata) {
+		global $hash, $tmpdir, $me;
 		
-		$repdate = strtotime($row['timestamp']);
-		?><tr class="<?= $css ?>">
-		<td><a href="/offensive/pages/pic.php?id=<?= $row['id'] ?>" target="_blank"><?
-		if($me->squelched($row['userid']) || 
-		    ($row["nsfw"] == 1 && $me->getPref("hide_nsfw") == 1) || 
-		    ($row["tmbo"] == 1 && $me->getPref("hide_tmbo") == 1)) {
-			?>[ filtered ]<?
-		} else {
-			?><img src="<?= getThumbURL($row['id'], $row['filename'], $row['timestamp'], $row['type']) ?>"><?
+		// avatars are exempt
+		if(isAvatarUpload($postdata)) return false;
+		
+		// not to be confused with the hash() function in activationFunctions
+		$hash = getHash($tmpdir."/".$postdata['tmpname']);
+	
+	    
+		if( strlen( $hash ) < 15 ) {
+			trigger_error("hash was < 15 chars!  how?!\n".var_dump($postdata), E_USER_ERROR);
 		}
-		?></a></td>
-		<td><a href="/offensive/?c=comments&fileid=<?= $row['id'] ?>" target="_blank"><?= $row['filename'] ?></a></td>
-		</tr><?
-	}
-	?></table></center><br />
-	<form action="<?= $_SERVER['PHP_SELF'] ?>" method="POST">
-		<input type="hidden" name="c" value="upload">
-		<input type="submit" name="killit" value="Cancel this upload."/>
-		<input type="submit" name="repost" value="Post it anyway."/>
-	</form>
-	</div>
-	</div>
-	<?
-	$_SESSION['postdata'] = serialize($postdata);
-	return true;
-}
-
-function checkDim($postdata) {
-	global $tmpdir;
-
-	// size only matters with images and avatars.
-	if(typeFor($postdata) != "image" && typeFor($postdata) != "avatar")
-		return false;
 	
-	$filesize = filesize($tmpdir."/".$postdata['tmpname']);
-	list($width, $height, $type, $attr) = getimagesize($tmpdir."/".$postdata['tmpname']);
-	
-	// sanity check
-	if(!is_numeric( $width ) || !is_numeric($height) || $width * $height == 0 ) {
-		box("something's wrong with this image...  it doesnt seem to be valid.", "oops.");
-		killUpload($postdata);
-		return true;
-	}
-	
-	// outright reject anything of the spaceball.gif variety
-	if($width < 5 && $height < 5) {
-		$message = "Why would you try to upload a $width x $height pixel image?";
-		box($message, "spaceballs alive!");
-		killUpload($postdata);
-		return true;
-	}
-	
-	// outrageous!
-	if($height > 1024 && $width > 1024) {
-		$message = "This image is rather large ($width x $height).<br />If you want, I can try resizing it for you.<br/><br/>
-		<form action=\"{$_SERVER['PHP_SELF']}\" method=\"POST\">
-			<input type=\"hidden\" name=\"c\" value=\"upload\">
-			<input type=\"submit\" name=\"killit\" value=\"Cancel this upload.\"/>
-			<input type=\"submit\" name=\"resize\" value=\"Resize it for me.\"/>
-			<input type=\"submit\" name=\"noresize\" value=\"Post it anyway.\"/>
-		</form>";
-		box($message, "good pic, but is there any reason why I need to view it on the Jumbotron?");
+		$sql = "SELECT id, filename, timestamp, type, nsfw, tmbo, userid
+				FROM offensive_uploads 
+				WHERE hash = '$hash' AND type != 'avatar'
+				ORDER by timestamp DESC";
+		$result = tmbo_query( $sql );
+		if( mysql_num_rows( $result ) == 0 ) return false;
+		
+		$filePath=dirname(realpath($_SERVER['SCRIPT_FILENAME']));
+		
+		?><div class="heading">poster child:</div>
+		<div class="bluebox">
+		<div style="text-align:center">
+		Your file appears to be a repost of:
+		<br /><center>
+		<table><?
+		while($row = mysql_fetch_assoc($result)) {
+			$css = (isset($css) && $css == "even_row") ? "odd_row" : "even_row";
+			
+			$repdate = strtotime($row['timestamp']);
+			?><tr class="<?= $css ?>">
+			<td><a href="/offensive/pages/pic.php?id=<?= $row['id'] ?>" target="_blank"><?
+			if($me->squelched($row['userid']) || 
+			    ($row["nsfw"] == 1 && $me->getPref("hide_nsfw") == 1) || 
+			    ($row["tmbo"] == 1 && $me->getPref("hide_tmbo") == 1)) {
+				?>[ filtered ]<?
+			} else {
+				?><img src="<?= getThumbURL($row['id'], $row['filename'], $row['timestamp'], $row['type']) ?>"><?
+			}
+			?></a></td>
+			<td><a href="/offensive/?c=comments&fileid=<?= $row['id'] ?>" target="_blank"><?= $row['filename'] ?></a></td>
+			</tr><?
+		}
+		?></table></center><br />
+		<form action="<?= $_SERVER['PHP_SELF'] ?>" method="POST">
+			<input type="hidden" name="c" value="upload">
+			<input type="submit" name="killit" value="Cancel this upload."/>
+			<input type="submit" name="repost" value="Post it anyway."/>
+		</form>
+		</div>
+		</div>
+		<?
 		$_SESSION['postdata'] = serialize($postdata);
 		return true;
 	}
-}
-
-function checkSize($postdata) {
-	global $tmpdir;
 	
-	if(typeFor($postdata) != 'image' && typeFor($postdata) != 'avatar')
-		return false;
+	function checkDim($postdata) {
+		global $tmpdir;
 	
-	// this stuff is for extra large (uncompressed) images.  not sure if we care as much.
-	$filesize = filesize($tmpdir."/".$postdata['tmpname']);
+		// size only matters with images and avatars.
+		if(typeFor($postdata) != "image" && typeFor($postdata) != "avatar")
+			return false;
+		
+		$filesize = filesize($tmpdir."/".$postdata['tmpname']);
+		list($width, $height, $type, $attr) = getimagesize($tmpdir."/".$postdata['tmpname']);
+		
+		// sanity check
+		if(!is_numeric( $width ) || !is_numeric($height) || $width * $height == 0 ) {
+			box("something's wrong with this image...  it doesnt seem to be valid.", "oops.");
+			killUpload($postdata);
+			return true;
+		}
+		
+		// outright reject anything of the spaceball.gif variety
+		if($width < 5 && $height < 5) {
+			$message = "Why would you try to upload a $width x $height pixel image?";
+			box($message, "spaceballs alive!");
+			killUpload($postdata);
+			return true;
+		}
+		
+		// outrageous!
+		if($height > 1024 && $width > 1024) {
+			$message = "This image is rather large ($width x $height).<br />If you want, I can try resizing it for you.<br/><br/>
+			<form action=\"{$_SERVER['PHP_SELF']}\" method=\"POST\">
+				<input type=\"hidden\" name=\"c\" value=\"upload\">
+				<input type=\"submit\" name=\"killit\" value=\"Cancel this upload.\"/>
+				<input type=\"submit\" name=\"resize\" value=\"Resize it for me.\"/>
+				<input type=\"submit\" name=\"noresize\" value=\"Post it anyway.\"/>
+			</form>";
+			box($message, "good pic, but is there any reason why I need to view it on the Jumbotron?");
+			$_SESSION['postdata'] = serialize($postdata);
+			return true;
+		}
+	}
 	
-	list($width, $height, $type, $attr) = getimagesize($tmpdir."/".$postdata['tmpname']);
+	function checkSize($postdata) {
+		global $tmpdir;
+		
+		if(typeFor($postdata) != 'image' && typeFor($postdata) != 'avatar')
+			return false;
+		
+		// this stuff is for extra large (uncompressed) images.  not sure if we care as much.
+		$filesize = filesize($tmpdir."/".$postdata['tmpname']);
+		
+		list($width, $height, $type, $attr) = getimagesize($tmpdir."/".$postdata['tmpname']);
+		
+		$bytesPerPixel = 0.0;
+		$expectedFileSize = round(($width * $height * 0.2)/1024);
+		$bytesPerPixel = ( 1.0 * $filesize / (1.0 * $width * $height ) );
+		$filesize = round($filesize/1024);
+		
+		if($bytesPerPixel <= 0.45) return false;
+		
+		$message = "This image has a pretty big filesize for its dimensions. Expected file size: ${expectedFileSize}k. Your file: ${filesize}k.<br />If you want, I can resample it as an 80% quality JPG image.<br /><br />
+			<form action=\"{$_SERVER['PHP_SELF']}\" method=\"POST\">
+				<input type=\"hidden\" name=\"c\" value=\"upload\">
+				<input type=\"submit\" name=\"killit\" value=\"Cancel this upload.\"/>
+				<input type=\"submit\" name=\"resample\" value=\"Compress my file.\"/>
+				<input type=\"submit\" name=\"noresample\" value=\"Post it anyway.\"/>
+			</form>";
+		if($postdata['format'] == 'gif') $message .= "<br /><br />(If this is an animated gif, don't click the \"Compress\" button!)";
+		
+		box($message, "whoa, nelly");
+		$_SESSION['postdata'] = serialize($postdata);
+		return true;
+	}
 	
-	$bytesPerPixel = 0.0;
-	$expectedFileSize = round(($width * $height * 0.2)/1024);
-	$bytesPerPixel = ( 1.0 * $filesize / (1.0 * $width * $height ) );
-	$filesize = round($filesize/1024);
-	
-	if($bytesPerPixel <= 0.45) return false;
-	
-	$message = "This image has a pretty big filesize for its dimensions. Expected file size: ${expectedFileSize}k. Your file: ${filesize}k.<br />If you want, I can resample it as an 80% quality JPG image.<br /><br />
-		<form action=\"{$_SERVER['PHP_SELF']}\" method=\"POST\">
-			<input type=\"hidden\" name=\"c\" value=\"upload\">
-			<input type=\"submit\" name=\"killit\" value=\"Cancel this upload.\"/>
-			<input type=\"submit\" name=\"resample\" value=\"Compress my file.\"/>
-			<input type=\"submit\" name=\"noresample\" value=\"Post it anyway.\"/>
-		</form>";
-	if($postdata['format'] == 'gif') $message .= "<br /><br />(If this is an animated gif, don't click the \"Compress\" button!)";
-	
-	box($message, "whoa, nelly");
-	$_SESSION['postdata'] = serialize($postdata);
-	return true;
-}
-
-function killUpload($postdata) {
-	global $tmpdir;
-	unset($_SESSION['postdata']);
-	if(file_exists($tmpdir."/".$postdata['tmpname']))
-		unlink($tmpdir."/".$postdata['tmpname']);
-	uploadForm();
-}
+	function killUpload($postdata) {
+		global $tmpdir;
+		unset($_SESSION['postdata']);
+		if(file_exists($tmpdir."/".$postdata['tmpname']))
+			unlink($tmpdir."/".$postdata['tmpname']);
+		uploadForm();
+	}
 
 ?>

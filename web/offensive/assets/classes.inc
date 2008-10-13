@@ -221,8 +221,9 @@ class Upload {
 				 * grab the entire user row, to prevent a duplicate database call
 				 * from the User class
 				 */
-				$sql = "SELECT u.* FROM users u, offensive_uploads up 
-				        WHERE u.userid = up.userid AND up.id = ".$this->data["id"];
+				$sql = "SELECT u.* FROM users u
+				        JOIN offensive_uploads up ON up.userid = u.userid
+				        WHERE up.id = ".$this->id();
 				
 				$result = tmbo_query($sql);
 				if(mysql_num_rows($result) !== 1)
@@ -460,6 +461,7 @@ class Comment {
 		
 		// format and maybe support some amount of bbcode?
 		// booyeah.
+		return nl2br(linkUrls(htmlEscape($this->text())));
 	}
 	
 	public function upload() {

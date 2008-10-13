@@ -1,5 +1,8 @@
 <?
 
+require_once("offensive/assets/classes.inc");
+require_once('Zend/Search/Lucene.php');
+
 /*
  * return if a user is capable of voting on a file
  * there are two reason a user would not be able to vote:
@@ -8,12 +11,12 @@
  */
 function canVote($fileid, $userid=null) {
 	if($userid == null) $userid = $_SESSION['userid'];
-	
+
 	if(alreadyVoted($fileid, $userid)) return false;
-	
-	$sql = "SELECT userid FROM offensive_uploads WHERE id = $fileid and userid = $userid";
-	if(mysql_num_rows(tmbo_query($sql))) return false;
-	
+
+	$file = new Upload($fileid);
+	if($file->uploader()->id() == $userid) return false;
+
 	return true;
 }
 
@@ -43,7 +46,7 @@ function subscribe($fileid, $userid=null) {
 
 	// ensure file exists
 	$sql = "SELECT * FROM offensive_uploads WHERE id = $fileid";
-	if(mysql_num_rows(tmbo_query($sql)) == 0) send(false);
+	if(mysql_num_rows(tmbo_query($sql)) == 0) return false;
 
     // finally, subscribe
 	$sql = "INSERT INTO offensive_subscriptions (userid, fileid) VALUES ( $userid, $fileid )";
@@ -65,7 +68,7 @@ function unsubscribe($fileid, $userid=null) {
 
 function updateSubscriptions( $fileid, $commentid ) {
 	$sql = "UPDATE offensive_subscriptions SET commentid = $commentid 
-	        WHERE fileid = $fileid AND commentid IS NULL AND userid != ".$_SESSION['userid'];
+	        WHERE fileid = $fileid AND commentid IS NULL";
 	$result = tmbo_query( $sql );
 }
 
@@ -106,36 +109,58 @@ function getUnreadComments($userid) {
 	// maybe.
 }
 
-function postComment($fileid, $vote, $repost, $offensive, $comment) {
+function postComment($fileid, $vote, $repost, $offensive, $comment, $subscribe=null) {
+	global $me;
 	$userid = $_SESSION['userid'];
-	
+
 	// XXX: arg checking for non-incoming args?
 	if($vote != "this is good" && $vote != "this is bad" && $vote != "") {
 		trigger_error("invalid vote $vote", E_USER_ERROR);
 	}
-	
+
+	$comment = trim($comment);
+
 	// check to see if the fileid is valid
 	$sql = "SELECT filename, nsfw, tmbo, timestamp, type FROM offensive_uploads WHERE id=$fileid";
 	if(mysql_num_rows(tmbo_query( $sql )) == 0) trigger_error("invalid fileid ($fileid)", E_USER_ERROR);
-	
+
 	// prevent double-votes and self-voting
 	if(!canVote($fileid)) {
 		$vote = "";
-		$repost = 0;
-		$tmbo = 0;
 	}
-	
+
 	// prevent empty comments from being inserted
 	if(!($comment || $vote || $offensive || $repost)) {
-		return;
+		trigger_error("nothing to do", E_USER_NOTICE);
+		return false;
 	}
-	
+
 	// protect the changeblog
-	if($fileid == "211604" && $_SESSION['status'] != "admin") return;
+	if($fileid == "211604" && $_SESSION['status'] != "admin") {
+		trigger_error("user not allowed to post to changeblog", E_USER_NOTICE);
+		return false;
+	}
+
+	// prevent doubleposts, but only content doubleposts within 30 seconds
+	$sql = "SELECT id, fileid, timestamp, comment, NOW() as curtime 
+	        FROM offensive_comments 
+	        WHERE userid = $userid ORDER BY timestamp DESC LIMIT 1";
+	$res = tmbo_query($sql);
+	$row = mysql_fetch_assoc($res);
+	if($row['fileid'] == $fileid &&
+	   $row['comment'] == $comment && 
+	   $comment != "" &&
+	   strtotime($row['curtime']) - strtotime($row['timestamp']) < 60) {
+		trigger_error("caught doublepost", E_USER_NOTICE);
+		return false;
+	}
 
 	// sanitize the comment
-	if($comment) $comment = trim(sqlEscape($comment));
-	
+	if($comment) {
+		// escape it for sql if the comment is not empty
+		$comment = sqlEscape($comment);
+	}
+
 	// update the offensive_count_cache
 	$good_count = ($vote == "this is good") ? 1 : 0;
 	$bad_count = ($vote == "this is bad") ? 1 : 0;
@@ -149,19 +174,41 @@ function postComment($fileid, $vote, $repost, $offensive, $comment) {
 	        VALUES ( $userid, $fileid, '$comment', '$vote', $offensive, $repost, '".sqlEscape($_SERVER['REMOTE_ADDR'])."')";
 	tmbo_query($sql);
 	$commentid = mysql_insert_id();
-	
-	if($comment != false || $vote == "this is bad") {
-		subscribe($fileid);
-		if($comment != false && $commentid != 0) {
-			updateSubscriptions($fileid, $commentid);
-		} else if ($commentid == 0) {
-			trigger_error("commentid was 0?", E_USER_ERROR);
+
+	if($comment) {
+		// update all subscriptions
+		updateSubscriptions($fileid, $commentid);
+		// mark your own as read
+		clearSubscription($fileid, $me->id());
+		
+		$file = new Upload($fileid);
+
+		// if a comment exists, we have to index it for searching later.
+		$indexname = get_include_path()."/offensive/data/comments.idx";
+		if(!file_exists($indexname)) {
+			$index = Zend_Search_Lucene::create($indexname);
+		} else {
+			$index = Zend_Search_Lucene::open($indexname);
 		}
+		$doc = new Zend_Search_Lucene_Document();
+		$doc->addField(Zend_Search_Lucene_Field::Keyword('commentid', $commentid));
+		$doc->addField(Zend_Search_Lucene_Field::Text('fileid', $fileid));
+		$doc->addField(Zend_Search_Lucene_Field::Unstored('filename', $file->filename()));
+		$doc->addField(Zend_Search_Lucene_Field::Unstored('comment', $comment));
+	    $doc->addField(Zend_Search_Lucene_Field::Unstored('username', $me->username()));
+		$index->addDocument($doc);
 	}
+
+	// sometimes, subscribe the commenter.
+	if($comment || $vote == "this is bad" || $subscribe) {
+		subscribe($fileid);
+	}
+
+	return true;
 }
 
 function searchComments($q, $limit) {
-	// pending search fixes
+	// pending classification.
 }
 
 ?>
