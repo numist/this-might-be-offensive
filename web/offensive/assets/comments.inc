@@ -191,11 +191,16 @@ function postComment($fileid, $vote, $repost, $offensive, $comment, $subscribe=n
 			$index = Zend_Search_Lucene::open($indexname);
 		}
 		$doc = new Zend_Search_Lucene_Document();
+		
 		$doc->addField(Zend_Search_Lucene_Field::Keyword('commentid', $commentid));
 		$doc->addField(Zend_Search_Lucene_Field::Text('fileid', $fileid));
-		$doc->addField(Zend_Search_Lucene_Field::Unstored('filename', $file->filename()));
+		// comment-related data
 		$doc->addField(Zend_Search_Lucene_Field::Unstored('comment', $comment));
-	    $doc->addField(Zend_Search_Lucene_Field::Unstored('username', $me->username()));
+		$doc->addField(Zend_Search_Lucene_Field::Unstored('commenter', $me->username()));
+		// upload-related data
+		$doc->addField(Zend_Search_Lucene_Field::Unstored('filename', $file->filename()));
+		$doc->addField(Zend_Search_Lucene_Field::Unstored('uploader', $file->uploader()->username()));
+		
 		$index->addDocument($doc);
 	}
 
