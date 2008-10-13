@@ -19,7 +19,7 @@ function indexUpload($id, $filename, $username) {
 	}
 	$doc = new Zend_Search_Lucene_Document();
 	$doc->addField(Zend_Search_Lucene_Field::Keyword('fileid', $id));
-	$doc->addField(Zend_Search_Lucene_Field::Unstored('contents', $filename));
+	$doc->addField(Zend_Search_Lucene_Field::Unstored('filename', $filename));
     $doc->addField(Zend_Search_Lucene_Field::Unstored('username', $username));
 	$index->addDocument($doc);
 	$index->commit();

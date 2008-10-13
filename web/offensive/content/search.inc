@@ -51,6 +51,7 @@
 		} else {
 			$index = Zend_Search_Lucene::open($indexname);
 		}
+		Zend_Search_Lucene::setDefaultSearchField('comment');
 		Zend_Search_Lucene_Search_QueryParser::suppressQueryParsingExceptions();
 		$query = Zend_Search_Lucene_Search_QueryParser::parse($find);
 		$hits  = $index->find($query);
@@ -75,7 +76,7 @@
 
 		<div class="contentbox">
 			<div class="blackbar"></div>
-			<div class="heading">results <?= $start ?> - <?= ($end < count($hits) ? $end : count($hits)) ?> of <?= count($hits) ?>:</div>
+			<div class="heading">results <?= $start + 1 ?> - <?= ($end < count($hits) ? $end : count($hits)) ?> of <?= count($hits) ?>:</div>
 			<div class="bluebox">
 		<?
 		
@@ -160,6 +161,7 @@
 		} else {
 			$index = Zend_Search_Lucene::open($indexname);
 		}
+		Zend_Search_Lucene::setDefaultSearchField('filename');
 		Zend_Search_Lucene_Search_QueryParser::suppressQueryParsingExceptions();
 		$query = Zend_Search_Lucene_Search_QueryParser::parse($find);
 		$hits  = $index->find($query);
@@ -195,7 +197,7 @@
 
 		<div class="contentbox">
 			<div class="blackbar"></div>
-			<div class="heading">results <?= $start ?> - <?= ($end < count($hits) ? $end : count($hits)) ?> of <?= count($hits) ?>:</div>
+			<div class="heading">results <?= $start + 1 ?> - <?= ($end < count($hits) ? $end : count($hits)) ?> of <?= count($hits) ?>:</div>
 			<div class="bluebox">
 		<?
 		
