@@ -11,6 +11,11 @@
 	
 	$me = new User($_SESSION["userid"]);
 
+	if(array_key_exists("random", $_REQUEST)) {
+		header("Location: /offensive/pages/pic.php?id=".get_random_id());
+		exit;
+	}
+	
 	$id = "";
 	if(array_key_exists("id", $_REQUEST)) {
 		$id = $_REQUEST["id"];
@@ -18,11 +23,13 @@
 	
 	if(!is_numeric($id)) {
 		header( "Location: /offensive/" );
+		exit;
 	}
 
 	$upload = new Upload($id);
 	if($upload->type() == "topic") {
 		header("Location: /offensive/?c=comments&fileid=".$id);
+		exit;
 	}
 
 	// update the pickup cookie
@@ -42,7 +49,16 @@
 	}
 
 	function get_random_id() {
-		global $cookiepic, $me;
+		global $me;
+		
+		$cookiename = $me->id()."lastpic";
+		if(array_key_exists($cookiename, $_COOKIE)) {
+			$cookiepic = $_COOKIE[$cookiename];
+		} else {
+			// this should never happen, since in normal browsing you have to hit
+			// pic.php at least once with an id argument in order to use random.
+			$cookiepic = 0;
+		}
 		
 		/*
 		 * since pic.php sets the ipickup db preference and the pickupid in the cookie
@@ -142,7 +158,7 @@
                 	
 						case 191: // ?
 							e.preventDefault();
-							document.location.href = "/offensive/pages/pic.php?id=<?= get_random_id() ?>";
+							document.location.href = "/offensive/pages/pic.php?random";
 							return;
 							break;
                 	
@@ -221,7 +237,7 @@
 							}
 							?>
 							e.preventDefault();
-							document.location.href = "/offensive/pages/pic.php?id=<?= get_random_id() ?>";
+							document.location.href = "/offensive/pages/pic.php?random";
 							return;
 							break;
 							<?
