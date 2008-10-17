@@ -5,17 +5,22 @@
 
 
 	function tabs() {
-		global $activeTab;
+		global $activeTab, $me;
 ?>
 
 
 <div>
-	<div class="<?= cssFor('images') ?>"><a href="./">images</a></div>
-	<div class="<?= cssFor('discussions') ?>"><a href="./?c=discussions">discussions</a></div>
-	<div class="<?= cssFor('hof') ?>"><a href="./?c=hof">hall of fame</a></div>	
-	<div class="<?= cssFor('map') ?>"><a href="./?c=map">map</a></div>	
-	<div class="<?= cssFor('yearbook') ?>"><a href="./?c=yearbook">yearbook</a></div>	
-	<div class="<?= cssFor('search') ?>"><a href="./?c=search">search</a></div>	
+	<div class="<?= cssFor('images') ?>"><a href="/offensive/<? 
+		if($me) {
+			echo "?c=".(($me->getPref("index") == "thumbs") ? 
+	      "thumbs" : "main"); 
+		}
+	?>">images</a></div>
+	<div class="<?= cssFor('discussions') ?>"><a href="/offensive/?c=discussions">discussions</a></div>
+	<div class="<?= cssFor('hof') ?>"><a href="/offensive/?c=hof">hall of fame</a></div>	
+	<div class="<?= cssFor('map') ?>"><a href="/offensive/?c=map">map</a></div>	
+	<div class="<?= cssFor('yearbook') ?>"><a href="/offensive/?c=yearbook">yearbook</a></div>	
+	<div class="<?= cssFor('search') ?>"><a href="/offensive/?c=search">search</a></div>	
 
 	<div class="tabspacer">&nbsp;</div>
 </div>
