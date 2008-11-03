@@ -102,7 +102,7 @@ function loadmap()
 		var pos = new GControlPosition(G_ANCHOR_BOTTOM_LEFT, new GSize(200,5));
 		pos.apply(document.getElementById("map_edit"));
 		map.getContainer().appendChild(document.getElementById("map_edit"));
-		map.setCenter(new GLatLng(0,0), 1, G_SATELLITE_TYPE);
+		map.setCenter(new GLatLng(0,0), 1, G_SATELLITE_MAP);
 
 		var mgrOptions = { borderPadding: 5};
 		mgr = new MarkerManager(map, mgrOptions);
@@ -192,7 +192,7 @@ function editmap(user) {
 		map.addControl(new GLargeMapControl());
 		map.addControl(new GMapTypeControl());
 		map.enableScrollWheelZoom();
-		map.setCenter(new GLatLng(0,0), 1, G_SATELLITE_TYPE);
+		map.setCenter(new GLatLng(0,0), 1, G_SATELLITE_MAP);
 		
 		var pos = new GControlPosition(G_ANCHOR_BOTTOM_LEFT, new GSize(200,5));
 		pos.apply(document.getElementById("map_edit"));
@@ -218,7 +218,7 @@ function editmap(user) {
 				var userid = markers[i].getAttribute("userid");
 				var icon = maxxerIcon;
 				var point = new GLatLng(parseFloat(markers[i].getAttribute("lat")), parseFloat(markers[i].getAttribute("lon")));
-				map.setCenter(point,8,G_SATELLITE_TYPE);
+				map.setCenter(point,8,G_SATELLITE_MAP);
 				var marker = createMarker(point, name, userid, icon);
 				map.addOverlay(marker);
 			}
