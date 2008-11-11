@@ -32,20 +32,22 @@
 		exit;
 	}
 
-	// update the pickup cookie
-	$cookiename = $me->id()."lastpic";
-	if(!array_key_exists($cookiename, $_COOKIE) ||
-	   !is_numeric($_COOKIE[$cookiename]) ||
-	   $_COOKIE[$cookiename] < $upload->id()) {
-		setcookie( $cookiename, $upload->id(), time() + 3600*24*365*10, "/offensive/");
-		$cookiepic = $upload->id();
-	} else {
-		$cookiepic = $_COOKIE[$cookiename];
-	}
+	if($upload->type() == "image") {
+		// update the pickup cookie
+		$cookiename = $me->id()."lastpic";
+		if(!array_key_exists($cookiename, $_COOKIE) ||
+		   !is_numeric($_COOKIE[$cookiename]) ||
+		   $_COOKIE[$cookiename] < $upload->id()) {
+			setcookie( $cookiename, $upload->id(), time() + 3600*24*365*10, "/offensive/");
+			$cookiepic = $upload->id();
+		} else {
+			$cookiepic = $_COOKIE[$cookiename];
+		}
 				
-	// update the pickup db entry
-	if($me->getPref("ipickup") == false || $me->getPref("ipickup") < $upload->id()) {
-		$me->setPref("ipickup", $upload->id());
+		// update the pickup db entry
+		if($me->getPref("ipickup") == false || $me->getPref("ipickup") < $upload->id()) {
+			$me->setPref("ipickup", $upload->id());
+		}
 	}
 
 	function get_random_id() {
