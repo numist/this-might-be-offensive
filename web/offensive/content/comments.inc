@@ -33,12 +33,6 @@
 			exit;
 		}
 		
-		$usrid = $_SESSION['userid'];
-		$fileid = $_REQUEST['fileid'];
-		
-				
-		clearSubscription($fileid, $usrid);
-		
 		$upload = new Upload($fileid);
 		$uploader = $upload->uploader();
 
@@ -46,6 +40,25 @@
 			require("offensive/404.php");
 			exit;
 		}
+
+		clearSubscription($upload->id(), $me->id());
+
+		// update pickuplink for discussions
+	        if($upload->type() == "topic") {
+	                // update the pickup cookie
+        	        $cookiename = $me->id()."lasttopic";
+        	        if(!array_key_exists($cookiename, $_COOKIE) ||
+        	           !is_numeric($_COOKIE[$cookiename]) ||
+        	           $_COOKIE[$cookiename] < $upload->id()) {
+        	                setcookie( $cookiename, $upload->id(), time() + 3600*24*365*10, "/offensive/"); 
+        	        }
+
+        	        // update the pickup db entry
+        	        if($me->getPref("tpickup") == false || $me->getPref("tpickup") < $upload->id()) {
+        	                $me->setPref("tpickup", $upload->id());
+        	        }
+        	}
+
 	
 	    // check to see if someone's posting.  
 	    /* check if someone is being hoodwinked by a link in comments
