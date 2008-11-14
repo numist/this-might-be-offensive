@@ -515,9 +515,12 @@
 			<!--
 				image block
 			-->
-			<? if($me->squelched($upload->uploader()) || 
+			<? 
+			$tig2tib = $upload->goods() / ($upload->bads() > 0 ? $upload->bads() : 1);
+			if($me->squelched($upload->uploader()) || 
 			    ($upload->is_nsfw() == 1 && $me->getPref("hide_nsfw") == 1) || 
-			    ($upload->is_tmbo() == 1 && $me->getPref("hide_tmbo") == 1)) {
+			    ($upload->is_tmbo() == 1 && $me->getPref("hide_tmbo") == 1) ||
+			    ($tig2tib < (1/9) && $upload->bads() > 10)) {
 				?><div style="padding:128px;">[ <a id="imageLink" href="<?= $upload->URL() ?>" target="_blank">filtered</a>:<?
 					if($me->squelched($upload->uploader())) {
 						?> squelched <!-- <?= $upload->uploader()->id() ?> --><?
@@ -527,6 +530,9 @@
 					}
 					if($upload->is_tmbo() == 1 && $me->getPref("hide_tmbo") == 1) {
 						echo " tmbo";
+					}
+					if($tig2tib < (1/9)) {
+						echo " bad";
 					}
 				?> ]</div><?
 			} else { ?>
