@@ -188,7 +188,7 @@ function postComment($fileid, $vote, $repost, $offensive, $comment, $subscribe=n
 		subscribe($fileid);
 	}
 
-	return true;
+	return $commentid;
 }
 
 function searchComments($q, $limit) {

@@ -90,7 +90,14 @@ function api_getquickcommentbox() {
 	<div id="qc_comments">
 	<?php	// now fetch all the comments so you can see the comments in the quickcomment box
 	$comments = $upload->getComments();
-	$comments_exist = count($comments) > 0;
+	$comments_exist = false;
+	foreach($comments as $comment) {
+		if($comment->text() != '') {
+			$comments_exist = true;
+			break;
+		}
+	}
+	
 
 	if( $comments_exist ) {
 		$comments_heading = "the dorks who came before you said: ";
@@ -99,6 +106,8 @@ function api_getquickcommentbox() {
 		}
 		echo '<div id="qc_commentrows">';
 		foreach($comments as $comment) {
+			if($comment->text() == '')
+				continue;
 			$commenter = $comment->commenter();
 			echo '<div class="qc_comment">';
 			if(!$me->squelched($commenter)) {	

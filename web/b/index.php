@@ -18,7 +18,7 @@ function poast($comment, $image) {
 	global $me;
 	
 	$comment = new Comment($comment['commentid']);
-	if(!$me->squelched($comment['userid'])) {
+	if(!$me->squelched($comment->commenter()->id())) {
 		$com = $comment->HTMLcomment();
 		$com = explode("\n", $com);
 		if(count($com) <= 10) { 

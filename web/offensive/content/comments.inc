@@ -89,7 +89,7 @@
 			$subscribe	 = array_key_exists("subscribe", $_REQUEST) && $_REQUEST['subscribe'] != "" ?
 							1 : 0;
 			
-			postComment($fileid, $vote, $repost, $offensive, $comment, $subscribe);
+			$commentid = postComment($fileid, $vote, $repost, $offensive, $comment, $subscribe);
 
 			if( array_key_exists("redirect", $_REQUEST) ) {
 				header( "Location: /offensive/pages/pic.php?id=" . $_REQUEST['fileid'] );
@@ -97,7 +97,7 @@
 			}
 			
 			// redirecting to the same place prevents 'reload' from reposting the comment.
-			header( "Location: " . $_SERVER['PHP_SELF'] . "?c=comments&fileid=" . $_REQUEST['fileid'] . (isset($commentid) ? "#".$commentid : "") );
+			header( "Location: " . $_SERVER['PHP_SELF'] . "?c=comments&fileid=" . $_REQUEST['fileid'] . ( is_numeric($commentid) ? "#".$commentid : "") );
 			exit;
 		}
 	}

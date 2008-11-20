@@ -119,7 +119,7 @@ class Upload {
 				return $this->data[$element];
 			// if not, register an error.
 			trigger_error("$element requested from offensive_uploads table, but was not available",
-			              E_USER_WARNING);
+			              E_USER_ERROR);
 		}
 		return $this->data['exists'];
 	}
@@ -423,7 +423,6 @@ class Comment {
 		// if we haven't hit the db for this upload already, do it
 		if(($element == false || !array_key_exists($element, $this->data)) &&
 		   $this->data['exists'] === null) {
-			trigger_error("hitting database looking for $element", E_USER_WARNING);
 			// get information we need from the database.
 			$sql = "SELECT * FROM offensive_comments WHERE id = ".$this->data["id"];
 			$result = tmbo_query($sql);
@@ -445,7 +444,7 @@ class Comment {
 				return $this->data[$element];
 			// if not, register an error.
 			trigger_error("$element requested from offensive_comments table, but was not available",
-			              E_USER_WARNING);
+			              E_USER_ERROR);
 		}
 		return $this->data['exists'];
 	}
@@ -554,12 +553,12 @@ class Comment {
 				 * grab the entire user row, to prevent a duplicate database call
 				 * from the User class
 				 */
-				$sql = "SELECT u.* FROM users u, offensive_uploads up 
-				        WHERE u.userid = up.userid AND up.id = ".$this->data["id"];
+				$sql = "SELECT u.* FROM users u, offensive_comments com 
+				        WHERE u.userid = com.userid AND com.id = ".$this->data["id"];
 				
 				$result = tmbo_query($sql);
 				if(mysql_num_rows($result) !== 1)
-					trigger_error("user failure, user for this upload does not exist?", E_USER_ERROR);
+					trigger_error("user failure, user for this comment does not exist?", E_USER_ERROR);
 				$this->data["commenter"] = new User(mysql_fetch_assoc($result));
 			}
 		}
@@ -635,7 +634,7 @@ class User {
 				return $this->data[$element];
 			// if not, register an error.
 			trigger_error("$element requested from offensive_comments table, but was not available",
-			              E_USER_WARNING);
+			              E_USER_ERROR);
 		}
 		return $this->data['exists'];
 	}
