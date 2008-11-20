@@ -519,18 +519,23 @@
 			-->
 			<? 
 			$tig2tib = $upload->goods() / ($upload->bads() > 0 ? $upload->bads() : 1);
-			if($me->squelched($upload->uploader()) || 
-			    ($upload->is_nsfw() == 1 && $me->getPref("hide_nsfw") == 1) || 
-			    ($upload->is_tmbo() == 1 && $me->getPref("hide_tmbo") == 1)) {
+			$filter_squelch = $me->squelched($upload->uploader());
+			$filter_nsfw = $upload->is_nsfw() == 1 && $me->getPref("hide_nsfw") == 1;
+			$filter_tmbo = $upload->is_tmbo() == 1 && $me->getPref("hide_tmbo") == 1;
+			$filter_bad = $tig2tib < 1/9 && $upload->bads > 10 && $me->getPref("hide_bad") == 1;
+			if( $filter_squelch || $filter_nsfw || $filter_tmbo || $filter_bad ) {
 				?><div style="padding:128px;">[ <a id="imageLink" href="<?= $upload->URL() ?>" target="_blank">filtered</a>:<?
-					if($me->squelched($upload->uploader())) {
-						?> squelched <!-- <?= $upload->uploader()->id() ?> --><?
+					if($filter_squelch) {
+						echo " squelched <!-- ".$upload->uploader()->id()."-->";
 					}
-					if($upload->is_nsfw() == 1 && $me->getPref("hide_nsfw") == 1) {
+					if($filter_nsfw) {
 						echo " nsfw";
 					}
-					if($upload->is_tmbo() == 1 && $me->getPref("hide_tmbo") == 1) {
+					if($filter_tmbo) {
 						echo " tmbo";
+					}
+					if($filter_bad) {
+						echo " bad";
 					}
 				?> ]</div><?
 			} else { ?>

@@ -76,7 +76,7 @@
 
 	<div class="heading">browsing filters:</div>
 	<div class="bluebox">
-		<p>use these to filter out images tagged as nsfw or tmbo.</p>
+		<p>use the nsfw and tmbo filters to block images that are not safe for work or potentially offensive.  <br />use the bad filter if you trust the judgement of your fellow maxxers.  10 [this is bad] votes and a ratio of 9 bad for every [this is good] causes the bad filter to activate.</p>
 		<div style="text-align:center">
 			<span><?
 				if($me->getPref("hide_nsfw") == 1) { ?>
@@ -91,6 +91,14 @@
 					<a href="/offensive/setPref.php?p=hide_tmbo&v=">turn tmbo filter off</a>
 				<? } else { ?>
 					<a href="/offensive/setPref.php?p=hide_tmbo&v=1">turn tmbo filter on</a>
+				<? } ?>
+			</span>
+			
+			<span style="margin-left:48px;"><?
+				if($me->getPref("hide_bad") == 1) { ?>
+					<a href="/offensive/setPref.php?p=hide_bad&v=">turn bad filter off</a>
+				<? } else { ?>
+					<a href="/offensive/setPref.php?p=hide_bad&v=1">turn bad filter on</a>
 				<? } ?>
 			</span>
 		</div>
