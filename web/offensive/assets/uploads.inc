@@ -1,6 +1,6 @@
 <?
 
-require_once('Zend/Search/Lucene.php');
+// this file is pretty useless right now.  eventually I want to do something with it?
 
 function getUpload() {
 	
@@ -11,30 +11,7 @@ function postUpload() {
 }
 
 function indexUpload($id, $filename, $username) {
-	$indexname = get_include_path()."/offensive/data/uploads.idx";
-	if(!file_exists($indexname)) {
-		$index = Zend_Search_Lucene::create($indexname);
-	} else {
-		$index = Zend_Search_Lucene::open($indexname);
-	}
-	$doc = new Zend_Search_Lucene_Document();
-	$doc->addField(Zend_Search_Lucene_Field::Keyword('fileid', $id));
-	$doc->addField(Zend_Search_Lucene_Field::Unstored('filename', $filename));
-    $doc->addField(Zend_Search_Lucene_Field::Unstored('uploader', $username));
-	$index->addDocument($doc);
-	$index->commit();
-	$index->optimize();
-	unset($index);
-	
-	$indexname = get_include_path()."/offensive/data/comments.idx";
-	if(!file_exists($indexname)) {
-		$index = Zend_Search_Lucene::create($indexname);
-	} else {
-		$index = Zend_Search_Lucene::open($indexname);
-	}
-	$index->commit();
-	$index->optimize();
-	unset($index);
+	// um, yes.
 }
 
 function searchUploads($q) {
