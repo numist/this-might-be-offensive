@@ -89,9 +89,8 @@ function api_getquickcommentbox() {
 	</form>
 	<div id="qc_comments">
 	<?php	// now fetch all the comments so you can see the comments in the quickcomment box
-	$sql = "SELECT offensive_comments.*, offensive_comments.id as commentid, offensive_comments.timestamp AS comment_timestamp, users.* FROM offensive_uploads, offensive_comments, users WHERE users.userid = offensive_comments.userid AND offensive_uploads.id=fileid AND fileid = '$fileid' AND offensive_comments.comment != '' ORDER BY offensive_comments.timestamp ASC";
-	$result = tmbo_query( $sql );
-	$comments_exist = mysql_num_rows( $result ) > 0;
+	$comments = $upload->getComments();
+	$comments_exist = count($comments) > 0;
 
 	if( $comments_exist ) {
 		$comments_heading = "the dorks who came before you said: ";
@@ -99,27 +98,26 @@ function api_getquickcommentbox() {
 			echo "<b>$comments_heading</b>";
 		}
 		echo '<div id="qc_commentrows">';
-		while( $row = mysql_fetch_assoc( $result ) ) {
-			extract($row);
-			$comment = htmlEscape($comment);
+		foreach($comments as $comment) {
+			$commenter = $comment->commenter();
 			echo '<div class="qc_comment">';
-			if(!$me->squelched($userid)) {	
-				echo nl2br( linkUrls( $comment ) );
+			if(!$me->squelched($commenter)) {	
+				echo $comment->HTMLcomment();
 			} else {
 				echo "<div class='squelched'>[ squelched ]</div>";
 			}
 ?>
 			<br />
-			<div class="timestamp"><?= $comment_timestamp ?></div>
-			&raquo; <a href="/offensive/?c=user&userid=<?= $userid ?>"><?= $username ?></a>
+			<div class="timestamp"><?= $comment->timestamp() ?></div>
+			&raquo; <a href="/offensive/?c=user&userid=<?= $commenter->id() ?>"><?= $commenter->username() ?></a>
 <?php
-			if($vote != '') {
-				echo '<span class="vote">[ ' . $vote .' ]</span>';
+			if($comment->vote() != '') {
+				echo '<span class="vote">[ ' . $comment->vote() .' ]</span>';
 			}
-			if($offensive) {
+			if($comment->tmbo()) {
 				echo '<span class="vote"> [ this might be offensive ]</span>';
 			}
-			if($repost) {
+			if($comment->tiar()) {
 				echo '<span class="vote"> [ this is a repost ]</span>';
 			}
 			echo '</div>';

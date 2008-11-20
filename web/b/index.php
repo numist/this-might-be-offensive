@@ -17,9 +17,9 @@ $p = array_key_exists("p", $_REQUEST) ? $_REQUEST['p'] : 0 ;
 function poast($comment, $image) {
 	global $me;
 	
-	$com = $comment['comment'];
+	$comment = new Comment($comment['commentid']);
 	if(!$me->squelched($comment['userid'])) {
-		$com = linkUrls( $com );
+		$com = $comment->HTMLcomment();
 		$com = explode("\n", $com);
 		if(count($com) <= 10) { 
 			$com = implode("<br />", $com);

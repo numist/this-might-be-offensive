@@ -1,7 +1,6 @@
 <?
 
 require_once("offensive/assets/classes.inc");
-require_once('Zend/Search/Lucene.php');
 
 /*
  * return if a user is capable of voting on a file
@@ -181,27 +180,7 @@ function postComment($fileid, $vote, $repost, $offensive, $comment, $subscribe=n
 		// mark your own as read
 		clearSubscription($fileid, $me->id());
 		
-		$file = new Upload($fileid);
-
-		// if a comment exists, we have to index it for searching later.
-		$indexname = get_include_path()."/offensive/data/comments.idx";
-		if(!file_exists($indexname)) {
-			$index = Zend_Search_Lucene::create($indexname);
-		} else {
-			$index = Zend_Search_Lucene::open($indexname);
-		}
-		$doc = new Zend_Search_Lucene_Document();
-		
-		$doc->addField(Zend_Search_Lucene_Field::Keyword('commentid', $commentid));
-		$doc->addField(Zend_Search_Lucene_Field::Text('fileid', $fileid));
-		// comment-related data
-		$doc->addField(Zend_Search_Lucene_Field::Unstored('comment', $comment));
-		$doc->addField(Zend_Search_Lucene_Field::Unstored('commenter', $me->username()));
-		// upload-related data
-		$doc->addField(Zend_Search_Lucene_Field::Unstored('filename', $file->filename()));
-		$doc->addField(Zend_Search_Lucene_Field::Unstored('uploader', $file->uploader()->username()));
-		
-		$index->addDocument($doc);
+		// XXX: indexing new comments should be done here
 	}
 
 	// sometimes, subscribe the commenter.
@@ -213,7 +192,7 @@ function postComment($fileid, $vote, $repost, $offensive, $comment, $subscribe=n
 }
 
 function searchComments($q, $limit) {
-	// pending classification.
+	// pending classification, search.
 }
 
 ?>

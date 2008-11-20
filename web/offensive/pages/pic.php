@@ -8,6 +8,8 @@
 	require_once("offensive/assets/comments.inc");
 
 	mustLogIn();
+
+	time_start($ptime);
 	
 	$me = new User($_SESSION["userid"]);
 
@@ -519,8 +521,7 @@
 			$tig2tib = $upload->goods() / ($upload->bads() > 0 ? $upload->bads() : 1);
 			if($me->squelched($upload->uploader()) || 
 			    ($upload->is_nsfw() == 1 && $me->getPref("hide_nsfw") == 1) || 
-			    ($upload->is_tmbo() == 1 && $me->getPref("hide_tmbo") == 1) ||
-			    ($tig2tib < (1/9) && $upload->bads() > 10)) {
+			    ($upload->is_tmbo() == 1 && $me->getPref("hide_tmbo") == 1)) {
 				?><div style="padding:128px;">[ <a id="imageLink" href="<?= $upload->URL() ?>" target="_blank">filtered</a>:<?
 					if($me->squelched($upload->uploader())) {
 						?> squelched <!-- <?= $upload->uploader()->id() ?> --><?
@@ -530,9 +531,6 @@
 					}
 					if($upload->is_tmbo() == 1 && $me->getPref("hide_tmbo") == 1) {
 						echo " tmbo";
-					}
-					if($tig2tib < (1/9)) {
-						echo " bad";
 					}
 				?> ]</div><?
 			} else { ?>
@@ -544,9 +542,19 @@
 					<? } ?>
 				</div>
 			<? } ?>
-			<br/><br/>
+			<br/>
 		</div>
     	
+		<?
+		if($me->status() == "admin") {
+			?>
+			<br />
+		
+			<center><div style="color:#ccc;"><?= number_format(time_end($ptime), 3)."s php, ".number_format($querytime, 3)."s sql, $queries queries"; ?></div></center>
+			<?
+		}
+		?>
+		
 		<br />&nbsp;
     	
 		<? record_hit();

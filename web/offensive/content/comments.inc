@@ -7,8 +7,6 @@
 	require_once("offensive/assets/comments.inc");
 	require_once("offensive/assets/classes.inc");
 
-// XXX: [tpg] — allow current winner to vote current image as new winner if [tpg] tag exists
-
 	function additionalCssFor($vote) {
 		if(strpos($vote, 'bad') > 0) return " bad";
 		if(strpos($vote, 'good') > 0) return " good";
@@ -33,7 +31,7 @@
 			exit;
 		}
 		
-		$upload = new Upload($fileid);
+		$upload = new Upload($_REQUEST['fileid']);
 		$uploader = $upload->uploader();
 
 		if(!$upload->exists()) {
@@ -44,38 +42,32 @@
 		clearSubscription($upload->id(), $me->id());
 
 		// update pickuplink for discussions
-	        if($upload->type() == "topic") {
-	                // update the pickup cookie
-        	        $cookiename = $me->id()."lasttopic";
-        	        if(!array_key_exists($cookiename, $_COOKIE) ||
-        	           !is_numeric($_COOKIE[$cookiename]) ||
-        	           $_COOKIE[$cookiename] < $upload->id()) {
-        	                setcookie( $cookiename, $upload->id(), time() + 3600*24*365*10, "/offensive/"); 
-        	        }
+	    if($upload->type() == "topic") {
+	    	// update the pickup cookie
+        	$cookiename = $me->id()."lasttopic";
+        	if(!array_key_exists($cookiename, $_COOKIE) ||
+        	   !is_numeric($_COOKIE[$cookiename]) ||
+        	   $_COOKIE[$cookiename] < $upload->id()) {
+        		setcookie( $cookiename, $upload->id(), time() + 3600*24*365*10, "/offensive/"); 
+			}
 
-        	        // update the pickup db entry
-        	        if($me->getPref("tpickup") == false || $me->getPref("tpickup") < $upload->id()) {
-        	                $me->setPref("tpickup", $upload->id());
-        	        }
-        	}
+			// update the pickup db entry
+			if($me->getPref("tpickup") == false || $me->getPref("tpickup") < $upload->id()) {
+				$me->setPref("tpickup", $upload->id());
+			}
+        }
 
 	
 	    // check to see if someone's posting.  
-	    /* check if someone is being hoodwinked by a link in comments
-	     * or outside the site's borders. while we're at it, let them know.
+	    /* check if someone is being hoodwinked into voting by link.
 	     * NB: only works if the client is reporting REFERERS. 
-		 * NNBB: this code will allow cheater-voting on discussions, since 
-		 * that's an easter egg anyway.
 	     */
 	    if($upload->type() != 'topic' &&
-		   array_key_exists("submit", $_GET) && array_key_exists("HTTP_REFERER", $_SERVER) && 
-	       trim($_SERVER['HTTP_REFERER']) !== "" &&
-	       (strpos($_SERVER['HTTP_REFERER'], $_SERVER['SERVER_NAME']."/offensive/?c=comments&fileid=") !== false ||
-	       strpos($_SERVER['HTTP_REFERER'], $_SERVER['SERVER_NAME']."/offensive/index.php?c=comments&fileid=") !== false ||
-	       strpos($_SERVER['HTTP_REFERER'], "//".$_SERVER['SERVER_NAME']."/") === false)) {
-	        echo "you've been had.";
-	        trigger_error("link in discussions tried to vote", E_USER_WARNING);
-	        return;
+		   array_key_exists("submit", $_REQUEST) && array_key_exists("HTTP_REFERER", $_SERVER) && 
+	       $_SERVER['HTTP_REFERER'] !== "" && strpos($_SERVER['SERVER_NAME'], $_SERVER['HTTP_REFERER']) === false) {
+			echo "you've been had.";
+			trigger_error("off-site tried to vote on non-topic upload, referer: ".$_SERVER['HTTP_REFERER'], E_USER_WARNING);
+			return;
 	    }
 	    
 	    // quietly snub them if they are not an admin and they are trying to post to the changeblog
@@ -211,7 +203,7 @@
     	
 					// XXX: this output stuff all gets to change.
 					if(!$me->squelched($commenter)) {
-						echo nl2br(linkUrls(htmlEscape($comment->text())));
+						echo $comment->HTMLcomment();
 					}
 					else {
 						echo "<div class='squelched'>[ squelched ]</div>";

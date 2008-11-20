@@ -100,7 +100,7 @@ function tmbo_error_handler($errno, $errstr, $errfile, $errline, $errcontext) {
         }
 }
 set_error_handler("tmbo_error_handler");
-error_reporting(E_STRICT);
+error_reporting(E_STRICT | E_ALL);
 
 /* timezone error fix applies to all pages */
 date_default_timezone_set("America/Los_Angeles");

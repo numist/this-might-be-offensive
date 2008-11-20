@@ -1,39 +1,20 @@
 <?
 
-
-
+// XXX: this public function may be up for deprecation
 function linkUrls( $input ) {
-
-	// replace urls with 'themaxx.com' in them with the current server name.
-	$p = "/(http[s]*:\/\/[w]*\.*)themaxx\.com/i";
-	$r = "\\1" . $_SERVER['SERVER_NAME'];
-	$domainSwapped = preg_replace( $p, $r, $input );
-	
-	// to prevent weird navigation things, do the same for tmbo.org
-	$p = "/(http[s]*:\/\/[w]*\.*)tmbo\.org/i";
-	$r = "\\1" . $_SERVER['SERVER_NAME'];
-	$domainSwapped = preg_replace( $p, $r, $domainSwapped );
-	
-	// aand thismight.be
-	$p = "/(http[s]*:\/\/[w]*\.*)thismight\.be/i";
-	$r = "\\1" . $_SERVER['SERVER_NAME'];
-	$domainSwapped = preg_replace( $p, $r, $domainSwapped );
-	
-	$pattern = "/(http[s]*:\/\/[^\s<>]+)/i";
-	$replacement = "<a href=\"\\1\">\\1</a>";
-	return preg_replace( $pattern, $replacement, $domainSwapped );
+	trigger_error("deprecated: use Comment::HTMLcomment() from now on.", E_USER_ERROR);
 }
 
 function sqlEscape($string) {
 	if(ini_get("magic_quotes_gpc")) {
 		$string = str_replace( "\\'", "'", $string );
-		$string = str_replace( "\\\"", "\"", $string );
+		$string = str_replace( '\\"', '"', $string );
 	}
 	return mysql_real_escape_string($string);
 }
 
 function htmlEscape($string) {
-	return str_replace(array("<", ">", "\"", "'"), 
+	return str_replace(array("<", ">", '"', "'"), 
 	                   array("&lt;", "&gt;", "&quot;", "&#39;"),
 	                   preg_replace("/&(?!#)/", 
 	                                "&amp;", 
@@ -217,6 +198,7 @@ function commentLabel($comments, $good, $bad, $tmbo, $votes=true) {
 	return $retval;
 }
 
+// XXX: fix: missing blackbar
 function box($message, $title="hmm:") {
 	?>
 		<div class="heading"><?= $title ?></div>
@@ -233,6 +215,7 @@ function box($message, $title="hmm:") {
  *  * array(filename, nsfw, tmbo, type) (numerically indexed)
  *  * array containing keys filename, nsfw, tmbo, type (like a row from the db)
  */
+// XXX: to be deprecated!
 function htmlFilename($id, $showtype=false) {
 	if(!is_numeric($id) && !is_array($id)) {
 		trigger_error("htmlFilename: ".var_info($id)." is not a number nor array!", E_USER_WARNING);
@@ -277,7 +260,7 @@ function htmlFilename($id, $showtype=false) {
 	return tagsHtml( $tags ) . htmlEscape($filename);
 }
 
-function tagsHtml( $tags ) {
+function tagsHtml( $tags ) { // XXX: is this ever called?
 	return count( $tags ) > 0 ? "<span class=\"tags\">" . implode( "", $tags ) . "</span> " : "";
 }
 

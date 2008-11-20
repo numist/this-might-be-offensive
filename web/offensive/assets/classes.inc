@@ -11,7 +11,7 @@ From a usability perspective, it's completely possible to take an upload and fin
 yearbook image by traversing $upload->getComments()[0]->commenter()->yearbook(); aside from PHP's
 inability to execute the getComments()[0] portion of the code, this will work perfectly well.
 
-From a performance perspective, this code does a lot of caching, and reduces the number of database
+From a performance perspective, this code aggressively caches, and reduces the number of database
 calls necessary to fetch data.  All public functions should not incur a database call after the
 first call.  for example, $upload->exists() might go to the database the first time it is called,
 but afterwards the result is cached, so all future calls to $upload->exists() will complete
@@ -21,34 +21,40 @@ contains additional information (in the case of $upload->exists(), you would als
 filename, is_tmbo, is_nsfw, timestamp, etc cached).  Second, this increases the likelihood of
 MySQL experiencing a database cache hit, which also speeds things up considerably.
 
-XXX: In the future, these objects may also be stored globally, so if there are multiple objects
-representing the same user (for example) they will all share the same data.
+In addition, the data store for these classes is centralized, so an object made in one function
+that gets data for Fipi Lele will load data from the database, and then future User objects for
+Fipi Lele will also take advantage of this data, and will not require futher calls to the database.
+
+The constructors for the classes accept arrays as input, which allow for prepopulation of the data
+store, for cases like the comments page, where an upload, its comments, and the comments' users
+all must be loaded from the database.
 */
 
 class Upload {
-	private $data = array();
-	private $exists = null;
+	private static $gdata = array();
+	private $data;
 	
 	public function __construct($info) {
 		/*
-		 * info must be an id or a database row array
-		 * to include user information, the database row can include
-		 * user_* columns that correspond to rows in the users table.
-		 * if the argument array contains any user_* elements, it MUST
-		 * include a user_userid element.
+		 * info must be an id or aggregate array.  for more information about aggregate arrays,
+		 * see this file's header comment.  the Upload class supports the following nested
+		 * aggregate arrays:
+		 * 		* User data with keys prefixed by user_
 		 */
 		if(is_array($info)) {
 			if(!array_key_exists("id", $info))
 				trigger_error("cannot prepopulate an Upload object without an id", E_USER_ERROR);
-			/*
-			 * prepopulate with everything.
-			 * this trusts other portions of the code to DO THE RIGHT THING
-			 * that might change if there are issues with location, yearbook, or posse
-			 */
+			
+			// set up the object alias for this object's data in the global data structure
+			if(!array_key_exists($info['id'], self::$gdata)) {
+				// create if it doesn't already exist
+				self::$gdata[$info['id']] = array('exists' => null);
+			}
+			$this->data =& self::$gdata[$info['id']];
 			
 			/*
 			 * strip out keys that start with user_ into their own array,
-			 * to be used to prepopulate a User object to go with this Upload object
+			 * to be used to prepopulate a member User object in this Upload object
 			 */
 			$userarr = array();
 			foreach($info as $key => $val) {
@@ -60,9 +66,10 @@ class Upload {
 			}
 			
 			/*
-			 * rescue the userid from the data as well, this will help
-			 * avoid the failure case where user data not including the userid
-			 * is included in the incoming data.
+			 * grab the userid from the data as well, if available.  this will help
+			 * rescue the failure case where user data not including the userid
+			 * is included in the incoming data, which would cause it to be discarded
+			 * and an error generated.
 			 */
 			if(array_key_exists("userid", $this->data))
 				$userarr["userid"] = $this->data["userid"];
@@ -71,36 +78,42 @@ class Upload {
 			if(count($userarr) > 0) {
 				$this->data["uploader"] = new User($userarr);
 			}
-		} else if(is_numeric($info) && strpos($info, ".") === false) {
-			$this->data = array("id" => $info);
+		}
+		/* it's a little silly that this conditional is the best way I can
+		 * think of to test if a variable of any type is losslessly castable
+		 * to an int (or already an int).  is_int() should be smarter.
+		 */
+		else if(is_numeric($info) && $info == (int)$info) {
+			if(!array_key_exists($info, self::$gdata)) {
+				self::$gdata[$info] = array('exists' => null);
+			}
+			$this->data =& self::$gdata[$info];
+			$this->data['id'] = $info;
 		} else {
 			trigger_error("type mismatch: constructor argument must be an integer or array", E_USER_ERROR);
 		}
 	}
 	
 	private function getUploadRow($element=false) {
-		// try to close requests via cache immediately if possible
-		if($element && array_key_exists($element, $this->data))
-			return $this->data[$element];
-		
 		// if we haven't hit the db for this upload already, do it
-		if($this->exists === null) {
+		if(($element == false || !array_key_exists($element, $this->data)) &&
+		   $this->data['exists'] === null) {
 			// get information we need from the database.
 			$sql = "SELECT * FROM offensive_uploads WHERE status = 'normal' AND id = ".$this->data["id"];
 			$result = tmbo_query($sql);
 			
 			// if the upload doesn't exist...  well what can we do?
 			if(mysql_num_rows($result) != 1) {
-				$this->exists = false;
+				$this->data['exists'] = false;
 			} else {
 				$row = mysql_fetch_assoc($result);
 				foreach($row as $key => $val) {
 					$this->data[$key] = $val;
 				}
-				$this->exists = true;
+				$this->data['exists'] = true;
 			}
 		}
-		// now we should have enough information for element queries
+		// fulfil the query
 		if($element) {
 			if(array_key_exists($element, $this->data))
 				return $this->data[$element];
@@ -108,7 +121,7 @@ class Upload {
 			trigger_error("$element requested from offensive_uploads table, but was not available",
 			              E_USER_WARNING);
 		}
-		return $this->exists;
+		return $this->data['exists'];
 	}
 	
 	public function exists() {
@@ -145,15 +158,14 @@ class Upload {
 		return $this->getUploadRow("type");
 	}
 	
-	// the status column is DEPRECATED and WILL be removed at a later point.
 	public function status() {
 		return $this->getUploadRow("status");
 	}
 	
 	/*
-	 * functions that deal with comments and votes
+	 * functions that deal with comment and vote information that are
+	 * stored in the offensive_count_cache
 	 */
-	// this function will error the entire script if you make a bad call against it!
 	private function getCacheRow($element) {
 		// try to close requests immediately if they are simple element queries
 		if(!array_key_exists($element, $this->data)) {
@@ -171,12 +183,12 @@ class Upload {
 				$this->data[$key] = $val;
 			}
 		}
-        
+      
 		if(array_key_exists($element, $this->data))
 			return $this->data[$element];
 		// if not, register an error.
 		trigger_error("$element requested from offensive_count_cache table, but was not available",
-		              E_USER_WARNING);
+		              E_USER_ERROR);
 	}
 	
 	public function goods() {
@@ -226,8 +238,13 @@ class Upload {
 				        WHERE up.id = ".$this->id();
 				
 				$result = tmbo_query($sql);
-				if(mysql_num_rows($result) !== 1)
+				
+				/* this error should be impossible.  if we ever hit it, we have a
+				 * datastore inconsistency problem on our hands. */
+				if(mysql_num_rows($result) !== 1) {
 					trigger_error("user failure, user for this upload does not exist?", E_USER_ERROR);
+				}
+				
 				$this->data["uploader"] = new User(mysql_fetch_assoc($result));
 			}
 		}
@@ -242,8 +259,12 @@ class Upload {
 		if(!array_key_exists("comments", $this->data)) {
 			$this->data["comments"] = array();
 			
-			$sql = "SELECT com.*, u.userid AS user_userid, u.username AS user_username,
-			        u.account_status AS user_account_status
+			$sql = "SELECT com.*,
+			               u.userid AS user_userid,
+			               u.username AS user_username,
+			               u.created AS user_created,
+			               u.account_status AS user_account_status,
+			               u.timestamp AS user_timestamp
 			        FROM offensive_comments com, users u
 			        WHERE u.userid = com.userid AND fileid = ".$this->data["id"].
 			       " ORDER BY timestamp ASC";
@@ -329,6 +350,7 @@ class Upload {
 	}
 
 	public function htmlFilename($showtype=false) {
+		// XXX: eventually htmlFilename should reside inside this function, not callable from outside.
 		$arg = array(
 			"filename" => $this->filename(),
 			"nsfw" => $this->is_nsfw(),
@@ -340,28 +362,31 @@ class Upload {
 }
 
 class Comment {
+	private static $gdata = array();
 	private $data = array();
-	private $exists = null;
 	
 	public function __construct($info) {
+		$this->data = array();
 		/*
-		 * info must be an id or a database row array
-		 * to include user information, the database row can include
-		 * user_* columns that correspond to rows in the users table.
-		 * if the argument array contains any user_* elements, it MUST
-		 * include a user_userid element.
+		 * info must be an id or aggregate array.  for more information about aggregate arrays,
+		 * see this file's header comment.  the Comment class supports the following nested
+		 * aggregate arrays:
+		 * 		* User data with keys prefixed by user_
 		 */
 		if(is_array($info)) {
 			if(!array_key_exists("id", $info))
 				trigger_error("cannot prepopulate a Comment object without an id", E_USER_ERROR);
-			/*
-			 * prepopulate with everything.
+
+			/* prepopulate with everything.
 			 * this trusts other portions of the code to DO THE RIGHT THING
 			 * that might change if there are issues with location, yearbook, or posse
 			 */
-			
-			/*
-			 * strip out keys that start with user_ into their own array,
+			if(!array_key_exists($info['id'], self::$gdata)) {
+				self::$gdata[$info['id']] = array('exists' => null);
+			}
+			$this->data =& self::$gdata[$info['id']];
+
+			/* strip out keys that start with user_ into their own array,
 			 * to be used to prepopulate a User object to go with this Upload object
 			 */
 			$userarr = array();
@@ -372,20 +397,22 @@ class Comment {
 					$this->data[$key] = $val;
 				}
 			}
-			
-			/*
-			 * rescue the userid from the data as well, this will help
+
+			/* rescue the userid from the data as well, this will help
 			 * avoid the failure case where user data not including the userid
 			 * is included in the incoming data.
 			 */
-			if(array_key_exists("userid", $this->data))
+			if(array_key_exists("userid", $this->data)) {
 				$userarr["userid"] = $this->data["userid"];
-				
-			// if we found any user data, create a User object from it.
+			}
 			if(count($userarr) > 0) {
 				$this->data["commenter"] = new User($userarr);
 			}
-		} else if(is_numeric($info) && strpos($info, ".") === false) {
+		} else if(is_numeric($info) && $info == (int)$info) {
+			if(!array_key_exists($info, self::$gdata)) {
+				self::$gdata[$info] = array('exists' => null);
+			}
+			$this->data =& self::$gdata[$info];
 			$this->data = array("id" => $info);
 		} else {
 			trigger_error("type mismatch: constructor argument must be an integer or array", E_USER_ERROR);
@@ -393,28 +420,26 @@ class Comment {
 	}
 	
 	private function getCommentRow($element=false) {
-		// try to close requests via cache immediately if possible
-		if($element && array_key_exists($element, $this->data))
-			return $this->data[$element];
-		
 		// if we haven't hit the db for this upload already, do it
-		if($this->exists === null) {
+		if(($element == false || !array_key_exists($element, $this->data)) &&
+		   $this->data['exists'] === null) {
+			trigger_error("hitting database looking for $element", E_USER_WARNING);
 			// get information we need from the database.
 			$sql = "SELECT * FROM offensive_comments WHERE id = ".$this->data["id"];
 			$result = tmbo_query($sql);
 			
 			// if the upload doesn't exist...  well what can we do?
 			if(mysql_num_rows($result) != 1) {
-				$this->exists = false;
+				$this->data['exists'] = false;
 			} else {
 				$row = mysql_fetch_assoc($result);
 				foreach($row as $key => $val) {
 					$this->data[$key] = $val;
 				}
-				$this->exists = true;
+				$this->data['exists'] = true;
 			}
 		}
-		// now we should have enough information for element queries
+		// fulfil the query
 		if($element) {
 			if(array_key_exists($element, $this->data))
 				return $this->data[$element];
@@ -422,7 +447,7 @@ class Comment {
 			trigger_error("$element requested from offensive_comments table, but was not available",
 			              E_USER_WARNING);
 		}
-		return $this->exists;
+		return $this->data['exists'];
 	}
 	
 	public function id() {
@@ -438,13 +463,40 @@ class Comment {
 	}
 	
 	public function tmbo() {
-		// XXX: this should eventually return a boolean
-		return $this->getCommentRow("offensive");
+		/* the database requires sanitization and type enforcement:
+		 *
+		 * mysql> select distinct offensive from offensive_comments;
+		 * +-----------+
+		 * | offensive |
+		 * +-----------+
+		 * |         0 | 
+		 * |         1 | 
+		 * |      NULL | 
+		 * +-----------+
+		 * 3 rows in set (12.21 sec)
+		 *
+		 * thus this code is more clever than it really should need to.
+		 */
+		
+		return (1 == $this->getCommentRow("offensive") ? true : false);
 	}
 	
 	public function tiar() {
-		// XXX: this should eventually return a boolean
-		return $this->getCommentRow("repost");
+		/* the database requires sanitization and type enforcement:
+		 *
+		 * 	mysql> select distinct repost from offensive_comments;
+		 *  +--------+
+		 *  | repost |
+		 *  +--------+
+		 *  |   NULL | 
+		 *  |      1 | 
+		 *  |      0 | 
+		 *  +--------+
+		 *  3 rows in set (14.39 sec)
+		 *
+		 * thus this code is more clever than it really should need to.
+		 */
+		return (1 == $this->getCommentRow("repost") ? true : false);
 	}
 	
 	public function timestamp() {
@@ -456,12 +508,29 @@ class Comment {
 	}
 	
 	public function HTMLcomment() {
-		$comment = $this->comment();
+		$comment = $this->text();
 		if($comment == "") return "";
 		
-		// format and maybe support some amount of bbcode?
-		// booyeah.
-		return nl2br(linkUrls(htmlEscape($this->text())));
+		$comment = htmlEscape($comment);
+		
+		// URLS from tmbo domains should all point to the one the user is currently using
+		$p = array("/http[s]?:\\/\\/([a-zA-z0-9]*\\.)*themaxx\\.com/i",
+		           "/http[s]?:\\/\\/([a-zA-z0-9]*\\.)*tmbo\\.org/i",
+		           "/http[s]?:\\/\\/([a-zA-z0-9]*\\.)*thismight\\.be/i",
+		          );
+		// whether the user is browsing http or https should also be respected
+		$r = "http".
+			 (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == "on" ? "s" : "").
+			 "://".$_SERVER['SERVER_NAME'];
+		$comment = preg_replace( $p, $r, $comment );
+		// linkify all bare URLs
+		$p = '/(http[s]?:\\/\\/[^\s<>]+)/i';
+		$r = '<a href="$1" title="$1">$1</a>';
+		$comment = preg_replace( $p, $r, $comment );
+
+		$comment = nl2br($comment);
+				
+		return $comment;
 	}
 	
 	public function upload() {
@@ -497,13 +566,18 @@ class Comment {
 		
 		return $this->data["commenter"];
 	}
-	
 }
 
 class User {
-	private $data = array();
-	private $exists = null;
+	private static $gdata = array();
+	private $data;
 	
+	/*
+	 * info must be an id or aggregate array.  for more information about aggregate arrays,
+	 * see this file's header comment.  the User class supports the following nested
+	 * aggregate arrays:
+	 * 		* none.
+	 */
 	public function __construct($info) {
 		if(is_array($info)) {
 			if(!array_key_exists("userid", $info))
@@ -513,9 +587,20 @@ class User {
 			 * this trusts other portions of the code to DO THE RIGHT THING
 			 * that might change if there are issues with location, yearbook, or posse
 			 */
-			$this->data = $info;
-		} else if(is_numeric($info) && strpos($info, ".") === false) {
-			$this->data = array("userid" => $info);
+			if(!array_key_exists($info['userid'], self::$gdata)) {
+				self::$gdata[$info['userid']] = array('exists' => null);
+			}
+			$this->data =& self::$gdata[$info['userid']];
+			
+			foreach($info as $key => $val) {
+				$this->data[$key] = $val;
+			}
+		} else if(is_numeric($info) && $info == (int)$info) {
+			if(!array_key_exists($info, self::$gdata)) {
+				self::$gdata[$info] = array('exists' => null);
+			}
+			$this->data =& self::$gdata[$info];
+			$this->data['userid'] = $info;
 		} else {
 			trigger_error("type mismatch: constructor argument must be an integer or array", E_USER_ERROR);
 		}
@@ -525,28 +610,26 @@ class User {
 	 * in the users table belonging to this user.
 	 */
 	private function getUserRow($element=false) {
-		// try to close requests via cache immediately if possible
-		if($element && array_key_exists($element, $this->data))
-			return $this->data[$element];
-		
 		// if we haven't hit the db for this upload already, do it
-		if($this->exists === null) {
+		if(($element == false || !array_key_exists($element, $this->data)) &&
+		   $this->data['exists'] === null) {
 			// get information we need from the database.
 			$sql = "SELECT * FROM users WHERE userid = ".$this->data["userid"];
 			$result = tmbo_query($sql);
 			
 			// if the upload doesn't exist...  well what can we do?
 			if(mysql_num_rows($result) != 1) {
-				$this->exists = false;
+				$this->data['exists'] = false;
 			} else {
 				$row = mysql_fetch_assoc($result);
 				foreach($row as $key => $val) {
 					$this->data[$key] = $val;
 				}
-				$this->exists = true;
+				$this->data['exists'] = true;
 			}
 		}
-		// now we should have enough information for element queries
+		
+		// fulfil the query
 		if($element) {
 			if(array_key_exists($element, $this->data))
 				return $this->data[$element];
@@ -554,7 +637,7 @@ class User {
 			trigger_error("$element requested from offensive_comments table, but was not available",
 			              E_USER_WARNING);
 		}
-		return $this->exists;
+		return $this->data['exists'];
 	}
 	
 	public function exists() {
@@ -669,7 +752,7 @@ class User {
 	public function squelched($target) {
 		if(is_object($target)) {
 			$target = $target->id();
-		} else if(!is_numeric($target) || strpos($target, ".") !== false) {
+		} else if(!is_numeric($target) || $target != (int)$target) {
 			trigger_error("target must be a userid or User object", E_USER_ERROR);
 		}
 		
@@ -693,7 +776,7 @@ class User {
 		// make sure user exists and all that
 		if(is_object($target)) {
 			$target = $target->id();
-		} else if(!is_numeric($target) || strpos($target, ".") !== false) {
+		} else if(!is_numeric($target) || $target != (int)$target) {
 			trigger_error("target must be a userid or User object", E_USER_ERROR);
 		} else {
 			$obj = new User($target);
@@ -718,7 +801,7 @@ class User {
 		// make sure user exists and all that
 		if(is_object($target)) {
 			$target = $target->id();
-		} else if(!is_numeric($target) || strpos($target, ".") !== false) {
+		} else if(!is_numeric($target) || $target != (int)$target) {
 			trigger_error("target must be a userid or User object", E_USER_ERROR);
 		} else {
 			$obj = new User($target);

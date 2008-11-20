@@ -14,6 +14,8 @@ $prefnames = array(
 	"index",
 	// pickup id for images
 	"ipickup",
+	// and pickup id for topics
+	"tpickup",
 	
 	// key commands:
 	// vote good
