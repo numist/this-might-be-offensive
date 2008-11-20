@@ -36,7 +36,8 @@
 
 	 	$threadid = mysql_insert_id();
 
-		indexUpload($threadid, $topic, $me->username());
+		// XXX: index the upload
+		//indexUpload($threadid, $topic, $me->username());
 
 		return $threadid;
 

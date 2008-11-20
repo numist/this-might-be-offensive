@@ -7,7 +7,6 @@
 	require_once( "offensive/getid3/getid3.php");
 	require_once( 'admin/mysqlConnectionInfo.inc' );
 	if(!isset($link) || !$link) $link = openDbConnection();
-	require_once('offensive/assets/uploads.inc');
 	
 
 	$tmpdir = "quarantine";
@@ -387,7 +386,8 @@
 		$sql = "UPDATE offensive_uploads SET status = 'normal' where id = $fileid";
 		tmbo_query($sql);
 		
-		indexUpload($fileid, $postdata['filename'], $me->username());
+		// XXX: index here
+		//indexUpload($fileid, $postdata['filename'], $me->username());
 
 		$message = "<p>
 			Thanks. Your upload can be viewed <a href=\"./pages/pic.php?id=$fileid\">here</a>.
