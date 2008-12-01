@@ -258,4 +258,18 @@ function byte_format($size, $digits=0) {
 	}
 }
 
+function me() {
+	global $me;
+	// get the User object for the logged-in user
+	if(is_object($me)) return $me;
+	
+	if(array_key_exists('userid', $_SESSION)) {
+		$me = new User($_SESSION['userid']);
+		return $me;
+	}
+	
+	trigger_error("user not discernable", E_USER_WARNING);
+	return null;
+}
+
 ?>

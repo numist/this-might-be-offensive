@@ -155,6 +155,11 @@ function handle_comment_post(fileid, comment, vote, tmbo, repost) {
 	if(tmbo == undefined) tmbo = "0";
 	if(repost == undefined) repost = "0";
 	
+	// XXX: not really convinced of this solution.  this fixes the bug, but not the behaviour.
+	// we just clicked the 'go' button without selecting anything
+	if(comment == "" && (vote == "novote" || vote == "") && tmbo == 0 && repost == 0)
+		return;
+	
 	// post the submit data using ajax
 	$.post("/offensive/api.php/postcomment.php", {
 		  fileid: fileid,

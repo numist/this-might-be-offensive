@@ -43,7 +43,10 @@
 
 <?
 
-		$defaultSort = $me->getPref("disc_sortorder") ? $me->getPref("disc_sortorder") : "up.timestamp";
+		// XXX: refactor to match yearbook.inc
+		$defaultSort = $me->getPref("sortorder_discussions") ?
+		               $me->getPref("sortorder_discussions") :
+		               "up.timestamp";
 		
 		$order = isset($_REQUEST['order']) ? sqlEscape( $_REQUEST['order'] ) : $defaultSort;
 		
@@ -52,7 +55,7 @@
 		}
 
 		if( $order != $defaultSort ) {
-			$me->setPref("disc_sortorder", $order);
+			$me->setPref("sortorder_discussions", $order);
 		}
 
 		$numPerPage = 100;

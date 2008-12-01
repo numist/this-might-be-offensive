@@ -487,7 +487,7 @@
 			trigger_error("hash was < 15 chars!  how?!\n".var_dump($postdata), E_USER_ERROR);
 		}
 	
-		$sql = "SELECT id, filename, timestamp, type, nsfw, tmbo, userid
+		$sql = "SELECT *
 				FROM offensive_uploads 
 				WHERE hash = '$hash' AND type != 'avatar'
 				ORDER by timestamp DESC";
@@ -503,20 +503,28 @@
 		<br /><center>
 		<table><?
 		while($row = mysql_fetch_assoc($result)) {
+			$upload = new Upload($row);
 			$css = (isset($css) && $css == "even_row") ? "odd_row" : "even_row";
 			
-			$repdate = strtotime($row['timestamp']);
 			?><tr class="<?= $css ?>">
-			<td><a href="/offensive/pages/pic.php?id=<?= $row['id'] ?>" target="_blank"><?
-			if($me->squelched($row['userid']) || 
-			    ($row["nsfw"] == 1 && $me->getPref("hide_nsfw") == 1) || 
-			    ($row["tmbo"] == 1 && $me->getPref("hide_tmbo") == 1)) {
-				?>[ filtered ]<?
-			} else {
-				?><img src="<?= getThumbURL($row['id'], $row['filename'], $row['timestamp'], $row['type']) ?>"><?
-			}
-			?></a></td>
-			<td><a href="/offensive/?c=comments&fileid=<?= $row['id'] ?>" target="_blank"><?= $row['filename'] ?></a></td>
+			<td height="100px" width="100px">
+			
+			
+			
+			<a href="pages/pic.php?id=<?= $upload->id() ?>"
+				<? if($upload->filtered()) { ?>
+					onMouseOver='changesrc("th<?= $upload->id()?>","<?= $upload->thumbURL() ?>")'
+			 		onMouseOut='changesrc("th<?= $upload->id() ?>","/offensive/graphics/th-filtered.gif")'
+				<? } ?>
+			><img name="th<?= $upload->id()?>"
+				src="<?= $upload->filtered()
+					? "/offensive/graphics/th-filtered.gif" 
+					: $upload->thumbURL() ?>"
+			/></a>
+			
+			
+			</td>
+			<td><a href="/offensive/?c=comments&fileid=<?= $upload->id(); ?>" target="_blank"><?= htmlEscape($upload->filename()) ?></a></td>
 			</tr><?
 		}
 		?></table></center><br />

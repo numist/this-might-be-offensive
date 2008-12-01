@@ -33,15 +33,29 @@
 	}
 
 	function yearbook() {
+		global $me;
+		
+		// get the default from user prefs
+		$defaultSort = $me->getPref("sortorder_yearbook") ?
+		               $me->getPref("sortorder_yearbook") :
+		               "username";
 
-		$order = array_key_exists("sort", $_REQUEST) && $_REQUEST['sort'] == 'date' ? 
-		         'up.timestamp DESC' :
-			 'username';
+		// see if we're trying to change it
+		$order = array_key_exists("sort", $_REQUEST) ? $_REQUEST['sort'] : $defaultSort;
+		$req = array_key_exists("sort", $_REQUEST) ? $_REQUEST['sort'] : '';
+		
+		// set up the query ordering
+		$sort = ($order == 'date' ? 'up.timestamp DESC' : 'username');
+		
+		// if the sort order was changed, save it
+		if($order != $defaultSort) {
+			$me->setPref("sortorder_yearbook", $order);
+		}
 
-		if( $order == 'username' ) {
-			?><b><a href="./?c=yearbook&sort=date">sort by date</a></b><?
-		} else {
+		if($req == 'date') {
 			?><b><a href="./?c=yearbook">sort by username</a></b><?
+		} else {
+			?><b><a href="./?c=yearbook&sort=date">sort by date</a></b><?
 		}
 ?>
 
@@ -59,7 +73,7 @@
 		}
 		$start = ($page * $numPerPage);
 
-		$sql = "SELECT users.userid, username, account_status, filename, up.id, up.timestamp
+		$sql = "SELECT users.userid, username AS user_username, up.*
 					FROM users, offensive_uploads up
 					WHERE users.userid=up.userid
 						AND up.type='avatar'
@@ -67,15 +81,19 @@
 						AND status != 'pending'
 						AND users.timestamp > DATE_SUB( NOW(), INTERVAL 12 MONTH )
 						AND up.id = (SELECT MAX( up.id) FROM offensive_uploads up WHERE type='avatar' AND userid=users.userid)
-					ORDER BY $order, up.id DESC";
+					ORDER BY $sort";
 
 		$result = tmbo_query($sql);
 
 		$THUMBS_PER_ROW = 4;
 		$count = 0;
 
+		$me = me();
+
 		while( $row = mysql_fetch_assoc( $result ) ) {
-			if(getThumb($row['id'], $row['filename'], $row['timestamp'], 'avatar') == '') continue;
+			$upload = new Upload($row);
+			
+			if($upload->expired() || ($me && $me->squelched($upload->uploader()))) continue;
 		
 			if( (($count++) % $THUMBS_PER_ROW) == 0 ) {
 				$css = (isset($css) && $css == "even_row") ? "odd_row" : "even_row";
@@ -85,12 +103,22 @@
 			?>
 				
 					<td>
-						<a href="pages/pic.php?id=<?= $row['id'] ?>"><img src="<?=
-							getThumbURL($row['id'], $row['filename'], $row['timestamp'], 'avatar');
-						?>"/></a>
+						
+						<? // forward-compatible image filtering? oh yes, squelching… ?>
+						<a href="pages/pic.php?id=<?= $upload->id() ?>"
+							<? if($upload->filtered()) { ?>
+								onMouseOver='changesrc("th<?= $upload->id()?>","<?= $upload->thumbURL() ?>")'
+						 		onMouseOut='changesrc("th<?= $upload->id() ?>","/offensive/graphics/th-filtered.gif")'
+							<? } ?>
+						><img name="th<?= $upload->id()?>"
+							src="<?= $upload->filtered()
+								? "/offensive/graphics/th-filtered.gif" 
+								: $upload->thumbURL() ?>"
+						/></a>
+						
 						<br/>
-						<a href="./?c=user&userid=<?= $row['userid'] ?>"><?= $row['username'] ?></a>
-						<a href="./?c=comments&fileid=<?= $row['id'] ?>">[c]</a>						
+						<a href="./?c=user&userid=<?= $upload->uploader()->userid() ?>"><?= $upload->uploader()->username() ?></a>
+						<a href="./?c=comments&fileid=<?= $upload->id() ?>">[c]</a>						
 					</td>
 
 			<?

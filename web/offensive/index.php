@@ -106,7 +106,6 @@ $timelimit = 10;
 	<link rel="shortcut icon" href="/favicon.ico" />
 	<link rel="stylesheet" type="text/css" href="/offensive/filepilestyle.css" />
 	<link rel="stylesheet" type="text/css" href="/styles/oldskool.css"/>
-	<link rel="stylesheet" type="text/css" href="/offensive/nsfw.css.php"/>
 
 	
 <style type="text/css">
@@ -140,6 +139,13 @@ $timelimit = 10;
 		widthHeight = "width="+w+",height="+h+",left="+l+",top="+t+",menubar=no,resizable=yes,scrollbars=no,status=no,toolbar=no,location=no";
 		window.open("/offensive/irc/chat.php","tmbo_chat",widthHeight);
 		return true
+	}
+	
+	/* image rollover stuff */
+	function changesrc(a,im)
+	{
+		x = eval("document."+a);
+		x.src=im;
 	}
 </script>
 

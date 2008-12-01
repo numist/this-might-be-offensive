@@ -189,7 +189,7 @@ function ensureDirExists( $path ) {
 function commentLabel($comments, $good, $bad, $tmbo, $votes=true) {
 	if(!is_numeric($comments)) $comments = 0;
 	
-	$retval = ($comments == 0 ? "no" : $comments)." comment".($comments == 1?"":"s");
+	$retval = ($comments == 0 ? "no" : $comments)." comment".($comments == 1 || $comments == 0 ? "" :"s");
 	if(!$votes) return $retval;
 	if(!is_numeric($good)) $good = 0;
 	if(!is_numeric($bad)) $bad = 0;

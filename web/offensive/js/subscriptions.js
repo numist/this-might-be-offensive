@@ -19,10 +19,14 @@ function handle_subscribe(o,e, imageid) {
 	e.preventDefault();
 	var sub = o.html();
 
-	toggle_subscribe(sub,imageid,o);
+	// remove the href to prevent doubleclicks
+	o.removeAttr("href");
 	if(sub == "subscribe") {
 		$.get("/offensive/api.php/subscribe.php", { threadid: imageid, subscribe: 1 } );
 	} else {
 		$.get("/offensive/api.php/subscribe.php", { threadid: imageid, subscribe: 0 } );
 	}
+	
+	// switch ui to opposite view
+	toggle_subscribe(sub,imageid,o);
 }

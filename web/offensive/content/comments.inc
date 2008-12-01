@@ -245,20 +245,27 @@
 	// end of "are there any comments"
 	}
 	
+		// thumbnail
 		if( $upload->type() == 'image' || $upload->type() == 'avatar' ) {
 			?>
-				<div style="<?= nextStyle($commentnum++) ?>; border-top:1px solid #000033">
+				<div style="background:#ccccff; border-top:1px solid #000033">
 					<div style="float:right"><? toggleThumbnailLink() ?></div>
 					<?
 						if($me->getPref("thumbnails_in_comments") == 1 || $me->getPref("thumbnails_in_comments") === false) {
-							if($me->squelched($uploader) || 
-							    ($upload->is_nsfw() == 1 && $me->getPref("hide_nsfw") == 1) || 
-							    ($upload->is_tmbo() == 1 && $me->getPref("hide_tmbo") == 1) ) {
-								?><div style="padding:40px;">[ thumbnail filtered ]</div><?
-							}
-							else {
-								?><a href="<?= $href ?>"><img style="margin:12px;" src="<?= $upload->thumbURL() ?>"/></a><?
-							}
+							?>
+							
+							<a href="<?= $href ?>"
+								<? if($upload->filtered()) { ?>
+									onMouseOver='changesrc("th<?= $upload->id()?>","<?= $upload->thumbURL() ?>")'
+							 		onMouseOut='changesrc("th<?= $upload->id() ?>","/offensive/graphics/th-filtered.gif")'
+								<? } ?>
+							><img name="th<?= $upload->id()?>" style="margin:12px;"
+								src="<?= $upload->filtered()
+									? "/offensive/graphics/th-filtered.gif" 
+									: $upload->thumbURL() ?>"
+							/></a>
+							
+							<?
 						}
 					?>
 					

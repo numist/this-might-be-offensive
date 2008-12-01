@@ -21,12 +21,10 @@
 		$start = $page * $numPerPage;
 		$find = $_REQUEST['findfile'];
 	
-		$sql = "SELECT offensive_uploads.id, filename, offensive_uploads.timestamp,
-					offensive_uploads.type, offensive_uploads.nsfw,
-					offensive_uploads.tmbo, offensive_uploads.type,
-					users.userid, username,
-					offensive_count_cache.good, offensive_count_cache.bad,
-					offensive_count_cache.tmbo as is_tmbo, offensive_count_cache.comments
+		$sql = "SELECT offensive_uploads.*,
+					users.username AS user_username,
+					offensive_count_cache.good AS goods, offensive_count_cache.bad AS bads,
+					offensive_count_cache.tmbo AS tmbos, offensive_count_cache.comments
 					FROM offensive_uploads, users, offensive_count_cache
 					WHERE filename LIKE '%".sqlEscape($find)."%'
 					AND offensive_uploads.userid = users.userid
@@ -58,46 +56,44 @@
 		while( $row = mysql_fetch_assoc( $result ) ) {
 			$style = (isset($style) && $style == "") ? "background:#bbbbee;" : "";
 			$css = (isset($css) && $css == "evenfile") ? "oddfile" : "evenfile";
-			$type = $row['type'];
 			
-			$filename = htmlFilename($row, $type != 'image');
+			$upload = new Upload($row);
 			
-			$expired = $type == 'image' && getFile($row['id'], $row['filename'], $row['timestamp']) == '' ? "(expired)" : ""
+			$filename = htmlFilename($row, $upload->type() != 'image');
+			
+			$expired = $upload->expired() ? "(expired)" : ""
 ?>
 	
 			<tr class="<? echo $css ?>" style="<?= $style ?>">
-				<? if( $type == 'image' || $type == 'avatar') { ?>
-					<td width="100px"><a class="<?echo $css ?>" href="./pages/pic.php?id=<? echo $row['id'] ?>"><?
-
-					$upload = new Upload($row['id']);
-					$tig2tib = $upload->goods() / ($upload->bads() > 0 ? $upload->bads() : 1);
-					$filter_squelch = $me->squelched($upload->uploader());
-					$filter_nsfw = $upload->is_nsfw() == 1 && $me->getPref("hide_nsfw") == 1;
-					$filter_tmbo = $upload->is_tmbo() == 1 && $me->getPref("hide_tmbo") == 1;
-					$filter_bad = $tig2tib < 1/9 && $upload->bads > 10 && $me->getPref("hide_bad") == 1;
-					if($filter_squelch || $filter_nsfw || $filter_tmbo || $filter_bad) {
-						?>[ filtered ]<?
-					} else {
-						?><img src="<?= getThumbURL($row['id'], $row['filename'], $row['timestamp']) ?>"/><?
-					}
-					?></a></td>
-					<td><a class="<?echo $css ?>" href="./pages/pic.php?id=<? echo $row['id'] ?>"><?= $filename ?></a> (uploaded by <?= htmlEscape($row['username']) ?>)<? echo  $expired ?></td>
-					<td width="100px" align="center"><a class="<?echo $css ?>" href="./?c=comments&fileid=<? echo $row['id'] ?>"><?= 
-						($row['comments'] != '')?$row['comments']:0;
-					?> comments</a> <br />(+<?=
-						($row['good'] != '')?$row['good']:0;
-					?> -<?=
-						($row['bad'] != '')?$row['bad']:0;
-					?> x<?=
-						($row['is_tmbo'] != '')?$row['is_tmbo']:0;
-					?>)<br /><?=
-						date( "Y-m-d", strtotime( $row['timestamp'] ) )
+				<? if( $upload->type() == 'image' || $upload->type() == 'avatar') { ?>
+					<td width="100px" height="100px">
+					
+					
+					<a href="pages/pic.php?id=<?= $upload->id() ?>"
+						<? if($upload->filtered()) { ?>
+							onMouseOver='changesrc("th<?= $upload->id()?>","<?= $upload->thumbURL() ?>")'
+					 		onMouseOut='changesrc("th<?= $upload->id() ?>","/offensive/graphics/th-filtered.gif")'
+						<? } ?>
+					><img name="th<?= $upload->id()?>"
+						src="<?= $upload->filtered()
+							? "/offensive/graphics/th-filtered.gif" 
+							: $upload->thumbURL() ?>"
+					/></a>
+					
+					
+					
+					</td>
+					<td><a class="<?echo $css ?>" href="./pages/pic.php?id=<? echo $upload->id() ?>"><?= $filename ?></a> (uploaded by <?= htmlEscape($upload->uploader()->username()) ?>)<? echo  $expired ?></td>
+					<td width="170px" align="center"><a class="<?echo $css ?>" href="./?c=comments&fileid=<? echo $upload->id() ?>"><?= 
+						$upload->commentLabel();
+					?><br /><?=
+						date( "Y-m-d", strtotime( $upload->timestamp() ) )
 					?></td>
 				<? } else if( $type == 'topic' ) { ?>
-					<td width="100px"><? echo date( "Y-m-d", strtotime( $row['timestamp'] ) ) ?></td>
-					<td><a class="<?echo $css ?>" href="./?c=comments&fileid=<? echo $row['id'] ?>"><?= $filename ?></a></td>
-					<td width="100px" align="center"><a class="<?echo $css ?>" href="./?c=comments&fileid=<? echo $row['id'] ?>"><?=
-						commentLabel($row['comments'], 0, 0, 0, false);
+					<td width="100px"><? echo date( "Y-m-d", strtotime( $upload->timestamp() ) ) ?></td>
+					<td><a class="<?echo $css ?>" href="./?c=comments&fileid=<? echo $upload->id() ?>"><?= $filename ?></a></td>
+					<td width="100px" align="center"><a class="<?echo $css ?>" href="./?c=comments&fileid=<? echo $upload->id() ?>"><?=
+						$upload->commentLabel(false);
 						?></td>
 				<? } ?>
 			</tr>

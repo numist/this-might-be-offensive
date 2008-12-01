@@ -30,6 +30,7 @@ if(mysql_num_rows($result) == 0) {
 	
 	$info = getimagesize(getThumb($id, $filename, $timestamp, $type));
 	
+	// this could stand some filtering.
 	$thumb = "<a href='/offensive/pages/pic.php?id=$id' target='_blank'><img src='" . getThumbURL($id,$filename,$timestamp,$type) . "' ".$info[3]." border='0' /></a>";
 }
 

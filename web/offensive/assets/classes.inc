@@ -128,6 +128,12 @@ class Upload {
 		return $this->getUploadRow();
 	}
 	
+	public function expired() {
+		if(!$this->exists()) return true;
+		if($this->file() == '') return true;
+		return false;
+	}
+	
 	/*
 	 * functions that deal with data available in the database upload row
 	 */
@@ -192,23 +198,33 @@ class Upload {
 	}
 	
 	public function goods() {
-		return is_numeric($this->getCacheRow("goods")) ? $this->getCacheRow("goods") : 0;
+		return is_numeric($this->getCacheRow("goods")) 
+			? $this->getCacheRow("goods")
+			: 0;
 	}
 	
 	public function bads() {
-		return is_numeric($this->getCacheRow("bads")) ? $this->getCacheRow("bads") : 0;
+		return is_numeric($this->getCacheRow("bads"))
+			? $this->getCacheRow("bads")
+			: 0;
 	}
 	
 	public function tmbos() {
-		return is_numeric($this->getCacheRow("tmbos")) ? $this->getCacheRow("tmbos") : 0;
+		return is_numeric($this->getCacheRow("tmbos"))
+			? $this->getCacheRow("tmbos")
+			: 0;
 	}
 	
 	public function tiars() {
-		return is_numeric($this->getCacheRow("tiars")) ? $this->getCacheRow("tiars") : 0;
+		return is_numeric($this->getCacheRow("tiars"))
+			? $this->getCacheRow("tiars")
+			: 0;
 	}
 	
 	public function comments() {
-		return is_numeric($this->getCacheRow("comments")) ? $this->getCacheRow("comments") : 0;
+		return is_numeric($this->getCacheRow("comments"))
+			? $this->getCacheRow("comments")
+			: 0;
 	}
 	
 	public function last_active() {
@@ -318,6 +334,42 @@ class Upload {
 		}
 		
 		return $this->data["prev"];
+	}
+	
+	/*
+	 * filtering code
+	 */
+	public function filtered() {
+		return $this->squelched() ||
+		       $this->filtered_nsfw() ||
+		       $this->filtered_tmbo() ||
+		       $this->filtered_bad();
+	}
+	
+	public function squelched() {
+		return (me() != false
+			? me()->squelched($this->uploader())
+			: false);
+	}
+	
+	public function filtered_nsfw() {
+		return (me() != false
+			? me()->getPref("hide_nsfw") == 1 && $this->is_nsfw() == 1
+			: false);
+	}
+	
+	public function filtered_tmbo() {
+		return (me() != false
+			? me()->getPref("hide_tmbo") == 1 && $this->is_tmbo() == 1
+			: false);
+	}
+	
+	public function filtered_bad() {
+		return (me() != false
+			? me()->getPref("hide_bad") == 1
+			  && $this->bads() > 10
+			  && $this->bads() / 9 > $this->goods()
+			: false);
 	}
 	
 	/*

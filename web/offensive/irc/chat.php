@@ -13,7 +13,6 @@ mustLogIn();
 	<META NAME="ROBOTS" CONTENT="NOARCHIVE">
 	<link rel="stylesheet" type="text/css" href="/offensive/filepilestyle.css" />
 	<link rel="stylesheet" type="text/css" href="/styles/oldskool.css"/>
-	<link rel="stylesheet" type="text/css" href="/offensive/nsfw.css.php"/>
 	<style type="text/css">
 
 		/* override definitions in oldskool.css to make main content area wider */	
@@ -51,7 +50,10 @@ mustLogIn();
 					<param name="alternateserver1" value="irc.chowned.org 6667">
 					<param name="alternateserver2" value="irc.choopa.net 6667">
 					<param name="gui" value="pixx">
-					<param name="quitmessage" value="maxx out with your ???? out">
+					<param name="quitmessage" value="<?
+						require("offensive/data/quips.inc");
+						echo str_replace('"', '\\"', $quip);
+					?>">
 							
 					<param name="pixx:highlight" value="true">
 					<param name="pixx:highlightnick" value="true">

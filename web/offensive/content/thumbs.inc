@@ -41,17 +41,13 @@ EOT;
 	 * begin with is anyone's guess.  Thanks jonxp for the help.
 	 */
     $sql = "SELECT
-  offensive_uploads.id,
-  offensive_uploads.timestamp,
-  offensive_uploads.filename,
-  offensive_uploads.nsfw,
-  offensive_uploads.tmbo,
-  offensive_uploads.type,
-  offensive_count_cache.good,
-  offensive_count_cache.bad,
-  offensive_count_cache.tmbo AS tmbo_vote,
+  offensive_uploads.*,
+  offensive_count_cache.good AS goods,
+  offensive_count_cache.bad AS bads,
+  offensive_count_cache.tmbo AS tmbos,
   offensive_count_cache.comments,
-  users.username
+  users.username AS user_username,
+  offensive_uploads.userid AS user_userid
 FROM
   offensive_uploads USE KEY (t_t_id)
 LEFT JOIN offensive_count_cache
@@ -77,6 +73,7 @@ LIMIT $start, $numPerPage
 		?>
 
 <?
+	// employee of the month insertion
     $employee = get_include_path()."/offensive/employeeOfTheMonth.txt";
     if(file_exists($employee) && time() - filemtime($employee) < 172800) {
         require("offensive/employeeOfTheMonth.txt");
@@ -110,19 +107,32 @@ LIMIT $start, $numPerPage
             $output = 0;
             while( $row = mysql_fetch_assoc( $result ) ) 
             {
-              $css = $row['nsfw'] == 1 ? ' class="nsfw"' : "";
-              $filename = rawurlencode($row['filename']);
+				$upload = new Upload($row);
+				
+             	$css = $upload->filtered() ? ' class="filtered"' : "";
+              	$filename = rawurlencode($row['filename']);
               	if( $output % $THUMBS_PER_ROW == 0 ) {
                   ?><tr><?php
                 }
               ?>
                     <td>
-
-	<a href="pages/pic.php?id=<?= $row['id'] ?>"><span<?= $css?>><img src="<?=
-		getThumbURL($row['id'], $row['filename'], $row['timestamp']);
-	?>" border="0" alt="<?= htmlEscape($row['filename']) ?>" title="uploaded by <?= htmlEscape($row['username']) ?>"/></span></a><br/>
-	<a href="./?c=comments&fileid=<?= $row['id'] ?>"><?= 
-		commentLabel($row['comments'], $row['good'], $row['bad'], $row['tmbo_vote']);
+	
+	<a href="pages/pic.php?id=<?= $upload->id() ?>"
+		<? if($upload->filtered()) { ?>
+			onMouseOver='changesrc("th<?= $upload->id()?>","<?= $upload->thumbURL() ?>")'
+	 		onMouseOut='changesrc("th<?= $upload->id() ?>","/offensive/graphics/th-filtered.gif")'
+		<? } ?>
+	><img name="th<?= $upload->id()?>"
+		src="<?= $upload->filtered()
+			? "/offensive/graphics/th-filtered.gif" 
+			: $upload->thumbURL() ?>"
+	/></a>
+	
+	
+	
+	<br/>
+	<a href="./?c=comments&fileid=<?= $upload->id() ?>"><?= 
+		$upload->commentLabel();
 	?></a>
 </td>
                 <?php
@@ -131,6 +141,10 @@ LIMIT $start, $numPerPage
                 }
                 $output++;
             }
+            if( $output % $THUMBS_PER_ROW ) {
+            ?></tr><?php
+            }
+            $output++;
           ?>
           </table>
 </td>

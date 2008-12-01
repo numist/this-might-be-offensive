@@ -7,13 +7,18 @@ $prefnames = array(
 	"hide_tmbo",
 	// indicates the user wants to hid content that has been deemed by others as "bad"
 	"hide_bad",
+	
+	// sorting for discussions
+	"sortorder_discussions",
+	// sorting for yearbook
+	"sortorder_yearbook",
+	
+	// type of frontpage, "thumbs" or blank
+	"index",
+	
 	// indicates if the user wants to view thumbnails in comments
 	"thumbnails_in_comments",
 	
-	// sorting for discussions
-	"disc_sortorder",
-	// type of frontpage, "thumbs" or blank
-	"index",
 	// pickup id for images
 	"ipickup",
 	// and pickup id for topics
