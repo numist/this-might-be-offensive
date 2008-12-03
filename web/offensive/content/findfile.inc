@@ -29,6 +29,7 @@
 					WHERE filename LIKE '%".sqlEscape($find)."%'
 					AND offensive_uploads.userid = users.userid
 					AND offensive_count_cache.threadid = offensive_uploads.id
+          AND status != 'pending';
 					ORDER BY offensive_uploads.timestamp DESC
 					LIMIT $start, $numPerPage;
 				";
