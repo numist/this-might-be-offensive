@@ -26,10 +26,10 @@
 					offensive_count_cache.good AS goods, offensive_count_cache.bad AS bads,
 					offensive_count_cache.tmbo AS tmbos, offensive_count_cache.comments
 					FROM offensive_uploads, users, offensive_count_cache
-					WHERE filename LIKE '%".sqlEscape($find)."%'
+					WHERE offensive_uploads.filename LIKE '%".sqlEscape($find)."%'
 					AND offensive_uploads.userid = users.userid
 					AND offensive_count_cache.threadid = offensive_uploads.id
-          AND status != 'pending';
+          AND offensive_uploads.status != 'pending'
 					ORDER BY offensive_uploads.timestamp DESC
 					LIMIT $start, $numPerPage;
 				";
