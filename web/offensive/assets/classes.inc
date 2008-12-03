@@ -99,7 +99,7 @@ class Upload {
 		if(($element == false || !array_key_exists($element, $this->data)) &&
 		   $this->data['exists'] === null) {
 			// get information we need from the database.
-			$sql = "SELECT * FROM offensive_uploads WHERE status = 'normal' AND id = ".$this->data["id"];
+			$sql = "SELECT * FROM offensive_uploads WHERE id = ".$this->data["id"];
 			$result = tmbo_query($sql);
 			
 			// if the upload doesn't exist...  well what can we do?
