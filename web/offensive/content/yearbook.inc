@@ -117,7 +117,7 @@
 						/></a>
 						
 						<br/>
-						<a href="./?c=user&userid=<?= $upload->uploader()->userid() ?>"><?= $upload->uploader()->username() ?></a>
+						<a href="./?c=user&userid=<?= $upload->uploader()->id() ?>"><?= $upload->uploader()->username() ?></a>
 						<a href="./?c=comments&fileid=<?= $upload->id() ?>">[c]</a>						
 					</td>
 
