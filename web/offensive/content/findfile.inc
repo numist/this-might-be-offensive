@@ -29,7 +29,7 @@
 					WHERE offensive_uploads.filename LIKE '%".sqlEscape($find)."%'
 					AND offensive_uploads.userid = users.userid
 					AND offensive_count_cache.threadid = offensive_uploads.id
-          AND offensive_uploads.status != 'pending'
+					AND offensive_uploads.status != 'pending'
 					ORDER BY offensive_uploads.timestamp DESC
 					LIMIT $start, $numPerPage;
 				";
@@ -62,7 +62,7 @@
 			
 			$filename = htmlFilename($row, $upload->type() != 'image');
 			
-			$expired = $upload->expired() ? "(expired)" : ""
+			$expired = $upload->expired() ? "(expired)" : "";
 ?>
 	
 			<tr class="<? echo $css ?>" style="<?= $style ?>">
@@ -85,12 +85,12 @@
 					
 					</td>
 					<td><a class="<?echo $css ?>" href="./pages/pic.php?id=<? echo $upload->id() ?>"><?= $filename ?></a> (uploaded by <?= htmlEscape($upload->uploader()->username()) ?>)<? echo  $expired ?></td>
-					<td width="170px" align="center"><a class="<?echo $css ?>" href="./?c=comments&fileid=<? echo $upload->id() ?>"><?= 
+					<td width="170px" align="center"><a class="<?echo $css ?>" href="./?c=comments&fileid=<? echo $upload->id() ?>"><nobr><?= 
 						$upload->commentLabel();
-					?><br /><?=
+					?></nobr><br /><?=
 						date( "Y-m-d", strtotime( $upload->timestamp() ) )
 					?></td>
-				<? } else if( $type == 'topic' ) { ?>
+				<? } else if( $upload->type() == 'topic' ) { ?>
 					<td width="100px"><? echo date( "Y-m-d", strtotime( $upload->timestamp() ) ) ?></td>
 					<td><a class="<?echo $css ?>" href="./?c=comments&fileid=<? echo $upload->id() ?>"><?= $filename ?></a></td>
 					<td width="100px" align="center"><a class="<?echo $css ?>" href="./?c=comments&fileid=<? echo $upload->id() ?>"><?=
