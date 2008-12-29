@@ -205,7 +205,7 @@
 					if(!$me->squelched($commenter)) {
 						echo $comment->HTMLcomment();
 					}
-					else {
+					else if(strlen($comment->text()) > 0) {
 						echo "<div class='squelched'>[ squelched ]</div>";
 					}
 					?>

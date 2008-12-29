@@ -113,9 +113,9 @@ LIMIT $start, $numPerPage";
 							<div class="clipr"><a href="pages/pic.php?id=<?= $row['id'] ?>" class="<?= $css ?>" title="uploaded by <?= htmlEscape($row['username']) ?>"><?= $filename ?></a></div>
 					</td>
 					<td class="<?= $css ?> com_cnt" style="text-align:right;white-space:nowrap">
-						<a href="./?c=comments&fileid=<?= $row['id'] ?>" class="<?= $css ?>"><?= 
+						<a href="./?c=comments&fileid=<?= $row['id'] ?>" class="<?= $css ?>"><nobr><?= 
 				commentLabel($row['comments'], $row['good'], $row['bad'], $row['tmbo_vote']);
-			?></a>
+			?></nobr></a>
 					</td>
                   </tr>
                 <?php
