@@ -8,8 +8,38 @@
 	require_once( 'admin/mysqlConnectionInfo.inc' );
 	if(!isset($link) || !$link) $link = openDbConnection();
 	
-
+	global $tmpdir, $filetypes;
 	$tmpdir = "quarantine";
+	$filetypes = array("jpg", "jpeg", "gif", "png");
+
+/*
+ * the upload path follows this state machine:
+ * 
+   digraph uploads {
+   	null -> "repost?" -> killit -> "dead.";
+   		"repost?" -> repost;
+   			repost -> "rotate?";
+   			repost -> "resize?";
+   			repost -> "resample?";
+   			repost -> "yummy.";
+   	null -> "rotate?" -> killit;
+   	 	"rotate?" -> rotate -> norotate;
+   		"rotate?" -> norotate;
+   			norotate -> "resize?";
+   			norotate -> "resample?";
+   			norotate -> "yummy.";
+   	null -> "resize?" -> killit;
+   		"resize?" -> resize -> noresize;
+   		"resize?" -> noresize;
+   			noresize -> "resample?";
+   			noresize -> "yummy.";
+   	null -> "resample?" -> killit;
+   		"resample?" -> resample -> noresample;
+   		"resample?" -> noresample -> "yummy.";
+   	null -> "yummy.";
+   }
+ * 
+ */
 
 	function start() {
 		global $readonly;
@@ -24,49 +54,31 @@
 		}
 		
 	}
-	
+
 	function requestDetail() {
 		ob_start();
 		var_dump( $_SERVER );
-		var_dump( $_REQUEST );		
+		var_dump( $_REQUEST );
+		if(array_key_exists("postdetail", $_SESSION))
+			var_dump( unserialize($_SESSION['postdetail']) );	
 		$string = ob_get_contents();
 		ob_end_clean();
 		return $string;
 	}
 	
-	function isAvatarUpload($postdata) {
-		if(!array_key_exists('avatar', $postdata)) return false;
-		return $postdata['avatar'];
-	}
-	
 	function typeFor( $postdata ) {
-
-		/*
-		 * a bug was present in this code that allowed people to upload
-		 * arbitrary accepted file types as their avatars.
-		 * since we do not actually allow people to use music or video as
-		 * their avatars, the check was moved to the default: block of the
-		 * switch statement below.
-		 */
-
 		switch( $postdata['format'] ) {
 			case "quicktime":
 				return "video";
-			break;
 			
 			case "mp3":
-			case "ogg":
 				return "audio";
-			break;
 			
 			default:
-				if( isAvatarUpload($postdata) ) {
-					return "avatar";
-				}
-				return "image";
+				return array_key_exists('avatar', $postdata) && $postdata['avatar'] ? 'avatar' : 'image';
 		}
 	}
-	
+
 	function getHash( $filePath ) {
 		$file = fopen( $filePath, "r" );
 		$filedata = fread ( $file, min( 4096, filesize( $filePath ) ) );
@@ -129,40 +141,7 @@
 		return min( ($bad > 0) ? round( 1 + ($good/$bad) * 2 ) : round(1 + ($good/20) * 2), 40 );
 
 	}
-
 	
-	// appends or increments a numeric filename suffix to ensure a unique filename
-	function uniqueFilename( $imageDir, $original ) {
-		$filename = $original;
-		while( file_exists( $imageDir ."/". $filename )) {
-			$filename = incrementSuffix( $filename );
-		}
-		return $filename;
-	}
-	
-	function incrementSuffix( $input ) {
-		$suffix = ( preg_match( "/([0-9]+)\.(jpg|gif|png)$/", $input, $matches ) == 1) ? $matches[1] : 1;		
-		$suffix++;
-		$result = preg_replace( "/([0-9]*)\.(jpg|gif|png)$/", "$suffix.\${2}", $input );
-		return $result;
-
-	}
-	
-	function dumpQuery( $sql ) {
-		
-		$LOGFILE = fopen( "queryLog.txt", "a" );
-		if( $LOGFILE ) {
-			fwrite( $LOGFILE, $sql . "\n" );
-			fclose( $LOGFILE );
-		}
-		
-	}
-	
-	function updateStatus( $fileid, $newstatus ) {
-		$sql = "update offensive_uploads set status='$newstatus' where id=$fileid limit 1";
-		tmbo_query( $sql );
-	}
-
 	function uploading_file() {
 		if(array_key_exists("image", $_FILES) && 
 			is_array($_FILES['image']) &&
@@ -177,12 +156,19 @@
 		return false;
 	}
 
-	function body() {
-		global $hash, $tmpdir, $me;
-		$postdata = array();
+	function check_format($extension) {
+		global $filetypes;
 		
+		$reg = "/(".implode("|", $filetypes).")/i";
+		
+		return (bool)preg_match($reg, $extension);
+	}
+
+	function body() {
+		global $hash, $tmpdir, $me, $filetypes;
 		// is there an incoming file?
 		if( uploading_file() ) {
+			$postdata = array();
 			$postdata['tmpname'] = explode("/", $_FILES['image']['tmp_name']);
 			$postdata['tmpname'] = array_pop($postdata['tmpname']);
 			// having the file extension helps ImageMagick do its thing.
@@ -201,10 +187,12 @@
 			$fileinfo = $getID3->analyze( $tmpdir."/".$postdata['tmpname'] );
 			error_reporting($errno);
 
-			if(!preg_match( "/(jpg|jpeg|gif|png)/i", $fileinfo["fileformat"])) {
-				box("acceptable file types: jpg, gif, png.", "sorry.");
+			if(!check_format($fileinfo["fileformat"])) {
+				box("acceptable file types: ".implode(", ", $filetypes).".", "sorry.");
 
-				mail( "ray@mysocalled.com", "[" . $_SERVER["REMOTE_ADDR"] . "] - SUSPICIOUS UPLOAD!!! " . $_SESSION['username'] . $postdata['tmpname'], requestDetail(), "From: offensive@themaxx.com (this might be offensive)\r\nPriority: urgent" );
+				mail( "ray@mysocalled.com", "[" . $_SERVER["REMOTE_ADDR"] . "] - SUSPICIOUS UPLOAD!!! " . $_SESSION['username'] .
+				      $postdata['tmpname'], requestDetail(),
+				      "From: offensive@thismight.be (this might be offensive)\r\nPriority: urgent" );
 
 				uploadForm();
 				return;
@@ -219,8 +207,8 @@
 				$postdata['tmpname'] .= $postdata['file_extension'];
 			}
 
-			if( ! preg_match( "/(jpg|jpeg|gif|png)/i", $postdata['file_extension'] ) ) {
-				box("accepted file types: jpg, gif, png.", "sorry.");
+			if(!check_format($postdata['file_extension'])) {
+				box("accepted file types: ".implode(", ", $filetypes).".", "sorry.");
 				killUpload($postdata);
 				unset($postdata);
 				return;
@@ -234,37 +222,39 @@
 			$postdata['redirect'] = array_key_exists('redirect', $_POST) && strlen($_POST['redirect']) > 0 ? 
 			                        $_POST['redirect'] : null;
 			$postdata['hash'] = getHash($tmpdir."/".$postdata['tmpname']);
+		}
+		else if(array_key_exists('postdata', $_SESSION) && $postdata = unserialize($_SESSION['postdata']))
+		{
 			
-		} else if(array_key_exists('postdata', $_SESSION) && $postdata = unserialize($_SESSION['postdata'])) {
-			
+			// cancel the upload
 			if(array_key_exists('killit', $_POST)) {
 				box("another one bites the dust", "all right!");
 				killUpload($postdata);
 				return;
 			}
 			
-			if(array_key_exists('resize', $_POST))
-				$postdata['resize'] = $_POST['resize'];
-			if(array_key_exists('noresize', $_POST))
-				$postdata['noresize'] = $_POST['noresize'];
-			if(array_key_exists('repost', $_POST))
-				$postdata['repost'] = $_POST['repost'];			
-			if(array_key_exists('resample', $_POST))
-				$postdata['resample'] = $_POST['resample'];			
-			if(array_key_exists('noresample', $_POST))
-				$postdata['noresample'] = $_POST['noresample'];			
+			// make sure the postdata gets populated correctly
+			{
+				$flags = array("rotate", "norotate",
+				               "resize", "noresize",
+				               "repost",
+				               "resample", "noresample");
+				foreach($flags as $flag) {
+					if(array_key_exists($flag, $_POST))
+						$postdata[$flag] = $_POST[$flag];
+				}
+			}
 			
 			// if the file doesn't exist, we're not doing any posting, are we...
 			if(!file_exists($tmpdir."/".$postdata['tmpname'])) {
 				trigger_error("post from SESSION failed: file not found.", E_USER_WARNING);
-				$message = "couldn't find the file you wanted to upload, sorry.";
+				$message = "couldn't find the file you wanted to upload, sorry.  try again?";
 				box($message);
 				killUpload($postdata);
 				unset($postdata);
+				unset($_SESSION['postdata']);
 				return;
 			}
-		} else {
-			unset($postdata);
 		}
 
 		if(!isset($postdata) || !$postdata) {
@@ -274,48 +264,96 @@
 	
 	
 		/**********************************************************************
-		* these blocks ensire that the file being uploaded is not a repost,   *
-		* not incredibly large (filesize), and not unreasonably big (pixels)  *
+		* these blocks ensure that the file being uploaded is not a repost,   *
+		* not incredibly large (filesize), not unreasonably big (pixels), and *
+		* not sideways.                                                       *
 		**********************************************************************/
-		/*
+		
+		/**********************************************************************
 		 * repost checking
 		 * note that this does not check avatars for duplicates.  yearbooks can be reposts, it's fine.
 		 */
 		if(!array_key_exists("repost", $postdata) && checkRepost($postdata))
 			return;
 		
-		/*
-		 * image dimension checking
-		 */
-		if(!array_key_exists("resize", $postdata) && !array_key_exists("noresize", $postdata) && 
-		   checkDim($postdata)) {
-			return;
-		} else if (array_key_exists("resize", $postdata)) {
-			$cmd = "convert -resize 1024x1024 $tmpdir/".$postdata['tmpname']." $tmpdir/".$postdata['tmpname'];
-			$err = shell_exec($cmd);
-			if(strlen($err) > 0) trigger_error("ImageMagick failed: $err", E_USER_ERROR);
-		}
-
-		/*
-		 * image size checking
-		 */
- 		if(!array_key_exists("resample", $postdata) && !array_key_exists("noresample", $postdata) &&
-		   checkSize($postdata)) {
- 			return;
- 		} else if (array_key_exists("resample", $postdata)) {
-			// convert from file.ext to file.jpg, quality 80
-			$newtmp = substr($postdata['tmpname'], 0, 0 - strlen($postdata['file_extension'])).".jpg";
-			$newfilename = substr($postdata['filename'], 0, 0 - strlen($postdata['file_extension'])).".jpg";
-			
-			$cmd = "convert -quality 80 $tmpdir/".$postdata['tmpname']." $tmpdir/$newtmp";
-			$err = shell_exec($cmd);
-			if(strlen($err) > 0) {
-				trigger_error("ImageMagick failed with: $err", E_USER_ERROR);
+		if(typeFor($postdata) == "image" || typeFor($postdata) == "avatar") {
+			/**********************************************************************
+			 * rotation checking
+			 * make sure that if there is rotation data in the EXIF tag that we break if it could be rotated.
+			 */
+			if(!array_key_exists("rotate", $postdata) && !array_key_exists("norotate", $postdata)
+			   && checkRotation($postdata))
+				return;
+			else if(array_key_exists("rotate", $postdata) && !array_key_exists("norotate", $postdata)
+					&& function_exists("exif_read_data")) {
+        	
+				$filename = $tmpdir."/".$postdata['tmpname'];
+				$exif = exif_read_data($tmpdir."/".$postdata['tmpname']);
+        	
+				if($exif && array_key_exists("Orientation", $exif)) {
+					$transform = getTransform($exif['Orientation']);
+					if($transform != "") {
+						// convert.
+						$cmd = "convert $transform $tmpdir/{$postdata['tmpname']} $tmpdir/{$postdata['tmpname']}";
+						$err = shell_exec($cmd);
+						if(strlen($err) > 0) trigger_error("ImageMagick failed: $err", E_USER_ERROR);
+					}
+				}
+				// avoid re-rotating (or attempting to) again
+				$postdata['norotate'] = $postdata['rotate'];
+				unset($postdata['rotate']);
 			}
-			$postdata['tmpname'] = $newtmp;
-			$postdata['filename'] = $newfilename;
-			$postdata['file_extension'] = ".jpg";
-			$postdata['format'] = "jpg";
+			
+			if(array_key_exists("norotate", $postdata)) {
+				if(file_exists("$tmpdir/th{$postdata['tmpname']}"))
+					unlink("$tmpdir/th{$postdata['tmpname']}");
+				if(file_exists("$tmpdir/rh{$postdata['tmpname']}"))
+					unlink("$tmpdir/rh{$postdata['tmpname']}");
+			}
+			
+			/**********************************************************************
+			 * image dimension checking
+			 */
+			if(!array_key_exists("resize", $postdata) && !array_key_exists("noresize", $postdata) && 
+			   checkDim($postdata)) {
+				return;
+			} else if (array_key_exists("resize", $postdata)) {
+				$cmd = "convert -resize 1024x1024 $tmpdir/".$postdata['tmpname']." $tmpdir/".$postdata['tmpname'];
+				$err = shell_exec($cmd);
+				if(strlen($err) > 0) trigger_error("ImageMagick failed: $err", E_USER_ERROR);
+				
+				$postdata['noresize'] = $postdata['resize'];
+				unset($postdata['resize']);
+			}
+        	
+			/**********************************************************************
+			 * image size checking
+			 */
+ 			if(!array_key_exists("resample", $postdata) && !array_key_exists("noresample", $postdata) &&
+			   checkSize($postdata)) {
+ 				return;
+ 			} else if (array_key_exists("resample", $postdata)) {
+				// convert from file.ext to file.jpg, quality 90
+				$newtmp = substr($postdata['tmpname'], 0, 0 - strlen($postdata['file_extension'])).".jpg";
+				$newfilename = substr($postdata['filename'], 0, 0 - strlen($postdata['file_extension'])).".jpg";
+				
+				$cmd = "convert -quality 90 $tmpdir/".$postdata['tmpname']." $tmpdir/$newtmp";
+				$err = shell_exec($cmd);
+				if(strlen($err) > 0)
+					trigger_error("ImageMagick failed with: $err", E_USER_ERROR);
+					
+				// clean up the (potentially) extra file
+				if($newfilename != $postdata['filename'])
+					unlink("$tmpdir/{$postdata['tmpname']}");
+        	
+				$postdata['tmpname'] = $newtmp;
+				$postdata['filename'] = $newfilename;
+				$postdata['file_extension'] = ".jpg";
+				$postdata['format'] = "jpg";
+				
+				$postdata['noresample'] = $postdata['resample'];
+				unset($postdata['resample']);
+			}
 		}
 
 		/**********************************************************************
@@ -399,10 +437,11 @@
 			<a href=\"./\">Back to the list</a>
 		</p>";
 		box($message, "yummy.");
+		if(typeFor($postdata) != "avatar")
+			uploadForm(true);
+			
 		unset($_SESSION['postdata']);
-		uploadForm(true);
-
-	} 
+	}
 
 	function uploadForm($fileuploaded=false) {
 		$uploadsRemaining = numUploadsRemaining( $_SESSION['userid'] );
@@ -473,11 +512,93 @@
 
 	}
 
+	function getTransform($orientation) {
+		/*
+		 *   1        2       3      4         5            6           7          8
+         * 
+		 * 888888  888888      88  88      8888888888  88                  88  8888888888
+		 * 88          88      88  88      88  88      88  88          88  88      88  88
+		 * 8888      8888    8888  8888    88          8888888888  8888888888          88
+		 * 88          88      88  88
+		 * 88          88  888888  888888
+		 */
+		
+		switch($orientation) {
+			case 2:
+				return "-flop";
+				break;
+			case 3:
+				return "-rotate 180";
+				break;
+			case 4:
+				return "-flip";
+				break;
+			case 5:
+				return "-transpose";
+				break;
+			case 6:
+				return "-rotate 90";
+				break;
+			case 7:
+				return "-transverse";
+				break;
+			case 8:
+				return "-rotate 270";
+				break;
+			default:
+				return "";
+		}
+	}
+
+	function checkRotation($postdata) {
+		global $tmpdir;
+	
+		// rotation only matters with images and avatars.
+		if((typeFor($postdata) != "image" && typeFor($postdata) != "avatar")
+		   || !function_exists("exif_read_data"))
+			return false;
+		
+		$filename = $tmpdir."/".$postdata['tmpname'];
+		$exif = exif_read_data($tmpdir."/".$postdata['tmpname']);
+		
+		if(!$exif || !array_key_exists("Orientation", $exif)) {
+			return false;
+		}
+		
+		$transform = getTransform($exif['Orientation']);
+		
+		if($transform == "")
+			return false;
+		
+		$cmd = "convert -resize 100x100 $tmpdir/{$postdata['tmpname']} $tmpdir/th{$postdata['tmpname']}";
+		$err = shell_exec($cmd);
+		if(strlen($err) > 0) trigger_error("ImageMagick failed: $err", E_USER_ERROR);
+		
+		$cmd = "convert $transform -resize 100x100 $tmpdir/{$postdata['tmpname']} $tmpdir/rh{$postdata['tmpname']}";
+		$err = shell_exec($cmd);
+		if(strlen($err) > 0) trigger_error("ImageMagick failed: $err", E_USER_ERROR);
+		
+		$message = "Is it sideways?<br />If you want, I can try rotating it for you.<br/><br/>
+		<center><table><tr><td align='middle'>Original</td><td align='middle'>Fixed</td></tr>
+		<tr><td><img src='/offensive/$tmpdir/th{$postdata['tmpname']}'></td><td><img src='/offensive/$tmpdir/rh{$postdata['tmpname']}'></td></tr></table></center><br/>
+		
+		<form action=\"{$_SERVER['PHP_SELF']}\" method=\"POST\">
+			<input type=\"hidden\" name=\"c\" value=\"upload\">
+			<input type=\"submit\" name=\"killit\" value=\"Cancel this upload.\"/>
+			<input type=\"submit\" name=\"rotate\" value=\"Rotate it for me.\"/>
+			<input type=\"submit\" name=\"norotate\" value=\"Post it anyway.\"/>
+		</form>";
+		box($message, "¡sǝou ɥo");
+		$_SESSION['postdata'] = serialize($postdata);
+				
+		return true;
+	}
+
 	function checkRepost($postdata) {
 		global $hash, $tmpdir, $me;
 		
 		// avatars are exempt
-		if(isAvatarUpload($postdata)) return false;
+		if(typeFor($postdata) == "avatar") return false;
 		
 		// not to be confused with the hash() function in activationFunctions
 		$hash = getHash($tmpdir."/".$postdata['tmpname']);
@@ -598,7 +719,7 @@
 		
 		if($bytesPerPixel <= 0.45) return false;
 		
-		$message = "This image has a pretty big filesize for its dimensions. Expected file size: ${expectedFileSize}k. Your file: ${filesize}k.<br />If you want, I can resample it as an 80% quality JPG image.<br /><br />
+		$message = "This image has a pretty big filesize for its dimensions. Expected file size: ${expectedFileSize}k. Your file: ${filesize}k.<br />If you want, I can resample it as an 90% quality JPG image.<br /><br />
 			<form action=\"{$_SERVER['PHP_SELF']}\" method=\"POST\">
 				<input type=\"hidden\" name=\"c\" value=\"upload\">
 				<input type=\"submit\" name=\"killit\" value=\"Cancel this upload.\"/>
