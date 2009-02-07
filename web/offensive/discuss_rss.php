@@ -9,6 +9,8 @@ if(!isset($link) || !$link) $link = openDbConnection();
 mustLogIn("http");
 
 require_once("offensive/assets/conditionalGet.inc");
+require_once("offensive/assets/classes.inc");
+require_once("offensive/assets/core.inc");
 
 $sql = "SELECT offensive_uploads.timestamp
 		FROM offensive_uploads USE KEY (t_t_id)
@@ -30,34 +32,29 @@ conditionalGet($lastBuildTime);
 		<description>[ this might be offensive ]</description>
 		<lastBuildDate><?= gmdate('r', $lastBuildTime); ?></lastBuildDate>
 <?
-	$sql = "SELECT offensive_uploads.*, users.username, users.userid
-			FROM offensive_uploads
-				LEFT JOIN users ON offensive_uploads.userid = users.userid
-			WHERE type='topic' AND status='normal'
-			ORDER BY timestamp DESC
-			LIMIT 200";
+	$args = $_REQUEST;
+	if(!array_key_exists("type", $args)) {
+		$args["type"] = "topic";
+	}
 
-	$result = tmbo_query( $sql );
+	$result = core_getuploads($args);
 
-	while( $row = mysql_fetch_assoc( $result ) ) {
-	
-		$nsfw = $row['nsfw'] == 1 ? "[nsfw]" : "";
-	
+	foreach( $result as $upload ) {
 ?>
 
 		<item>
-			<title><![CDATA[<? echo $nsfw . $row['filename']?> (started by <? echo $row['username']?>)]]></title>
-			<link>http://<?= $_SERVER['SERVER_NAME'] ?>/offensive/pages/pic.php?id=<? echo $row['id'] ?></link>
+			<title><![CDATA[<?= $upload->filename() ?> (started by <?= $upload->uploader()->username() ?>)]]></title>
+			<link>http://<?= $_SERVER['SERVER_NAME'] ?>/offensive/?c=comments&fileid=<?= $upload->id() ?></link>
 			<description><![CDATA[<?
-			$sql = "SELECT comment, userid from offensive_comments where fileid = 226019 order by id asc limit 1";
-			$res = tmbo_query($sql);
-			$ro = mysql_fetch_assoc($res);
-			if($ro['userid'] == $row['userid']) {
-				echo htmlEncode($ro['comment']);
-			}
+				if(count($upload->getComments()) > 0) {
+					$comments = $upload->getComments();
+					echo $comments[0]->HTMLcomment();
+				} else {
+					echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(whaddya want, they didn't say anything)";
+				}
 			?>]]></description>
-			<pubDate><? echo date( "r", strtotime( $row['timestamp'] ) ) ?></pubDate>			
-			<comments><![CDATA[http://<?= $_SERVER['SERVER_NAME'] ?>/offensive/page.php?c=comments&fileid=<? echo $row['id'] ?>]]></comments>
+			<pubDate><?= date( "r", strtotime( $upload->timestamp() ) ) ?></pubDate>			
+			<comments><![CDATA[http://<?= $_SERVER['SERVER_NAME'] ?>/offensive/page.php?c=comments&fileid=<?= $upload->id() ?>]]></comments>
 		</item>
 <?
 	}

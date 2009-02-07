@@ -383,24 +383,31 @@
 				/*
 				 * navigation buttons, prev index next are dependant on type
 				 */
-				if($upload->type() == 'avatar') {?>
-					<a href="../" id="next" style="visibility:hidden">newer</a> . <a id="index" href="/offensive/">index</a> . <a id="previous" href="../" style="visibility:hidden">older</a>
-					<?
-				} else {
-					if($upload->next()) { 
-						$style = ($upload->next()->is_nsfw() || $upload->next()->is_tmbo() ? 'style="color: rgb(255,0,0)"' : "") ?>
-						<a id="next" <?= $style ?> href="<?= $_SERVER['PHP_SELF'] ?>?id=<?= $upload->next()->id() ?>">newer</a>
-					<? } else { ?>
-						<a href="../" id="next" style="visibility:hidden">newer</a>
-					<? } ?>
-					. <a id="index" href="/offensive/">index</a> .
-					<? if($upload->prev()) {
-						$style = ($upload->prev()->is_nsfw() || $upload->prev()->is_tmbo() ? 'style="color: rgb(255,0,0)"' : "") ?>
-						<a id="previous" <?= $style ?> href="<?= $_SERVER['PHP_SELF'] ?>?id=<?= $upload->prev()->id() ?>">older</a>
-					<? } else { ?>
-						<a id="previous" href="../" style="visibility:hidden">older</a>
-					<?}
-				} ?>
+				if($upload->next()) { 
+					$style = ($upload->next()->is_nsfw() || $upload->next()->is_tmbo() ? 'style="color: rgb(255,0,0)"' : "") ?>
+					<a id="next" <?= $style ?> href="<?= $_SERVER['PHP_SELF'] ?>?id=<?= $upload->next()->id() ?>">newer</a>
+				<? } else { ?>
+					<a href="../" id="next" style="visibility:hidden">newer</a>
+				<? }
+				switch($upload->type()) {
+					case "avatar":
+						$index = "yearbook";
+						break;
+					default:
+						$index = $me->getPref("index");
+						if($index == "") {
+							$index = "main";
+						}
+						break;
+				}
+				?>
+				. <a id="index" href="/offensive/?c=<?= $index ?>">index</a> .
+				<? if($upload->prev()) {
+					$style = ($upload->prev()->is_nsfw() || $upload->prev()->is_tmbo() ? 'style="color: rgb(255,0,0)"' : "") ?>
+					<a id="previous" <?= $style ?> href="<?= $_SERVER['PHP_SELF'] ?>?id=<?= $upload->prev()->id() ?>">older</a>
+				<? } else { ?>
+					<a id="previous" href="../" style="visibility:hidden">older</a>
+				<? } ?>
 					
 				<!--
 					comment block

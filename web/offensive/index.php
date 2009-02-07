@@ -337,11 +337,20 @@ $timelimit = 10;
 
 	<div class="textlinks">portions &copy; 1997-<?= date("Y") ?>. site development by <a href="/contact/" class="textlinks" onmouseover='window.status="[ connect ]"; return true' onmouseout='window.status=""'>ray hatfield</a>, scott perry, and others.</div>
 	<?
+	
 	if($me->status() == "admin") {
 		?>
 		<div class="textlinks"><?= number_format(time_end($ptime), 3)."s php, ".number_format($querytime, 3)."s sql, $queries queries"; ?></div>
 		<?
+		$loadavg = "/proc/loadavg";
+		if(file_exists($loadavg) && is_readable($loadavg)) {
+			$load = file_get_contents($loadavg);
+			?>
+			<div class="textlinks"><?= $load ?></div>
+			<?
+		}
 	}
+	
 	?>
 </div>
 <br />

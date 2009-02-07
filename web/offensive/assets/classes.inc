@@ -283,8 +283,8 @@ class Upload {
 	 * comment slinging code
 	 */
 	public function getComments() {
-		if(!array_key_exists("comments", $this->data)) {
-			$this->data["comments"] = array();
+		if(!array_key_exists("thecomments", $this->data)) {
+			$this->data["thecomments"] = array();
 			
 			$sql = "SELECT com.*,
 			               u.userid AS user_userid,
@@ -297,11 +297,11 @@ class Upload {
 			       " ORDER BY timestamp ASC";
 			$result = tmbo_query($sql);
 			while(false !== ($row = mysql_fetch_assoc($result))) {
-				$this->data["comments"][] = new Comment($row);
+				$this->data["thecomments"][] = new Comment($row);
 			}
 		}
 		
-		return $this->data["comments"];
+		return $this->data["thecomments"];
 	}
 	
 	/*

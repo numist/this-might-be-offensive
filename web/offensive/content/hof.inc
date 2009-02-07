@@ -50,9 +50,11 @@
 			    $_REQUEST['p'] : 0;		
 		$args = $_REQUEST;
 		$args["type"] = "image";
-		$args["p"] = $page;
 		if(!array_key_exists("sort", $args)) {
 			$args["sort"] = "votes_desc";
+		}
+		if(!array_key_exists("limit", $args)) {
+			$args["limit"] = "100";
 		}
 		
 		$result = core_getuploads($args);
