@@ -153,6 +153,9 @@ function tmbo_query($sql, $timeout=2) {
 	$time = time_end($time);
 	$querytime += $time;
 
+	// var_dump($time);
+	// var_dump($sql);
+
 	if($time > $timeout && $timeout != 0) {
 		$trace = debug_backtrace();
 		$trace = $trace[0];

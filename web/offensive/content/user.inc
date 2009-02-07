@@ -336,43 +336,28 @@ function setStatusForm( $id, $status, $email ) {
 
 
 function votingRecord( $id, $name ) {
-	return;
-	
-// XXX: this query needs an index to be created in the database
-	$sql = "SELECT count(*) as count, vote
-				FROM offensive_comments
-				WHERE userid = $id
-				GROUP  BY vote";
-
+	$sql = "SELECT COUNT(*) FROM offensive_comments WHERE userid = $id";
 	$result = tmbo_query( $sql );
+	$comments = mysql_fetch_row($result);
+	$comments = $comments[0];
 
-	$good = 0;
-	$bad = 0;
-	$comments = 0;
-	
-	while( $row = mysql_fetch_array( $result ) ) {
-	
-		switch( $row['vote'] ) {
+	if($comments > 1000) {
+		?><div class="piletitle" style="margin-bottom:12px;"><?echo $name ?> has made <?= $comments ?>  votes/comments<?
+	} else {
+		$sql = "SELECT COUNT(*) FROM offensive_comments WHERE userid = $id";
+		$result = tmbo_query( $sql );
+		$good = mysql_fetch_row($result);
+		$good = $good[0];
 		
-			case 'this is good':
-				$good = $row['count'];
-			break;
-			
-			case 'this is bad':
-				$bad = $row['count'];
-			break;
-			
-			default:
-				$comments = $row['count'];
-			break;
+		$sql = "SELECT COUNT(*) FROM offensive_comments WHERE userid = $id";
+		$result = tmbo_query( $sql );
+		$bad = mysql_fetch_row($result);
+		$bad = $bad[0];
 		
-		}
-
+		?><div class="piletitle" style="margin-bottom:12px;"><?echo $name ?>'s voting record: +<?= $good ?> -<?= $bad ?><?
 	}
 
-?>
-	<div class="piletitle" style="margin-bottom:12px;"><?echo $name ?>'s voting record: <? echo "+$good -$bad"?> (<a href="./?c=votedetail&userid=<?= $id ?>">click for details</a>)</div>
-
+?> (<a href="./?c=votedetail&userid=<?= $id ?>">click for details</a>)</div>
 <?
 
 }
