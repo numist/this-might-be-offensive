@@ -273,10 +273,12 @@ function recentComments( $uid ) {
 
 	$seen = array();
 	$count = 0;
-	while( false !== ($row = mysql_fetch_assoc( $result )) && $count++ < 15) {
+	while( false !== ($row = mysql_fetch_assoc( $result )) && $count < 15) {
 		$upload = new Upload($row);
 		
 		if(array_key_exists($upload->filename(), $seen)) continue;
+		$seen[$upload->filename()] = true;
+		$count++;
 		
 		$css = isset($css) && strpos($css, "even") !== false ? "oddfile odd_row" : "evenfile even_row";
 ?>
