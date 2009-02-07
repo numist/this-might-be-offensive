@@ -7,7 +7,6 @@ require_once( "offensive/assets/activationFunctions.inc" );
 require_once( 'admin/mysqlConnectionInfo.inc' );
 if(!isset($link) || !$link) $link = openDbConnection();
 require_once("offensive/assets/functions.inc");
-require_once("offensive/assets/xml.inc");
 require_once("offensive/assets/argvalidation.inc");
 require_once("offensive/assets/classes.inc");
 require_once("offensive/assets/comments.inc");
