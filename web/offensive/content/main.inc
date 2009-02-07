@@ -5,6 +5,7 @@
   
 	require_once( 'offensive/assets/tabs.inc' );
 	require_once("offensive/assets/classes.inc");
+	require_once("offensive/assets/core.inc");
 	
 	function start() {
 		global $me;
@@ -25,41 +26,11 @@ EOT;
 
 	function body() {
 
-		$numPerPage = 100;
 		$page = isset($_REQUEST['p']) && is_numeric($_REQUEST['p']) ?
-			    $_REQUEST['p'] : 0;
-		$start = $page * $numPerPage;
-    
-	/* adding the USE KEY statement seems to have resolved performance
-	 * issues with this query.  Why MySQL wasn't using the key to
-	 * begin with is anyone's guess.  Thanks jonxp for the help.
-	 */
-    $sql = "SELECT
-  offensive_uploads.id,
-  offensive_uploads.timestamp,
-  offensive_uploads.filename,
-  offensive_uploads.nsfw,
-  offensive_uploads.tmbo,
-  offensive_uploads.type,
-  offensive_count_cache.good,
-  offensive_count_cache.bad,
-  offensive_count_cache.tmbo AS tmbo_vote,
-  offensive_count_cache.comments,
-  users.username
-FROM
-  offensive_uploads USE KEY (t_t_id)
-LEFT JOIN offensive_count_cache
-ON  offensive_count_cache.threadid = offensive_uploads.id
-JOIN users
-ON offensive_uploads.userid = users.userid
-WHERE
-  offensive_uploads.type= 'image'
-AND
-  offensive_uploads.status = 'normal'
-AND
-  users.account_status != 'locked'
-ORDER BY offensive_uploads.timestamp DESC, offensive_uploads.id DESC
-LIMIT $start, $numPerPage";
+			    $_REQUEST['p'] : 0;		
+		$args = $_REQUEST;
+		$args["type"] = "image";
+		$args["p"] = $page;
 
 ?>
 <div class="heading">
@@ -93,7 +64,7 @@ LIMIT $start, $numPerPage";
 			<td valign="top">
 				<? require( 'offensive/assets/pickupLink.inc' ) ?>
 			</td>
-			<td valign="top">
+			<td valign="top" width="100px">
 				<div style="text-align:right"><b><a href="./?c=thumbs">thumbnail view</a></b></div>
 			</td>
 		</tr>
@@ -101,20 +72,19 @@ LIMIT $start, $numPerPage";
 			<td valign="top" colspan="2">
 				<table width="100%" id="main">
             <?php
-            $result = tmbo_query($sql);
-            while( $row = mysql_fetch_assoc( $result ) ) 
-            {
-              $css = (isset($css) && $css == "odd_row") ? "even_row" : "odd_row";
-              $filename = htmlFilename($row);
+        	$result = core_getuploads($args);
+        	foreach( $result as $upload ) {
+              	$css = (isset($css) && $css == "odd_row") ? "even_row" : "odd_row";
+              	$filename = $upload->htmlFilename();
 	      
-              ?>
-                  <tr class="<?= $css ?>">
+              	?>
+                  	<tr class="<?= $css ?>">
                     <td>
-							<div class="clipr"><a href="pages/pic.php?id=<?= $row['id'] ?>" class="<?= $css ?>" title="uploaded by <?= htmlEscape($row['username']) ?>"><?= $filename ?></a></div>
+						<div class="clipr"><a href="pages/pic.php?id=<?= $upload->id() ?>" class="<?= $css ?>" title="uploaded by <?= htmlEscape($upload->uploader()->username()) ?>"><?= $upload->htmlFilename() ?></a></div>
 					</td>
 					<td class="<?= $css ?> com_cnt" style="text-align:right;white-space:nowrap">
-						<a href="./?c=comments&fileid=<?= $row['id'] ?>" class="<?= $css ?>"><nobr><?= 
-				commentLabel($row['comments'], $row['good'], $row['bad'], $row['tmbo_vote']);
+						<a href="./?c=comments&fileid=<?= $upload->id() ?>" class="<?= $css ?>"><nobr><?= 
+				$upload->commentLabel();
 			?></nobr></a>
 					</td>
                   </tr>
@@ -131,9 +101,7 @@ LIMIT $start, $numPerPage";
 				<? } ?>
 			</td>
 			<td style="text-align:right">
-				<? if( mysql_num_rows( $result ) == $numPerPage ) { ?>
 					<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'] ?>&p=<?= $page + 1 ?>"><b>next page</b></a> &raquo;
-				<? } ?>
 			</td>
 		</tr>
 	</table>

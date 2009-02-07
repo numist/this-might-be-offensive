@@ -4,6 +4,7 @@
 	if(!isset($link) || !$link) $link = openDbConnection();  
 	require_once( 'offensive/assets/tabs.inc' );
 	require_once("offensive/assets/classes.inc");
+	require_once("offensive/assets/core.inc");
 
 	function start() {
 		global $me;
@@ -28,40 +29,12 @@ EOT;
   
 		$THUMBS_PER_ROW = 4;
 
-		$numPerPage = 100;
 		$page = isset($_REQUEST['p']) && is_numeric($_REQUEST['p']) ?
-			    $_REQUEST['p'] : 0;
-		$start = $page * $numPerPage;
-
-		$userid = isset($_REQUEST['userid']) && is_numeric($_REQUEST['userid']) ? $_REQUEST['userid'] : 0;
-		$userid_sql = $userid ? " AND users.userid = '$userid' " : " AND users.account_status != 'locked' ";
-    
-	/* adding the USE KEY statement seems to have resolved performance
-	 * issues with this query.  Why MySQL wasn't using the key to
-	 * begin with is anyone's guess.  Thanks jonxp for the help.
-	 */
-    $sql = "SELECT
-  offensive_uploads.*,
-  offensive_count_cache.good AS goods,
-  offensive_count_cache.bad AS bads,
-  offensive_count_cache.tmbo AS tmbos,
-  offensive_count_cache.comments,
-  users.username AS user_username,
-  offensive_uploads.userid AS user_userid
-FROM
-  offensive_uploads USE KEY (t_t_id)
-LEFT JOIN offensive_count_cache
-ON  offensive_count_cache.threadid = offensive_uploads.id
-JOIN users
-ON offensive_uploads.userid = users.userid
-WHERE
-  offensive_uploads.type= 'image'
-AND
-  offensive_uploads.status = 'normal'
-$userid_sql
-ORDER BY offensive_uploads.timestamp DESC, offensive_uploads.id DESC
-LIMIT $start, $numPerPage
-";
+			    $_REQUEST['p'] : 0;		
+		$args = $_REQUEST;
+		$args["type"] = "image";
+		$args["p"] = $page;
+		
 ?>
 <div class="heading">
 
@@ -93,7 +66,7 @@ LIMIT $start, $numPerPage
 			<td valign="top">			
 				<? include( 'offensive/assets/pickupLink.inc' ) ?>
 			</td>
-			<td valign="top">
+			<td valign="top" width="100px">
 				<div style="text-align:right"><b><a href="./?c=main">text view</a></b></div>
 			</td>
 		</tr>
@@ -101,11 +74,10 @@ LIMIT $start, $numPerPage
 			<td valign="top" colspan="2">
 			          <table width="100%" class="thumbnails">
             <?php
-            $result = tmbo_query($sql);
+            $result = core_getuploads($args);
             $output = 0;
-            while( $row = mysql_fetch_assoc( $result ) ) 
+            foreach( $result as $upload ) 
             {
-				$upload = new Upload($row);
 				
              	$css = $upload->filtered() ? ' class="filtered"' : "";
               	$filename = rawurlencode($row['filename']);
@@ -157,9 +129,7 @@ LIMIT $start, $numPerPage
 				<? } ?>
 			</td>
 			<td style="text-align:right">
-				<? if( mysql_num_rows( $result ) == $numPerPage ) { ?>
 					<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'].$args ?>&p=<?= $page + 1 ?>"><b>next page</b></a> &raquo;
-				<? } ?>
 			</td>
 		</tr>
 	</table>

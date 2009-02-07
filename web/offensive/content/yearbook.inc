@@ -4,6 +4,8 @@
 	if(!isset($link) || !$link) $link = openDbConnection();
 
 	require_once( 'offensive/assets/tabs.inc' );
+	require_once( 'offensive/assets/classes.inc' );
+	require_once( 'offensive/assets/core.inc' );
 	
 	function start() {
 		global $me;
@@ -55,46 +57,30 @@
 		if($req == 'date') {
 			?><b><a href="./?c=yearbook">sort by username</a></b><?
 		} else {
-			?><b><a href="./?c=yearbook&sort=date">sort by date</a></b><?
+			?><b><a href="./?c=yearbook&sort=date_desc">sort by date</a></b><?
 		}
 ?>
-
-
-
 <table width="100%" class="thumbnails">
-
 <?
-
 		$numPerPage = 100;
 		$page = array_key_exists("p", $_REQUEST) ? $_REQUEST['p'] : 0;
-
-		if( ! is_numeric( $page ) ) {
-			$page = 0;
-		}
-		$start = ($page * $numPerPage);
-
-		$sql = "SELECT users.userid, username AS user_username, up.*
-					FROM users, offensive_uploads up
-					WHERE users.userid=up.userid
-						AND up.type='avatar'
-						AND account_status != 'locked'
-						AND status != 'pending'
-						AND users.timestamp > DATE_SUB( NOW(), INTERVAL 12 MONTH )
-						AND up.id = (SELECT MAX( up.id) FROM offensive_uploads up WHERE type='avatar' AND userid=users.userid)
-					ORDER BY $sort";
-
-		$result = tmbo_query($sql);
 
 		$THUMBS_PER_ROW = 4;
 		$count = 0;
 
 		$me = me();
 
-		while( $row = mysql_fetch_assoc( $result ) ) {
-			$upload = new Upload($row);
-			
-			if($upload->expired() || ($me && $me->squelched($upload->uploader()))) continue;
-		
+		$args = $_REQUEST;
+		if(!array_key_exists("sort", $args)) {
+			$args["sort"] = "uname_asc";
+		}
+		if(!array_key_exists("limit", $args)) {
+			$args["limit"] = "100";
+		}
+
+		$result = core_getyearbook($args);
+
+		foreach($result as $upload) {
 			if( (($count++) % $THUMBS_PER_ROW) == 0 ) {
 				$css = (isset($css) && $css == "even_row") ? "odd_row" : "even_row";
 				?><tr class="<?= $css ?>"><?
@@ -103,7 +89,6 @@
 			?>
 				
 					<td>
-						
 						<? // forward-compatible image filtering? oh yes, squelching… ?>
 						<a href="pages/pic.php?id=<?= $upload->id() ?>"
 							<? if($upload->filtered()) { ?>
@@ -133,9 +118,20 @@
 		}
 		?>
 
+		<tr>
+			<td>
+				<? if( $page > 0 ) { ?>
+					<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'] ?>&p=<?= $page - 1 ?>">&laquo; <b>previous page</b></a></td>
+				<? } ?>
+			</td>
+			<td colspan="2"></td>
+			<td style="text-align:right">
+				<? if(count($result) == $numPerPage) { ?>
+					<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'] ?>&p=<?= $page + 1 ?>"><b>next page</b></a> &raquo;
+				<? } ?>
+			</td>
+		</tr>
 	</table>
-
-
 <?
 	}
 ?>

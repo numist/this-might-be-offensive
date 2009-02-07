@@ -60,7 +60,7 @@
 			
 			$upload = new Upload($row);
 			
-			$filename = htmlFilename($row, $upload->type() != 'image');
+			$filename = $upload->htmlFilename($upload->type() != 'image');
 			
 			$expired = $upload->expired() ? "(expired)" : "";
 ?>

@@ -16,6 +16,30 @@
  * not intended to be called from external code.
  */
 
+function tmbo_plist_encode($data) {
+	if(is_array($data)) {
+		foreach($data as $key => $var) {
+			if(is_object($var)) {
+				if(get_class($var) == "Error") {
+					if(!array_key_exists("errors", $data)) $data["errors"] = array();
+					$data["errors"][] = "ERROR: ".$var->api_data();
+					unset($data[$key]);
+				} else {
+					$data[$key] = $var->api_data();
+				}
+			}
+		}
+	} else if(is_object($data)) {
+		if(get_class($data) == "Error") {
+			$data = array("errors" => $data->api_data());
+		} else {
+			$data = $data->api_data();
+		}
+	}
+	format_data($data);
+	return plist_encode($data);
+}
+
 // EXAMPLE USAGE:
 if(false) {
     $arr = array("foo&", "<bar>", "<baz>" => "qux", 

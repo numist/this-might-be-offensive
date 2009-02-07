@@ -51,10 +51,10 @@ function do_vote(o) {
 
 	disable_voting();
 	if(vote == "good") {
-		handle_comment_post(imageid, "", "this is good", "", "");
+		handle_comment_post(imageid, "", "this is good", "", "", "");
 		increase_count("#count_good");
 	} else {
-		handle_comment_post(imageid, "", "this is bad", "", "");
+		handle_comment_post(imageid, "", "this is bad", "", "", "");
 		increase_count("#count_bad");
 	}
 }
@@ -136,6 +136,7 @@ function get_comments(hash) {
 				comment = $("#qc_comment").val();
 				tmbo = $("#tmbo").attr("checked") ? "1" : "0";
 				repost = $("#repost").attr("checked") ? "1" : "0";
+				subscribe = $('#subscribe').attr("checked") ? "1" : "0";
 
 				if(vote == "this is good" || vote == "this is bad") {
 					disable_voting();
@@ -144,16 +145,17 @@ function get_comments(hash) {
 				}
 				if(comment != "") increase_count("#count_comment");
 
-				handle_comment_post(fileid, comment, vote, tmbo, repost);
+				handle_comment_post(fileid, comment, vote, tmbo, repost, subscribe);
 			});
 		});
 }
 
-function handle_comment_post(fileid, comment, vote, tmbo, repost) {
+function handle_comment_post(fileid, comment, vote, tmbo, repost, subscribe) {
 	if(comment == undefined) comment = "";
 	if(vote == undefined) vote = "";
 	if(tmbo == undefined) tmbo = "0";
 	if(repost == undefined) repost = "0";
+	if(subscribe == undefined) subscribe = "0";
 	
 	// XXX: not really convinced of this solution.  this fixes the bug, but not the behaviour.
 	// we just clicked the 'go' button without selecting anything
@@ -166,13 +168,16 @@ function handle_comment_post(fileid, comment, vote, tmbo, repost) {
 		  comment: comment,
 		  vote: vote,
 		  offensive: tmbo,
-		  repost: repost
+		  repost: repost,
+		  subscribe: subscribe
 		}, function(data) {
-			greyout_voting();
+			if(vote == "this is good" || vote == "this is bad") {
+				greyout_voting();
+			}
 		}
 	);
 	// if you made a comment or you voted 'this is bad', you have auto-subscribed to the thread
-	if(comment != '' || vote == "this is bad") {
+	if(comment != '' || vote == "this is bad" || subscribe != "0") {
 		toggle_subscribe("subscribe", fileid, $("#subscribeLink"));
 	}
 }

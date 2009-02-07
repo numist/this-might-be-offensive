@@ -28,7 +28,7 @@ function poast($comment, $image) {
 			for($i = 0; $i < 10; $i++) {
 				echo $com[$i] . "<br />";
 			}?>
-				<span class="abbr">Comment too long. Click <a href="/offensive/?c=comments&fileid=<?= $image['id'] ?>#<?= $comment['commentid'] ?>">here</a> to view the full text.</span>
+				<span class="abbr">Comment too long. Click <a href="/offensive/?c=comments&fileid=<?= $upload->id() ?>#<?= $comment->id() ?>">here</a> to view the full text.</span>
 			<?
 		}
 	} else {
@@ -58,7 +58,15 @@ function setActiveStyleSheet(title) {
     }
   }
 }
+
+/* image rollover stuff */
+function changesrc(a,im)
+{
+	x = eval("document."+a);
+	x.src=im;
+}
 </script>
+
 
 </head>
 <body bgcolor="#FFFFEE" text="#800000" link="#0000EE" vlink="#0000EE">
@@ -149,12 +157,12 @@ $sql = "SELECT
   offensive_uploads.nsfw,
   offensive_uploads.tmbo,
   offensive_uploads.type,
-  offensive_count_cache.good,
-  offensive_count_cache.bad,
-  offensive_count_cache.tmbo AS tmbo_vote,
+  offensive_count_cache.good as goods,
+  offensive_count_cache.bad as bads,
+  offensive_count_cache.tmbo AS tmbos,
   offensive_count_cache.comments,
-  users.username,
-  users.userid
+  users.username as user_username,
+  users.userid as user_userid
 FROM
   offensive_uploads USE KEY (t_t_id)
 LEFT JOIN offensive_count_cache
@@ -173,13 +181,15 @@ LIMIT $page_limit_clause, 15";
 $result = tmbo_query($sql);
 while( $image = mysql_fetch_assoc( $result ) ) 
 {
-	$filepath = getFile($image['id'], $image['filename'], $image['timestamp'], $image['type']);
+	$upload = new Upload($image);
+	
+	$filepath = $upload->file();
 ?>
 
 
 <!-- loopy -->
 <span class="filesize">
-	File: <a href="<?= "/offensive/pages/pic.php?id=".$image['id'] ?>"><?= htmlEscape($image['filename']) ?></a> - (<?= byte_format(filesize($filepath))?>, <?
+	File: <a href="<?= "/offensive/pages/pic.php?id=".$upload->id() ?>"><?= htmlEscape($upload->filename()) ?></a> - (<?= byte_format(filesize($filepath))?>, <?
 
 $info = getimagesize($filepath);
 echo $info[0]."x".$info[1];
@@ -187,35 +197,31 @@ echo $info[0]."x".$info[1];
 ?>)
 </span>
 <br>
+
+
+
+
+<a href="<?= $upload->URL() ?>"
+	<? if($upload->filtered()) { ?>
+		onMouseOver='changesrc("th<?= $upload->id()?>","<?= $upload->thumbURL() ?>")'
+ 		onMouseOut='changesrc("th<?= $upload->id() ?>","/offensive/graphics/th-filtered.gif")'
+	<? } ?>
+><img name="th<?= $upload->id()?>"
+	src="<?= $upload->filtered()
+		? "/offensive/graphics/th-filtered.gif" 
+		: $upload->thumbURL() ?>"
+ 	border=0 align=left hspace=20 title="<?= byte_format(filesize($filepath)); ?>" /></a>
 <?
-	if($me->squelched($image['userid'])) {
-		echo "[squelched]";
-	} else if(($me->getPref("hide_tmbo") == 1 && $image['tmbo'] == 1) &&
-			  ($me->getPref("hide_nsfw") == 1 && $image['nsfw'] == 1)) { 
-		echo "[blocked: nsfw &amp; tmbo]";
-	} else if($me->getPref("hide_tmbo") == 1 && $image['tmbo'] == 1) { 
-		echo "[blocked: tmbo]";
-	} else if($me->getPref("hide_nsfw") == 1 && $image['nsfw'] == 1) {
-		echo "[blocked: nsfw]"; 
-	} else {
-?>
-<a href="<?= getFileURL($image['id'], $image['filename'], $image['timestamp'], $image['type']) ?>"  target=_blank><img src="<?php
-	if(getThumb($image['id'], $image['filename'], $image['timestamp'], $image['type']) != '') {
-		echo getThumbURL($image['id'], $image['filename'], $image['timestamp'], $image['type']);
-	} else {
-		echo "/offensive/graphics/previewNotAvailable.gif";
-	}
-?>" border=0 align=left hspace=20 alt="<?= byte_format(filesize($filepath)); ?>"></a><?
-	}
-?><a name="im<?= $image['id'] ?>"></a>
+
+?><a name="im<?= $upload->id() ?>"></a>
 <!-- voting goes here -->
 <span class="filetitle"></span> 
-<span class="postername"><?= htmlEscape($image['username']) ?></span>&nbsp;
+<span class="postername"><?= htmlEscape($upload->uploader()->username()) ?></span>&nbsp;
 <?= date("m/d/y(D)H:i:s", $time) ?>
 <span></span>
-<span id="nothread<?= $image['id'] ?>">
-	<a href="/offensive/pages/pic.php?id=<?= $image['id'] ?>" class="quotejs">No.<?= $image['id'] ?></a>
-	&nbsp; [<a href="/offensive/?c=comments&fileid=<?= $image['id'] ?>">Reply</a>]
+<span id="nothread<?= $upload->id() ?>">
+	<a href="/offensive/pages/pic.php?id=<?= $upload->id() ?>" class="quotejs">No.<?= $upload->id() ?></a>
+	&nbsp; [<a href="/offensive/?c=comments&fileid=<?= $upload->id() ?>">Reply</a>]
 </span><br />
 <!--<blockquote>So ur with ur honey and yur making out wen the phone rigns. U anser it n the vioce is &quot;wut r u doing wit my daughter?&quot; U tell ur girl n she say &quot;my dad is ded&quot;. THEN WHO WAS PHONE?
 <br /><span class="abbr">Comment too long. Click <a href="res/60550329.html#60550329">here</a> to view the full text.</span></blockquote>-->
@@ -226,7 +232,7 @@ echo $info[0]."x".$info[1];
 	$sql = "SELECT offensive_comments.*, offensive_comments.id as commentid, offensive_comments.timestamp AS comment_timestamp, users.*
 				FROM offensive_uploads, offensive_comments, users
 				WHERE users.userid = offensive_comments.userid
-				AND offensive_uploads.id=fileid AND fileid = " . $image['id'] . "
+				AND offensive_uploads.id=fileid AND fileid = " . $upload->id() . "
 				AND comment != ''
 				ORDER BY comment_timestamp";
 	
@@ -237,7 +243,7 @@ echo $info[0]."x".$info[1];
 
 	$comment = mysql_fetch_assoc($res);
 	++$fetch;
-	if($comment['userid'] == $image['userid']) {
+	if($comment['userid'] == $upload->uploader()->id()) {
 		$op = 1;
 		echo "<blockquote>";
 		poast($comment, $image);
@@ -277,7 +283,7 @@ echo $info[0]."x".$info[1];
 			date("m/d/y(D)H:i:s", strtotime($comment['comment_timestamp']));
 			?><span></span>
 			<span id="norep<?= $comment['commentid'] ?>">
-				<a href="/offensive/?c=comments&fileid=<?= $image['id'] ?>#<?= $comment['commentid'] ?>" class="quotejs">No.<?= $comment['commentid'] ?></a>
+				<a href="/offensive/?c=comments&fileid=<?= $upload->id() ?>#<?= $comment['commentid'] ?>" class="quotejs">No.<?= $comment['commentid'] ?></a>
 			</span>
 			<blockquote><?
 				poast($comment, $image);

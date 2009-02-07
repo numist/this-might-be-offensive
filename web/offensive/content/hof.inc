@@ -6,6 +6,8 @@
 
 	require_once('offensive/assets/tabs.inc');
 	require_once('offensive/assets/functions.inc');
+	require_once("offensive/assets/classes.inc");
+	require_once("offensive/assets/core.inc");
 	
 	function start() {
 		global $me;
@@ -43,31 +45,36 @@
 			</tr>
 
 <?
-		$sql = "SELECT up.id as fileid, cache.good as votes, up.userid, up.filename, up.timestamp, users.username, up.nsfw, up.tmbo, up.type, cache.comments FROM offensive_uploads up, users, offensive_count_cache cache WHERE up.id = cache.threadid AND users.userid = up.userid AND up.type = 'image'";
-		if($view == "today") $sql .= " AND up.timestamp > now() - INTERVAL 1 DAY";
-		if(isset($_REQUEST['nonsfw'])) $sql .= " AND up.nsfw = 0";
-		if(isset($_REQUEST['notmbo'])) $sql .= " AND up.tmbo = 0";
-		$sql .=" ORDER BY cache.good DESC LIMIT 100";
-
-		$result = tmbo_query( $sql );
-		$count = 0;
-
-		while( $row = mysql_fetch_assoc( $result ) ) {
+		$numPerPage = 100;
+		$page = isset($_REQUEST['p']) && is_numeric($_REQUEST['p']) ?
+			    $_REQUEST['p'] : 0;		
+		$args = $_REQUEST;
+		$args["type"] = "image";
+		$args["p"] = $page;
+		if(!array_key_exists("sort", $args)) {
+			$args["sort"] = "votes_desc";
+		}
+		
+		$result = core_getuploads($args);
+		$count = $page * $numPerPage;
+		foreach($result as $upload) {
 			$css = strpos($css, "even") !== false ? "oddfile odd_row" : "evenfile even_row";
-			if( $row['userid'] == $_SESSION['userid'] ) {
+			
+			if( $upload->uploader()->id() == $_SESSION['userid'] ) {
 				$css = "my_hof ".(strpos($css, "even") !== false ? "even_row" : "odd_row");
 			}
-			if($view=="today") $timeSince=hoursSince($row['timestamp']);
-			if($view=="hof") $timeSince = weeksSince($row['timestamp']);
+			
+			if($view=="today") $timeSince=hoursSince($upload->timestamp());
+			if($view=="hof") $timeSince = weeksSince($upload->timestamp());
 			$cssw = $view == 'hof' ? "$css weeks_$timeSince" : $css;
 ?>
 			<tr class="<? echo $cssw ?>">
 				<td style="text-align:right"><? echo ++$count ?>.</td>
-				<td><div style="white-space:nowrap;width:312px;overflow:hidden;"><a class="<? echo $cssw ?>" href="pages/pic.php?id=<?= $row['fileid'] ?>"><? echo htmlFilename($row)
+				<td><div style="white-space:nowrap;width:312px;overflow:hidden;"><a class="<? echo $cssw ?>" href="pages/pic.php?id=<?= $upload->id() ?>"><?= $upload->htmlFilename()
 			    ?></a></td></div>
-				<td><a class="<? echo $cssw ?>" href="./?c=user&userid=<? echo $row['userid'] ?>"><? echo htmlEscape($row['username']) ?></a></td>
-				<td><a class="<? echo $cssw ?>" href="./?c=comments&fileid=<?= $row['fileid'] ?>"><?= $row['comments'] ?></a></td>
-				<td>(+<? echo $row['votes'] ?>)</td>
+				<td><a class="<? echo $cssw ?>" href="./?c=user&userid=<?= $upload->uploader()->id() ?>"><?= htmlEscape($upload->uploader()->username()) ?></a></td>
+				<td><a class="<? echo $cssw ?>" href="./?c=comments&fileid=<?= $upload->id() ?>"><?= $upload->comments() ?></a></td>
+				<td>(+<?= $upload->goods() ?>)</td>
 				<td style="text-align:right"><?= $timeSince ?></td>
 			</tr>
 <?

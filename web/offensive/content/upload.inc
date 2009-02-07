@@ -288,7 +288,7 @@
 					&& function_exists("exif_read_data")) {
         	
 				$filename = $tmpdir."/".$postdata['tmpname'];
-				$exif = exif_read_data($tmpdir."/".$postdata['tmpname']);
+				$exif = @exif_read_data($tmpdir."/".$postdata['tmpname']);
         	
 				if($exif && array_key_exists("Orientation", $exif)) {
 					$transform = getTransform($exif['Orientation']);
@@ -362,18 +362,18 @@
 		* metadata in the database and on the filesystem.                     *
 		**********************************************************************/
 		
-		/*
-		 * get the current time from the database instead of from the server
-		 * this solves the time zone problems that occur when we put a file in
-		 * the uploads directory for one date, and the database is already in 
-		 * the next (or previous) day.  in tmbo's case, the times are 
-		 * traditionally 2 hours apart or so, and issues occur when moving
-		 * between servers.
-		 */ 
+		// it's possible (it's happened in the past!) for the time in sql to differ from PHP
+		// use the SQL server's time as the trusted source
 		$sql = "SELECT NOW()";
 		$res = tmbo_query($sql);
 		list($now) = mysql_fetch_array($res);
-		$path = basePath($now, typeFor($postdata));
+
+		// basePath()
+		$timestamp = strtotime($now);
+		$year = date( "Y", $timestamp );
+		$month = date( "m", $timestamp );
+		$day = date( "d", $timestamp );
+		$path = get_include_path()."/offensive/uploads/$year/$month/$day/".typeFor($postdata)."/";
 
 		$nsfw = array_key_exists('nsfw', $postdata) ? 1 : 0;
 		$tmbo = array_key_exists('tmbo', $postdata) ? 1 : 0;
@@ -559,7 +559,7 @@
 			return false;
 		
 		$filename = $tmpdir."/".$postdata['tmpname'];
-		$exif = exif_read_data($tmpdir."/".$postdata['tmpname']);
+		$exif = @exif_read_data($tmpdir."/".$postdata['tmpname']);
 		
 		if(!$exif || !array_key_exists("Orientation", $exif)) {
 			return false;

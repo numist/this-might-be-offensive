@@ -11,6 +11,8 @@ mustLogIn("http");
 require_once("offensive/assets/conditionalGet.inc");
 require_once("offensive/assets/functions.inc");
 
+require_once("offensive/assets/classes.inc");
+
 $sql = "SELECT offensive_uploads.timestamp
 		FROM offensive_uploads USE KEY (t_t_id)
 			LEFT JOIN users ON offensive_uploads.userid = users.userid
@@ -32,7 +34,7 @@ conditionalGet($lastBuildTime);
 			<description>[ this might be offensive ]</description>
 			<lastBuildDate><?= gmdate('r', $lastBuildTime);	?></lastBuildDate>
 		<? } 
-	$sql = "SELECT offensive_uploads.*, users.username
+	$sql = "SELECT offensive_uploads.*, users.username as user_username
 			FROM offensive_uploads USE KEY (t_t_id)
 				LEFT JOIN users ON offensive_uploads.userid = users.userid
 			WHERE type='image' AND status='normal'";
@@ -44,29 +46,30 @@ conditionalGet($lastBuildTime);
 	$result = tmbo_query( $sql );
 
 	while( $row = mysql_fetch_assoc( $result ) ) {
+		$upload = new Upload($row);
 	
-	  // mark tmbo and nsfw files, if they aren't already
-		$filename = $row['filename'];
-		$filename = $row['tmbo'] == 1 && strpos(strtolower($filename), "[tmbo]") === false ?
+		// mark tmbo and nsfw files, if they aren't already
+		$filename = $upload->filename();
+		$filename = $upload->is_tmbo == 1 && strpos(strtolower($filename), "[tmbo]") === false ?
 				'[tmbo] '.$filename : $filename;
-			$filename = $row['nsfw'] == 1 && strpos(strtolower($filename), "[nsfw]") === false ?
+		$filename = $upload->is_nsfw() == 1 && strpos(strtolower($filename), "[nsfw]") === false ?
 				'[nsfw] '.$filename : $filename;
 
-		$fileURL = "http://". $_SERVER['SERVER_NAME'] . getFileURL($row['id'], $row['filename'], $row['timestamp']);
-		$thumbURL = "http://". $_SERVER['SERVER_NAME'] . getThumbURL($row['id'], $row['filename'], $row['timestamp']);
+		$fileURL = "http://". $_SERVER['SERVER_NAME'] . $upload->fileURL();
+		$thumbURL = "http://". $_SERVER['SERVER_NAME'] . $upload->thumbURL();
 ?>
 
 		<item>
 			<? if( isset($_GET['gallery']) ) { ?>
 				<media:content url="<?= $fileURL ?>" />
 				<media:thumbnail url="<?= $thumbURL ?>" />
-				<guid isPermaLink="false">tmbo-<?= $row['id'] ?></guid>
+				<guid isPermaLink="false">tmbo-<?= $upload->id() ?></guid>
 			<? } else { ?>
-				<title><![CDATA[<?= $filename ?> (uploaded by <?= $row['username'] ?>)]]></title>
-				<link>http://<?= $_SERVER['SERVER_NAME'] ?>/offensive/pages/pic.php?id=<?= $row['id'] ?></link>
+				<title><![CDATA[<?= $filename ?> (uploaded by <?= $upload->uploader()->username()'] ?>)]]></title>
+				<link>http://<?= $_SERVER['SERVER_NAME'] ?>/offensive/pages/pic.php?id=<?= $upload->id() ?></link>
 				<description><![CDATA[<? if($fileURL != '') { ?><img src="<?= $fileURL ?>"/><? } else { echo "(expired)"; } ?>]]></description>
-				<pubDate><? echo gmdate( "r", strtotime( $row['timestamp'] ) ) ?></pubDate>			
-				<comments><![CDATA[http://<?= $_SERVER['SERVER_NAME'] ?>/offensive/?c=comments&fileid=<?= $row['id'] ?>]]></comments>
+				<pubDate><? echo gmdate( "r", strtotime( $upload->timestamp() ) ) ?></pubDate>			
+				<comments><![CDATA[http://<?= $_SERVER['SERVER_NAME'] ?>/offensive/?c=comments&fileid=<?= $upload->id() ?>]]></comments>
 			<? } ?>
 		</item>
 <?

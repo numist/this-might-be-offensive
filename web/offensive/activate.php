@@ -1,4 +1,6 @@
 <?
+// YYY: awaiting activation doesn't seem to be actually set anywhere in the code
+// XXX: revisit the login process and rewrite
 	set_include_path("..");
 	require_once( 'offensive/assets/header.inc' );
 
@@ -40,8 +42,6 @@
 <html>
 <head>
 	<title></title>
-	<meta name="generator" content="BBEdit 7.0.3">
-
 	<link rel="stylesheet" type="text/css" href="filepilestyle.css" />
 	<link rel="stylesheet" type="text/css" href="/styles/oldskool.css"/>
 
@@ -104,17 +104,6 @@
 						
 					</div>
 		
-				</div>
-			<div class="blackbar"></div>
-		</div>
-	
-	
-		<div class="contentbox">
-			<div class="blackbar"></div>
-				<div class="heading">web hosting provided by:</div>
-				<div class="bluebox" style="text-align:center">
-
-					<a href="http://www.dreamhost.com/rewards.cgi"><img src="/graphics/dreamhost.gif" alt="dreamhost" width="88" height="33" hspace="0" vspace="0"></a>
 				</div>
 			<div class="blackbar"></div>
 		</div>

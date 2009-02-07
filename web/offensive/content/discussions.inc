@@ -4,6 +4,8 @@
 	if(!isset($link) || !$link) $link = openDbConnection();
 	require_once( 'offensive/assets/functions.inc' );
 	require_once( 'offensive/assets/tabs.inc' );
+	require_once("offensive/assets/classes.inc");
+	require_once("offensive/assets/core.inc");
 	
 	function start() {
 		global $me;
@@ -14,6 +16,13 @@
 
 	function body() {
 		global $me;
+		
+		$page = isset($_REQUEST['p']) && is_numeric($_REQUEST['p']) ?
+			    $_REQUEST['p'] : 0;		
+		$args = $_REQUEST;
+		$args["type"] = "topic";
+		$args["p"] = $page;
+	
 ?>
 	<div class="heading">we need to talk.</div>
 <?
@@ -23,7 +32,74 @@
 			<div style="font-weight:bold;text-align:right">
 				<a href="./?c=newtopic">new topic</a>
 			</div>
-			<? discussionList(); ?>
+			<?
+			
+			?>
+
+			<table width="100%" id="discussions">
+
+				<tr style="background:#bbbbee;text-align:center;">
+					<td><b><a href="./?c=discussions&sort=date_desc">sort by thread creation date</a></b></td>
+					<td><b><a href="./?c=discussions&sort=comments_desc">comment count</a></b></td>
+					<td><b><a href="./?c=discussions&sort=activity_desc">latest comment</a></b></td>
+				</tr>
+
+			<?
+
+					// XXX: refactor to match yearbook.inc
+					$defaultSort = $me->getPref("sortorder_discussions") ?
+					               $me->getPref("sortorder_discussions") :
+					               "date_desc";
+					if(strpos($defaultSort, "_") == false) $defaultSort = "date_desc";
+					$args = $_REQUEST;
+					if(!array_key_exists("sort", $args)) {
+						$args["sort"] = $defaultSort;
+					} else {
+						$me->setPref("sortorder_discussions", $args["sort"]);
+					}
+					
+					$numPerPage = 100;
+					$page = isset($_REQUEST['p']) && is_numeric($_REQUEST['p']) ?
+						    $_REQUEST['p'] : 0;
+					$start = $page * $numPerPage;
+					$limit = "$start, $numPerPage";
+
+					$args = $_REQUEST;
+					if(!array_key_exists("limit", $args)) {
+						$args["limit"] = $limit;
+					}
+					$args["type"] = "topic";
+					
+					$result = core_getuploads($args);
+					foreach( $result as $upload ) {
+						$css = (isset($css) && $css == "even_row") ? "odd_row" : "even_row";
+
+						?>
+							<tr class="<?= $css ?>">
+								<td><div class="clipr"><a href="./?c=comments&fileid=<?= $upload->id() ?>"><?= $upload->htmlFilename() ?></a></div></td>
+								<td class="com_cnt"><a href="./?c=comments&fileid=<?= $upload->id() ?>">(<?=
+									$upload->commentLabel(false);
+									?>)</a></td>
+								<td class="dater"><?= $upload->last_active() ?></td>
+							</tr>
+						<?
+					}
+
+
+					?>
+						<tr>
+							<td>
+								<? if( $page > 0 ) { ?>
+									<a href="<?= $_SERVER['PHP_SELF']?>?c=<?= $_REQUEST['c'] ?>&order=<?=$order?>&p=<?= $page - 1 ?>">&laquo; <b>previous page</b></a></td>
+								<? } ?>
+							</td>
+							<td></td>
+							<td style="text-align:right">
+									<a href="<?= $_SERVER['PHP_SELF']?>?c=<?= $_REQUEST['c'] ?>&order=<?=$order?>&p=<?= $page + 1 ?>"><b>next page</b></a> &raquo;
+							</td>
+						</tr>
+
+				</table>
 		</div>
 <?
 	}
@@ -31,85 +107,5 @@
 	function discussionList() {
 		global $me;
 
-?>
-
-<table width="100%" id="discussions">
-
-	<tr style="background:#bbbbee;text-align:center;">
-		<td><b><a href="./?c=discussions&order=up.timestamp">sort by thread creation date</a></b></td>
-		<td><b><a href="./?c=discussions&order=thecount">comment count</a></b></td>
-		<td><b><a href="./?c=discussions&order=latest">latest comment</a></b></td>
-	</tr>
-
-<?
-
-		// XXX: refactor to match yearbook.inc
-		$defaultSort = $me->getPref("sortorder_discussions") ?
-		               $me->getPref("sortorder_discussions") :
-		               "up.timestamp";
-		
-		$order = isset($_REQUEST['order']) ? sqlEscape( $_REQUEST['order'] ) : $defaultSort;
-		
-		if(!in_array(strtolower($order), array("up.timestamp", "thecount", "latest"))) {
-			$order = "up.timestamp";
-		}
-
-		if( $order != $defaultSort ) {
-			$me->setPref("sortorder_discussions", $order);
-		}
-
-		$numPerPage = 100;
-		$page = array_key_exists("p", $_REQUEST) ? $_REQUEST['p'] : 0;
-		if( ! is_numeric( $page ) ) {
-			$page = 0;
-		}
-		$start = ($page * $numPerPage);
-
-		$sql = "select up.*, up.id as fileid, counts.*, counts.timestamp AS latest, counts.comments AS thecount
-				FROM offensive_uploads up
-				LEFT JOIN offensive_count_cache counts ON counts.threadid = up.id
-				WHERE type = 'topic'
-					ORDER BY $order DESC
-					LIMIT $start, $numPerPage";
-
-		$result = tmbo_query( $sql );
-
-		while( $row = mysql_fetch_assoc( $result ) ) {
-			$css = (isset($css) && $css == "even_row") ? "odd_row" : "even_row";
-			
-			$filename = trim($row['filename']);
-			$filename = htmlEscape($filename);
-
-			?>
-				<tr class="<?= $css ?>">
-					<td><div class="clipr"><a href="./?c=comments&fileid=<?= $row['fileid'] ?>"><?= $filename ?></a></div></td>
-					<td class="com_cnt"><a href="./?c=comments&fileid=<?= $row['fileid'] ?>">(<?=
-						commentLabel($row['comments'], 0, 0, 0, false);
-						?>)</a></td>
-					<td class="dater"><?= $row['latest'] ?></td>
-				</tr>
-			<?
-		}
-
-		
-		?>
-			<tr>
-				<td>
-					<? if( $page > 0 ) { ?>
-						<a href="<?= $_SERVER['PHP_SELF']?>?c=<?= $_REQUEST['c'] ?>&order=<?=$order?>&p=<?= $page - 1 ?>">&laquo; <b>previous page</b></a></td>
-					<? } ?>
-				</td>
-				<td></td>
-				<td style="text-align:right">
-					<? if( mysql_num_rows( $result ) == $numPerPage ) { ?>
-						<a href="<?= $_SERVER['PHP_SELF']?>?c=<?= $_REQUEST['c'] ?>&order=<?=$order?>&p=<?= $page + 1 ?>"><b>next page</b></a> &raquo;
-					<? } ?>
-				</td>
-			</tr>
-
-	</table>
-
-
-<?
 	}
 ?>

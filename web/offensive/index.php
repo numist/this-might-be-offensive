@@ -360,12 +360,12 @@ $timelimit = 10;
 			return;
 		}
 
-		$sql = "SELECT DISTINCT b.fileid, u.filename, u.nsfw, u.tmbo, u.type, b.commentid
+		$sql = "SELECT DISTINCT u.*, b.commentid
 					FROM offensive_uploads u, offensive_subscriptions b
 					WHERE b.userid = $uid 
 						AND u.id = b.fileid
 						AND b.commentid IS NOT NULL
-					ORDER BY fileid ASC
+					ORDER BY b.commentid ASC
 					LIMIT 50";
 
 		$result = tmbo_query( $sql );
@@ -379,9 +379,10 @@ $timelimit = 10;
 			<div class="heading">unread comments:</div>
 			<div class="bluebox">
 				<? while( $row = mysql_fetch_assoc( $result ) ) {
-					$css = isset($css) && $css == "evenfile" ? "oddfile" : "evenfile"; ?>
+					$css = isset($css) && $css == "evenfile" ? "oddfile" : "evenfile"; 
+					$upload = new Upload($row); ?>
 				
-					<div class="clipper"><a class="<?= $css ?>" href="?c=comments&fileid=<?= $row['fileid'] ?>#<?= $row['commentid']?>"><?= htmlFilename($row) ?></a></div>
+					<div class="clipper"><a class="<?= $css ?>" href="?c=comments&fileid=<?= $upload->id() ?>#<?= $row['commentid']?>"><?= $upload->htmlFilename() ?></a></div>
 				<? } ?>
 			</div>
 			<div class="heading" style="text-align:center">

@@ -1,5 +1,15 @@
 <?
 
+/* if the called_by_api function is already defined (and returns true)
+ * then errors due to argument type/formatting will be output to the
+ * user instead of causing a runtime error
+ */ 
+if(!function_exists("called_by_api")) {
+	function called_by_api() {
+		return false;
+	}
+}
+
 $validation_errors = array();
 
 /*
@@ -17,6 +27,7 @@ function check_arg($key, $type, $method=null, $required=true, $set=null) {
 
 	// make sure a valid method is being used.
 	if($method == null) $method = $_REQUEST;
+	
 	// if this is triggered, there is a code problem.  kaboom.
 	if(!is_array($method)) {
 		trigger_error("ASSERT: invalid method", E_USER_ERROR);
@@ -164,15 +175,26 @@ function handle_errors() {
 	global $validation_errors;
 	if(count($validation_errors) == 0) return true;
 	
-	header("400 Bad Request");
-	header("Content-type: text/plain");
-		
-	foreach($validation_errors as $error) {
-		trigger_error($error, E_USER_WARNING);
-		echo "$error\n";
+	if(called_by_api()) {
+		header("400 Bad Request");
+		header("Content-type: text/plain");
+			
+		$errors = array();
+		foreach($validation_errors as $error) {
+			$errors[] = new Error($error);
+		}
+		send($errors);
 	}
 	
-	exit;
+	foreach($validation_errors as $error) {
+		trigger_error($error, E_USER_WARNING);
+	}
+	$trace = debug_backtrace();
+	$where = "";
+	if(count($trace) > 1) {
+		$where = " in {$trace[1]['file']}:{$trace[1]['line']} - {$trace[1]['function']}";
+	}
+	trigger_error("exiting{$where} due to previous errors", E_USER_ERROR);
 }
 
 ?>

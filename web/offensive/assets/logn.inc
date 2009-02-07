@@ -25,6 +25,10 @@ require_once('offensive/assets/activationFunctions.inc');
 function loginFromQueryResult( $result ) {
 	global $login_message, $prompt;
 
+	if(session_id() == "") {
+		session_start();
+	}
+
 	if( mysql_num_rows($result) > 0 ) {		
 		$row = mysql_fetch_assoc( $result );
 		$status = $row['account_status'];

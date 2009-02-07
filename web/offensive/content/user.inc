@@ -16,14 +16,18 @@
 		   $_REQUEST['userid'] == "0" ||
 		   !is_numeric($_REQUEST['userid'])) {
 			header("Location: ./");
+			exit;
+		}
+		
+		global $them;
+		$them = new User($_REQUEST['userid']);
+		
+		if(!$them->exists()) {
+			header("Location: ./");
+			exit;
 		}
 	}
-	
-	function isAdmin() {
-		$status = $_SESSION['status'];
-		return $status == 'admin';
-	}
-	
+		
 	function uploadAvatarForm() {
 ?>
 	<div style="margin-bottom:12px">
@@ -43,35 +47,31 @@
 	</div>
 <?
 	}
+
+	function title() {
+		global $them;
+		return "[user] : ".$them->username();
+	}
 	
 	function body() {
-		global $me;
+		global $me, $them;
 		if( $me->status() == "admin" && 
 		    array_key_exists("set_account_status", $_REQUEST) && 
 		    $_REQUEST['set_account_status'] ) {
 			handleSetStatusSubmission();
 		}
 
-		$usrid = $_REQUEST['userid'];
-		
-		$sql = "SELECT username, account_status, email, created,
-					(select username from users ref where users.referred_by=ref.userid) AS referredby,
-					(select userid from users ref where users.referred_by=ref.userid) AS referrerid,
-					last_login_ip, timestamp
-					FROM users WHERE userid={$usrid}";
-		$res = tmbo_query( $sql );
-		list($name, $status, $email, $created, $referredby, $refid, $ip, $timestamp) = mysql_fetch_array( $res );
-	
-		$sql = "SELECT id, filename, timestamp FROM offensive_uploads
-					WHERE userid={$usrid}
-						AND type='avatar'
-					ORDER BY TIMESTAMP DESC
-					LIMIT 1";
+//		list($name, $status, $email, $created, $referredby, $refid, $ip, $timestamp) = mysql_fetch_array( $res );
 
-		$result = tmbo_query( $sql );
-		if( mysql_num_rows( $result ) == 1 ) {
-			list($avid, $avatar, $avstamp) = mysql_fetch_array( $result );
-		}
+		$usrid = $them->id();
+		$avatar = $them->yearbook();
+		$name = $them->username();
+		$status = $them->status();
+		$email = $them->email();
+		$created = $them->created();
+		$referredby = $them->referred_by();
+		$timestamp = $them->timestamp();
+		$ip = $them->last_login_ip();
 	
 		switch ($status) {
 			case "locked":
@@ -87,6 +87,7 @@
 				$accountMessage = "$name is welcome here.";
 			break;
 		}
+		
 		$formattedDate = date( "F d, Y", strtotime($created) );
 		$accountDateMessage = $formattedDate == "September 15, 2004" ? "before the dawn of time" : $formattedDate;
 
@@ -97,13 +98,13 @@
 						<? echo $accountMessage ?><br/>
 						<span style="color:#666699">
 							<? echo "$name has been around since $accountDateMessage."?>
-							<? if( is_numeric( $refid ) && $refid != $usrid ) { ?>
-								(thanks to <a href="./?c=<?= $_REQUEST['c'] ?>&userid=<?= $refid?>" style="color:#666699"><?= $referredby ?></a>.)
+							<? if( $referredby ) { ?>
+								(thanks to <a href="./?c=<?= $_REQUEST['c'] ?>&userid=<?= $referredby->id() ?>" style="color:#666699"><?= $referredby->username() ?></a>.)
 							<? } ?>
 							<? if( isset( $ip ) ) { ?>
-								<br/>Last seen on <?= date( "F d, Y", strtotime($timestamp) ) ?><? if( isAdmin() ) { ?> from <?= $ip ?> (<a href="./?c=iphistory&uid=<?= $usrid ?>">view history</a>)<? } ?>.
+								<br/>Last seen on <?= date( "F d, Y", strtotime($timestamp) ) ?><? if( $me->status() == "admin" ) { ?> from <?= $ip ?> (<a href="./?c=iphistory&uid=<?= $usrid ?>">view history</a>)<? } ?>.
 								<?
-									if( isAdmin() ) {
+									if( $me->status() == "admin" ) {
 										$sql = "SELECT DISTINCT userid, username, account_status FROM users WHERE last_login_ip = '$ip' AND userid != $usrid" ;
 										$result = tmbo_query( $sql );
 										if( mysql_num_rows( $result ) > 0 ) {
@@ -124,7 +125,7 @@
 					<div class="bluebox">
 						
 						<?
-							if( isAdmin() ) {
+							if( $me->status() == "admin" ) {
 								?>
 								<div class="adminControls"><?
 									setStatusForm( $usrid, $status, $email );
@@ -147,12 +148,12 @@
 						</div>
 
 						<?
-							if(isset($avstamp) && isset($avatar) && isset($avid)) {
+							if($avatar) {
 // XXX: avatar history
-								if(getFile($avid, $avatar, $avstamp, 'avatar')) {
+								if($avatar->file()) {
 								?>
 									<div class="piletitle" style="margin-bottom:12px;">
-										<a href="<?= getFileURL($avid, $avatar, $avstamp, 'avatar') ?>" target="_blank"><?= $name ?> is gorgeous.</a>
+										<a href="pages/pic.php?id=<?= $avatar->id() ?>"><?= $name ?> is gorgeous.</a>
 									</div>
 									<!-- next onclick="img.src=arr[i]" -->
 								<?
@@ -200,7 +201,7 @@
 							</tr>
 							<tr>
 								<td>
-									<div class="piletitle"><a href="/offensive/?c=thumbs&userid=<?php echo $usrid?>"><?echo $name ?>'s contributions to society:</a><!-- +<?php echo isset($good_votes) ? $good_votes : 0; ?> -<?php echo isset($bad_votes) ? $bad_votes : 0; ?> (<a href="./?c=uservotedetail&userid=<?= $usrid ?>">click for details</a>)--></div>
+									<div class="piletitle"><a href="/offensive/?c=thumbs&userid=<?= $usrid?>"><?= $name ?>'s contributions to society:</a><!-- +<?php echo isset($good_votes) ? $good_votes : 0; ?> -<?php echo isset($bad_votes) ? $bad_votes : 0; ?> (<a href="./?c=uservotedetail&userid=<?= $usrid ?>">click for details</a>)--></div>
 								</td>
 							</tr>
 						
@@ -210,7 +211,7 @@
 <table style="width:100%">
 									
 <?php
-		$sql = "SELECT up.*, up.id AS fileid, up.timestamp as uploadtime, counts.*
+		$sql = "SELECT up.*, counts.good as goods, counts.bad as bads, counts.tmbo as tmbos, counts.comments
 				FROM offensive_uploads up
 				LEFT JOIN offensive_count_cache counts ON up.id = counts.threadid
 			WHERE up.userid = $usrid AND status != 'pending'
@@ -223,9 +224,23 @@
 	$class = 'evenfile';
 
 	while( $row = mysql_fetch_assoc( $result ) ) {
-		$id = $row['fileid'];
 		$css = isset($css) && strpos($css, "even") !== false ? "oddfile odd_row" : "evenfile even_row";
-		emitFileRow( $css, $row );
+		$upload = new Upload($row);
+		?>
+			<tr class="<?= $css ?>">
+				<td style="width:100%"><div style="overflow:hidden;white-space:nowrap;width:285px;"><a class="<?= $css ?>" href="<?
+				if($upload->type() == "image" || $upload->type() == "avatar") 
+					echo "pages/pic.php?id=".$upload->id();
+				else
+					echo "/offensive/?c=comments&fileid=".$upload->id();
+				?>"><?= $upload->htmlFilename(true) ?></div></td>
+				<td class="<?php echo $css?>" style="text-align:right;white-space:nowrap;width:100%"><a href="./?c=comments&fileid=<?php echo $upload->id() ?>" class="<?php echo $css?>"><?=
+					$upload->commentLabel(!($type == 'topic'));
+				?></a></td>
+				<td style="text-align:right;white-space:nowrap;width:100%" class="<?php echo $css?>"><?php echo $upload->timestamp() ?></td>
+			</tr>
+		<?
+		
 	}
 
 ?>
@@ -239,35 +254,9 @@
 <?
 }
 
-function emitFileRow( $css, $row ) {
-	$id = $row['fileid'];
-	$filename = $row['filename'];
-	$comments = $row['comments'];
-	$good = $row['good'];
-	$bad = $row['bad'];
-	$offensive = $row['tmbo'];
-	$nsfw = $row['nsfw'];
-	$timestamp = $row['uploadtime'];
-	$type = $row['type'];
-?>
-	<tr class="<?= $css ?>">
-		<td style="width:100%"><div style="overflow:hidden;white-space:nowrap;width:285px;"><a class="<?= $css ?>" href="<?
-		if($type == "image" || $type == "avatar") 
-			echo "pages/pic.php?id=$id";
-		else
-			echo "/offensive/?c=comments&fileid=$id";
-		?>"><?= htmlFilename($row, true) ?></div></td>
-		<td class="<?php echo $css?>" style="text-align:right;white-space:nowrap;width:100%"><a href="./?c=comments&fileid=<?php echo $id ?>" class="<?php echo $css?>"><?=
-			commentLabel($comments, $good, $bad, $offensive, !($type == 'topic'));
-		?></a></td>
-		<td style="text-align:right;white-space:nowrap;width:100%" class="<?php echo $css?>"><?php echo $timestamp?></td>
-	</tr>
-<?
-	return $id;
-}
 
 function recentComments( $uid ) {
-	$sql="SELECT up.*, offensive_comments.timestamp, offensive_comments.id as commentid
+	$sql="SELECT up.*, offensive_comments.id as commentid
 			FROM offensive_uploads up, offensive_comments
 			WHERE offensive_comments.userid = $uid
 			AND up.id = offensive_comments.fileid
@@ -284,9 +273,10 @@ function recentComments( $uid ) {
 <?
 
 	while( $row = mysql_fetch_assoc( $result ) ) {
+		$upload = new Upload($row);
 		$css = isset($css) && strpos($css, "even") !== false ? "oddfile odd_row" : "evenfile even_row";
 ?>
-		<tr class="<?= $css ?>"><td><div style="white-space:nowrap; width:535px; overflow:hidden;"><a class="<?= $css ?>" href="?c=comments&fileid=<?= $row['id'] ?>#<?= $row['commentid'] ?>"><?= htmlFilename($row) ?></a></div></td></tr>
+		<tr class="<?= $css ?>"><td><div style="white-space:nowrap; width:535px; overflow:hidden;"><a class="<?= $css ?>" href="?c=comments&fileid=<?= $upload->id() ?>#<?= $row['commentid'] ?>"><?= $upload->htmlFilename() ?></a></div></td></tr>
 <?
 	}
 ?>
@@ -340,7 +330,7 @@ function setStatusForm( $id, $status, $email ) {
 
 
 function votingRecord( $id, $name ) {
-	//return;
+	return;
 	
 // XXX: this query needs an index to be created in the database
 	$sql = "SELECT count(*) as count, vote

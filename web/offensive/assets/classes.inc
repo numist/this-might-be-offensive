@@ -60,7 +60,7 @@ class Upload {
 			foreach($info as $key => $val) {
 				if(strpos($key, "user_") === 0) {
 					$userarr[substr($key, 5)] = $val;
-				} else {
+				} else if($key != "exists") {
 					$this->data[$key] = $val;
 				}
 			}
@@ -228,7 +228,18 @@ class Upload {
 	}
 	
 	public function last_active() {
-		return $this->getCacheRow("last_active");
+		$last_active = $this->getCacheRow("last_active");
+		return ($last_active == null ? $this->timestamp() : $last_active);
+	}
+	
+	public function subscribed() {
+		if(!array_key_exists('subscribed', $this->data)) {
+			$sql = "SELECT * FROM offensive_subscriptions
+				WHERE userid=".me()->id()." AND fileid=".$this->id();
+			$this->data['subscribed'] = mysql_num_rows(tmbo_query($sql)) > 0 ? true : false;
+		}
+		
+		return (bool)$this->data['subscribed'];
 	}
 	
 	/*
@@ -242,7 +253,7 @@ class Upload {
 				 * if we already have a userid, the User class can do the
 				 * database work, it already knows how.
 				 */
-				$this->data["uploader"] = new User($this->data["userid"]);
+				$this->data["uploader"] = new User($this->getUploadRow("userid"));
 			} else {
 				/*
 				 * if we have to go to the database anyway, we may as well
@@ -376,40 +387,235 @@ class Upload {
 	 * string slinging code
 	 */
 	
+	private function basePath($timestamp=null, $nopath=false) {
+		if($timestamp == null) $timestamp = $this->timestamp();
+		
+		if(!is_numeric($timestamp))
+			$timestamp = strtotime($timestamp);
+		
+		$year = date( "Y", $timestamp );
+		$month = date( "m", $timestamp );
+		$day = date( "d", $timestamp );
+		
+		return ($nopath ? "" : get_include_path()."/")."offensive/uploads/$year/$month/$day/".$this->type()."/";
+	}
+		
+	private function fileConform($path) {
+		if($path == '' || !file_exists($path)) return false;
+		
+		$target = $this->basePath();
+		ensureDirExists($target);
+		$target .= $this->id()."_".$this->filename();
+		
+		// if timestamp is numeric, we want to move, not copy
+		if(!rename($path, $target)) {
+			trigger_error("rename($path, $target) failed", E_USER_WARNING);
+			return false;
+		}
+		
+		trigger_error("CONFORM: moved $path to $target", E_USER_NOTICE);
+		return true;
+	}
+	
 	public function file() {
-		// XXX: eventually getFile should reside inside this function, not callable from outside.
-		return getFile($this->id(), $this->filename(), $this->timestamp(), $this->type());
+		$id = $this->id();
+		$filename = $this->filename();
+				
+		// uploads with files only
+		if($this->type() == 'topic') {
+			return '';
+		}
+
+		$retname = $this->basePath().$id."_".$filename;
+
+		if(file_exists($retname)) {
+			return $retname;
+		}
+		
+		/**********************************
+		 * UH OH!  image not found!
+		 * ignore the man behind the curtain
+		 * what about yesterday?  or tomorrow?
+		 */
+		$timestamp = strtotime($this->timestamp());
+			
+		$yesterday = $timestamp - 86400;
+		$retname = $this->basePath($yesterday).$id."_".$filename;
+		if($this->fileConform($retname)) return $retname;
+			
+		$tomorrow = $timestamp + 86400;
+		$retname = $this->basePath($tomorrow).$id."_".$filename;
+		if($this->fileConform($retname)) return $retname;
+
+		return '';
 	}
 	
 	public function URL() {
-		// XXX: eventually getFileURL should reside inside this function, not callable from outside.
-		return getFileURL($this->id(), $this->filename(), $this->timestamp(), $this->type());
+		// uploads with files only
+		// if there's no file, why bother with a URL?
+		if($this->type() == 'topic'
+		   || $this->file() == '') {
+			return '';
+		}
+
+		return "/".$this->basePath($this->timestamp(), true)
+		       .$this->id()."_".rawurlencode($this->filename());
+	}
+	
+	private function thumbConform($path) {
+		if($path == '' || !file_exists($path)) return false;
+		
+		$target = $this->basePath()."thumbs/";
+		ensureDirExists($target);
+		$target .= "th".$this->id().getFileExtension($path);
+
+		if(!rename($path, $target)) {
+			trigger_error("rename($path, $target) failed", E_USER_WARNING);
+		}
+
+		trigger_error("CONFORM: moved $path to $target", E_USER_NOTICE);
+		return true;
 	}
 	
 	public function thumb() {
-		// XXX: eventually getThumb should reside inside this function, not callable from outside.
-		return getThumb($this->id(), $this->filename(), $this->timestamp(), $this->type());
+		$id = $this->id();
+		$filename = $this->filename();
+		$timestamp = $this->timestamp();
+		$type = $this->type();
+		$ext = getFileExtension($filename);
+
+		// images only.
+		if($type != 'image' && $type != 'avatar') return '';
+
+		$retname = $this->basePath()."thumbs/th$id$ext";
+
+		if(file_exists($retname)) {
+			return $retname;
+		}
+		
+		/**********************************
+		 * UH OH!  image not found!
+		 * ignore the man behind the curtain
+		 * what about yesterday?  or tomorrow?
+		 */
+		$timestamp = strtotime($timestamp);
+			
+		$yesterday = $timestamp - 86400;
+		$retname = $this->basePath($yesterday)."thumbs/th$id$ext";
+		if(Upload::thumbConform($retname)) return $retname;
+			
+		$tomorrow = $timestamp + 86400;
+		$retname = $this->basePath($tomorrow)."thumbs/th$id$ext";
+		if(Upload::thumbConform($retname)) return $retname;
+
+		// still no good :( … is there a big image we can create a thumb from?
+		$bigfile = $this->file();
+		if($bigfile == '') {
+			return '';
+		}
+		
+		$retname = $this->basePath()."thumbs/th$id$ext";
+		
+		// man, I sure hope this doesn't happen often.
+		// this will probably hurt if we get dogpiled, but this is a pretty uncommon code path
+		$tmpfile = get_include_path()."/offensive/quarantine/$id".rand().$ext;
+		copy($bigfile, $tmpfile);
+        
+		$cmd = "convert -resize 100x100 $tmpfile $tmpfile";
+		$err = shell_exec($cmd);
+		if(strlen($err > 0)) {
+			trigger_error("ImageMagick failed: $err", E_USER_WARNING);
+			return '';
+		}
+		ensureDirExists(dirname($retname));
+		rename($tmpfile, $retname);
+        
+		trigger_error("CONFORM: resized $bigfile to $retname", E_USER_NOTICE);
+        
+		return $retname;
 	}
 	
 	public function thumbURL() {
-		// XXX: eventually getThumbURL should reside inside this function, not callable from outside.
-		return getThumbURL($this->id(), $this->filename(), $this->timestamp(), $this->type());
+		// images only
+		// if the file or thumb don't exist, why bother?
+		if(($this->type() != 'image' && $this->type() != 'avatar')
+		   || ($this->file() == '' || $this->thumb() == '')) {
+			return "/offensive/graphics/previewNotAvailable.gif";
+		}
+		
+		return "/".$this->basePath(null, true)."thumbs/th".$this->id().getFileExtension($this->filename());
 	}
 	
 	public function commentLabel($showvotes=true) {
-		// XXX: eventually commentLabel should reside inside this function, not callable from outside.
-		return commentLabel($this->comments(), $this->goods(), $this->bads(), $this->tmbos(), $showvotes);
+		$comments = $this->comments();
+
+		$retval = ($comments == 0 ? "no" : $comments)." comment".($comments == 1 ? "" :"s");
+		if(!$showvotes) return $retval;
+		$retval .= " (+".$this->goods()." -".$this->bads()
+		        . ($this->tmbos() > 0 ? " x".$this->tmbos() : "").")";
+		return $retval;
 	}
 
 	public function htmlFilename($showtype=false) {
-		// XXX: eventually htmlFilename should reside inside this function, not callable from outside.
-		$arg = array(
-			"filename" => $this->filename(),
-			"nsfw" => $this->is_nsfw(),
-			"tmbo" => $this->is_tmbo(),
-			"type" => $this->type()
+		$tags = array();
+
+		if($showtype) {
+			$tags[] = $this->type().":";
+		}
+
+		if($this->is_nsfw()) {
+			$tags[] = "[nsfw]";
+		}
+
+		if($this->is_tmbo()) {
+			$tags[] = "[tmbo]";
+		}
+
+		// TODO: consume tags from image name
+
+		return (count( $tags ) > 0 ? "<span class=\"tags\">" . implode( "", $tags ) . "</span> " : "")
+		       .htmlEscape($this->filename());
+	}
+
+	// API support
+	public function api_data() {
+
+		$ret = array(
+				"id" => $this->id(),
+				"userid" => $this->uploader()->id(),
+				"filename" => $this->filename(),
+				"timestamp" => $this->timestamp(),
+				"nsfw" => $this->is_nsfw(),
+				"tmbo" => $this->is_tmbo(),
+				"type" => $this->type(),
+				"username" => $this->uploader()->username(),
+				"subscribed" => $this->subscribed(),
+				"vote_good" => $this->goods(),
+				"vote_bad" => $this->bads(),
+				"vote_tmbo" => $this->tmbos(),
+				"vote_repost" => $this->tiars(),
+				"comments" => $this->comments()
 			);
-		return htmlFilename($arg, $showtype);
+		if($this->type() != "topic" && $this->file() != '') {
+			$ret["link_file"] = $this->URL();
+		}
+		if(($this->type() == "image" || $this->type() == "avatar")
+		   && $this->file() != "") {
+			$arr = getimagesize($this->file());
+			if($arr === false) { trigger_error($this->file()." is not a valid image!?", E_USER_ERROR); }
+			
+			$ret["width"] = $arr[0];
+			$ret["height"] = $arr[1];
+			
+			$ret["link_thumb"] = $this->thumbURL();
+			
+			$arr = getimagesize($this->thumb());
+			
+			$ret["thumb_width"] = $arr[0];
+			$ret["thumb_height"] = $arr[1];
+		}
+		
+		return $ret;
 	}
 }
 
@@ -424,6 +630,7 @@ class Comment {
 		 * see this file's header comment.  the Comment class supports the following nested
 		 * aggregate arrays:
 		 * 		* User data with keys prefixed by user_
+		 *		* Uplaod data with keys prefixed by upload_
 		 */
 		if(is_array($info)) {
 			if(!array_key_exists("id", $info))
@@ -438,14 +645,17 @@ class Comment {
 			}
 			$this->data =& self::$gdata[$info['id']];
 
-			/* strip out keys that start with user_ into their own array,
-			 * to be used to prepopulate a User object to go with this Upload object
+			/* strip out keys that start with user_ or upload_ into their own array,
+			 * to be used to prepopulate a User or Upload object to go with this Comment object
 			 */
 			$userarr = array();
+			$uplarr = array();
 			foreach($info as $key => $val) {
 				if(strpos($key, "user_") === 0) {
 					$userarr[substr($key, 5)] = $val;
-				} else {
+				} else if(strpos($key, "upload_") === 0) {
+					$uplarr[substr($key, 7)] = $val;
+				} else if($key != "exists"){
 					$this->data[$key] = $val;
 				}
 			}
@@ -457,15 +667,29 @@ class Comment {
 			if(array_key_exists("userid", $this->data)) {
 				$userarr["userid"] = $this->data["userid"];
 			}
-			if(count($userarr) > 0) {
+			if(count($userarr) > 0 && array_key_exists("userid", $userarr)) {
 				$this->data["commenter"] = new User($userarr);
 			}
+			
+			/* rescue the fileid as well, this will help avoid the failure case
+			 * where file data not including the fileid
+			 * is included in the incoming data
+			 */
+			if(array_key_exists("fileid", $this->data)) {
+				$uplarr["id"] = $this->data["fileid"];
+			}
+			if(count($uplarr) > 0 && array_key_exists("id", $uplarr)) {
+				$this->data["upload"] = new Upload($uplarr);
+			}
+			
 		} else if(is_numeric($info) && $info == (int)$info) {
+			// there's not a lot to do if the argument is just an int.
 			if(!array_key_exists($info, self::$gdata)) {
 				self::$gdata[$info] = array('exists' => null);
 			}
 			$this->data =& self::$gdata[$info];
 			$this->data = array("id" => $info);
+			
 		} else {
 			trigger_error("type mismatch: constructor argument must be an integer or array", E_USER_ERROR);
 		}
@@ -585,7 +809,36 @@ class Comment {
 	}
 	
 	public function upload() {
-		return new Upload($this->getCommentRow("fileid"));
+		if(!array_key_exists("upload", $this->data)) {
+			if(array_key_exists("fileid", $this->data)) {
+				/*
+				 * if we already have a userid, the User class can do the
+				 * database work, it already knows how.
+				 */
+				$this->data["upload"] = new Upload($this->getCommentRow("fileid"));
+			} else {
+				/*
+				 * if we have to go to the database anyway, we may as well
+				 * grab the entire user row, to prevent a duplicate database call
+				 * from the User class
+				 */
+				$sql = "SELECT up.* FROM offensive_uploads up
+				        JOIN offensive_comments com ON up.id = com.fileid
+				        WHERE com.id = ".$this->id();
+				
+				$result = tmbo_query($sql);
+				
+				/* this error should be impossible.  if we ever hit it, we have a
+				 * datastore inconsistency problem on our hands. */
+				if(mysql_num_rows($result) !== 1) {
+					trigger_error("upload failure, upload for this comment does not exist?", E_USER_ERROR);
+				}
+				
+				$this->data["upload"] = new Upload(mysql_fetch_assoc($result));
+			}
+		}
+		
+		return $this->data["upload"];
 	}
 
 	/*
@@ -617,6 +870,20 @@ class Comment {
 		
 		return $this->data["commenter"];
 	}
+
+	public function api_data() {
+		return array(
+			"fileid" => $this->upload()->id(),
+			"id" => $this->id(),
+			"comment" => $this->text(),
+			"timestamp" => $this->timestamp(),
+			"userid" => $this->commenter()->id(),
+			"username" => $this->commenter()->username(),
+			"vote" => $this->vote(),
+			"tmbo" => $this->tmbo(),
+			"tiar" => $this->tiar()
+			); 
+	}
 }
 
 class User {
@@ -644,7 +911,9 @@ class User {
 			$this->data =& self::$gdata[$info['userid']];
 			
 			foreach($info as $key => $val) {
-				$this->data[$key] = $val;
+				if($key != "exists") {
+					$this->data[$key] = $val;
+				}
 			}
 		} else if(is_numeric($info) && $info == (int)$info) {
 			if(!array_key_exists($info, self::$gdata)) {
@@ -703,6 +972,10 @@ class User {
 	 */
 	// id() is guaranteed to work for all User objects.
 	// whether or not the data it returns is good can be determined with exists().
+	public function userid() {
+		return $this->id();
+	}
+	
 	public function id() {
 		return $this->data["userid"];
 	}
@@ -727,6 +1000,10 @@ class User {
 		return $this->getUserRow("timestamp");
 	}
 	
+	public function last_login_ip() {
+		return $this->getUserRow("last_login_ip");
+	}
+	
 	public function referred_by() {
 		if($this->getUserRow("referred_by") == $this->data["userid"]) {
 			return false;
@@ -740,15 +1017,16 @@ class User {
 	
 	public function posse() {
 		if(!array_key_exists("posse", $this->data)) {
+			$this->data["posse"] = array();
 			$sql = "SELECT * FROM users WHERE referred_by = ".$this->data["userid"]. "
 			        AND userid != ".$this->data["userid"];
 			$result = tmbo_query($sql);
-			if(mysql_num_rows($result) === 0)
-				$this->data["posse"] = false;
-			else {
-				$this->data["posse"] = array();
-				while(false !== ($row = mysql_fetch_assoc($result)))
-					$this->data["posse"][] = new User($row);
+			if(mysql_num_rows($result) != 0) {
+				while(false !== ($row = mysql_fetch_assoc($result))) {
+					if($row['userid'] != $this->id()) {
+						$this->data["posse"][] = new User($row);
+					}
+				}
 			}
 		}
 		
@@ -763,7 +1041,7 @@ class User {
 		if(!array_key_exists("location", $this->data)) {
 		
 			$sql = "SELECT x AS latitude, y AS longitude, timestamp 
-			        FROM maxxer_locations WHERE userid = ".$this->data["userid"];
+			        FROM maxxer_locations WHERE mapversion = 'google' AND userid = ".$this->data["userid"];
 			$result = tmbo_query($sql);
 			
 			if(mysql_num_rows($result) !== 1)
@@ -778,6 +1056,9 @@ class User {
 	/*
 	 * yearbook data
 	 */
+	public function avatar() {
+		return $this->yearbook();
+	}
 	
 	public function yearbook() {
 		if(!array_key_exists("yearbook", $this->data)) {
@@ -918,6 +1199,30 @@ class User {
 		
 		// write through cache
 		tmbo_query($sql);
+	}
+
+	public function api_data() {
+		$ret = array(
+				"posse" => count($this->posse()),
+				"yearbook" => ($this->yearbook() !== false ? true : false),
+				"userid" => $this->id(),
+				"username" => $this->username(),
+				"created" => $this->created(),
+				"account_status" => $this->status(),
+				"timestamp" => $this->timestamp(),
+			);
+		
+		if($this->referred_by()){
+			$ret["referer_id"] = $this->referred_by()->id();
+			$ret["referer"] = $this->referred_by()->username();
+		}
+		
+		if($_SESSION["status"] == "admin") {
+			$ret["ip"] = $this->last_login_ip();
+			$ret["email"] = $this->email();
+		}
+		
+		return $ret;
 	}
 }
 
