@@ -44,7 +44,7 @@ function check_arg($key, $type, $method=null, $required=true, $set=null) {
 	}
 	
 	// currently we don't accept arrays, which you can submit through POST
-	if(!is_string($method[$key])) {
+	if(is_array($method[$key])) {
 		$validation_errors[] = "parameter '$key' must be of type $type.";
 	}
 	// this might change someday.  but not today.

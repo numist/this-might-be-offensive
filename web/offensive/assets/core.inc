@@ -26,7 +26,7 @@
 		                 u.username as user_username,
 		                 u.account_status as user_account_status
 	FROM offensive_uploads up, offensive_count_cache ca, users u
-	WHERE ca.threadid = up.id AND up.userid = u.userid";
+	WHERE ca.threadid = up.id AND up.userid = u.userid AND up.status = 'normal'";
 	
 	$commentsql = "SELECT com.*,
 	                     u.username as user_username, u.account_status as user_account_status, u.userid as user_userid,
@@ -61,7 +61,9 @@
 		$since =  check_arg("since",  "integer", $args, false);
 		$sort =   check_arg("sort",   "string",  $args, false, array("date_desc", "date_asc", "votes_asc", "votes_desc", "comments_asc", "comments_desc", "activity_asc", "activity_desc"));
 		$limit =  check_arg("limit",  "limit",   $args, false);
-		$p =      check_arg("p", "integer", $args, false);
+		$p =      check_arg("p",      "integer", $args, false);
+		$nsfw =   check_arg("nsfw",   "integer", $args, false, array(0,1));
+		$tmbo =   check_arg("tmbo",   "integer", $args, false, array(0,1));
 		handle_errors();
 		
 		// sort order needs to always be set, even if only to default.
@@ -87,7 +89,20 @@
 		if($since !== false) {
 			$sql .= " AND up.id >= $since";
 		}
-		$sql .= " AND up.status = 'normal'";
+		if($nsfw !== false) {
+			if($nsfw) {
+				$sql .= " AND up.nsfw = 1";
+			} else {
+				$sql .= " AND up.nsfw = 0";
+			}
+		}
+		if($tmbo !== false) {
+			if($tmbo) {
+				$sql .= " AND up.tmbo = 1";
+			} else {
+				$sql .= " AND up.tmbo = 0";
+			}
+		}
 		switch($sort) {
 			// XXX: date orders have two order clauses because...  well because otherwise the query takes half a minute D:
 			case "date_desc":

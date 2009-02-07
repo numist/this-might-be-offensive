@@ -59,14 +59,9 @@
 					}
 					
 					$numPerPage = 100;
-					$page = isset($_REQUEST['p']) && is_numeric($_REQUEST['p']) ?
-						    $_REQUEST['p'] : 0;
-					$start = $page * $numPerPage;
-					$limit = "$start, $numPerPage";
-
 					$args = $_REQUEST;
 					if(!array_key_exists("limit", $args)) {
-						$args["limit"] = $limit;
+						$args["limit"] = $numPerPage;
 					}
 					$args["type"] = "topic";
 					
@@ -95,7 +90,9 @@
 							</td>
 							<td></td>
 							<td style="text-align:right">
+								<? if(count($result) == $numPerPage) { ?>
 									<a href="<?= $_SERVER['PHP_SELF']?>?c=<?= $_REQUEST['c'] ?>&order=<?=$order?>&p=<?= $page + 1 ?>"><b>next page</b></a> &raquo;
+								<? } ?>
 							</td>
 						</tr>
 

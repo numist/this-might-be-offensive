@@ -29,11 +29,15 @@ EOT;
   
 		$THUMBS_PER_ROW = 4;
 
+		$numPerPage = 100;
+
 		$page = isset($_REQUEST['p']) && is_numeric($_REQUEST['p']) ?
 			    $_REQUEST['p'] : 0;		
 		$args = $_REQUEST;
 		$args["type"] = "image";
-		$args["p"] = $page;
+		if(!array_key_exists("limit", $args)) {
+			$args["limit"] = $numPerPage;
+		}
 		
 ?>
 <div class="heading">
@@ -129,7 +133,9 @@ EOT;
 				<? } ?>
 			</td>
 			<td style="text-align:right">
+				<? if(count($result) == $numPerPage) { ?>
 					<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'].$args ?>&p=<?= $page + 1 ?>"><b>next page</b></a> &raquo;
+				<? } ?>
 			</td>
 		</tr>
 	</table>
