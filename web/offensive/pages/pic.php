@@ -5,6 +5,7 @@
 	require_once( 'admin/mysqlConnectionInfo.inc' );
 	if(!isset($link) || !$link) $link = openDbConnection();
 	require_once("offensive/assets/classes.inc");
+	require_once("offensive/assets/core.inc");
 	require_once("offensive/assets/comments.inc");
 
 	mustLogIn();
@@ -28,7 +29,7 @@
 		exit;
 	}
 
-	$upload = new Upload($id);
+	$upload = core_getupload($id);
 	if($upload->type() == "topic") {
 		header("Location: /offensive/?c=comments&fileid=".$id);
 		exit;
@@ -386,14 +387,16 @@
 					<a href="../" id="next" style="visibility:hidden">newer</a> . <a id="index" href="/offensive/">index</a> . <a id="previous" href="../" style="visibility:hidden">older</a>
 					<?
 				} else {
-					if($upload->next()) { ?>
-						<a id="next" href="<?= $_SERVER['PHP_SELF'] ?>?id=<?= $upload->next()->id() ?>">newer</a>
+					if($upload->next()) { 
+						$style = ($upload->next()->is_nsfw() || $upload->next()->is_tmbo() ? 'style="color: rgb(255,0,0)"' : "") ?>
+						<a id="next" <?= $style ?> href="<?= $_SERVER['PHP_SELF'] ?>?id=<?= $upload->next()->id() ?>">newer</a>
 					<? } else { ?>
 						<a href="../" id="next" style="visibility:hidden">newer</a>
 					<? } ?>
 					. <a id="index" href="/offensive/">index</a> .
-					<? if($upload->prev()) {?>
-						<a id="previous" href="<?= $_SERVER['PHP_SELF'] ?>?id=<?= $upload->prev()->id() ?>">older</a>
+					<? if($upload->prev()) {
+						$style = ($upload->prev()->is_nsfw() || $upload->prev()->is_tmbo() ? 'style="color: rgb(255,0,0)"' : "") ?>
+						<a id="previous" <?= $style ?> href="<?= $_SERVER['PHP_SELF'] ?>?id=<?= $upload->prev()->id() ?>">older</a>
 					<? } else { ?>
 						<a id="previous" href="../" style="visibility:hidden">older</a>
 					<?}
@@ -439,7 +442,7 @@
 				-->
 				<span style="margin-left:48px;">
 					<?	
-					if(subscribed($upload->id())) { ?>
+					if($upload->subscribed()) { ?>
 						<a class="subscribe_toggle" id="unsubscribeLink" href="/offensive/subscribe.php?un=1&fileid=<?= $id ?>" title="take this file off my 'unread comments' watch list.">unsubscribe</a>
 					<?	} else { ?>
 						<a class="subscribe_toggle" id="subscribeLink" href="/offensive/subscribe.php?fileid=<?= $id ?>" title="watch this thread for new comments.">subscribe</a>
@@ -468,8 +471,6 @@
 			</div>
 	
 			<br />
-
-
 
 			<!--
 				filename/size block

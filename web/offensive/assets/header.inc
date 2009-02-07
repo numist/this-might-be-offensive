@@ -1,5 +1,8 @@
 <?php
 
+// circular dependencies!
+require_once("offensive/assets/classes.inc");
+
 /* make TMBO read-only */
 $readonly = false;
 
@@ -143,7 +146,7 @@ function tmbo_query($sql, $timeout=2) {
 	}
 
 	time_start($time);
-	
+		
 	$result = mysql_query($sql, $link) or 
 		tmbo_error_handler(E_USER_ERROR, mysql_error()." query '$sql'", 
 		                   $trace['file'], $trace['line'], null);
@@ -188,10 +191,11 @@ function loggedin($lite=true) {
 	
 	if($row['account_status'] == 'locked' || $row['account_status'] == 'awaiting activation') return false;
 	
-	if(!$lite) {
-		if($_SESSION['username'] != $row['username']) $_SESSION['username'] = $row['username'];
-		if($_SESSION['status'] != $row['account_status']) $_SESSION['status'] = $row['account_status'];
-	}
+	// initialize a User object so we don't have to go to the DB again later for it
+	$throwaway = new User($row);
+	
+	if($_SESSION['username'] != $row['username']) $_SESSION['username'] = $row['username'];
+	if($_SESSION['status'] != $row['account_status']) $_SESSION['status'] = $row['account_status'];
 	
 	return true;
 }

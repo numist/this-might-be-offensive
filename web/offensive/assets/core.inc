@@ -154,6 +154,21 @@
 		
 		return $ret;
 	}
+	
+	function core_getupload($id) {
+		global $uploadsql;
+		$args = array("id" => $id);
+		$id =   check_arg("id", "integer", $args);
+		handle_errors();
+		
+		$sql = $uploadsql." AND up.id = $id";
+		
+		$result = tmbo_query($sql);
+		
+		if(mysql_num_rows($result) == 0) trigger_error("upload nonexist", E_USER_ERROR);
+		
+		return new Upload(mysql_fetch_assoc($result));
+	}
 
 	function core_getyearbook($args) {
 		global $uploadsql;
