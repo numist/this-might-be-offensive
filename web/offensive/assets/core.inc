@@ -129,8 +129,6 @@
 		
 		$sql .= " LIMIT $limit";
 		
-		var_dump($sql);
-		
 		$result = tmbo_query($sql);
 		$ret = array();
 		while($row = mysql_fetch_assoc($result)) {
@@ -200,8 +198,6 @@
 		}
 		
 		$sql .= " LIMIT $limit";
-        
-		var_dump($sort);var_dump($sql);
         
 		$result = tmbo_query($sql);
         
