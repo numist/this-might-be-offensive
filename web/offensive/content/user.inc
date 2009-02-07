@@ -261,9 +261,8 @@ function recentComments( $uid ) {
 			WHERE offensive_comments.userid = $uid
 			AND up.id = offensive_comments.fileid
 			AND comment <> \"\"
-			GROUP BY fileid
 			ORDER  BY offensive_comments.timestamp DESC 
-			LIMIT 15";
+			LIMIT 100";
 	$result = tmbo_query( $sql );
 	
 ?>
@@ -272,8 +271,13 @@ function recentComments( $uid ) {
 
 <?
 
-	while( $row = mysql_fetch_assoc( $result ) ) {
+	$seen = array();
+	$count = 0;
+	while( false !== ($row = mysql_fetch_assoc( $result )) && $count++ < 15) {
 		$upload = new Upload($row);
+		
+		if(array_key_exists($upload->filename(), $seen)) continue;
+		
 		$css = isset($css) && strpos($css, "even") !== false ? "oddfile odd_row" : "evenfile even_row";
 ?>
 		<tr class="<?= $css ?>"><td><div style="white-space:nowrap; width:535px; overflow:hidden;"><a class="<?= $css ?>" href="?c=comments&fileid=<?= $upload->id() ?>#<?= $row['commentid'] ?>"><?= $upload->htmlFilename() ?></a></div></td></tr>
