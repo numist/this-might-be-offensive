@@ -56,6 +56,9 @@
 		if(!array_key_exists("limit", $args)) {
 			$args["limit"] = "100";
 		}
+		if($view == "today") {
+			$args["after"] = time() - (60 * 60 * 24);
+		}
 		
 		$result = core_getuploads($args);
 		$count = $page * $numPerPage;

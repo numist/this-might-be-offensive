@@ -33,20 +33,6 @@
 				<a href="./?c=newtopic">new topic</a>
 			</div>
 			<?
-			
-			?>
-
-			<table width="100%" id="discussions">
-
-				<tr style="background:#bbbbee;text-align:center;">
-					<td><b><a href="./?c=discussions&sort=date_desc">sort by thread creation date</a></b></td>
-					<td><b><a href="./?c=discussions&sort=comments_desc">comment count</a></b></td>
-					<td><b><a href="./?c=discussions&sort=activity_desc">latest comment</a></b></td>
-				</tr>
-
-			<?
-
-					// XXX: refactor to match yearbook.inc
 					$defaultSort = $me->getPref("sortorder_discussions") ?
 					               $me->getPref("sortorder_discussions") :
 					               "date_desc";
@@ -54,8 +40,6 @@
 					$args = $_REQUEST;
 					if(!array_key_exists("sort", $args)) {
 						$args["sort"] = $defaultSort;
-					} else {
-						$me->setPref("sortorder_discussions", $args["sort"]);
 					}
 					
 					$numPerPage = 100;
@@ -66,6 +50,29 @@
 					$args["type"] = "topic";
 					
 					$result = core_getuploads($args);
+					
+					// if we made it this far, sort is valid, so we don't have to check it
+					if($args["sort"] != $defaultSort) {
+						$me->setPref("sortorder_discussions", $args["sort"]);
+					}
+					
+					?>
+					<table width="100%" id="discussions">
+
+						<tr style="background:#bbbbee;text-align:center;">
+							<td><b><?= ($args["sort"] !== "date_desc"
+								? '<a href="./?c=discussions&sort=date_desc">sort by thread creation date</a>'
+								: 'sort by thread creation date' ) ?></b></td>
+							<td><b><?= ($args["sort"] !== "comments_desc"
+							    ? '<a href="./?c=discussions&sort=comments_desc">comment count</a>'
+							    : 'comment count' )?></b></td>
+							<td><b><?= ($args["sort"] !== "activity_desc"
+							    ? '<b><a href="./?c=discussions&sort=activity_desc">latest comment</a></b>'
+							    : 'latest comment' ) ?></b></td>
+						</tr>
+
+					<?
+					
 					foreach( $result as $upload ) {
 						$css = (isset($css) && $css == "even_row") ? "odd_row" : "even_row";
 

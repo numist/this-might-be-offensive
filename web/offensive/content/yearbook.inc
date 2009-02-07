@@ -40,46 +40,44 @@
 		// get the default from user prefs
 		$defaultSort = $me->getPref("sortorder_yearbook") ?
 		               $me->getPref("sortorder_yearbook") :
-		               "username";
+		               "uname_asc";
 
-		// see if we're trying to change it
-		$order = array_key_exists("sort", $_REQUEST) ? $_REQUEST['sort'] : $defaultSort;
-		$req = array_key_exists("sort", $_REQUEST) ? $_REQUEST['sort'] : '';
-		
-		// set up the query ordering
-		$sort = ($order == 'date' ? 'up.timestamp DESC' : 'username');
-		
-		// if the sort order was changed, save it
-		if($order != $defaultSort) {
-			$me->setPref("sortorder_yearbook", $order);
-		}
-
-		if($req == 'date') {
-			?><b><a href="./?c=yearbook">sort by username</a></b><?
-		} else {
-			?><b><a href="./?c=yearbook&sort=date_desc">sort by date</a></b><?
-		}
-?>
-<table width="100%" class="thumbnails">
-<?
 		$numPerPage = 100;
 		$page = array_key_exists("p", $_REQUEST) ? $_REQUEST['p'] : 0;
 
 		$THUMBS_PER_ROW = 4;
 		$count = 0;
 
-		$me = me();
-
 		$args = $_REQUEST;
 		if(!array_key_exists("sort", $args)) {
-			$args["sort"] = "uname_asc";
+			$args["sort"] = $defaultSort;
 		}
 		if(!array_key_exists("limit", $args)) {
 			$args["limit"] = "100";
 		}
 
 		$result = core_getyearbook($args);
+		
+		// if we made it this far, sort is valid, so we don't have to check it
+		if($args["sort"] != $defaultSort) {
+			$me->setPref("sortorder_yearbook", $args["sort"]);
+		}
 
+		// sorting links
+		if($args["sort"] !== 'uname_asc') {
+			?><b><a href="./?c=yearbook&sort=uname_asc">sort by username</a></b> <?
+			if($args["sort"] !== 'date_desc') {
+				?>| <?
+			}
+		}
+		if($args["sort"] !== 'date_desc') {
+			?><b><a href="./?c=yearbook&sort=date_desc">sort by date</a></b> <?
+		}
+		?>
+		<table width="100%" class="thumbnails">
+		<?
+
+		// output loop
 		foreach($result as $upload) {
 			if( (($count++) % $THUMBS_PER_ROW) == 0 ) {
 				$css = (isset($css) && $css == "even_row") ? "odd_row" : "even_row";
