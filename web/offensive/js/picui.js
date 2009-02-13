@@ -61,12 +61,15 @@ function do_vote(o) {
 
 // here laid handle_keypress and handle_qc_keypress
 
+form_text = "";
 function handle_quickcomment()
 {
 	fileid = $("#good").attr("name");
 	// make the #dialog div into a popup window
 	$('#dialog').jqm({
 		onHide: function(hash) {
+			// save form text
+			form_text = $("#qc_form textarea").val();
 			// keyboard events
 			$(document).keydown(function(e) {
 				handle_keypress($(this),e);
@@ -75,9 +78,6 @@ function handle_quickcomment()
 				$("body div:first").removeClass('jqmOverlay');
 			hash.w.fadeOut('fast',function() {
 				hash.o.remove();
-				// empty the form 
-				$("#qc_form input").attr("checked", false);
-				$("#qc_form textarea").val("");
 			});
 		},
 		onShow: function(hash) {
@@ -116,6 +116,9 @@ function get_comments(hash) {
 		function(data) {
 			// insert the html into #qc_bluebox
 			$("#qc_bluebox").html(data);
+			
+			// restore text
+			$("#qc_form textarea").val(form_text);
 
 			// create different colors for each row of data
 			$(".qc_comment:even").css("background-color", "#bbbbee");
@@ -146,6 +149,7 @@ function get_comments(hash) {
 				if(comment != "") increase_count("#count_comment");
 
 				handle_comment_post(fileid, comment, vote, tmbo, repost, subscribe);
+				form_text = "";
 			});
 		});
 }
