@@ -51,10 +51,10 @@ function do_vote(o) {
 
 	disable_voting();
 	if(vote == "good") {
-		handle_comment_post(imageid, "", "this is good", "", "", "");
+		handle_comment_post(imageid, "", "this is good", "", "0", "0", "0");
 		increase_count("#count_good");
 	} else {
-		handle_comment_post(imageid, "", "this is bad", "", "", "");
+		handle_comment_post(imageid, "", "this is bad", "", "0", "0", "0");
 		increase_count("#count_bad");
 	}
 }
@@ -159,7 +159,7 @@ function handle_comment_post(fileid, comment, vote, tmbo, repost, subscribe) {
 	
 	// XXX: not really convinced of this solution.  this fixes the bug, but not the behaviour.
 	// we just clicked the 'go' button without selecting anything
-	if(comment == "" && (vote == "novote" || vote == "") && tmbo == 0 && repost == 0)
+	if(comment == "" && (vote == "novote" || vote == "") && tmbo == 0 && repost == 0 && subscribe == 0)
 		return;
 	
 	// post the submit data using ajax

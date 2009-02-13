@@ -161,11 +161,21 @@
 		$id =   check_arg("id", "integer", $args);
 		handle_errors();
 		
+		$upload = new Upload($id);
+		
 		$sql = $uploadsql." AND up.id = $id";
 		
 		$result = tmbo_query($sql);
 		
-		if(mysql_num_rows($result) == 0) trigger_error("upload nonexist", E_USER_ERROR);
+		if(mysql_num_rows($result) == 0) {
+			if(!$upload->exists()) {
+				trigger_error("upload nonexist", E_USER_ERROR);
+			}
+			
+			updateCommentCount($id, 0, 0, 0, 0, 0);
+			
+			return new Upload($id);
+		}
 		
 		return new Upload(mysql_fetch_assoc($result));
 	}

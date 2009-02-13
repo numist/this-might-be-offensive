@@ -167,6 +167,7 @@
 	function body() {
 		global $hash, $tmpdir, $me, $filetypes;
 		// is there an incoming file?
+		// XXX: check $_FILES['error'] someday.
 		if( uploading_file() ) {
 			$postdata = array();
 			$postdata['tmpname'] = explode("/", $_FILES['image']['tmp_name']);

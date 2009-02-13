@@ -251,7 +251,7 @@
 		$me = new User($_SESSION['userid']);
 		
 		// if no comment, vote, offensive, or repost, then why are you here?
-		if(!($comment || $vote || $offensive || $repost)) {
+		if(!($comment || $vote || $offensive || $repost || $subscribe)) {
 			trigger_error("no comment, vote, tmbo, or tiar set -- nothing to do!", E_USER_WARNING);
 			send(false);
 		}
@@ -262,10 +262,13 @@
 		if($offensive === false) $offensive = 0;
 		if($repost === false) $repost = 0;
 
-		postComment($fileid, $vote, $repost, $offensive, $comment);
+		if($comment || $vote || $offensive || $repost) {
+			postComment($fileid, $vote, $repost, $offensive, $comment);
+		}
 		
-		if($subscribe == 1) $me->subscribe($fileid);
-		
+		if($subscribe == 1) {
+			subscribe($fileid);
+		}
 		send(true);
 	}
 

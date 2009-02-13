@@ -84,7 +84,6 @@ EOT;
             {
 				
              	$css = $upload->filtered() ? ' class="filtered"' : "";
-              	$filename = rawurlencode($row['filename']);
               	if( $output % $THUMBS_PER_ROW == 0 ) {
                   ?><tr><?php
                 }

@@ -397,19 +397,19 @@
 				}
 				
 				if($upload->next()) { 
-					$style = ($upload->next()->is_nsfw() || $upload->next()->is_tmbo() ? 'style="color: rgb(255,0,0)"' : "") ?>
+					$style = ($upload->next()->is_nsfw() || $upload->next()->is_tmbo() ? 'style="font-style:italic; color: #990000"' : "") ?>
 					<a id="next" <?= $style ?> href="<?= $_SERVER['PHP_SELF'] ?>?id=<?= $upload->next()->id() ?>">newer</a>
 				<? } else { ?>
 					<a href="/offensive/?c=<?= $index ?>" id="next" style="visibility:hidden">newer</a>
 				<? } ?>
 				. <a id="index" href="/offensive/?c=<?= $index ?>">index</a> .
 				<? if($upload->prev()) {
-					$style = ($upload->prev()->is_nsfw() || $upload->prev()->is_tmbo() ? 'style="color: rgb(255,0,0)"' : "") ?>
+					$style = ($upload->prev()->is_nsfw() || $upload->prev()->is_tmbo() ? 'style="font-style:italic; color: #990000"' : "") ?>
 					<a id="previous" <?= $style ?> href="<?= $_SERVER['PHP_SELF'] ?>?id=<?= $upload->prev()->id() ?>">older</a>
 				<? } else { ?>
 					<a id="previous" href="/offensive/?c=<?= $index ?>" style="visibility:hidden">older</a>
 				<? } ?>
-					
+				
 				<!--
 					comment block
 				-->
