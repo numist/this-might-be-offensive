@@ -344,12 +344,12 @@ function votingRecord( $id, $name ) {
 	if($comments > 1000) {
 		?><div class="piletitle" style="margin-bottom:12px;"><?echo $name ?> has made <?= $comments ?>  votes/comments<?
 	} else {
-		$sql = "SELECT COUNT(*) FROM offensive_comments WHERE userid = $id";
+		$sql = "SELECT COUNT(*) FROM offensive_comments WHERE userid = $id AND vote = 'this is good'";
 		$result = tmbo_query( $sql );
 		$good = mysql_fetch_row($result);
 		$good = $good[0];
 		
-		$sql = "SELECT COUNT(*) FROM offensive_comments WHERE userid = $id";
+		$sql = "SELECT COUNT(*) FROM offensive_comments WHERE userid = $id AND vote = 'this is bad'";
 		$result = tmbo_query( $sql );
 		$bad = mysql_fetch_row($result);
 		$bad = $bad[0];
