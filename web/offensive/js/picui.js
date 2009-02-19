@@ -139,7 +139,7 @@ function get_comments(hash) {
 				comment = $("#qc_comment").val();
 				tmbo = $("#tmbo").attr("checked") ? "1" : "0";
 				repost = $("#repost").attr("checked") ? "1" : "0";
-				subscribe = $('#subscribe').attr("checked") ? "1" : "0";
+				subscribe = $("#subscribe").attr("checked") ? "1" : "0";
 
 				if(vote == "this is good" || vote == "this is bad") {
 					disable_voting();
