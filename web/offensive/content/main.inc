@@ -30,9 +30,12 @@ EOT;
 		$page = isset($_REQUEST['p']) && is_numeric($_REQUEST['p']) ?
 			    $_REQUEST['p'] : 0;		
 		$args = $_REQUEST;
-		$args["type"] = "image";
+		
 		if(!array_key_exists("limit", $args)) {
 			$args["limit"] = $numPerPage;
+		}
+		if(!array_key_exists("type", $args)) {
+			$args["type"] = "image";
 		}
 
 ?>

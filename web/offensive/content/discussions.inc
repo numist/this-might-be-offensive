@@ -47,7 +47,9 @@
 					if(!array_key_exists("limit", $args)) {
 						$args["limit"] = $numPerPage;
 					}
-					$args["type"] = "topic";
+					if(!array_key_exists("type", $args)) {
+						$args["type"] = "topic";
+					}
 					
 					$result = core_getuploads($args);
 					

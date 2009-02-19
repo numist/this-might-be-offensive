@@ -49,7 +49,7 @@
 		$page = isset($_REQUEST['p']) && is_numeric($_REQUEST['p']) ?
 			    $_REQUEST['p'] : 0;		
 		$args = $_REQUEST;
-		$args["type"] = "image";
+		
 		if(!array_key_exists("sort", $args)) {
 			$args["sort"] = "votes_desc";
 		}
@@ -58,6 +58,9 @@
 		}
 		if($view == "today") {
 			$args["after"] = time() - (60 * 60 * 24);
+		}
+		if(!array_key_exists("type", $args)) {
+			$args["type"] = "image";
 		}
 		
 		$result = core_getuploads($args);
