@@ -49,9 +49,11 @@
 		$count = 0;
 
 		$args = $_REQUEST;
-		if($args["sort"] == "date") {
+		// handle the outdated option "date", superceded by "date_desc"
+		if($args["sort"] == "date" || $defaultSort == "date") {
 			$args["sort"] = "date_desc";
 		}
+		
 		if(!array_key_exists("sort", $args)) {
 			$args["sort"] = $defaultSort;
 		}
