@@ -73,9 +73,12 @@ function tmbo_error_handler($errno, $errstr, $errfile, $errline, $errcontext) {
         $critical = E_ERROR | E_WARNING | E_PARSE | E_CORE_ERROR | E_CORE_WARNING | 
                     E_COMPILE_ERROR | E_COMPILE_WARNING | E_USER_ERROR | E_USER_WARNING;
 
-
         $shortfile = (strlen($errfile) > 25 ? 
 	             "...".substr($errfile, -22) : $errfile);
+
+        error_log("$shortfile:$errline:[".$errortype[$errno]."] ".$errstr);
+
+		if(!($errno & error_reporting())) return;
 
         if(isset($_SESSION['status']) && $_SESSION['status'] == "admin" && $errno & $critical) {
                 echo "<br />\n".
@@ -83,12 +86,10 @@ function tmbo_error_handler($errno, $errstr, $errfile, $errline, $errcontext) {
 		     "<b>$shortfile</b> on line <b>$errline</b><br />";
         }
 
-        error_log("$shortfile:$errline:[".$errortype[$errno]."] ".$errstr);
-
-        // handle fatal errors by sending users to kaboom, don't bug admins
+        // handle fatal errors by sending users to the kaboom page, don't redirect admins
         if($errno & (E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR)) {
-                if(!array_key_exists("status", $_SESSION) ||
-				   $_SESSION['status'] != "admin") {
+                if((!array_key_exists("status", $_SESSION) ||
+				   $_SESSION['status'] != "admin") && ob_get_level() > 0) {
 					ob_end_clean();
 					require("offensive/index.outoforder.php");
 				} else if (array_key_exists("status", $_SESSION) &&
@@ -159,8 +160,12 @@ function tmbo_query($sql, $timeout=2) {
 	if($time > $timeout && $timeout != 0) {
 		$trace = debug_backtrace();
 		$trace = $trace[0];
-		tmbo_error_handler(E_USER_NOTICE, "query took ".number_format($time, 0).
-		                   "s: \"$sql\"", $trace['file'], $trace['line'], null);
+		
+		$shortfile = (strlen($trace['file']) > 25 ? 
+		         "...".substr($trace['file'], -22) : $trace['file']);
+        
+		error_log("$shortfile:{$trace['file']}: query took ".number_format($time, 0).
+			                   "s: \"$sql\"");
 	}
 
 	$queries++;

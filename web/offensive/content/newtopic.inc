@@ -39,9 +39,6 @@
 		$sql = "INSERT INTO offensive_count_cache(threadid, good, bad, tmbo, comments, repost) VALUES($threadid, 0, 0, 0, 0, 0)";
 		tmbo_query($sql);
 
-		// XXX: index the upload
-		//indexUpload($threadid, $topic, $me->username());
-
 		return $threadid;
 
 	}
