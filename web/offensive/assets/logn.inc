@@ -128,7 +128,7 @@ function login( $name=null, $pw=null ) {
 				$string = ob_get_contents();
 				ob_end_clean();
 					
-				mail( "ray@sneakymeans.com", "[" . $_SERVER["REMOTE_ADDR"] . "] - $count FAILED LOGIN ATTEMPTS TODAY!!! ", $string, "From: offensive@themaxx.com (this might be offensive)\r\nPriority: urgent" );
+				// mail( "ray@sneakymeans.com", "[" . $_SERVER["REMOTE_ADDR"] . "] - $count FAILED LOGIN ATTEMPTS TODAY!!! ", $string, "From: offensive@themaxx.com (this might be offensive)\r\nPriority: urgent" );
 			}
 		}
 	}
