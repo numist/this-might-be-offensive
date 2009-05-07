@@ -7,6 +7,7 @@ $timelimit = 10;
 
 /*****************************************************************************/
 
+	$defaultpath = ini_get('include_path');
 	set_include_path("..");
 	require_once("offensive/assets/header.inc");
 
@@ -340,7 +341,9 @@ $timelimit = 10;
 	
 	if($me->status() == "admin") {
 		?>
-		<div class="textlinks"><?= number_format(time_end($ptime), 3)."s php, ".number_format($querytime, 3)."s sql, $queries queries"; ?></div>
+		<div class="textlinks"><?= number_format(time_end($ptime), 3)."s php, ".number_format($querytime, 3)."s sql, ".count($queries)." queries\n\n <!--\n\n";
+			var_dump($queries);
+			echo "\n\n-->\n\n"; ?></div>
 		<?
 		$loadavg = "/proc/loadavg";
 		if(file_exists($loadavg) && is_readable($loadavg)) {

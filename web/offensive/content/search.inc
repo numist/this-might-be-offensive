@@ -5,6 +5,12 @@
 
 	require_once( 'offensive/assets/functions.inc' );	
 	require_once( 'offensive/assets/tabs.inc' );
+	require_once( 'offensive/assets/core.inc' );
+	
+	$tmboroot = get_include_path();
+	set_include_path($defaultpath);
+	require_once("xapian.php");
+	set_include_path($tmboroot);
 
 	function start() {
 		global $me;
@@ -15,89 +21,201 @@
 	
 
 	function doSearch( $find ) {
-		$numPerPage = 100;
-		$page = isset($_REQUEST['p']) && is_numeric($_REQUEST['p']) ?
+		$page = isset($_REQUEST['p']) && is_numeric($_REQUEST['p'])
+		        && $_REQUEST['p'] == (int)$_REQUEST['p'] ?
 			    $_REQUEST['p'] : 0;
-		$start = $page * $numPerPage;
+		$numperpage = isset($_REQUEST['limit']) && is_numeric($_REQUEST['limit'])
+		              && $_REQUEST['limit'] == (int)$_REQUEST['limit'] ?
+			          $_REQUEST['limit'] : 25;
+		$start = $page * $numperpage;
 
-		$sql = "SELECT *, offensive_comments.timestamp AS comment_timestamp, offensive_comments.id as commentid
-					FROM offensive_comments, offensive_uploads, users
-					WHERE MATCH(comment) AGAINST('".sqlEscape($find)."' IN BOOLEAN MODE)
-					AND offensive_comments.fileid = offensive_uploads.id
-					AND offensive_comments.userid = users.userid
-					ORDER BY offensive_comments.timestamp DESC
-					LIMIT $start, $numPerPage
-		";
+		$indexfile = get_include_path()."/offensive/data/comments.db";
+		$lockfile = get_include_path()."/offensive/data/comments.db.lock";
 
-		$result = tmbo_query( $sql );
+		// aquire lock.  try a couple times
+		$starttime = microtime(true);
+		$fp = fopen($lockfile, "r") or trigger_error("lockfile not found", E_USER_ERROR);
+		while(microtime(true) < $starttime + 2 && false === ($locked = flock($fp, LOCK_SH | LOCK_NB))) {
+			usleep(round(rand(100, 400) * 1000));
+		}
+		if(!$locked) {
+			trigger_error("locked out.", E_USER_ERROR);
+			exit(2);
+		}
 		
-		renderResults( $result, $numPerPage, $page );
-	
-	}
+		try {
+			$database = new XapianDatabase($indexfile);
 
+		    // Start an enquire session.
+		    $enquire = new XapianEnquire($database);
 
-	function searchForm( $value ) {
-		?>
-			<form action="./">
-				<input type="hidden" name="c" value="search"/>
-				<input type="text" name="find" value="<?= $value ?>"/>
-				<input type="submit" value="search comments"/>				
-			</form>
-		<?
-	}
+		    // Combine the rest of the command line arguments with spaces between
+		    // them, so that simple queries don't have to be quoted at the shell
+		    // level.
+		    $query_string = $find;
 
-	function renderResults( $result, $numPerPage, $page ) {
-		while( $row = mysql_fetch_assoc( $result ) ) {
-			$css = (isset($css) && $css == "") ? "background:#bbbbee;" : "";
-			?>
-			<div class="entry" style="<?= $css ?>">
-			<?
-				$comment = htmlEscape($row['comment']);
-
-				 echo nl2br( linkUrls( $comment ) ); ?><br/>
-				 
- 	 			<div class="timestamp"><a href="./?c=comments&fileid=<?= $row['fileid'] ?>#<?= $row['commentid'] ?>"><?= $row['comment_timestamp'] ?></a></div>
-				&raquo; 
-
-			<?
-
-			echo "<a href=\"./?c=user&userid=" . $row['userid'] . "\">" . $row['username'] . "</a>";
-			if( $row['vote'] ) {
-				echo "<span class='vote'> [ " . $row['vote'] . " ]</span>";
-			}
-						
-			if( $row['offensive'] == 1 ) {
-				?><span class="vote"> [ this might be offensive ]</span><?php
+		    $qp = new XapianQueryParser();
+		    $stemmer = new XapianStem("english");
+		    $qp->set_stemmer($stemmer);
+		    $qp->set_database($database);
+		    $qp->set_stemming_strategy(XapianQueryParser::STEM_SOME);
+		    $query = $qp->parse_query($query_string, XapianQueryParser::FLAG_SPELLING_CORRECTION);
+		    echo "<!-- Parsed query is: {$query->get_description()} -->\n";
+		
+			$corrected = $qp->get_corrected_query_string();
+			if($corrected) {
+				echo "Did you mean: <a href=\"XXX\">\"$corrected\"</a>?<br />\n";
 			}
 			
-			if( $row['repost'] == 1 ) {
-				?><span class="vote"> [ this is a repost ]</span><?php
-			}
+			// get results for the query.
+		    $enquire->set_query($query);
+		    $matches = $enquire->get_mset($start, $numperpage);
+
+			// end top head with some infos
+
+		    // Display the results.
+		    //echo "<br/>".($start + 1)." - ".min($start + $numperpage ,$matches->get_matches_estimated()).
+			     " of about {$matches->get_matches_estimated()}.\n\n";
+		    
+			// XXX: end end end yadda
 			?>
-			</div>
-			<?
-		}
-		?>
-		<table width="100%">
-			<tr>
-				<td>
-					<? if( $page > 0 ) { ?>
-						<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'] ?>&find=<?= urlencode($_REQUEST['find']) ?>&p=<?= $page - 1 ?>">&laquo; <b>previous page</b></a></td>
-					<? } ?>
-				</td>
-				<td style="text-align:right">
-					<? if( mysql_num_rows( $result ) == $numPerPage ) { ?>
-						<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'] ?>&find=<?= urlencode($_REQUEST['find']) ?>&p=<?= $page + 1 ?>"><b>next page</b></a> &raquo;
-					<? } ?>
-				</td>
-			</tr>        
-		</table>
+			<br />
+			<table width="100%">
+				<tr>
+					<td width="200px">
+						<? if( $page > 0 ) { ?>
+							<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'] ?>&find=<?= urlencode($_REQUEST['find']) ?>&p=<?= $page - 1 ?>">&laquo;&nbsp;<b>previous&nbsp;page</b></a></td>
+						<? } ?>
+					</td>
+					<td style="text-align:center">
+						<?
+							// pagination
+							echo ($start + 1)." - ".min($start + $numperpage ,$matches->get_matches_estimated()).
+							     " of about {$matches->get_matches_estimated()}.\n\n";
+						?>
+					</td>
+					<td style="text-align:right" width="200px">
+						<? if( $start + $numperpage < $matches->get_matches_estimated() ) { ?>
+							<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'] ?>&find=<?= urlencode($_REQUEST['find']) ?>&p=<?= $page + 1 ?>"><b>next&nbsp;page</b></a>&nbsp;&raquo;
+						<? } ?>
+					</td>
+				</tr>        
+			</table>
+			
+			</div></div><?
 		
-		<?
+			// d'oh this is not going to be very efficient, is it…
+			
+			$results = array();
+			$comments = array();
+			$i = $matches->begin();
+		    while (!$i->equals($matches->end())) {
+				$result = array();
+				$result['rank'] = $i->get_rank() + 1;
+				// XXX: prepopulate comment, upload, username from db
+				$result['comment'] = new Comment($i->get_document()->get_data());
+				$comments[] = $i->get_document()->get_data();
+				$result['match'] = $i->get_percent();
+				$i->next();
+				$results[] = $result;
+			}
+			core_getcomment($comments);
+			
+			foreach($results as $result) {
+				$comment = $result['comment'];
+				$upload = $comment->upload();
+				$uploader = $upload->uploader();
+				?>
+				<div class="contentbox">
+						<div class="heading"><?
+						    // changeblog special header
+							if($upload->id() == "211604") {
+								?>
+								changeblog
+								<br/><span style="color:#666699">beat to fit. paint to match.</span><br/>
+								<?
+							} else if( $upload->type() == 'topic' ) {
+								$prefix = $uploader->status() == "admin" ? "" : "don't blame me,";
+
+								echo htmlEscape($upload->filename());
+
+								?><br/><span style="color:#666699"><?= $prefix ?> <a href="./?c=user&userid=<?= $uploader->id() ?>" style="color:#666699"><?= $uploader->username() ?></a> started it.</span><br/>
+						<?
+							} else if( $upload->type() == 'audio' ) {
+								?><a class="heading" id="pic" href="images/audio/<?= $upload->filename() ?>"><?= $upload->htmlFilename() ?></a><br/><span style="color:#666699">uploaded by <a href="./?c=user&userid=<?= $uploader->id() ?>" style="color:#666699"><?= $uploader->username() ?></a></span><br/><?
+							} else {
+						?>
+								<a class="heading" id="pic" href="<?= $href ?>"><?= $upload->htmlFilename() ?></a><br/><span style="color:#666699">uploaded by <a href="./?c=user&userid=<?= $uploader->id() ?>" style="color:#666699"><?= $uploader->username() ?></a></span><br/>
+						<?
+							}	
+						?></div>
+				
+				
+				<?
+				//$css = (isset($css) && $css == "") ? "background:#bbbbee;" : "";
+				
+				?>
+				<div class="entry" style="<?= $css ?>">
+				<?= $result['comment']->HTMLcomment(); ?><br/>
+					 
+	 	 			<div class="timestamp"><?= $result['match'] ?>% <a href="./?c=comments&fileid=<?= $result['comment']->upload()->id() ?>#<?= $result['comment']->id() ?>"><?= $result['comment']->timestamp() ?></a></div>
+					&raquo; <a href="./?c=user&userid=<?= $result['comment']->commenter()->id() ?>"> <?= $result['comment']->commenter()->username() ?></a>
+	
+				<?
+
+				if( $result['comment']->vote() ) {
+					echo "<span class='vote'> [ " . $result['comment']->vote() . " ]</span>";
+				}
+							
+				if( $result['comment']->tmbo() ) {
+					?><span class="vote"> [ this might be offensive ]</span><?php
+				}
+				
+				if( $result['comment']->tiar() ) {
+					?><span class="vote"> [ this is a repost ]</span><?php
+				}
+				?>
+				</div></div>
+				<?
+			}
+			
+			?>
+			
+			<div class="contentbox">
+				<div class="entry" style="<?= $css ?>">
+			<table width="100%">
+				<tr>
+					<td width="200px">
+						<? if( $page > 0 ) { ?>
+							<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'] ?>&find=<?= urlencode($_REQUEST['find']) ?>&p=<?= $page - 1 ?>">&laquo;&nbsp;<b>previous&nbsp;page</b></a></td>
+						<? } ?>
+					</td>
+					<td style="text-align:center">
+						<?
+							// pagination.
+						?>
+					</td>
+					<td style="text-align:right" width="200px">
+						<? if( $start + $numperpage < $matches->get_matches_estimated() ) { ?>
+							<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'] ?>&find=<?= urlencode($_REQUEST['find']) ?>&p=<?= $page + 1 ?>"><b>next&nbsp;page</b></a>&nbsp;&raquo;
+						<? } ?>
+					</td>
+				</tr>        
+			</table>
+
+			<?
+		
+		} catch (Exception $e) {
+			flock($fp, LOCK_UN);
+			fclose($fp);
+		    trigger_error("XAPIAN: ".$e->getMessage(), E_USER_ERROR);
+		}
+		
+		flock($fp, LOCK_UN);
+		fclose($fp);
 	}
 
 	function body() {
-	box("<a href='/offensive/index.php?c=comments&fileid=245324'>comment search is dead</a> right now (long live comment search)");
 ?>
 
 	<div class="heading">both hands and a flashlight.</div>
@@ -108,11 +226,14 @@
 		$find = trim(sqlEscape(
 		        array_key_exists("find", $_REQUEST) ? $_REQUEST['find'] : ""));
 
-		?><!--<div class="entry" style="background:#bbbbee">
-		<?
-			searchForm( $find );
 		?>
-		</div>-->
+		<div class="entry" style="background:#bbbbee">
+				<form action="./">
+					<input type="hidden" name="c" value="search"/>
+					<input type="text" name="find" value="<?= $value ?>"/>
+					<input type="submit" value="search comments"/>				
+				</form>
+		</div>
 		<div class="entry">
 		<form action="finduser.php">
 			<input type="text" name="finduser" value="<?

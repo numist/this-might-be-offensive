@@ -110,7 +110,7 @@ error_reporting(E_STRICT | E_ALL);
 date_default_timezone_set("America/Los_Angeles");
 
 /* debugging information gathering */
-$queries = 0;
+$queries = array();
 $querytime = 0;
 
 function time_start(&$time) {
@@ -154,9 +154,6 @@ function tmbo_query($sql, $timeout=2) {
 	$time = time_end($time);
 	$querytime += $time;
 
-	// var_dump($time);
-	// var_dump($sql);
-
 	if($time > $timeout && $timeout != 0) {
 		$trace = debug_backtrace();
 		$trace = $trace[0];
@@ -168,7 +165,7 @@ function tmbo_query($sql, $timeout=2) {
 			                   "s: \"$sql\"");
 	}
 
-	$queries++;
+	$queries[] = array($sql, $time);
 	return $result;
 }
 

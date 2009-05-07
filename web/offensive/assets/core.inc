@@ -354,7 +354,46 @@
 		
 		return $ret;
 	}
+	
+	function core_getcomment($id) {
+		global $commentsql;
 
+		if(!is_array($id)) {
+			$args = array("id" => $id);
+			$id = array(check_arg("id", "integer", $args));
+		} else {
+			$targs = array();
+			foreach($id as $key => $arg) {
+				$targs[] = check_arg($key, "integer", $id);
+			}
+			$id = $targs;
+			unset($targs);
+		}
+		handle_errors();
+
+		$sql = $commentsql;
+
+		if(count($id) == 1) {
+			$sql .= " AND com.id = ".$id[0];
+		} else {
+			$sql .= " AND ( com.id = ".$id[0];
+			for($i = 1; $i < count($id); $i++) {
+				$sql .= " OR com.id = ".$id[$i];
+			}
+			$sql .= ")";
+		}
+
+		$result = tmbo_query($sql);
+
+		$ret = array();
+
+		while($row = mysql_fetch_assoc($result)) {
+			$ret[] = new Comment($row);
+		}
+
+		return count($ret) == 1 ? $ret[0] : $ret;
+	}
+	
 	// XXX: unimplemented
 	function core_posttopic($args) {
 		if(!is_array($args)) {

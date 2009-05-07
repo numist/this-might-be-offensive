@@ -29,6 +29,7 @@ body {
 .nsfw {
 
 	<?php
+	// XXX: is this necessary anymore?  it's taking quite a long time!
 		if( array_key_exists("prefs", $_SESSION) &&
 		    is_array($_SESSION['prefs']) &&
 		    array_key_exists("hide nsfw", $_SESSION["prefs"]) &&

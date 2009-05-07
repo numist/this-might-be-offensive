@@ -561,7 +561,18 @@
 			?>
 			<br />
 		
-			<center><div style="color:#ccc;"><?= number_format(time_end($ptime), 3)."s php, ".number_format($querytime, 3)."s sql, $queries queries"; ?></div></center>
+			<center><div style="color:#ccc;"><?= number_format(time_end($ptime), 3)."s php, ".number_format($querytime, 3)."s sql, ".count($queries)." queries\n\n <!--\n\n";
+				var_dump($queries);
+				echo "\n\n-->\n\n"; ?></div>
+			<?
+			$loadavg = "/proc/loadavg";
+			if(file_exists($loadavg) && is_readable($loadavg)) {
+				$load = file_get_contents($loadavg);
+				?>
+				<div style="color:#ccc;"><?= $load ?></div>
+				<?
+			}
+?>			</center>
 			<?
 		}
 		?>
