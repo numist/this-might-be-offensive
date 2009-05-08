@@ -50,7 +50,7 @@
 
 		$args = $_REQUEST;
 		// handle the outdated option "date", superceded by "date_desc"
-		if($args["sort"] == "date" || $defaultSort == "date") {
+		if((array_key_exists("sort", $args) && $args["sort"] == "date") || $defaultSort == "date") {
 			$args["sort"] = "date_desc";
 		}
 		

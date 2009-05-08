@@ -131,21 +131,19 @@
 						    // changeblog special header
 							if($upload->id() == "211604") {
 								?>
-								changeblog
+								<a class="heading" id="pic" href="./?c=changeblog">changeblog</a>
 								<br/><span style="color:#666699">beat to fit. paint to match.</span><br/>
 								<?
 							} else if( $upload->type() == 'topic' ) {
 								$prefix = $uploader->status() == "admin" ? "" : "don't blame me,";
-
-								echo htmlEscape($upload->filename());
-
+								?>
+								<a class="heading" id="pic" href="./?c=comments&fileid=<?= $upload->id() ?>"><?= $upload->htmlFilename(); ?></a>
+								<?
 								?><br/><span style="color:#666699"><?= $prefix ?> <a href="./?c=user&userid=<?= $uploader->id() ?>" style="color:#666699"><?= $uploader->username() ?></a> started it.</span><br/>
 						<?
-							} else if( $upload->type() == 'audio' ) {
-								?><a class="heading" id="pic" href="images/audio/<?= $upload->filename() ?>"><?= $upload->htmlFilename() ?></a><br/><span style="color:#666699">uploaded by <a href="./?c=user&userid=<?= $uploader->id() ?>" style="color:#666699"><?= $uploader->username() ?></a></span><br/><?
 							} else {
 						?>
-								<a class="heading" id="pic" href="<?= $href ?>"><?= $upload->htmlFilename() ?></a><br/><span style="color:#666699">uploaded by <a href="./?c=user&userid=<?= $uploader->id() ?>" style="color:#666699"><?= $uploader->username() ?></a></span><br/>
+								<a class="heading" id="pic" href="pages/pic.php?id=<?= $upload->id() ?>"><?= $upload->htmlFilename(); ?></a><br/><span style="color:#666699">uploaded by <a href="./?c=user&userid=<?= $uploader->id() ?>" style="color:#666699"><?= $uploader->username() ?></a></span><br/>
 						<?
 							}	
 						?></div>

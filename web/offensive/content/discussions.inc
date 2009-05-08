@@ -51,6 +51,7 @@
 						$args["type"] = "topic";
 					}
 					
+					// if any of the args have incorrect values, core_getuploads will kill us here
 					$result = core_getuploads($args);
 					
 					// if we made it this far, sort is valid, so we don't have to check it
