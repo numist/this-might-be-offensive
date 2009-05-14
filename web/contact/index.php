@@ -1,4 +1,4 @@
-<?php
+<?php ob_start();
 set_include_path("..");
 require_once("offensive/assets/header.inc");
 
@@ -10,6 +10,7 @@ $badStrings = array("Content-Type:",
                      "cc:",
                      "multipart/mixed",
                      "charleslegbe@aol.com",
+                     "sandy@gmail.com",
                      "hometown.aol.com");
 
 // Loop through each POST'ed value and test if it contains
@@ -23,6 +24,8 @@ foreach($_POST as $k => $v){
 		}
 	}
 }  
+
+ob_end_flush();
 
 function logBadRequest() {
 	mail( "ray@mysocalled.com",
