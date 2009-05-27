@@ -43,7 +43,6 @@
 					}
 					
 					$numPerPage = 100;
-					$args = $_REQUEST;
 					if(!array_key_exists("limit", $args)) {
 						$args["limit"] = $numPerPage;
 					}
