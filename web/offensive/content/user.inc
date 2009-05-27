@@ -14,7 +14,7 @@
 		
 		if(!isset($_REQUEST['userid']) ||
 		   $_REQUEST['userid'] == "0" ||
-		   !is_numeric($_REQUEST['userid'])) {
+		   !is_intger($_REQUEST['userid'])) {
 			header("Location: ./");
 			exit;
 		}
@@ -296,7 +296,7 @@ function handleSetStatusSubmission() {
 	$usrid =  sqlEscape( $_POST['userid'] );
 	$status =  sqlEscape( $_POST['set_account_status'] );
 	$email =  sqlEscape( $_POST['set_email'] );
-	if( is_numeric($usrid ) && $status !== "" ) {
+	if( is_intger($usrid ) && $status !== "" ) {
 		$isEmailValid = preg_match( '/[a-zA-Z0-9-_\.]+\@[a-zA-Z0-9-_\.]+\.[a-zA-Z0-9-_\.]+/', $email ) > 0;
 		$emailClause = $isEmailValid ? ", email = '$email' " : "";
 		$sql = "update users set account_status ='$status' $emailClause where userid = $usrid limit 1";

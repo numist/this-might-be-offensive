@@ -5,13 +5,13 @@
 	
 	// get cookie pickuplink
 	$cookiename = $me->id()."lastpic";
-	if(array_key_exists($cookiename, $_COOKIE) &&
-	   is_numeric($_COOKIE[$cookiename])) {	
+	if(array_key_exists($cookiename, $_COOKIE) && is_intger($_COOKIE[$cookiename])) {
 		$cookiepic = $_COOKIE[$cookiename];
 	} else {
 		$cookiepic = false;
 	}
 	
+	// output correct pickuplink
 	if($dbpic && $dbpic == $cookiepic) {
 		?><div><b><a href="pages/pic.php?id=<?= $dbpic ?>" id="pickUp">click here to pick up where you left off</a></b></div><?
 	} else if ($dbpic && $cookiepic){

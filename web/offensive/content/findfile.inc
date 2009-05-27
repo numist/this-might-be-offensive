@@ -16,7 +16,7 @@
 // XXX: _REQUEST['since'] gives a lower timestamp bound -- I forget why I wanted this...
 
 		$numPerPage = 100;
-		$page = isset($_REQUEST['p']) && is_numeric($_REQUEST['p']) ?
+		$page = isset($_REQUEST['p']) && is_intger($_REQUEST['p']) ?
 			    $_REQUEST['p'] : 0;
 		$start = $page * $numPerPage;
 		$find = $_REQUEST['findfile'];

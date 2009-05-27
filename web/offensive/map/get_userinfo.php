@@ -13,7 +13,7 @@ require_once("offensive/assets/classes.inc");
 // authentication
 mustLogIn("http");
 
-$user = (isset($_GET['user']) && is_numeric($_GET['user'])) ? $_GET['user'] : "";
+$user = (isset($_GET['user']) && is_intger($_GET['user'])) ? $_GET['user'] : "";
 if($user == "") trigger_error("no user argument", E_USER_ERROR);
 
 $user = new User($user);

@@ -58,7 +58,7 @@ function check_arg($key, $type, $method=null, $required=true, $set=null) {
 			}
 			break;
 		case "integer":
-			if(!is_numeric($method[$key]) || strpos($method[$key], ".") !== false) {
+			if(!is_intger($method[$key])) {
 				$validation_errors[] = "parameter '$key' must be of type $type (was: ".$method[$key].").";
 				return false;
 			}					
@@ -76,7 +76,7 @@ function check_arg($key, $type, $method=null, $required=true, $set=null) {
 		 */
 		case "date":
 			// unix timestamps, stop here.
-			if(is_numeric($method[$key]) && strpos($method[$key], ".") === false) {
+			if(is_intger($method[$key])) {
 				return date("Y-m-d H:i:s", (int)$method[$key]);
 			}
 			// other date formats that we recognize, stop here.
@@ -98,7 +98,7 @@ function check_arg($key, $type, $method=null, $required=true, $set=null) {
 			/*
 			 * Either the limit is a standalone integer...
 			 */
-			if(is_numeric($method[$key]) && strpos($method[$key], ".") === false) {
+			if(is_intger($method[$key])) {
 				$limit = (int)$method[$key];
 				$offset = 0;
 			/*
@@ -111,8 +111,7 @@ function check_arg($key, $type, $method=null, $required=true, $set=null) {
 				 * both of which are integers.
 				 */
 				if(count($arr) == 2 &&
-				   is_numeric($arr[0]) && strpos($arr[0], ".") === false &&
-				   is_numeric($arr[1]) && strpos($arr[1], ".") === false ) {
+				   is_intger($arr[0]) && is_intger($arr[1])) {
 					list($offset, $limit) = $arr;
 				}
 			}

@@ -94,12 +94,10 @@
 		} else if(strtotime($data) > 0 && $rtype == "plist") {
 			$data = date('c', strtotime($data));
 		} else if(is_numeric($data)) {
-			if(is_string($data)) {
-				if(strpos($data, ".") === false) {
-					$data = (int)$data;
-				} else {
-					$data = (double)$data;
-				}
+			if(is_intger($data)) {
+				$data = (int)$data;
+			} else {
+				$data = (double)$data;
 			}
 		} else if($data == "true") {
 			$data = true;

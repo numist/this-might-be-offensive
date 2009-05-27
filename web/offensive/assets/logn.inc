@@ -139,7 +139,7 @@ function login( $name=null, $pw=null ) {
 		global $salt;
 
 		$uid = id_from_hash( $_COOKIE['remember'] );
-		if(is_numeric($uid)) {
+		if(is_intger($uid)) {
 			$sql = "SELECT * from users where userid=$uid LIMIT 1";
 			$result = tmbo_query( $sql );
 			if(mysql_num_rows( $result ) == 1) {

@@ -57,7 +57,7 @@ if(!file_exists($indexfile) || !file_exists($lastcfile)) {
 if(file_exists($lastcfile)) {
 	$lastc = trim(file_get_contents($lastcfile));
 	// if the file is corrupted, we have to start from scratch
-	if(!is_numeric($lastc) || strpos($lastc, ".") !== false) {
+	if(!is_intger($lastc)) {
 		// throw out the corrupt file and the index
 		rmr($lastcfile);
 		// XXX: usually I don't find myself saying this, but this would be a great time to have a goto instruction

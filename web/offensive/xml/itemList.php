@@ -21,8 +21,8 @@ header( "Content-type: text/xml" ); ?>
 	
 	if(!isset($link) || !$link) $link = openDbConnection();
 	
-	$startNum = is_numeric( $_REQUEST['start'] ) ? $_REQUEST['start'] : 0;
-	$numItems = is_numeric( $_REQUEST['num'] ) ? $_REQUEST['num'] : 100;	
+	$startNum = is_intger( $_REQUEST['start'] ) ? $_REQUEST['start'] : 0;
+	$numItems = is_intger( $_REQUEST['num'] ) ? $_REQUEST['num'] : 100;	
 
 	$sql = "select offensive_uploads.*, users.username, offensive_count_cache.*
 			FROM offensive_uploads

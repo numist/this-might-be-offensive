@@ -1,7 +1,7 @@
 <?
 
 function conditionalGet($timestamp) {
-	if(!is_numeric($timestamp)) {
+	if(!is_intger($timestamp)) {
 		$timestamp = strtotime($timestamp);
 		if($timestamp === false) return;
 	}

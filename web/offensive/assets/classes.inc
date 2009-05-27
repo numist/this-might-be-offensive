@@ -83,7 +83,7 @@ class Upload {
 		 * think of to test if a variable of any type is losslessly castable
 		 * to an int (or already an int).  is_int() should be smarter.
 		 */
-		else if(is_numeric($info) && $info == (int)$info) {
+		else if(is_intger($info)) {
 			if(!array_key_exists($info, self::$gdata)) {
 				self::$gdata[$info] = array('exists' => null);
 			}
@@ -198,31 +198,31 @@ class Upload {
 	}
 	
 	public function goods() {
-		return is_numeric($this->getCacheRow("goods")) 
+		return is_intger($this->getCacheRow("goods")) 
 			? $this->getCacheRow("goods")
 			: 0;
 	}
 	
 	public function bads() {
-		return is_numeric($this->getCacheRow("bads"))
+		return is_intger($this->getCacheRow("bads"))
 			? $this->getCacheRow("bads")
 			: 0;
 	}
 	
 	public function tmbos() {
-		return is_numeric($this->getCacheRow("tmbos"))
+		return is_intger($this->getCacheRow("tmbos"))
 			? $this->getCacheRow("tmbos")
 			: 0;
 	}
 	
 	public function tiars() {
-		return is_numeric($this->getCacheRow("tiars"))
+		return is_intger($this->getCacheRow("tiars"))
 			? $this->getCacheRow("tiars")
 			: 0;
 	}
 	
 	public function comments() {
-		return is_numeric($this->getCacheRow("comments"))
+		return is_intger($this->getCacheRow("comments"))
 			? $this->getCacheRow("comments")
 			: 0;
 	}
@@ -390,7 +390,7 @@ class Upload {
 	private function basePath($timestamp=null, $nopath=false) {
 		if($timestamp == null) $timestamp = $this->timestamp();
 		
-		if(!is_numeric($timestamp))
+		if(!is_intger($timestamp))
 			$timestamp = strtotime($timestamp);
 		
 		$year = date( "Y", $timestamp );
@@ -682,7 +682,7 @@ class Comment {
 				$this->data["upload"] = new Upload($uplarr);
 			}
 			
-		} else if(is_numeric($info) && $info == (int)$info) {
+		} else if(is_intger($info)) {
 			// there's not a lot to do if the argument is just an int.
 			if(!array_key_exists($info, self::$gdata)) {
 				self::$gdata[$info] = array('exists' => null);
@@ -915,7 +915,7 @@ class User {
 					$this->data[$key] = $val;
 				}
 			}
-		} else if(is_numeric($info) && $info == (int)$info) {
+		} else if(is_intger($info)) {
 			if(!array_key_exists($info, self::$gdata)) {
 				self::$gdata[$info] = array('exists' => null);
 			}
@@ -1084,7 +1084,7 @@ class User {
 	public function squelched($target) {
 		if(is_object($target)) {
 			$target = $target->id();
-		} else if(!is_numeric($target) || $target != (int)$target) {
+		} else if(!is_intger($target)) {
 			trigger_error("target must be a userid or User object", E_USER_ERROR);
 		}
 		
@@ -1108,7 +1108,7 @@ class User {
 		// make sure user exists and all that
 		if(is_object($target)) {
 			$target = $target->id();
-		} else if(!is_numeric($target) || $target != (int)$target) {
+		} else if(!is_intger($target)) {
 			trigger_error("target must be a userid or User object", E_USER_ERROR);
 		} else {
 			$obj = new User($target);
@@ -1133,7 +1133,7 @@ class User {
 		// make sure user exists and all that
 		if(is_object($target)) {
 			$target = $target->id();
-		} else if(!is_numeric($target) || $target != (int)$target) {
+		} else if(!is_intger($target)) {
 			trigger_error("target must be a userid or User object", E_USER_ERROR);
 		} else {
 			$obj = new User($target);

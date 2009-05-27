@@ -113,6 +113,10 @@ date_default_timezone_set("America/Los_Angeles");
 $queries = array();
 $querytime = 0;
 
+function is_intger($arg) {
+	return (is_numeric($arg) && floor($arg) == ceil($arg));
+}
+
 function time_start(&$time) {
 	$time = microtime(true);
 }
@@ -177,7 +181,7 @@ function record_hit() {
 }
 
 function loggedin($lite=true) {
-	if(!array_key_exists('userid', $_SESSION) || !is_numeric($_SESSION['userid'])) return false;
+	if(!array_key_exists('userid', $_SESSION) || !is_intger($_SESSION['userid'])) return false;
 	
 	/* lite checks do not make a round trip to the database.  this is good enough for code
 	 * sanity checks, but not good enough for authorization checks that may want to check

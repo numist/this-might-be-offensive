@@ -34,7 +34,7 @@
 
 		$numPerPage = 100;
 		$page = array_key_exists("p", $_REQUEST) ? $_REQUEST['p'] : 0;
-		if( ! is_numeric( $page ) ) {
+		if( ! is_intger( $page ) ) {
 			$page = 0;
 		}
 		$start = ($page * $numPerPage);

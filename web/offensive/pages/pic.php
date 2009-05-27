@@ -24,7 +24,7 @@
 		$id = $_REQUEST["id"];
 	}
 	
-	if(!is_numeric($id)) {
+	if(!is_intger($id)) {
 		header( "Location: /offensive/" );
 		exit;
 	}
@@ -39,7 +39,7 @@
 		// update the pickup cookie
 		$cookiename = $me->id()."lastpic";
 		if(!array_key_exists($cookiename, $_COOKIE) ||
-		   !is_numeric($_COOKIE[$cookiename]) ||
+		   !is_intger($_COOKIE[$cookiename]) ||
 		   $_COOKIE[$cookiename] < $upload->id()) {
 			setcookie( $cookiename, $upload->id(), time() + 3600*24*365*10, "/offensive/");
 			$cookiepic = $upload->id();

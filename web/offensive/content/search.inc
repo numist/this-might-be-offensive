@@ -21,11 +21,9 @@
 	
 
 	function doSearch( $find ) {
-		$page = isset($_REQUEST['p']) && is_numeric($_REQUEST['p'])
-		        && $_REQUEST['p'] == (int)$_REQUEST['p'] ?
-			    $_REQUEST['p'] : 0;
-		$numperpage = isset($_REQUEST['limit']) && is_numeric($_REQUEST['limit'])
-		              && $_REQUEST['limit'] == (int)$_REQUEST['limit'] ?
+		$page = isset($_REQUEST['p']) && is_intger($_REQUEST['p']) ? $_REQUEST['p'] : 0;
+		// XXX: this should probably use argvalidation
+		$numperpage = isset($_REQUEST['limit']) && is_intger($_REQUEST['limit']) ?
 			          $_REQUEST['limit'] : 25;
 		$start = $page * $numperpage;
 
@@ -119,6 +117,8 @@
 				$i->next();
 				$results[] = $result;
 			}
+			
+			// load the class cache
 			core_getcomment($comments);
 			
 			foreach($results as $result) {
@@ -147,29 +147,23 @@
 						<?
 							}	
 						?></div>
-				
-				
-				<?
-				//$css = (isset($css) && $css == "") ? "background:#bbbbee;" : "";
-				
-				?>
 				<div class="entry" style="<?= $css ?>">
-				<?= $result['comment']->HTMLcomment(); ?><br/>
+				<?= $comment->HTMLcomment(); ?><br/>
 					 
-	 	 			<div class="timestamp"><?= $result['match'] ?>% <a href="./?c=comments&fileid=<?= $result['comment']->upload()->id() ?>#<?= $result['comment']->id() ?>"><?= $result['comment']->timestamp() ?></a></div>
-					&raquo; <a href="./?c=user&userid=<?= $result['comment']->commenter()->id() ?>"> <?= $result['comment']->commenter()->username() ?></a>
+	 	 			<div class="timestamp"><?= $result['match'] ?>% <a href="./?c=comments&fileid=<?= $comment->upload()->id() ?>#<?= $comment->id() ?>"><?= $comment->timestamp() ?></a></div>
+					&raquo; <a href="./?c=user&userid=<?= $comment->commenter()->id() ?>"> <?= $comment->commenter()->username() ?></a>
 	
 				<?
 
-				if( $result['comment']->vote() ) {
-					echo "<span class='vote'> [ " . $result['comment']->vote() . " ]</span>";
+				if( $comment->vote() ) {
+					echo "<span class='vote'> [ " . $comment->vote() . " ]</span>";
 				}
 							
-				if( $result['comment']->tmbo() ) {
+				if( $comment->tmbo() ) {
 					?><span class="vote"> [ this might be offensive ]</span><?php
 				}
 				
-				if( $result['comment']->tiar() ) {
+				if( $comment->tiar() ) {
 					?><span class="vote"> [ this is a repost ]</span><?php
 				}
 				?>

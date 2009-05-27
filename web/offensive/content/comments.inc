@@ -26,7 +26,7 @@
 		
 		$me = new User($_SESSION["userid"]);
 
-		if( ! is_numeric( $_REQUEST['fileid'] ) ){
+		if( ! is_intger( $_REQUEST['fileid'] ) ){
 			header( "Location: ./" );
 			exit;
 		}
@@ -46,7 +46,7 @@
 	    	// update the pickup cookie
         	$cookiename = $me->id()."lasttopic";
         	if(!array_key_exists($cookiename, $_COOKIE) ||
-        	   !is_numeric($_COOKIE[$cookiename]) ||
+        	   !is_intger($_COOKIE[$cookiename]) ||
         	   $_COOKIE[$cookiename] < $upload->id()) {
         		setcookie( $cookiename, $upload->id(), time() + 3600*24*365*10, "/offensive/"); 
 			}

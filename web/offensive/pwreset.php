@@ -122,7 +122,7 @@ https://".$_SERVER['SERVER_NAME']."/offensive/pwreset.php?x=$code
 	function userRowFromCode( $code ) {
 	
 		$id = id_from_hash( $code );
-		if( is_numeric( $id ) && $id > 1 ) {
+		if( is_intger( $id ) && $id > 1 ) {
 			$sql = "SELECT * FROM users WHERE userid = $id";
 			$result = tmbo_query( $sql );
 			if( mysql_num_rows( $result ) == 1 ) {

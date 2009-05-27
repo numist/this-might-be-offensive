@@ -18,11 +18,11 @@
 		$me->setPref($prefname, $value);
 	}
 
-	if( array_key_exists("sq", $_REQUEST) && is_numeric( $_REQUEST['sq'] ) ) {
+	if( array_key_exists("sq", $_REQUEST) && is_intger( $_REQUEST['sq'] ) ) {
 		$me->squelch($_REQUEST['sq']);
 	}
 
-	if( array_key_exists("unsq", $_REQUEST) && is_numeric( $_REQUEST['unsq'] ) ) {
+	if( array_key_exists("unsq", $_REQUEST) && is_intger( $_REQUEST['unsq'] ) ) {
 		$me->unsquelch($_REQUEST['unsq']);
 	}
 

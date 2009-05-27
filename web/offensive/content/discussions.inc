@@ -17,7 +17,7 @@
 	function body() {
 		global $me;
 		
-		$page = isset($_REQUEST['p']) && is_numeric($_REQUEST['p']) ?
+		$page = isset($_REQUEST['p']) && is_intger($_REQUEST['p']) ?
 			    $_REQUEST['p'] : 0;		
 		$args = $_REQUEST;
 		$args["type"] = "topic";
