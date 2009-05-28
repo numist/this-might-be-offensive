@@ -29,12 +29,38 @@
 	}
 
 	function canInvite( $uid ) {
-		$sql = "select (created < date_sub( now(), INTERVAL 1 MONTH )) as canInvite
-					FROM users where userid=$uid";
+		// member for a month
+		$sql = "SELECT (created < DATE_SUB( NOW(), INTERVAL 1 MONTH )) AS canInvite
+					FROM users WHERE userid=$uid";
 		$result = tmbo_query( $sql );
 		$row = mysql_fetch_assoc( $result );
+		if ($row['canInvite'] != 1) return false;
 
-		return $row['canInvite'] == 1;
+		// 3 uploads scored better than +50
+		// $sql = "SELECT COUNT(*) AS wins FROM offensive_uploads up, offensive_count_cache ca WHERE up.id = ca.threadid AND up.userid = $uid AND ca.good > 50";
+		// 		$result = tmbo_query($sql);
+		// 		$row = mysql_fetch_assoc($result);
+		// 		if($row["wins"] < 3) return false;
+		
+		// no uploads in the last month did worse than -50
+		$sql = "SELECT COUNT(*) AS losses FROM offensive_uploads up, offensive_count_cache ca WHERE up.id = ca.threadid AND up.userid = $uid AND ca.bad > 50 AND up.timestamp > DATE_SUB(NOW(), INTERVAL 1 MONTH)";
+		$result = tmbo_query($sql);
+		$row = mysql_fetch_assoc($result);
+		if($row["losses"] != 0) return false;
+				
+		// a dozen votes
+		$sql = "SELECT COUNT(*) AS comments FROM offensive_comments WHERE userid = $uid";
+		$result = tmbo_query($sql);
+		$row = mysql_fetch_assoc($result);
+		if($row["comments"] < 12) return false;
+		
+		// no posse members got banned in the last month
+		$sql = "SELECT COUNT(*) AS banned FROM users WHERE referred_by = $uid AND account_status = 'locked' AND timestamp > DATE_SUB(NOW(), INTERVAL 1 MONTH)";
+		$result = tmbo_query($sql);
+		$row = mysql_fetch_assoc($result);
+		if($row["banned"] != 0) return false;
+
+		return true;
 	}
 
 	function sendInvitation( $email ) {
@@ -123,10 +149,9 @@ Enjoy.
 				</form>
 			</p>
 			<?
-				}
-				else {
+				} else {
 			?>
-					<p>You have no invitations to send. We need to check you out and sniff your butt for 1 month before we let your friends in.</p>
+					<p>You have no invitations to send.  You might be too new, not getting along with the other kids, or invited someone who took a ride on the short bus.</p>
 			<?
 				}
 			?>
