@@ -33,11 +33,15 @@ EOT;
 		$page = isset($_REQUEST['p']) && is_intger($_REQUEST['p']) ?
 			    $_REQUEST['p'] : 0;		
 		$args = $_REQUEST;
-		$args["type"] = "image";
+		if(!array_key_exists("type", $args)) {
+			$args["type"] = "image";
+		}
 		if(!array_key_exists("limit", $args)) {
 			$args["limit"] = $numPerPage;
 		}
-		
+		if($args["type"] == "topic") {
+			trigger_error("topics do not have thumbnails", E_USER_ERROR);
+		}
 ?>
 <div class="heading">
 
@@ -98,7 +102,7 @@ EOT;
 		src="<?= $upload->filtered()
 			? "/offensive/graphics/th-filtered.gif" 
 			: $upload->thumbURL() ?>"
-		title="uploaded by <?= $upload->uploader()->username(); ?>"
+		title="uploaded by <?= $upload->uploader()->username(); ?>" border="0"
 	/></a>
 	
 	

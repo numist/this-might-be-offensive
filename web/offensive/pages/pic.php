@@ -371,6 +371,13 @@
 				}
 				return true;
 			}
+			
+			/* image rollover stuff */
+			function changesrc(a,im)
+			{
+				x = eval("document."+a);
+				x.src=im;
+			}
 
 		</script>
 	</head>
@@ -596,12 +603,25 @@
 				if(file_exists($upload->file())) {
 					$fp = fopen($upload->file(), 'r');
 					$id3 = new getid3_id3v2($fp, $info);
-				
+					?><table><tr><td height="100px" width="100px" align="right"><?
 					if(array_key_exists('id3v2', $info) && array_key_exists('comments', $info['id3v2'])) {
-						?><table><tr><td><?
 						if(file_exists($upload->thumb())) {
-							?><img src="<?= $upload->thumbURL() ?>"></td><td><?
+							?>
+							<a href="/offensive/ui/albumArt.php?id=<?= $upload->id() ?>"
+								<? if($upload->filtered()) { ?>
+									onMouseOver='changesrc("th<?= $upload->id()?>","<?= $upload->thumbURL() ?>")'
+							 		onMouseOut='changesrc("th<?= $upload->id() ?>","/offensive/graphics/th-filtered.gif")'
+								<? } ?> target="_blank"
+							><img name="th<?= $upload->id()?>"
+								src="<?= $upload->filtered()
+									? "/offensive/graphics/th-filtered.gif" 
+									: $upload->thumbURL() ?>"
+								alt="album art" border="0"
+							/></a>
+							<?
 						}
+						
+						?></td><td><?
 						
 						$tags = $info['id3v2']['comments'];
 						
@@ -626,9 +646,8 @@
 						if(array_key_exists('album', $tags)) { ?>
 						<span style="color:#666666">Album: <?= trim($tags['album'][0]); ?></span><br /><br />
 						<? }
-						?></td></tr></table><?
-						
 					}
+					?></td></tr></table><?
 					
 					?>
 					<!-- before you ask, at some point I'm going to add support for not using the flash player and embedding the file (quicktime is very good at this) as well as supporting the new slick HTML5 media stuff that's coming out in the next year or few. if you want to help with any of this (or just help with the flash player), please get in touch with me. -->

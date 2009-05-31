@@ -260,7 +260,7 @@
 							><img name="th<?= $upload->id()?>" style="margin:12px;"
 								src="<?= $upload->filtered()
 									? "/offensive/graphics/th-filtered.gif" 
-									: $upload->thumbURL() ?>"
+									: $upload->thumbURL() ?>" border="0"
 							/></a>
 							
 							<?
