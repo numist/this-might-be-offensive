@@ -652,6 +652,7 @@
 					?>
 					<!-- before you ask, at some point I'm going to add support for not using the flash player and embedding the file (quicktime is very good at this) as well as supporting the new slick HTML5 media stuff that's coming out in the next year or few. if you want to help with any of this (or just help with the flash player), please get in touch with me. -->
 					<object type="application/x-shockwave-flash" data="/offensive/ui/player_mp3_maxi.swf" width="500" height="20">
+						<param value="transparent" name="wmode" />
 					    <param name="movie" value="/offensive/ui/player_mp3_maxi.swf" />
 					    <param name="bgcolor" value="#ffffff" />
 					    <param name="FlashVars" value="<?= $args ?>" />
