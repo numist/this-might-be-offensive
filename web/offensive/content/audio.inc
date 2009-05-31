@@ -12,7 +12,6 @@
 		mustLogIn();
 
 		$me = new User($_SESSION["userid"]);
-		$me->setPref("index", "");
 	}
 	
 	function head() {
