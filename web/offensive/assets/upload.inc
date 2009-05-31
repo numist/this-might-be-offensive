@@ -192,6 +192,10 @@ function upload() {
 		$postdata['file_extension'] = getFileExtension($_FILES['image']['name']);
 		$postdata['tmpname'] = $postdata['tmpname'].$postdata['file_extension'];
 		$postdata['filename'] = $_FILES['image']['name'];
+		if(array_key_exists('nsfw', $_POST))
+			$postdata['nsfw'] = $_POST['nsfw'];
+		if(array_key_exists('tmbo', $_POST))
+			$postdata['tmbo'] = $_POST['tmbo'];
 
 		ensureDirExists($tmpdir);
 		move_uploaded_file($_FILES['image']['tmp_name'], $tmpdir."/".$postdata['tmpname']) or trigger_error("", E_USER_ERROR);
