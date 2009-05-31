@@ -56,13 +56,15 @@
    	   !is_intger($_COOKIE[$cookiename]) ||
    	   $_COOKIE[$cookiename] < $upload->id()) {
 		setcookie( $cookiename, $upload->id(), time() + 3600*24*365*10, "/offensive/");
-		$cookiepic = $upload->id();
-	} else {
-		$cookiepic = $_COOKIE[$cookiename];
 	}
+	
+	global $autoplay;
+	$autoplay = false;
 	
 	// update the pickup db entry
 	if($me->getPref($prefname) == false || $me->getPref($prefname) < $upload->id()) {
+		// if this account has not been this far forward in the stream before, autoplay.
+		$autoplay = true;
 		$me->setPref($prefname, $upload->id());
 	}
 
@@ -579,7 +581,10 @@
 						"loadingcolor=9d9d9d&amp;".
 						"sliderovercolor=9999ff&amp;".
 						"buttonovercolor=9999ff";
-				if($upload->filtered()) {
+
+				// if the upload is filtered, do not automatically play
+				// likewise, if we've seen this before and are not asking to loop, do not autoplay
+				if($upload->filtered() || (!$autoplay && !array_key_exists('loop', $_REQUEST))) {
 					$args .= "&amp;autoload=1";
 				} else {
 					$args .= "&amp;autoplay=1";
