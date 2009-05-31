@@ -440,8 +440,19 @@ class Upload {
 		/**********************************
 		 * UH OH!  image not found!
 		 * ignore the man behind the curtain
-		 * what about yesterday?  or tomorrow?
+		 * maybe a backup restoration caused unicodes to break,
+		 * or caused things to shift into yesterday.  or tomorrow.
+		 * sigh.
 		 */
+		if(count(glob($this->basePath().$id."_*")) == 1) {
+			list($ffilename) = glob($this->basePath().$id."_*");
+			$filename = basename($ffilename);
+			$filename = substr($ffilename, strpos($ffilename, "_") + 1);
+			$sql = "UPDATE offensive_uploads SET timestamp=timestamp, filename = '".sqlEscape($filename)."' WHERE id = ".$this->id();
+			tmbo_query($sql);
+			return $ffilename;
+		}
+		
 		$timestamp = strtotime($this->timestamp());
 			
 		$yesterday = $timestamp - 86400;
