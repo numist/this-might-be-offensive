@@ -246,7 +246,7 @@
 	}
 	
 		// thumbnail
-		if( $upload->type() == 'image' || $upload->type() == 'avatar' ) {
+		if( $upload->type() != 'topic' && ($upload->type() != "audio" || $upload->thumb())) {
 			?>
 				<div style="background:#ccccff; border-top:1px solid #000033">
 					<div style="float:right"><? toggleThumbnailLink() ?></div>
@@ -292,7 +292,7 @@
 				</div>
 
 					<div>
-					<? if ( $upload->type() == "image" || $upload->type() == "avatar" ) { ?>
+					<? if ($upload->type() != "topic") { ?>
 						<a class="heading" id="pic" href="pages/pic.php?id=<?= $upload->id() ?>"><?= $upload->htmlFilename(); ?></a><br/>
 					<? }
 						else {

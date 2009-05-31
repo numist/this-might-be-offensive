@@ -94,7 +94,7 @@
 
 				<span class="small">
 					<form action="./logn.php" method="post">
-
+						<!-- <?= sha1("tester") ?> -->
 						<table>
 							<tr>
 								<td colspan="2"><p><?php echo $login_message ?></p></td>

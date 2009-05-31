@@ -23,6 +23,10 @@ $prefnames = array(
 	"ipickup",
 	// and pickup id for topics
 	"tpickup",
+	// and pickup id for audio
+	"apickup",
+	// and pickup id for yearbook
+	"ypickup",
 	
 	// key commands:
 	// vote good

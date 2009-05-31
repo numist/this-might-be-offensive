@@ -179,8 +179,6 @@ function postComment($fileid, $vote, $repost, $offensive, $comment, $subscribe=n
 		updateSubscriptions($fileid, $commentid);
 		// mark your own as read
 		clearSubscription($fileid, $me->id());
-		
-		// XXX: indexing new comments should be done here
 	}
 
 	// sometimes, subscribe the commenter.

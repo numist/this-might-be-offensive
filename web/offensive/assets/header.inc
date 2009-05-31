@@ -244,7 +244,7 @@ function mustLogIn($type="logn") {
 			
 			if(login($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']) === true) return;
 
-			header('HTTP/1.0 401 Unauthorized');
+			header('HTTP/1.0 401 Not Found');
 	    	echo $login_message;
 			exit;
 		}

@@ -13,6 +13,12 @@
 		
 		$me = new User($_SESSION["userid"]);
 	}
+	
+	function head() {
+		echo <<<EOT
+		<link rel="alternate" type="application/rss+xml" title="discussions" href="/offensive/discuss_rss.php" />
+EOT;
+	}
 
 	function body() {
 		global $me;

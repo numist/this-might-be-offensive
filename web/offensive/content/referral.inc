@@ -14,8 +14,11 @@
 		$me = new User($_SESSION["userid"]);
 
 		if( array_key_exists("invite", $_REQUEST) &&
-		    isValidEmail( $_REQUEST['invite'] ) && 
-		    canInvite( $_SESSION['userid'] ) ) {
+		    isValidEmail( $_REQUEST['invite'] )) {
+			if(!canInvite( $_SESSION['userid'] )) {
+				trigger_error($_SESSION["username"]." tried to send invite, is not allowed!", E_USER_ERROR);
+				exit;
+			}
 			sendInvitation( $_REQUEST['invite'] );
 			header( "Location: " . $_SERVER['PHP_SELF'] . "?c=referral&s=1" );
 			exit;

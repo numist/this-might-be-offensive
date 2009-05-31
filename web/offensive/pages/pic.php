@@ -35,28 +35,53 @@
 		exit;
 	}
 
-	if($upload->type() == "image") {
-		// update the pickup cookie
-		$cookiename = $me->id()."lastpic";
-		if(!array_key_exists($cookiename, $_COOKIE) ||
-		   !is_intger($_COOKIE[$cookiename]) ||
-		   $_COOKIE[$cookiename] < $upload->id()) {
-			setcookie( $cookiename, $upload->id(), time() + 3600*24*365*10, "/offensive/");
-			$cookiepic = $upload->id();
-		} else {
-			$cookiepic = $_COOKIE[$cookiename];
-		}
-				
-		// update the pickup db entry
-		if($me->getPref("ipickup") == false || $me->getPref("ipickup") < $upload->id()) {
-			$me->setPref("ipickup", $upload->id());
-		}
+	###########################################################################
+	// update pickuplinks
+	switch($upload->type()) {
+		case "image":
+			$cookiename = $me->id()."lastpic";
+			$prefname = "ipickup";
+			break;
+		case "audio":
+			$cookiename = $me->id()."lasttrack";
+			$prefname = "apickup";
+			break;
+		case "avatar":
+			$cookiename = $me->id()."lastavatar";
+			$prefname = "ypickup";
+	}
+	
+	// update the pickup cookie
+	if(!array_key_exists($cookiename, $_COOKIE) ||
+   	   !is_intger($_COOKIE[$cookiename]) ||
+   	   $_COOKIE[$cookiename] < $upload->id()) {
+		setcookie( $cookiename, $upload->id(), time() + 3600*24*365*10, "/offensive/");
+		$cookiepic = $upload->id();
+	} else {
+		$cookiepic = $_COOKIE[$cookiename];
+	}
+	
+	// update the pickup db entry
+	if($me->getPref($prefname) == false || $me->getPref($prefname) < $upload->id()) {
+		$me->setPref($prefname, $upload->id());
 	}
 
+	###########################################################################
 	function get_random_id() {
 		global $me;
 		
-		$cookiename = $me->id()."lastpic";
+		switch($upload->type()) {
+			case "image":
+				$cookiename = $me->id()."lastpic";
+				break;
+			case "audio":
+				$cookiename = $me->id()."lasttrack";
+				break;
+			case "avatar":
+				$cookiename = $me->id()."lastavatar";
+				break;
+		}
+		
 		if(array_key_exists($cookiename, $_COOKIE)) {
 			$cookiepic = $_COOKIE[$cookiename];
 		} else {
@@ -84,7 +109,7 @@
 		}
 		return $k;
 	}
-
+	###########################################################################
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
    "http://www.w3.org/TR/html4/loose.dtd">
@@ -388,6 +413,9 @@
 					case "avatar":
 						$index = "yearbook";
 						break;
+					case "audio":
+						$index = "audio";
+						break;
 					default:
 						$index = $me->getPref("index");
 						if($index == "") {
@@ -494,7 +522,16 @@
 				
 				$style = ($upload->is_tmbo() || $upload->is_nsfw()) ? "style=\"margin-left:.3em\"" : "";
 				
+				if($upload->type() == "audio") {
+						echo "<a href=\"".$upload->URL()."\">";
+				}
+				
 				echo "<span $style>" . htmlEscape($upload->filename()) . "</span>" ;
+				
+				if($upload->type() == "audio") {
+						echo "</a>";
+				}
+				
 			?>
 			<span style="color:#999999"><? 
 				if($upload->file() != "")
@@ -524,35 +561,117 @@
 			<br/><br/>
 			
 			<!--
-				image block
+				file block
 			-->
 			<? 
 
-			if( $upload->filtered() ) {
-				?><div style="padding:128px;">[ <a id="imageLink" href="<?= $upload->URL() ?>" target="_blank">filtered</a>:<?
-					if($upload->squelched()) {
-						echo " squelched <!-- ".$upload->uploader()->id()
-						     ." - ".$upload->uploader()->username()." -->";
+			if($upload->type() == "audio") {
+				require_once("offensive/assets/id3.inc");
+				
+				$args = "mp3=".urlencode($upload->URL())."&amp;".
+						"width=500&amp;".
+						"showvolume=1&amp;".
+						"showloading=always&amp;".
+						"buttonwidth=25&amp;".
+						"sliderwidth=15&amp;".
+						"volumewidth=36&amp;".
+						"volumeheight=8&amp;".
+						"loadingcolor=9d9d9d&amp;".
+						"sliderovercolor=9999ff&amp;".
+						"buttonovercolor=9999ff";
+				if($upload->filtered()) {
+					$args .= "&amp;autoload=1";
+				} else {
+					$args .= "&amp;autoplay=1";
+				}
+				if(array_key_exists('loop', $_REQUEST)) {
+					$args .= "&amp;loop=1";
+				}
+				
+				if(file_exists($upload->file())) {
+					$fp = fopen($upload->file(), 'r');
+					$id3 = new getid3_id3v2($fp, $info);
+				
+					if(array_key_exists('id3v2', $info) && array_key_exists('comments', $info['id3v2'])) {
+						?><table><tr><td><?
+						if(file_exists($upload->thumb())) {
+							?><img src="<?= $upload->thumbURL() ?>"></td><td><?
+						}
+						
+						$tags = $info['id3v2']['comments'];
+						
+						if(array_key_exists('title', $tags)) { ?>
+						<span style="color:#666666">Title: <?= trim($tags['title'][0]); ?>
+							<?
+							if(array_key_exists('tracknum', $tags)) {
+								echo "(track ".(int)trim($tags['tracknum'][0]);
+								if(array_key_exists('totaltracks', $tags)) {
+									echo " of ".(int)trim($tags['totaltracks'][0]);
+								}
+								echo ")";
+							}
+							?>
+						</span><br />
+						<? }
+						
+						if(array_key_exists('artist', $tags)) { ?>
+						<span style="color:#666666">By: <?= trim($tags['artist'][0]); ?></span><br />
+						<? }
+						
+						if(array_key_exists('album', $tags)) { ?>
+						<span style="color:#666666">Album: <?= trim($tags['album'][0]); ?></span><br /><br />
+						<? }
+						?></td></tr></table><?
+						
 					}
-					if($upload->filtered_nsfw()) {
-						echo " nsfw";
-					}
-					if($upload->filtered_tmbo()) {
-						echo " tmbo";
-					}
-					if($upload->filtered_bad()) {
-						echo " bad";
-					}
-				?> ]</div><?
-			} else { ?>
-				<div class="<?php echo $upload->is_nsfw() == 1 ? 'nsfw' : 'image' ?> u<?= $upload->uploader()->id() ?>">
-					<? if($upload->file() != "") { ?>
-						<a id="imageLink" href="<?= $upload->URL() ?>" target="_blank"><img src="<?= $upload->URL() ?>" style="border:none"/></a>
-					<? } else { ?>
-						<div style="padding:128px;">[ got nothin' for ya ]</div>
-					<? } ?>
-				</div>
-			<? } ?>
+					
+					?>
+					<!-- before you ask, at some point I'm going to add support for not using the flash player and embedding the file (quicktime is very good at this) as well as supporting the new slick HTML5 media stuff that's coming out in the next year or few. if you want to help with any of this (or just help with the flash player), please get in touch with me. -->
+					<object type="application/x-shockwave-flash" data="/offensive/ui/player_mp3_maxi.swf" width="500" height="20">
+					    <param name="movie" value="/offensive/ui/player_mp3_maxi.swf" />
+					    <param name="bgcolor" value="#ffffff" />
+					    <param name="FlashVars" value="<?= $args ?>" />
+					</object>
+					
+					<table><tr><td style="text-align:right" width="480px">
+							&nbsp;
+							<? if(!array_key_exists('loop', $_REQUEST)) { ?>
+									<a style="color:#999999; text-decoration:underline" href="/offensive/pages/pic.php?id=<?= $upload->id() ?>&loop">loop</a>
+							<? } ?>
+					</td></tr></table>
+					<?
+				} else { ?>
+					<div style="padding:128px;">[ got nothin' for ya ]</div><?
+				}
+			} else {
+
+				if( $upload->filtered() ) {
+					?><div style="padding:128px;">[ <a id="imageLink" href="<?= $upload->URL() ?>" target="_blank">filtered</a>:<?
+						if($upload->squelched()) {
+							echo " squelched <!-- ".$upload->uploader()->id()
+							     ." - ".$upload->uploader()->username()." -->";
+						}
+						if($upload->filtered_nsfw()) {
+							echo " nsfw";
+						}
+						if($upload->filtered_tmbo()) {
+							echo " tmbo";
+						}
+						if($upload->filtered_bad()) {
+							echo " bad";
+						}
+					?> ]</div><?
+				} else { ?>
+					<div class="<?php echo $upload->is_nsfw() == 1 ? 'nsfw' : 'image' ?> u<?= $upload->uploader()->id() ?>">
+						<? if($upload->file() != "") { ?>
+							<a id="imageLink" href="<?= $upload->URL() ?>" target="_blank"><img src="<?= $upload->URL() ?>" style="border:none"/></a>
+						<? } else { ?>
+							<div style="padding:128px;">[ got nothin' for ya ]</div>
+						<? } ?>
+					</div>
+					<?
+				} 
+			} ?>
 			<br/>
 		</div>
     	

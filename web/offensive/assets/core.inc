@@ -42,7 +42,7 @@
 	core functions
 **/	
 	global $types;
-	$types = array("image", "topic", "avatar");
+	$types = array("image", "topic", "avatar", "audio");
 
 	function core_getuploads($args) {
 		global $uploadsql, $types;

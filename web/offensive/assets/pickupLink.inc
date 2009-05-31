@@ -1,18 +1,33 @@
 <?
 	// get db pickuplink
-	global $me;
-	$dbpic = $me->getPref("ipickup");
+	global $me, $activeTab;
 	
+	switch($activeTab) {
+		case "yearbook":
+			$prefname = "ypickup";
+			$cookiename = $me->id()."lastavatar";
+			break;
+		case "audio":
+			$prefname = "apickup";
+			$cookiename = $me->id()."lasttrack";
+			break;
+		default:
+			$prefname = "ipickup";
+			$cookiename = $me->id()."lastpic";
+	}
+	
+	// get db pickuplink
+	$dbpic = $me->getPref($prefname);
+
 	// get cookie pickuplink
-	$cookiename = $me->id()."lastpic";
 	if(array_key_exists($cookiename, $_COOKIE) && is_intger($_COOKIE[$cookiename])) {
 		$cookiepic = $_COOKIE[$cookiename];
 	} else {
-		$cookiepic = false;
+		$cookiepic = 0;
 	}
 	
 	// output correct pickuplink
-	if($dbpic && $dbpic == $cookiepic) {
+	if($dbpic !== false && $dbpic == $cookiepic) {
 		?><div><b><a href="pages/pic.php?id=<?= $dbpic ?>" id="pickUp">click here to pick up where you left off</a></b></div><?
 	} else if ($dbpic && $cookiepic){
 		?><div><b>pick up where you left off 

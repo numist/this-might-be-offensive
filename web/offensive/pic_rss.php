@@ -64,7 +64,7 @@ conditionalGet($lastBuildTime);
 			<? } else { ?>
 				<title><![CDATA[<?= $filename ?> (uploaded by <?= $upload->uploader()->username() ?>)]]></title>
 				<link>http://<?= $_SERVER['SERVER_NAME'] ?>/offensive/pages/pic.php?id=<?= $upload->id() ?></link>
-				<description><![CDATA[<? 
+				<description><![CDATA[<? // TODO: pretty this up like audio
 					if($fileURL != '') { 
 						?><img src="<?= $fileURL ?>"/><?
 					} else {

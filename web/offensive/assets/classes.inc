@@ -428,6 +428,11 @@ class Upload {
 
 		$retname = $this->basePath().$id."_".$filename;
 
+		// if there are still files somewhere following the old naming scheme, this will flush them out.
+		if(file_exists($this->basePath().$filename)) {
+			rename($this->basePath().$filename, $retname);
+		}
+
 		if(file_exists($retname)) {
 			return $retname;
 		}
@@ -467,7 +472,7 @@ class Upload {
 		
 		$target = $this->basePath()."thumbs/";
 		ensureDirExists($target);
-		$target .= "th".$this->id().getFileExtension($path);
+		$target .= "th".$this->id().($this->type() == "audio" ? "" : getFileExtension($path));
 
 		if(!rename($path, $target)) {
 			trigger_error("rename($path, $target) failed", E_USER_WARNING);
@@ -479,15 +484,15 @@ class Upload {
 	
 	public function thumb() {
 		$id = $this->id();
-		$filename = $this->filename();
 		$timestamp = $this->timestamp();
 		$type = $this->type();
-		$ext = getFileExtension($filename);
+		$ext = getFileExtension($this->filename());
+		$thumbpath = "thumbs/th$id".($type == "audio" ? "" : $ext);
 
-		// images only.
-		if($type != 'image' && $type != 'avatar') return '';
+		// files only
+		if($type == 'topic') return '';
 
-		$retname = $this->basePath()."thumbs/th$id$ext";
+		$retname = $this->basePath().$thumbpath;
 
 		if(file_exists($retname)) {
 			return $retname;
@@ -498,23 +503,28 @@ class Upload {
 		 * ignore the man behind the curtain
 		 * what about yesterday?  or tomorrow?
 		 */
+		
 		$timestamp = strtotime($timestamp);
 			
 		$yesterday = $timestamp - 86400;
-		$retname = $this->basePath($yesterday)."thumbs/th$id$ext";
+		$retname = $this->basePath($yesterday).$thumbpath;
 		if(Upload::thumbConform($retname)) return $retname;
 			
 		$tomorrow = $timestamp + 86400;
-		$retname = $this->basePath($tomorrow)."thumbs/th$id$ext";
+		$retname = $this->basePath($tomorrow).$thumbpath;
 		if(Upload::thumbConform($retname)) return $retname;
 
+		if($type == "audio") {
+			return "";
+		}
+		
 		// still no good :( … is there a big image we can create a thumb from?
 		$bigfile = $this->file();
 		if($bigfile == '') {
 			return '';
 		}
 		
-		$retname = $this->basePath()."thumbs/th$id$ext";
+		$retname = $this->basePath().$thumbpath;
 		
 		// man, I sure hope this doesn't happen often.
 		// this will probably hurt if we get dogpiled, but this is a pretty uncommon code path
@@ -538,12 +548,12 @@ class Upload {
 	public function thumbURL() {
 		// images only
 		// if the file or thumb don't exist, why bother?
-		if(($this->type() != 'image' && $this->type() != 'avatar')
-		   || ($this->file() == '' || $this->thumb() == '')) {
+		if($this->type() == 'topic' || $this->file() == '' || $this->thumb() == '') {
 			return "/offensive/graphics/previewNotAvailable.gif";
 		}
 		
-		return "/".$this->basePath(null, true)."thumbs/th".$this->id().getFileExtension($this->filename());
+		return "/".$this->basePath(null, true)."thumbs/th".$this->id().
+		       ($this->type() == "audio" ? "" : getFileExtension($this->filename()));
 	}
 	
 	public function commentLabel($showvotes=true) {
