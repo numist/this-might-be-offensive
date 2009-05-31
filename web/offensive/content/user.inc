@@ -229,7 +229,7 @@
 		?>
 			<tr class="<?= $css ?>">
 				<td style="width:100%"><div style="overflow:hidden;white-space:nowrap;width:285px;"><a class="<?= $css ?>" href="<?
-				if($upload->type() == "image" || $upload->type() == "avatar") 
+				if($upload->type() != "topic") 
 					echo "pages/pic.php?id=".$upload->id();
 				else
 					echo "/offensive/?c=comments&fileid=".$upload->id();
