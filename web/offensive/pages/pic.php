@@ -13,11 +13,6 @@
 	time_start($ptime);
 	
 	$me = new User($_SESSION["userid"]);
-
-	if(array_key_exists("random", $_REQUEST)) {
-		header("Location: /offensive/pages/pic.php?id=".get_random_id());
-		exit;
-	}
 	
 	$id = "";
 	if(array_key_exists("id", $_REQUEST)) {
@@ -30,6 +25,17 @@
 	}
 
 	$upload = core_getupload($id);
+	
+	if(!$upload->exists()) {
+		header( "Location: /offensive/" );
+		exit;
+	}
+	
+	if(array_key_exists("random", $_REQUEST)) {
+		header("Location: /offensive/pages/pic.php?id=".get_random_id($upload));
+		exit;
+	}
+	
 	if($upload->type() == "topic") {
 		header("Location: /offensive/?c=comments&fileid=".$id);
 		exit;
@@ -69,7 +75,7 @@
 	}
 
 	###########################################################################
-	function get_random_id() {
+	function get_random_id($upload) {
 		global $me;
 		
 		switch($upload->type()) {
@@ -97,7 +103,7 @@
 		 * at the beginning of execution if they are invalid, it's safe to skip
 		 * existence and type checks at this point.
 		 */
-		$sql = "SELECT id FROM offensive_uploads WHERE type='image' AND status='normal' AND id < ".min($me->getPref('ipickup'), $cookiepic)." ORDER BY RAND() LIMIT 1";
+		$sql = "SELECT id FROM offensive_uploads WHERE type='".$upload->type()."' AND status='normal' AND id < ".min($me->getPref('ipickup'), $cookiepic)." ORDER BY RAND() LIMIT 1";
 		$res = tmbo_query($sql);
 		$row = mysql_fetch_assoc( $res );
 		return($row['id']);
@@ -190,7 +196,7 @@
                 	
 						case 191: // ?
 							e.preventDefault();
-							document.location.href = "/offensive/pages/pic.php?random";
+							document.location.href = "/offensive/pages/pic.php?id=<?= $upload->id() ?>&random";
 							return;
 							break;
                 	
@@ -269,7 +275,7 @@
 							}
 							?>
 							e.preventDefault();
-							document.location.href = "/offensive/pages/pic.php?random";
+							document.location.href = "/offensive/pages/pic.php?id=<?= $upload->id() ?>&random";
 							return;
 							break;
 							<?
