@@ -309,13 +309,8 @@ class Upload {
 	 */
 	public function next() {
 		if(!array_key_exists("next", $this->data)) {
-			$sql = "SELECT * FROM offensive_uploads WHERE id = (SELECT MIN( id ) AS next FROM offensive_uploads 
-		        	WHERE id > ".$this->id()." AND type='".$this->type()."' AND status='normal'
-					AND id != ".$this->id().")";
-					/*
-					 * this last conditional was added due to a bug in MySQL that would
-					 * sometimes cause this query to return the current id as the next id.
-					 */
+			$sql = "SELECT * FROM offensive_uploads WHERE id > ".$this->id()." AND type='".$this->type()."' AND status='normal'
+					ORDER BY id ASC LIMIT 1";
 			$result = tmbo_query($sql);
 			if(mysql_num_rows($result) == 0) {
 				$this->data["next"] = false;
@@ -329,13 +324,8 @@ class Upload {
 	
 	public function prev() {
 		if(!array_key_exists("prev", $this->data)) {
-			$sql = "SELECT * FROM offensive_uploads WHERE id = (SELECT MAX( id ) AS prev FROM offensive_uploads
-		        	WHERE id < ".$this->id()." AND type='".$this->type()."' AND status='normal'
-					AND id != ".$this->id().")";
-					/*
-					 * this last conditional was added due to a bug in MySQL that would
-					 * sometimes cause this query to return the current id as the previous id.
-					 */
+			$sql = "SELECT * FROM offensive_uploads WHERE id < ".$this->id()." AND type='".$this->type()."' AND status='normal'
+					ORDER BY id DESC LIMIT 1";
 			$result = tmbo_query($sql);
 			if(mysql_num_rows($result) == 0) {
 				$this->data["prev"] = false;
