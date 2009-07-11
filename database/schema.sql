@@ -65,7 +65,7 @@ CREATE TABLE `ip_history` (
   `timestamp` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   PRIMARY KEY  (`id`),
   KEY `userid_ip` (`userid`,`ip`)
-) ENGINE=InnoDB AUTO_INCREMENT=4059220 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=4059315 DEFAULT CHARSET=latin1;
 SET character_set_client = @saved_cs_client;
 
 --
@@ -206,7 +206,7 @@ CREATE TABLE `offensive_comments` (
   KEY `userid_fileid` (`userid`,`fileid`),
   KEY `userid_timestamp` (`userid`,`timestamp`),
   KEY `userid_fileid_commentid` (`id`,`userid`,`fileid`)
-) ENGINE=MyISAM AUTO_INCREMENT=276171922 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=276172015 DEFAULT CHARSET=latin1;
 SET character_set_client = @saved_cs_client;
 
 --
@@ -227,8 +227,10 @@ CREATE TABLE `offensive_count_cache` (
   `repost` int(10) unsigned NOT NULL default '0',
   PRIMARY KEY  (`id`),
   UNIQUE KEY `threadid_2` (`threadid`),
-  KEY `good` (`good`)
-) ENGINE=InnoDB AUTO_INCREMENT=380711 DEFAULT CHARSET=latin1;
+  KEY `good` (`good`),
+  KEY `ca_timestamp` (`timestamp`),
+  KEY `ca_comments` (`comments`)
+) ENGINE=InnoDB AUTO_INCREMENT=380713 DEFAULT CHARSET=latin1;
 SET character_set_client = @saved_cs_client;
 
 --
@@ -310,7 +312,7 @@ CREATE TABLE `offensive_uploads` (
   KEY `type_userid` (`type`,`userid`),
   KEY `status_type_id` (`status`,`type`,`id`),
   KEY `t_t_id` (`type`,`timestamp`,`id`,`status`)
-) ENGINE=InnoDB AUTO_INCREMENT=266078 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=266080 DEFAULT CHARSET=latin1;
 SET character_set_client = @saved_cs_client;
 
 --
@@ -498,4 +500,4 @@ SET character_set_client = @saved_cs_client;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2009-07-11  7:04:47
+-- Dump completed on 2009-07-11  7:52:14
