@@ -307,9 +307,16 @@ class Upload {
 	/*
 	 * upload slinging code
 	 */
-	public function next() {
+	public function next($userid = -1, $nsfw_filter = false, $tmbo_filter = false) {
 		if(!array_key_exists("next", $this->data)) {
+      $tmbo_sql = $tmbo_filter ? " AND NOT tmbo " : "";
+      $nsfw_sql = $nsfw_filter ? " AND NOT nsfw " : "";
+      $squelched_sql = ($userid != -1) ? " AND userid NOT IN (SELECT squelched FROM offensive_squelched WHERE userid = $userid) " : "";
+        
 			$sql = "SELECT * FROM offensive_uploads WHERE id > ".$this->id()." AND type='".$this->type()."' AND status='normal'
+          $tmbo_sql
+          $nsfw_sql
+          $squelched_sql
 					ORDER BY id ASC LIMIT 1";
 			$result = tmbo_query($sql);
 			if(mysql_num_rows($result) == 0) {
@@ -324,7 +331,14 @@ class Upload {
 	
 	public function prev() {
 		if(!array_key_exists("prev", $this->data)) {
+      $tmbo_sql = $tmbo_filter ? " AND NOT tmbo " : "";
+      $nsfw_sql = $nsfw_filter ? " AND NOT nsfw " : "";
+      $squelched_sql = ($userid != -1) ? " AND userid NOT IN (SELECT squelched FROM offensive_squelched WHERE userid = $userid) " : "";
+      
 			$sql = "SELECT * FROM offensive_uploads WHERE id < ".$this->id()." AND type='".$this->type()."' AND status='normal'
+          $tmbo_sql
+          $nsfw_sql
+          $squelched_sql
 					ORDER BY id DESC LIMIT 1";
 			$result = tmbo_query($sql);
 			if(mysql_num_rows($result) == 0) {
