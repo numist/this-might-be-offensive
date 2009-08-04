@@ -127,7 +127,7 @@
 		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 		<META NAME="ROBOTS" CONTENT="NOARCHIVE" />
 		<title>[<?= $upload->type() ?>] : <?= $upload->filename() ?> </title>
-		<link rel="stylesheet" type="text/css" href="styles.php"/>
+		<link rel="stylesheet" type="text/css" href="/styles/pic.css"/>
 		<script type="text/javascript" src="/offensive/js/jquery-1.2.6.min.js"></script>
 		<!-- XXX: a lot of this picui stuff is going to have to move into this header so it can be customized -->
 		<script type="text/javascript" src="/offensive/js/picui.js"></script>

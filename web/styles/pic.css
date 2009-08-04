@@ -1,10 +1,3 @@
-<?php 
-set_include_path("../..");
-require_once( 'offensive/assets/header.inc' );
-
-header( "Content-type: text/css" );
-?>
-
 #comments_link {
 	padding-left:24px;
 }
@@ -24,19 +17,6 @@ body {
 #votelinks.off, #votelinks.off a {
 	color:#ccc;
 	text-decoration:none;
-}
-
-.nsfw {
-
-	<?php
-	// XXX: is this necessary anymore?  it's taking quite a long time!
-		if( array_key_exists("prefs", $_SESSION) &&
-		    is_array($_SESSION['prefs']) &&
-		    array_key_exists("hide nsfw", $_SESSION["prefs"]) &&
-		    $_SESSION['prefs']['hide nsfw'] == 1 ) {
-	?>		display:none; <?php
-		}
-	?>
 }
 
 .jqmWindow {
