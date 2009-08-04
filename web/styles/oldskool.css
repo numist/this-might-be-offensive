@@ -246,3 +246,7 @@ table.thumbnails td a {
 a .tags {
 
 }
+
+@media only screen and (max-device-width: 480px) {
+	body { -webkit-text-size-adjust: none; }
+}
