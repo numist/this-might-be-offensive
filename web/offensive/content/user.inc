@@ -81,10 +81,13 @@
 			case "awaiting activation":
 				$accountMessage = "$name has not picked up the keys yet.";
 			break;
-		
 			case "admin":
 			default:
-				$accountMessage = "$name is welcome here.";
+				if(strtotime($them->timestamp()) < time() - 60 * 60 * 24 * 365) {
+					$accountMessage = "$name gave up.";
+				} else {
+					$accountMessage = "$name is welcome here.";
+				}
 			break;
 		}
 		
