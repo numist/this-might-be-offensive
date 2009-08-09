@@ -26,11 +26,11 @@
 		return upload();
 	}
 
-	function uploadForm($fileuploaded=false) {
+	function uploadForm($fileuploaded=false, $avatar=false) {
 		$uploadsRemaining = numUploadsRemaining( $_SESSION['userid'] );
 		?>
 			<div class="heading"><?
-			 	if($fileuploaded && $uploadsRemaining !== 0) {
+				if($fileuploaded && $uploadsRemaining !== 0) {
 					echo "thank you, sir, may i have another?";
 				} else if ($uploadsRemaining !== 0) {
 					echo "gimme.";
@@ -42,9 +42,9 @@
 
 			<div style="text-align:center">
 
-				<?php 
+				<?php
 
-					if( $uploadsRemaining !== 0 || $_SESSION['status'] == "admin" ) { 
+					if( $uploadsRemaining !== 0 || $_SESSION['status'] == "admin" ) {
 						$remaining = $_SESSION['status'] == 'admin' ? '∞' : $uploadsRemaining;
 
 				?>
@@ -65,7 +65,7 @@
 								<tr>
 									<td style="text-align:right"><label for="image">file:</label></td>
 									<td><input type="file" name="image" id="image" onchange="setFileName( this )"/></td>
-								</tr>	
+								</tr>
 								<tr>
 									<td></td>
 									<td><input type="checkbox" id="nsfw" name="nsfw" value="1"/><label for="nsfw">[ nsfw ]</label></td>
@@ -73,11 +73,14 @@
 								<tr>
 									<td></td>
 									<td><input type="checkbox" id="tmbo" name="tmbo" value="1"/><label for="tmbo">[ this might be offensive ]</label></td>
-								</tr>			
+								</tr>
 
 								<tr>
 									<td></td>
 									<td>
+<? if($avatar) {?>
+										<input type="hidden" name="avatar" value=""/>
+<?}?>
 										<input type="hidden" name="filename" value=""/>
 										<input type="hidden" name="c" value="upload"/>
 										<input type="submit" value="upload"/>
