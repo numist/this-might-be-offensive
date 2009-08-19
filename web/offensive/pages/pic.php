@@ -1,4 +1,4 @@
-<?php 
+<?php
 	set_include_path("../..");
 	require_once("offensive/assets/header.inc");
 	require_once("offensive/assets/functions.inc");
@@ -11,31 +11,31 @@
 	mustLogIn();
 
 	time_start($ptime);
-	
+
 	$me = new User($_SESSION["userid"]);
-	
+
 	$id = "";
 	if(array_key_exists("id", $_REQUEST)) {
 		$id = $_REQUEST["id"];
 	}
-	
+
 	if(!is_intger($id)) {
 		header( "Location: /offensive/" );
 		exit;
 	}
 
 	$upload = core_getupload($id);
-	
+
 	if(!$upload->exists()) {
 		header( "Location: /offensive/" );
 		exit;
 	}
-	
+
 	if(array_key_exists("random", $_REQUEST)) {
 		header("Location: /offensive/pages/pic.php?id=".get_random_id($upload));
 		exit;
 	}
-	
+
 	if($upload->type() == "topic") {
 		header("Location: /offensive/?c=comments&fileid=".$id);
 		exit;
@@ -70,8 +70,11 @@
 	// update the pickup db entry
 	if($me->getPref($prefname) == false || $me->getPref($prefname) < $upload->id()) {
 		// if this account has not been this far forward in the stream before, autoplay.
-		$autoplay = true;
+		$autoplay = !$upload->filtered();
 		$me->setPref($prefname, $upload->id());
+	}
+	if(array_key_exists('loop', $_REQUEST)) {
+		$autoplay = true;
 	}
 
 	###########################################################################
@@ -119,8 +122,7 @@
 	}
 	###########################################################################
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-   "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE HTML>
 
 <html>
 	<head>
@@ -136,12 +138,12 @@
 		<script type="text/javascript" src="/offensive/js/jqDnR.js"></script>
 		<script type="text/javascript">
 			self.file_id = "";
-			
+
 			// prevent sites from hosting this page in a frame;
 			if( window != top ) {
 				top.location.href = window.location.href;
 			}
-			
+
 			// handle a keybased event. this code was incorporated from offensive.js, which has now been deprecated
 			function handle_keypress(o,e)
 			{
@@ -161,7 +163,7 @@
 							$prefs[$option] = unserialize($val);
 						}
 					}
-			    	
+
 					if(count($prefs) == 0) {
 						// use the default keybindings, the user has set nothing special.
 						?>
@@ -176,7 +178,7 @@
 							}
 							return;
 							break;
-                	
+
 						case 109: // - (numpad)
 						case 189: // -
 						case 170: // Wii -
@@ -187,38 +189,38 @@
 							}
 							return;
 							break;
-                	
+
 						case 81:  // q
 							e.preventDefault();
 							$("#dialog").jqmShow();
 							return;
 							break;
-                	
+
 						case 191: // ?
 							e.preventDefault();
 							document.location.href = "/offensive/pages/pic.php?id=<?= $upload->id() ?>&random";
 							return;
 							break;
-                	
+
 					// following not ajaxified
 						case 39:  // →
 						case 177: // Wii Right
 							e.preventDefault();
 							id = "previous";
 							break;
-                	
+
 						case 37:  // ←
 						case 178: // Wii Left
 							e.preventDefault();
 							id = "next";
 							break;
-                	
+
 						case 38:  // ↑
 						case 175: // Wii Up
 							e.preventDefault();
 							id = "index";
 							break;
-                	
+
 						case 40:  // ↓
 						case 176: // Wii Down
 							e.preventDefault();
@@ -241,7 +243,7 @@
 							break;
 							<?
 						}
-						
+
 						if(array_key_exists("key_bad", $prefs)) {
 							foreach($prefs["key_bad"] as $code) {
 								echo "case $code:\n";
@@ -256,7 +258,7 @@
 							break;
 							<?
 						}
-                	
+
 						if(array_key_exists("key_quick", $prefs)) {
 							foreach($prefs["key_quick"] as $code) {
 								echo "case $code:\n";
@@ -268,7 +270,7 @@
 							break;
 							<?
 						}
-						
+
 						if(array_key_exists("key_random", $prefs)) {
 							foreach($prefs["key_random"] as $code) {
 								echo "case $code:\n";
@@ -280,7 +282,7 @@
 							break;
 							<?
 						}
-						
+
 						if(array_key_exists("key_prev", $prefs)) {
 							foreach($prefs["key_prev"] as $code) {
 								echo "case $code:\n";
@@ -291,7 +293,7 @@
 							break;
 							<?
 						}
-						
+
 						if(array_key_exists("key_next", $prefs)) {
 							foreach($prefs["key_next"] as $code) {
 								echo "case $code:\n";
@@ -302,7 +304,7 @@
 							break;
 							<?
 						}
-						
+
 						if(array_key_exists("key_index", $prefs)) {
 							foreach($prefs["key_index"] as $code) {
 								echo "case $code:\n";
@@ -313,7 +315,7 @@
 							break;
 							<?
 						}
-						
+
 						if(array_key_exists("key_comments", $prefs)) {
 							foreach($prefs["key_comments"] as $code) {
 								echo "case $code:\n";
@@ -377,7 +379,7 @@
 				}
 				return true;
 			}
-			
+
 			/* image rollover stuff */
 			function changesrc(a,im)
 			{
@@ -403,7 +405,7 @@
 				( change 'em at your <a href="/offensive/?c=settings">settings</a> page. )
 			</div>
 		<? } ?>
-    	
+
 		<!-- this window is not visible unless you do a quick comment -->
 		<!-- data is fetched using ajax in js and put in #qc_bluebox  -->
 		<div class="jqmWindow" id="dialog">
@@ -415,7 +417,7 @@
 			<div class="bluebox" id="qc_bluebox" style="text-align: center">
 			</div>
 		</div> <!-- end quickcomment -->
-		
+
 		<div id="content">
 			<div id="heading" style="white-space:nowrap;">
 				&nbsp;&nbsp;
@@ -438,7 +440,7 @@
 						}
 						break;
 				}
-				
+
 				if($upload->next_filtered()) {
 					$style = ($upload->next_filtered()->is_nsfw() || $upload->next_filtered()->is_tmbo() ? 'style="font-style:italic; color: #990000"' : "") ?>
 					<a id="next" <?= $style ?> href="<?= $_SERVER['PHP_SELF'] ?>?id=<?= $upload->next_filtered()->id() ?>" title="<?= str_replace('"', '\\"', $upload->next_filtered()->filename()) ?>">newer</a>
@@ -452,7 +454,7 @@
 				<? } else { ?>
 					<a id="previous" href="/offensive/?c=<?= $index ?>" style="visibility:hidden">older</a>
 				<? } ?>
-				
+
 				<!--
 					comment block
 				-->
@@ -597,15 +599,13 @@
 
 				// if the upload is filtered, do not automatically play
 				// likewise, if we've seen this before and are not asking to loop, do not autoplay
-				if($upload->filtered() || (!$autoplay && !array_key_exists('loop', $_REQUEST))) {
-					$args .= "&amp;autoload=1";
-				} else {
+				if($autoplay) {
 					$args .= "&amp;autoplay=1";
 				}
 				if(array_key_exists('loop', $_REQUEST)) {
 					$args .= "&amp;loop=1";
 				}
-				
+
 				if(file_exists($upload->file())) {
 					$fp = fopen($upload->file(), 'r');
 					$id3 = new getid3_id3v2($fp, $info);
@@ -626,11 +626,11 @@
 							/></a>
 							<?
 						}
-						
+
 						?></td><td><?
-						
+
 						$tags = $info['id3v2']['comments'];
-						
+
 						if(array_key_exists('title', $tags)) { ?>
 						<span style="color:#666666">Title: <?= trim($tags['title'][0]); ?>
 							<?
@@ -644,26 +644,35 @@
 							?>
 						</span><br />
 						<? }
-						
+
 						if(array_key_exists('artist', $tags)) { ?>
 						<span style="color:#666666">By: <?= trim($tags['artist'][0]); ?></span><br />
 						<? }
-						
+
 						if(array_key_exists('album', $tags)) { ?>
 						<span style="color:#666666">Album: <?= trim($tags['album'][0]); ?></span><br /><br />
 						<? }
 					}
 					?></td></tr></table><?
-					
+
 					?>
-					<!-- before you ask, at some point I'm going to add support for not using the flash player and embedding the file (quicktime is very good at this) as well as supporting the new slick HTML5 media stuff that's coming out in the next year or few. if you want to help with any of this (or just help with the flash player), please get in touch with me. -->
-					<object type="application/x-shockwave-flash" data="/offensive/ui/player_mp3_maxi.swf" width="500" height="20">
-						<param value="transparent" name="wmode" />
-					    <param name="movie" value="/offensive/ui/player_mp3_maxi.swf" />
-					    <param name="bgcolor" value="#ffffff" />
-					    <param name="FlashVars" value="<?= $args ?>" />
-					</object>
-					
+
+						<audio src="<?= $upload->URL() ?>" controls<?
+							if($autoplay) {
+								echo " autoplay";
+							}
+							if(array_key_exists('loop', $_REQUEST)) {
+								echo " loop";
+							}
+						?>>
+						<object type="application/x-shockwave-flash" data="/offensive/ui/player_mp3_maxi.swf" width="500" height="20">
+							<param value="transparent" name="wmode" />
+							<param name="movie" value="/offensive/ui/player_mp3_maxi.swf" />
+							<param name="bgcolor" value="#ffffff" />
+							<param name="FlashVars" value="<?= $args ?>" />
+						</object>
+					</audio>
+
 					<table><tr><td style="text-align:right" width="480px">
 							&nbsp;
 							<? if(!array_key_exists('loop', $_REQUEST)) { ?>

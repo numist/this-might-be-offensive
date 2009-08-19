@@ -93,3 +93,7 @@ body {
 	font-size: 9px;
 	color: #9999cc;
 }
+
+audio {
+	width: 500px;
+}
