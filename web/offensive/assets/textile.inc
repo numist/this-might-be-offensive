@@ -684,7 +684,7 @@ class Textile
     function fSpan($m)
     {
         $qtags = array(
-            '*'  => 'strong',
+         //   '*'  => 'strong',
             '**' => 'b',
             '??' => 'cite',
             '_'  => 'em',
@@ -697,6 +697,11 @@ class Textile
         );
 
         list(,, $tag, $atts, $cite, $content, $end) = $m;
+
+		if($tag == "*") {
+			return $tag.$content.$end.$tag;
+		}
+
         $tag = $qtags[$tag];
         $atts = $this->pba($atts);
         $atts .= ($cite != '') ? 'cite="' . $cite . '"' : '';
