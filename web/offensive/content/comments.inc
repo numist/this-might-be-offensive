@@ -199,15 +199,16 @@
     	
 				<?php
     	
-					// XXX: this output stuff all gets to change.
-					if(!$me->squelched($commenter)) {
+					if(!$me->squelched($commenter) && strlen($comment->text()) > 0) {
 						echo $comment->HTMLcomment();
 					}
 					else if(strlen($comment->text()) > 0) {
 						echo "<div class='squelched'>[ squelched ]</div>";
+					} else {
+						// to appease ray.  I really want to ditch this.
+						echo "<br />";
 					}
 					?>
-    	            <br/>
 
 				<div class="timestamp"><a href="#<?= $comment->id() ?>"><?= $comment->timestamp() ?></a></div>
 				

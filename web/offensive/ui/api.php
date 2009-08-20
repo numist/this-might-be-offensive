@@ -109,13 +109,13 @@ function api_getquickcommentbox() {
 				continue;
 			$commenter = $comment->commenter();
 			echo '<div class="qc_comment">';
-			if(!$me->squelched($commenter)) {	
-				echo $comment->HTMLcomment();
-			} else {
-				echo "<div class='squelched'>[ squelched ]</div>";
-			}
+					if(!$me->squelched($commenter) && strlen($comment->text()) > 0) {
+						echo $comment->HTMLcomment();
+					}
+					else if(strlen($comment->text()) > 0) {
+						echo "<div class='squelched'>[ squelched ]</div>";
+					}
 ?>
-			<br />
 			<div class="timestamp"><?= $comment->timestamp() ?></div>
 			&raquo; <a href="/offensive/?c=user&userid=<?= $commenter->id() ?>"><?= $commenter->username() ?></a>
 <?php
