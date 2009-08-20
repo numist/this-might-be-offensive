@@ -861,17 +861,18 @@ class Comment {
 			 (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == "on" ? "s" : "").
 			 "://".$_SERVER['SERVER_NAME'];
 		$comment = preg_replace( $p, $r, $comment );
-		// linkify all bare URLs
-		//$p = '/(http[s]?:\\/\\/[^\s<>]+)/i';
-		//$r = '<a href="$1" title="$1">$1</a>';
-		//$comment = preg_replace( $p, $r, $comment );
 
-		//$comment = nl2br($comment);
+
+		// linkify all bare URLs
+		$comment = " ".$comment." ";
+		$p = '/\s(http[s]?:\\/\\/[^\s<>]+)/i';
+		$r = ' "$1":$1';
+		$comment = preg_replace( $p, $r, $comment );
+		$comment = trim($comment);
 
 		$textile = new Textile();
 		$textile->restricted = true;
 		$comment = $textile->TextileRestricted($comment, 0, 0);
-
 		unset($textile);
 
 		return $comment;

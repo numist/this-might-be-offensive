@@ -1073,10 +1073,12 @@ class Textile
     }
 
 // -------------------------------------------------------------
+	// XXX: this function should stay the hell away from URLs
     function encode_html($str, $quotes=1)
     {
         $a = array(
-            '&' => '&#38;',
+			// XXX: this is stupid as it breaks links.  need a better fix than this.
+//            '&' => '&#38;',
             '<' => '&#60;',
             '>' => '&#62;',
         );
