@@ -1,6 +1,7 @@
 <?
 
 require_once("offensive/assets/functions.inc");
+require_once("offensive/assets/textile.inc");
 
 /*
 The purpose in creating a bunch of classes to handle users, uploads, and comments is to try and
@@ -846,8 +847,9 @@ class Comment {
 	public function HTMLcomment() {
 		$comment = $this->text();
 		if($comment == "") return "";
-		
-		$comment = htmlEscape($comment);
+
+		// XXX: not doing this since we have textile
+		//$comment = htmlEscape($comment);
 		
 		// URLS from tmbo domains should all point to the one the user is currently using
 		$p = array("/http[s]?:\\/\\/([a-zA-z0-9]*\\.)*themaxx\\.com/i",
@@ -860,12 +862,18 @@ class Comment {
 			 "://".$_SERVER['SERVER_NAME'];
 		$comment = preg_replace( $p, $r, $comment );
 		// linkify all bare URLs
-		$p = '/(http[s]?:\\/\\/[^\s<>]+)/i';
-		$r = '<a href="$1" title="$1">$1</a>';
-		$comment = preg_replace( $p, $r, $comment );
+		//$p = '/(http[s]?:\\/\\/[^\s<>]+)/i';
+		//$r = '<a href="$1" title="$1">$1</a>';
+		//$comment = preg_replace( $p, $r, $comment );
 
-		$comment = nl2br($comment);
-				
+		//$comment = nl2br($comment);
+
+		$textile = new Textile();
+		$textile->restricted = true;
+		$comment = $textile->TextileRestricted($comment, 0, 0);
+
+		unset($textile);
+
 		return $comment;
 	}
 	
