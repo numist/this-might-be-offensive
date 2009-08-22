@@ -657,21 +657,21 @@
 
 					?>
 
-						<audio src="<?= $upload->URL() ?>" controls<?
+						<!--<audio src="<?= $upload->URL() ?>" controls<?
 							if($autoplay) {
 								echo " autoplay";
 							}
 							if(array_key_exists('loop', $_REQUEST)) {
 								echo " loop";
 							}
-						?>>
+						?>> -->
 						<object type="application/x-shockwave-flash" data="/offensive/ui/player_mp3_maxi.swf" width="500" height="20">
 							<param value="transparent" name="wmode" />
 							<param name="movie" value="/offensive/ui/player_mp3_maxi.swf" />
 							<param name="bgcolor" value="#ffffff" />
 							<param name="FlashVars" value="<?= $args ?>" />
 						</object>
-					</audio>
+					<!--</audio>-->
 
 					<table><tr><td style="text-align:right" width="480px">
 							&nbsp;
