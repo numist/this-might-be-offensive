@@ -242,7 +242,6 @@ function upload() {
 		chmod($tmpdir."/".$postdata['tmpname'], 0644);
 	}
 
-	var_dump("uploading: ".upload_type($postdata));
 	switch(upload_type($postdata)) {
 		case "image":
 			return upload_image($postdata);
@@ -904,7 +903,6 @@ function upload_checkrotation($postdata) {
 	</form>";
 	box($message, "¡sǝou ɥo");
 	$_SESSION['postdata'] = serialize($postdata);
-	var_dump(serialize($postdata));
 
 	return true;
 }
