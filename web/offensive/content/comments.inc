@@ -204,12 +204,9 @@
 					}
 					else if(strlen($comment->text()) > 0) {
 						echo "<div class='squelched'>[ squelched ]</div>";
-					} else {
-						// to appease ray.  I really want to ditch this.
-						echo "<br />";
 					}
-					?>
-
+		?>
+				<br />
 				<div class="timestamp"><a href="#<?= $comment->id() ?>"><?= $comment->timestamp() ?></a></div>
 				
 				&raquo; <a href="./?c=user&userid=<?= $commenter->id() ?>"><?= $commenter->username() ?></a>

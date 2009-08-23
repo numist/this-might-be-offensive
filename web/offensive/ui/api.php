@@ -116,6 +116,7 @@ function api_getquickcommentbox() {
 						echo "<div class='squelched'>[ squelched ]</div>";
 					}
 ?>
+			<br />
 			<div class="timestamp"><?= $comment->timestamp() ?></div>
 			&raquo; <a href="/offensive/?c=user&userid=<?= $commenter->id() ?>"><?= $commenter->username() ?></a>
 <?php
