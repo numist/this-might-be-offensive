@@ -848,7 +848,7 @@ class Comment {
 		if($comment == "") return "";
 
 		$comment = htmlEscape($comment);
-		
+
 		// URLS from tmbo domains should all point to the one the user is currently using
 		$p = array("/http[s]?:\\/\\/([a-zA-z0-9]*\\.)*themaxx\\.com/i",
 		           "/http[s]?:\\/\\/([a-zA-z0-9]*\\.)*tmbo\\.org/i",
@@ -867,6 +867,8 @@ class Comment {
 		$r = '<a href="$1" rel="nofollow">$1</a>';
 		$comment = preg_replace( $p, $r, $comment );
 		$comment = trim($comment);
+
+		$comment = nl2br($comment);
 
 		return $comment;
 	}

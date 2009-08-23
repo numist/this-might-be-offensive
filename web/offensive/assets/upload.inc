@@ -32,9 +32,6 @@ function uploading_file() {
 	return false;
 }
 
-/*
- * getHash -- creates an md5 hash from the first 4K of a file
- */
 function getHash( $filePath ) {
 	$file = fopen( $filePath, "r" );
 	$filedata = fread ( $file, min( 4096, filesize( $filePath ) ) );
@@ -42,25 +39,16 @@ function getHash( $filePath ) {
 	return md5( $filedata );
 }
 
-/*
- * exceededUploadLimit -- does the user have any more uploads remaining?
- */
 function exceededUploadLimit($uid) {
 	return (numUploadsRemaining( $uid ) === 0 && $_SESSION['status'] != 'admin');
 }
 
-/*
- * numUploadsRemaining -- uploads allowed minus uploads used.
- */
 function numUploadsRemaining( $uid ) {
 	$limit = numAllowedUploads( $_SESSION['userid'] );
 	$used = numUploadsToday( $_SESSION['userid'] );
 	return ($limit - $used ) > 0 ? ($limit - $used ) : 0;
 }
 
-/*
- * numUploadsToday -- number of uploads made in the last 24 hours.
- */
 function numUploadsToday( $uid ) {
 	$sql = "SELECT count( id ) as thecount FROM offensive_uploads WHERE userid = " . $_SESSION['userid'] . " AND timestamp > DATE_SUB( NOW(), INTERVAL 1 DAY ) AND type='image'";
 	$result = tmbo_query( $sql );
@@ -71,9 +59,6 @@ function numUploadsToday( $uid ) {
 
 }
 
-/*
- * numApplowedUploads -- allowed uploads per 24 hours based on user history.
- */
 function numAllowedUploads( $uid ) {
 
 	// Fipi Lele is allowed (effectively) unlimited uploads.
@@ -109,9 +94,6 @@ function numAllowedUploads( $uid ) {
 
 }
 
-/*
- * requestDetail -- returns textual data for hacking attempt reports
- */
 function requestDetail() {
 	// XXX: would be nice to get some user data in here at some point.
 	ob_start();
@@ -124,9 +106,6 @@ function requestDetail() {
 	return $string;
 }
 
-/*
- * getTransform -- returns the correct im transformation based on the rotation type.
- */
 function getTransform($orientation) {
 	/*
 	 *   1        2       3      4         5            6           7          8
@@ -165,9 +144,6 @@ function getTransform($orientation) {
 	}
 }
 
-/*
- * killUpload -- destroy all state for uploads-in-progress
- */
 function killUpload($postdata) {
 	global $tmpdir;
 	unset($_SESSION['postdata']);
