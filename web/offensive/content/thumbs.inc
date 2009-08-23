@@ -21,6 +21,7 @@
 		<link id="gallery" rel="alternate" href="/offensive/pic_rss.php?gallery=true" type="application/rss+xml" title="PicLens feed" />
 		<link rel="alternate" type="application/rss+xml" title="image stream" href="/offensive/pic_rss.php" />
 		<link rel="alternate" type="application/rss+xml" title="daily archives" href="/offensive/zip_rss.php" />
+		<link href="/styles/thumbs.css" type="text/css" rel="stylesheet">
 EOT;
 	}
 
@@ -67,81 +68,42 @@ EOT;
 ?>
 
 <div class="bluebox">
-		
-	<table width="100%" border="0" cellpadding="0" cellspacing="0">
-		<tr>
-			<td valign="top">			
-				<? include( 'offensive/assets/pickupLink.inc' ) ?>
-			</td>
-			<td valign="top" width="100px">
-				<div style="text-align:right"><b><a href="./?c=main">text view</a></b></div>
-			</td>
-		</tr>
-		<tr>
-			<td valign="top" colspan="2">
-			          <table width="100%" class="thumbnails">
-            <?php
-            $result = core_getuploads($args);
-            $output = 0;
-            foreach( $result as $upload ) 
-            {
-				
-             	$css = $upload->filtered() ? ' class="filtered"' : "";
-              	if( $output % $THUMBS_PER_ROW == 0 ) {
-                  ?><tr><?php
-                }
-              ?>
-                    <td>
-	
-	<a href="pages/pic.php?id=<?= $upload->id() ?>"
-		<? if($upload->filtered()) { ?>
-			onMouseOver='changesrc("th<?= $upload->id()?>","<?= $upload->thumbURL() ?>")'
-	 		onMouseOut='changesrc("th<?= $upload->id() ?>","/offensive/graphics/th-filtered.gif")'
-		<? } ?>
-	><img name="th<?= $upload->id()?>"
-		src="<?= $upload->filtered()
-			? "/offensive/graphics/th-filtered.gif" 
-			: $upload->thumbURL() ?>"
-		title="uploaded by <?= $upload->uploader()->username(); ?>" border="0"
-	/></a>
-	
-	
-	
-	<br/>
-	<a href="./?c=comments&fileid=<?= $upload->id() ?>"><?= 
-		$upload->commentLabel();
-	?></a>
-</td>
-                <?php
-                if( $output % $THUMBS_PER_ROW == $THUMBS_PER_ROW - 1 ) {
-                ?></tr><?php
-                }
-                $output++;
-            }
-            if( $output % $THUMBS_PER_ROW ) {
-            ?></tr><?php
-            }
-            $output++;
-          ?>
-          </table>
-</td>
-		</tr>
-		<tr>
-			<td>
-				<? 
-				$args = isset($_REQUEST['userid']) ? "&userid=".$_REQUEST['userid'] :'';
-				if( $page > 0 ) { ?>
-					<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'].$args ?>&p=<?= $page - 1 ?>">&laquo; <b>previous page</b></a></td>
-				<? } ?>
-			</td>
-			<td style="text-align:right">
-				<? if(count($result) == $numPerPage) { ?>
-					<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'].$args ?>&p=<?= $page + 1 ?>"><b>next page</b></a> &raquo;
-				<? } ?>
-			</td>
-		</tr>
-	</table>
-
+	<div id="pickupbox"><? include( 'offensive/assets/pickupLink.inc' ) ?></div>
+	<div id="textlink"><b><a href="./?c=main">text view</a></b></div>
+	<div id="thumbnails">
+		<ul>
+		<?php
+			$result = core_getuploads($args);
+			$output = 0;
+			foreach( $result as $upload ) {	?>
+				<li>
+					<div><a href="pages/pic.php?id=<?= $upload->id() ?>"
+						<?php if($upload->filtered()) { ?>
+							onMouseOver='changesrc("th<?= $upload->id()?>","<?= $upload->thumbURL() ?>")' 
+							onMouseOut='changesrc("th<?= $upload->id() ?>","/offensive/graphics/th-filtered.gif")'
+						<? } ?>	
+					><img name="th<?= $upload->id()?>" 
+								src="<?= $upload->filtered() ? "/offensive/graphics/th-filtered.gif" : $upload->thumbURL() ?>" 
+								title="uploaded by <?= $upload->uploader()->username(); ?>" 
+					 	>
+					</a></div>
+					<div><a href="./?c=comments&amp;fileid=<?= $upload->id() ?>"><?= $upload->commentLabel(); ?></a></div>
+				</li>
+		<?php } ?>
+		</ul>	
+	</div>
+	<span id="prevpage">&nbsp;
+	<?php
+	$args = isset($_REQUEST['userid']) ? "&userid=".$_REQUEST['userid'] :'';
+	if( $page > 0 ) { ?>
+		<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'].$args ?>&p=<?= $page - 1 ?>">&laquo; <b>previous page</b></a></td>
+	<? } ?>
+	</span>
+	<span id="nextpage">&nbsp;
+	<? if(count($result) == $numPerPage) { ?>
+		<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'].$args ?>&p=<?= $page + 1 ?>"><b>next page</b></a> &raquo;
+	<? } ?>
+	</span>
 </div>
 
 <?

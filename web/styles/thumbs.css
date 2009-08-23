@@ -1,0 +1,40 @@
+#pickupbox {
+  float: left;
+}
+#textlink {
+  text-align: right;
+}
+
+#thumbnails * { 
+  margin: 0; 
+  padding: 0; 
+} 
+#thumbnails {
+  margin-bottom: 10px;
+}
+#thumbnails li { 
+  text-align: center; 
+  vertical-align: bottom; 
+  width: 135px; 
+  display: -moz-inline-stack; 
+  display: inline-block; 
+  *display: inline;
+  font-weight: bold; 
+  zoom: 1; 
+} 
+#thumbnails li * { 
+  position:relative; /* to make sure things are clickable *and* selectable in FF */ 
+} 
+#thumbnails img { 
+  display: block; 
+  margin: 9px auto 0; 
+  border: 0;
+} 
+ 
+#nextpage {
+  text-align: right;
+  float: right;
+}
+#prevpage {
+  text-align: left;
+}
