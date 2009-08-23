@@ -336,11 +336,14 @@ $timelimit = 10;
 
 	<? require('includes/footer.txt'); ?>
 
-	<div class="textlinks">portions &copy; 1997-<?= date("Y") ?>. site development by <a href="/contact/" class="textlinks" onmouseover='window.status="[ connect ]"; return true' onmouseout='window.status=""'>ray hatfield</a>, scott perry, and others.</div>
+	<div class="textlinks">portions &copy; 1997-<?= date("Y") ?>.
+		site development by
+		<a href="/contact/" class="textlinks" onmouseover='window.status="[ connect ]"; return true' onmouseout='window.status=""'>ray hatfield</a>,
+		<a href="mailto:thismightbe@numist.net">scott perry</a>,
+		and others.</div>
 	<div class="textlinks">tmbo runs on
 		<a href="http://www.imagemagick.org" title="for messing with images">ImageMagick</a>,
 		<a href="http://xapian.org" title="for comment search">Xapian</a>,
-		<a href="http://textile.thresholdstate.com" title="for comment formatting">Textile</a>,
 		and unicorn farts.
 	</div>
 	<?

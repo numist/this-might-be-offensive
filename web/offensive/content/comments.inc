@@ -63,7 +63,7 @@
 	     * NB: only works if the client is reporting REFERERS. 
 	     */
 	    if($upload->type() != 'topic' &&
-		   array_key_exists("submit", $_REQUEST) && array_key_exists("HTTP_REFERER", $_SERVER) && 
+		   array_key_exists("submit", $_REQUEST) && array_key_exists("HTTP_REFERER", $_SERVER) &&
 	       $_SERVER['HTTP_REFERER'] !== "" && strpos($_SERVER['HTTP_REFERER'], $_SERVER['SERVER_NAME']) === false) {
 			echo "you've been had.";
 			trigger_error("off-site tried to vote on non-topic upload, referer: ".$_SERVER['HTTP_REFERER'], E_USER_WARNING);
@@ -75,21 +75,26 @@
 	        return;
 	    }
 	    
-		if( array_key_exists("submit", $_REQUEST)) {		    
-			$fileid		 = array_key_exists("fileid", $_REQUEST) ?
-							$_REQUEST['fileid'] : '';
-			$comment	 = array_key_exists("comment", $_REQUEST) ?
-							trim($_REQUEST['comment']) : "";
-			$vote		 = array_key_exists("vote", $_REQUEST) ?
-							$_REQUEST['vote'] : null;
-			$offensive	 = array_key_exists("offensive", $_REQUEST) && $_REQUEST['offensive'] != "" ?
+		if( array_key_exists("submit", $_POST)) {
+			$fileid		 = array_key_exists("fileid", $_POST) ?
+							$_POST['fileid'] : '';
+			$comment	 = array_key_exists("comment", $_POST) ?
+							trim($_POST['comment']) : "";
+			$vote		 = array_key_exists("vote", $_POST) ?
+							$_POST['vote'] : "";
+			$offensive	 = array_key_exists("offensive", $_POST) && $_POST['offensive'] != "" ?
 							1 : 0;
-			$repost		 = array_key_exists("repost", $_REQUEST) 	&& $_REQUEST['repost'] != "" ?
+			$repost		 = array_key_exists("repost", $_POST) 	&& $_POST['repost'] != "" ?
 							1 : 0;
-			$subscribe	 = array_key_exists("subscribe", $_REQUEST) && $_REQUEST['subscribe'] != "" ?
+			$subscribe	 = array_key_exists("subscribe", $_POST) && $_POST['subscribe'] != "" ?
 							1 : 0;
 			
 			$commentid = postComment($fileid, $vote, $repost, $offensive, $comment, $subscribe);
+
+			if($commentid === false) {
+				echo "you've been had.";
+				return;
+			}
 
 			if( array_key_exists("redirect", $_REQUEST) ) {
 				header( "Location: /offensive/pages/pic.php?id=" . $_REQUEST['fileid'] );

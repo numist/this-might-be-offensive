@@ -112,7 +112,6 @@ function postComment($fileid, $vote, $repost, $offensive, $comment, $subscribe=n
 	global $me;
 	$userid = $_SESSION['userid'];
 
-	// XXX: arg checking for non-incoming args?
 	if($vote != "this is good" && $vote != "this is bad" && $vote != "") {
 		trigger_error("invalid vote $vote", E_USER_ERROR);
 	}
@@ -120,6 +119,7 @@ function postComment($fileid, $vote, $repost, $offensive, $comment, $subscribe=n
 	$comment = trim($comment);
 
 	// check to see if the fileid is valid
+	// XXX: this can be done better with an Upload object
 	$sql = "SELECT filename, nsfw, tmbo, timestamp, type FROM offensive_uploads WHERE id=$fileid";
 	if(mysql_num_rows(tmbo_query( $sql )) == 0) trigger_error("invalid fileid ($fileid)", E_USER_ERROR);
 
