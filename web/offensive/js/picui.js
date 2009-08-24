@@ -178,12 +178,13 @@ function handle_comment_post(fileid, comment, vote, tmbo, repost, subscribe) {
 			if(vote == "this is good" || vote == "this is bad") {
 				greyout_voting();
 			}
+
+			// if you made a comment or you voted 'this is bad', you have auto-subscribed to the thread
+			if(comment != '' || vote == "this is bad" || subscribe != "0") {
+				toggle_subscribe("subscribe", fileid, $("#subscribeLink"));
+			}
 		}
 	);
-	// if you made a comment or you voted 'this is bad', you have auto-subscribed to the thread
-	if(comment != '' || vote == "this is bad" || subscribe != "0") {
-		toggle_subscribe("subscribe", fileid, $("#subscribeLink"));
-	}
 }
 
 function disable_voting() {
@@ -200,4 +201,46 @@ function greyout_voting() {
 function increase_count(id) {
 	count = parseInt($(id).html()) + 1;
 	$(id).html(count);
+}
+
+// Resizing images
+
+// This does the math and recomputes the size of the image according to
+// the width of the window, then sets it
+var original_height=null;
+var original_width=null;
+function resizeImage(imageID) {
+  var width = 0; var height = 0;
+  var img = $('#'+imageID);
+
+  var maxWidth = $(window).width();
+  // normalize the widths coming back 
+  if ($.browser.opera || $.browser.mozilla) {
+    maxWidth=maxWidth+5;
+  }
+  if ($.browser.msie) {
+    maxWidth=maxWidth+8;
+  }
+  maxWidth=maxWidth-30;    // for the surrounding HTML
+
+  // Are we going back to the original size?
+  if ( original_height != null && original_width != null ) {
+     img.width(original_width);
+     img.height(original_height);
+     original_width=null;
+     original_height=null;
+     return;
+  }
+
+  // do nothing if we fit already
+  if (img.width() < maxWidth) {
+     return;
+  }
+
+  original_height = img.height();
+  original_width = img.width();
+  var fact = maxWidth / img.width();
+  height = Math.round(img.height() * fact);
+  img.width(maxWidth);
+  img.height(height);
 }

@@ -706,7 +706,7 @@
 				} else { ?>
 					<div class="<?php echo $upload->is_nsfw() == 1 ? 'nsfw' : 'image' ?> u<?= $upload->uploader()->id() ?>">
 						<? if($upload->file() != "") { ?>
-							<a id="imageLink" href="<?= $upload->URL() ?>" target="_blank"><img src="<?= $upload->URL() ?>" style="border:none"/></a>
+							<a id="imageLink" href="javascript:resizeImage('image')"><img src="<?= $upload->URL() ?>" style="border:none" id="image" /></a>
 						<? } else { ?>
 							<div style="padding:128px;">[ got nothin' for ya ]</div>
 						<? } ?>
