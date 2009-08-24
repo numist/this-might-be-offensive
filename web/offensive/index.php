@@ -13,6 +13,17 @@ $timelimit = 10;
 
 	time_start($ptime);
 
+	function query_string($remove = null, $prefix = "") {
+		parse_str($_SERVER['QUERY_STRING'], $params);
+		foreach(explode(" ", $remove) as $key) {
+			if(array_key_exists($key, $params)) {
+				unset($params[$key]);
+			}
+		}
+		$ret = http_build_query($params);
+		return strlen($ret) > 0 ? $prefix.$ret : $ret;
+	}
+
 	// if we're logged in, we'll want access to the user object for the logged in user
 	require_once("offensive/assets/classes.inc");
 	$me = false;

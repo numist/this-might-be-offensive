@@ -69,7 +69,7 @@ EOT;
 
 <div class="bluebox">
 	<div id="pickupbox"><? include( 'offensive/assets/pickupLink.inc' ) ?></div>
-	<div id="textlink"><b><a href="./?c=main">text view</a></b></div>
+	<div id="textlink"><b><a href="./?c=main<?= query_string("c", "&") ?>">text view</a></b></div>
 	<div id="thumbnails">
 		<ul>
 		<?php
@@ -94,14 +94,14 @@ EOT;
 	</div>
 	<span id="prevpage">&nbsp;
 	<?php
-	$args = isset($_REQUEST['userid']) ? "&userid=".$_REQUEST['userid'] :'';
+
 	if( $page > 0 ) { ?>
-		<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'].$args ?>&p=<?= $page - 1 ?>">&laquo; <b>previous page</b></a></td>
+		<a href="./?<?= query_string("p") ?>&p=<?= $page - 1 ?>">&laquo; <b>previous page</b></a></td>
 	<? } ?>
 	</span>
 	<span id="nextpage">&nbsp;
 	<? if(count($result) == $numPerPage) { ?>
-		<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'].$args ?>&p=<?= $page + 1 ?>"><b>next page</b></a> &raquo;
+		<a href="./?<?= query_string("p") ?>&p=<?= $page + 1 ?>"><b>next page</b></a> &raquo;
 	<? } ?>
 	</span>
 </div>

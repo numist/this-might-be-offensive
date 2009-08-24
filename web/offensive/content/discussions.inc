@@ -69,13 +69,13 @@ EOT;
 
 						<tr style="background:#bbbbee;text-align:center;">
 							<td><b><?= ($args["sort"] !== "date_desc"
-								? '<a href="./?c=discussions&sort=date_desc">sort by thread creation date</a>'
+								? '<a href="./?'.query_string("sort").'&sort=date_desc">sort by thread creation date</a>'
 								: 'sort by thread creation date' ) ?></b></td>
 							<td><b><?= ($args["sort"] !== "comments_desc"
-							    ? '<a href="./?c=discussions&sort=comments_desc">comment count</a>'
+								? '<a href="./?'.query_string("sort").'&sort=comments_desc">comment count</a>'
 							    : 'comment count' )?></b></td>
 							<td><b><?= ($args["sort"] !== "activity_desc"
-							    ? '<b><a href="./?c=discussions&sort=activity_desc">latest comment</a></b>'
+								? '<b><a href="./?'.query_string("sort").'&sort=activity_desc">latest comment</a></b>'
 							    : 'latest comment' ) ?></b></td>
 						</tr>
 
@@ -100,13 +100,13 @@ EOT;
 						<tr>
 							<td>
 								<? if( $page > 0 ) { ?>
-									<a href="<?= $_SERVER['PHP_SELF']?>?c=<?= $_REQUEST['c'] ?>&order=<?=$order?>&p=<?= $page - 1 ?>">&laquo; <b>previous page</b></a></td>
+									<a href="./?<?= query_string("p") ?>&p=<?= $page - 1 ?>">&laquo; <b>previous page</b></a></td>
 								<? } ?>
 							</td>
 							<td></td>
 							<td style="text-align:right">
 								<? if(count($result) == $numPerPage) { ?>
-									<a href="<?= $_SERVER['PHP_SELF']?>?c=<?= $_REQUEST['c'] ?>&order=<?=$order?>&p=<?= $page + 1 ?>"><b>next page</b></a> &raquo;
+									<a href="./?<?= query_string("p") ?>&p=<?= $page + 1 ?>"><b>next page</b></a> &raquo;
 								<? } ?>
 							</td>
 						</tr>

@@ -70,7 +70,7 @@ EOT;
 				<? require( 'offensive/assets/pickupLink.inc' ) ?>
 			</td>
 			<td valign="top" width="100px">
-				<div style="text-align:right"><b><a href="./?c=thumbs">thumbnail view</a></b></div>
+				<div style="text-align:right"><b><a href="./?c=thumbs<?= query_string("c", "&") ?>">thumbnail view</a></b></div>
 			</td>
 		</tr>
 		<tr>
@@ -102,12 +102,12 @@ EOT;
 		<tr>
 			<td>
 				<? if( $page > 0 ) { ?>
-					<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'] ?>&p=<?= $page - 1 ?>">&laquo; <b>previous page</b></a></td>
+					<a href="./?<?= query_string("p") ?>&p=<?= $page - 1 ?>">&laquo; <b>previous page</b></a></td>
 				<? } ?>
 			</td>
 			<td style="text-align:right">
 				<? if(count($result) == $numPerPage) { ?>
-					<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'] ?>&p=<?= $page + 1 ?>"><b>next page</b></a> &raquo;
+					<a href="./?<?= query_string("p") ?>&p=<?= $page + 1 ?>"><b>next page</b></a> &raquo;
 				<? } ?>
 			</td>
 		</tr>

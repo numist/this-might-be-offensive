@@ -124,13 +124,13 @@
 		<tr>
 			<td>
 				<? if( $page > 0 ) { ?>
-					<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'] ?>&p=<?= $page - 1 ?>">&laquo; <b>previous page</b></a></td>
+					<a href="./?<?= query_string("p") ?>&p=<?= $page - 1 ?>">&laquo; <b>previous page</b></a></td>
 				<? } ?>
 			</td>
 			<td colspan="2"></td>
 			<td style="text-align:right">
 				<? if(count($result) == $numPerPage) { ?>
-					<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'] ?>&p=<?= $page + 1 ?>"><b>next page</b></a> &raquo;
+					<a href="./?<?= query_string("p") ?>&p=<?= $page + 1 ?>"><b>next page</b></a> &raquo;
 				<? } ?>
 			</td>
 		</tr>
