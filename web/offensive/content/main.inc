@@ -65,7 +65,7 @@ EOT;
 
 <div class="bluebox">
 	<div id="pickupbox"><? include( 'offensive/assets/pickupLink.inc' ) ?></div>
-	<div id="textlink"><b><a href="./?c=thumbs<?= query_string("c") ?>">thumbnail view</a></b></div>	
+	<div id="textlink"><b><a href="./?c=thumbs<?= query_string("c", "&") ?>">thumbnail view</a></b></div>	
 	<div id="main">
 		<ul>
 			<?php
