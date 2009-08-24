@@ -20,6 +20,7 @@
 		<link id="gallery" rel="alternate" href="/offensive/pic_rss.php?gallery=true" type="application/rss+xml" title="PicLens feed" />
 		<link rel="alternate" type="application/rss+xml" title="image stream" href="/offensive/pic_rss.php" />
 		<link rel="alternate" type="application/rss+xml" title="daily archives" href="/offensive/zip_rss.php" />
+		<link href="/styles/main.css" type="text/css" rel="stylesheet" />
 EOT;
 	}
 
@@ -63,58 +64,42 @@ EOT;
 ?>
 
 <div class="bluebox">
-		
-	<table width="100%" border="0" cellpadding="0" cellspacing="0">
-		<tr>
-			<td valign="top">
-				<? require( 'offensive/assets/pickupLink.inc' ) ?>
-			</td>
-			<td valign="top" width="100px">
-				<div style="text-align:right"><b><a href="./?c=thumbs<?= query_string("c", "&") ?>">thumbnail view</a></b></div>
-			</td>
-		</tr>
-		<tr>
-			<td valign="top" colspan="2">
-				<table width="100%" id="main">
-            <?php
-        	$result = core_getuploads($args);
-        	foreach( $result as $upload ) {
-              	$css = (isset($css) && $css == "odd_row") ? "even_row" : "odd_row";
-              	$filename = $upload->htmlFilename();
-	      
-              	?>
-                  	<tr class="<?= $css ?>">
-                    <td>
-						<div class="clipr"><a href="pages/pic.php?id=<?= $upload->id() ?>" class="<?= $css ?>" title="uploaded by <?= htmlEscape($upload->uploader()->username()) ?>"><?= $upload->htmlFilename() ?></a></div>
-					</td>
-					<td class="<?= $css ?> com_cnt" style="text-align:right;white-space:nowrap">
-						<a href="./?c=comments&fileid=<?= $upload->id() ?>" class="<?= $css ?>"><nobr><?= 
-				$upload->commentLabel();
-			?></nobr></a>
-					</td>
-                  </tr>
-                <?php
-            }
-          ?>
-          </table>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<? if( $page > 0 ) { ?>
-					<a href="./?<?= query_string("p") ?>&p=<?= $page - 1 ?>">&laquo; <b>previous page</b></a></td>
-				<? } ?>
-			</td>
-			<td style="text-align:right">
-				<? if(count($result) == $numPerPage) { ?>
-					<a href="./?<?= query_string("p") ?>&p=<?= $page + 1 ?>"><b>next page</b></a> &raquo;
-				<? } ?>
-			</td>
-		</tr>
-	</table>
-			
+	<div id="pickupbox"><? include( 'offensive/assets/pickupLink.inc' ) ?></div>
+	<div id="textlink"><b><a href="./?c=thumbs<?= query_string("c") ?>">thumbnail view</a></b></div>	
+	<div id="main">
+		<ul>
+			<?php
+				$result = core_getuploads($args);
+				$output = 0;
+				foreach( $result as $upload ) {
+					$css = (isset($css) && $css == "odd_row") ? "even_row" : "odd_row";
+					$filename = $upload->htmlFilename();
+			?>
+					<li>
+						<div class="title <?= $css ?>">
+							<a href="pages/pic.php?id=<?= $upload->id() ?>" class="<?= $css ?>" title="uploaded by <?= htmlEscape($upload->uploader()->username()) ?>"><?= $upload->htmlFilename() ?></a>
+						</div>
+						<div class="score <?= $css ?>">
+							<a href="./?c=comments&fileid=<?= $upload->id() ?>"><?= $upload->commentLabel(); ?></a>
+						</div>
+					</li>
+			<?
+				}
+			?>
+		</ul>
+	</div>
+	<span id="prevpage">&nbsp;
+	<?
+	if( $page > 0 ) { ?>
+		<a href="./?<?= query_string("p") ?>&p=<?= $page - 1 ?>">&laquo; <b>previous page</b></a>
+	<? } ?>
+	</span>
+	<span id="nextpage">&nbsp;
+	<? if(count($result) == $numPerPage) { ?>
+		<a href="./?c=<?= query_string("p") ?>&p=<?= $page + 1 ?>"><b>next page</b></a> &raquo;
+	<? } ?>
+	</span>
 </div>
 
 <?
 }
-?>
