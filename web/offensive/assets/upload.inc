@@ -602,19 +602,19 @@ function upload_type(&$postdata) {
 
 ###############################################################################
 function upload_image($postdata) {
+	if(upload_largerthan($postdata, 4*1024*1024)) return false;
 	if(upload_checkrepost($postdata)) return false;
 	if(upload_checkrotation($postdata)) return false;
 	if(upload_checkdims($postdata)) return false;
 	if(upload_checksize($postdata)) return false;
-	if(upload_largerthan($postdata, 4*1024*1024)) return false;
 	return upload_insert_file($postdata);
 }
 
 function upload_avatar($postdata) {
+	if(upload_largerthan($postdata, 4*1024*1024)) return false;
 	if(upload_checkrotation($postdata)) return false;
 	if(upload_checkdims($postdata)) return false;
 	if(upload_checksize($postdata)) return false;
-	if(upload_largerthan($postdata, 4*1024*1024)) return false;
 	return upload_insert_file($postdata);
 }
 
@@ -625,8 +625,8 @@ function upload_topic() {
 function upload_audio($postdata) {
 	global $tmpdir;
 
-	if(upload_checkrepost($postdata)) return false;
 	if(upload_largerthan($postdata, 10*1024*1024)) return false;
+	if(upload_checkrepost($postdata)) return false;
 
 	return upload_insert_file($postdata);
 }
@@ -686,7 +686,7 @@ function upload_checkdims($postdata) {
 }
 
 // does the upload have a reasonable bits per pixel? (pictures only)
-function upload_checksize($postdata) {
+function upload_checksize(&$postdata) {
 	global $tmpdir;
 
 	if(upload_type($postdata) == "topic" || upload_type($postdata) == "audio")
@@ -713,9 +713,11 @@ function upload_checksize($postdata) {
 		$postdata['filename'] = $newfilename;
 		$postdata['file_extension'] = ".jpg";
 		$postdata['format'] = "jpg";
+		$postdata['format_name'] = "jpg";
 
 		$postdata['noresample'] = $postdata['resample'];
 		unset($postdata['resample']);
+
 		return false;
 	}
 
