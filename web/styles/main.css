@@ -15,9 +15,7 @@
   padding: 0;
 }
 #main li {
-  display: -moz-inline-stack; 
-  display: inline-block; 
-  *display: inline;
+  display: inline;
   line-height: 15px;
 }
 #main a {

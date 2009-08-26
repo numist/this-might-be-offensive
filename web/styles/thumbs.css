@@ -18,9 +18,9 @@
   width: 135px; 
   display: -moz-inline-stack; 
   display: inline-block; 
+  zoom: 1; 
   *display: inline;
   font-weight: bold; 
-  zoom: 1; 
 } 
 #thumbnails li * { 
   position:relative; /* to make sure things are clickable *and* selectable in FF */ 

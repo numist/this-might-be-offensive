@@ -76,7 +76,7 @@ EOT;
 			$result = core_getuploads($args);
 			$output = 0;
 			foreach( $result as $upload ) {	?>
-				<li>
+				<li><div>
 					<div><a href="pages/pic.php?id=<?= $upload->id() ?>"
 						<?php if($upload->filtered()) { ?>
 							onMouseOver='changesrc("th<?= $upload->id()?>","<?= $upload->thumbURL() ?>")' 
@@ -88,7 +88,7 @@ EOT;
 					 	>
 					</a></div>
 					<div><a href="./?c=comments&amp;fileid=<?= $upload->id() ?>"><?= $upload->commentLabel(); ?></a></div>
-				</li>
+			</div>	</li>
 		<?php } ?>
 		</ul>	
 	</div>
