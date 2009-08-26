@@ -26,19 +26,17 @@ EOT;
 	}
 
 	function body() {
-  
-		$THUMBS_PER_ROW = 4;
-
 		$numPerPage = 100;
 
 		$page = isset($_REQUEST['p']) && is_intger($_REQUEST['p']) ?
 			    $_REQUEST['p'] : 0;		
 		$args = $_REQUEST;
-		if(!array_key_exists("type", $args)) {
-			$args["type"] = "image";
-		}
+
 		if(!array_key_exists("limit", $args)) {
 			$args["limit"] = $numPerPage;
+		}
+		if(!array_key_exists("type", $args)) {
+			$args["type"] = "image";
 		}
 		if($args["type"] == "topic") {
 			trigger_error("topics do not have thumbnails", E_USER_ERROR);
@@ -46,18 +44,16 @@ EOT;
 ?>
 <div class="heading">
 
-        <?
+    <?
 		require("offensive/data/quips.inc");
 		echo $quip;
-		?>
 
-<?
-	// employee of the month insertion
-    $employee = get_include_path()."/offensive/employeeOfTheMonth.txt";
-    if(file_exists($employee) && time() - filemtime($employee) < 172800) {
-        require("offensive/employeeOfTheMonth.txt");
-    }
-?>
+		// employee of the month insertion
+		$employee = get_include_path()."/offensive/employeeOfTheMonth.txt";
+		if(file_exists($employee) && time() - filemtime($employee) < 172800) {
+		    require("offensive/employeeOfTheMonth.txt");
+		}
+	?>
 
 </div>
 
@@ -93,10 +89,9 @@ EOT;
 		</ul>	
 	</div>
 	<span id="prevpage">&nbsp;
-	<?php
-
+	<?
 	if( $page > 0 ) { ?>
-		<a href="./?<?= query_string("p") ?>&p=<?= $page - 1 ?>">&laquo; <b>previous page</b></a></td>
+	<a href="./?<?= query_string("p") ?>&p=<?= $page - 1 ?>">&laquo; <b>previous page</b></a></td>
 	<? } ?>
 	</span>
 	<span id="nextpage">&nbsp;
@@ -105,7 +100,6 @@ EOT;
 	<? } ?>
 	</span>
 </div>
-
 <?
 }
 ?>

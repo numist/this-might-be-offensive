@@ -42,18 +42,15 @@ EOT;
 <div class="heading">
 
 	<?
-	require("offensive/data/quips.inc");
-	echo $quip;
-	?>
+		require("offensive/data/quips.inc");
+		echo $quip;
 
-<?
-// XXX: [tpg] — instead of eom, put current tpg winner here.  
-// Current [tpg] winner: ________.  See current submissions. (link to findfile [tpg] since (winnerdate))
-    $employee = get_include_path()."/offensive/employeeOfTheMonth.txt";
-    if(file_exists($employee) && time() - filemtime($employee) < 172800) {
-        require("offensive/employeeOfTheMonth.txt");
-    }
-?>
+		// employee of the month insertion
+		$employee = get_include_path()."/offensive/employeeOfTheMonth.txt";
+		if(file_exists($employee) && time() - filemtime($employee) < 172800) {
+		    require("offensive/employeeOfTheMonth.txt");
+		}
+	?>
 
 </div>
 
@@ -96,10 +93,10 @@ EOT;
 	</span>
 	<span id="nextpage">&nbsp;
 	<? if(count($result) == $numPerPage) { ?>
-		<a href="./?c=<?= query_string("p") ?>&p=<?= $page + 1 ?>"><b>next page</b></a> &raquo;
+		<a href="./?<?= query_string("p") ?>&p=<?= $page + 1 ?>"><b>next page</b></a> &raquo;
 	<? } ?>
 	</span>
 </div>
-
 <?
 }
+?>
