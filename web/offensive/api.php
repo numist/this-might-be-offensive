@@ -99,10 +99,13 @@
 			} else {
 				$data = (double)$data;
 			}
-		} else if($data == "true") {
+		} else if($data === "true") {
 			$data = true;
-		} else if($data == "false") {
+		} else if($data === "false") {
 			$data = false;
+		}
+		if(is_string($data) && $rtype == "xml") {
+			$data = str_replace(array("&", "<", ">"), array("&amp;", "&lt;", "&gt;"), $data);
 		}
 	}
 	
