@@ -104,32 +104,53 @@
 			}
 		}
 		switch($sort) {
-			// XXX: date orders have two order clauses because...  well because otherwise the query takes half a minute D:
+			// XXX: date orders have two order clauses because...  well because otherwise the query takes half a minute, even with the correct indices explicitly in the query D:
 			case "date_desc":
 				$sql .= " ORDER BY up.timestamp DESC, 
 						  up.id DESC";
+				// make the common case fast
+				$sql = str_replace("offensive_uploads up", "offensive_uploads up USE KEY (t_t_id)", $sql);
+				$sql = str_replace("users u", "users u USE KEY (PRIMARY)", $sql);
 				break;
 			case "date_asc":
 				$sql .= " ORDER BY up.timestamp ASC, 
 						  up.id ASC";
+				// force the correct index usage
+				$sql = str_replace("offensive_uploads up", "offensive_uploads up USE KEY (t_t_id)", $sql);
+				$sql = str_replace("users u", "users u USE KEY (PRIMARY)", $sql);
 				break;
 			case "votes_asc":
 				$sql .= " ORDER BY ca.good ASC";
+				// force the correct index usage
+				$sql = $after ? str_replace("offensive_uploads up", "offensive_uploads up USE KEY (t_t_id)", $sql)
+				              : str_replace("offensive_uploads up", "offensive_uploads up USE KEY (status_type_id)", $sql);
+				$sql = $after ? $sql : str_replace("offensive_count_cache ca", "offensive_count_cache ca USE KEY (good)", $sql);
+				$sql = str_replace("users u", "users u USE KEY (PRIMARY)", $sql);
 				break;
 			case "votes_desc":
 				$sql .= " ORDER BY ca.good DESC";
+				// force the correct index usage
+				$sql = $after ? str_replace("offensive_uploads up", "offensive_uploads up USE KEY (t_t_id)", $sql)
+				              : str_replace("offensive_uploads up", "offensive_uploads up USE KEY (status_type_id)", $sql);
+				$sql = $after ? $sql : str_replace("offensive_count_cache ca", "offensive_count_cache ca USE KEY (good)", $sql);
+				$sql = str_replace("users u", "users u USE KEY (PRIMARY)", $sql);
 				break;
+			// these sorting options are slow due to insufficient indices.  average query time over 1s.  luckily they are uncommon.
 			case "comments_asc":
 				$sql .= " ORDER BY ca.comments ASC";
+				$sql = str_replace("offensive_count_cache ca", "offensive_count_cache ca USE KEY (ca_comments)", $sql);
 				break;
 			case "comments_desc":
 				$sql .= " ORDER BY ca.comments DESC";
+				$sql = str_replace("offensive_count_cache ca", "offensive_count_cache ca USE KEY (ca_comments)", $sql);
 				break;
 			case "activity_asc":
 				$sql .= " ORDER BY ca.timestamp ASC";
+				$sql = str_replace("offensive_count_cache ca", "offensive_count_cache ca USE KEY (ca_timestamp)", $sql);
 				break;
 			case "activity_desc":
 				$sql .= " ORDER BY ca.timestamp DESC";
+				$sql = str_replace("offensive_count_cache ca", "offensive_count_cache ca USE KEY (ca_timestamp)", $sql);
 				break;
 			default:
 				trigger_error("impossible order: $sort", E_USER_ERROR);
@@ -143,7 +164,7 @@
 		}
 		
 		$sql .= " LIMIT $limit";
-		
+	
 		$result = tmbo_query($sql);
 		$ret = array();
 		while($row = mysql_fetch_assoc($result)) {
