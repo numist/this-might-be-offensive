@@ -2,22 +2,23 @@
 	// Include, and check we've got a connection to the database.
 	require_once( 'admin/mysqlConnectionInfo.inc' );
 	if(!isset($link) || !$link) $link = openDbConnection();
-  
+
 	require_once( 'offensive/assets/tabs.inc' );
 	require_once("offensive/assets/classes.inc");
 	require_once("offensive/assets/core.inc");
-	
+
 	function start() {
 		global $me;
 		mustLogIn();
 
 		$me = new User($_SESSION["userid"]);
 	}
-	
+
 	function head() {
 		echo <<<EOT
 		<link id="gallery" rel="alternate" href="/offensive/audio_rss.php" type="application/rss+xml" title="audio stream" />
 		<link rel="alternate" type="application/rss+xml" title="daily archives" href="/offensive/zip_rss.php" />
+		<link href="/styles/grid.css?v=1.03" type="text/css" rel="stylesheet">
 EOT;
 	}
 
@@ -25,9 +26,9 @@ EOT;
 		$numPerPage = 100;
 
 		$page = isset($_REQUEST['p']) && is_intger($_REQUEST['p']) ?
-			    $_REQUEST['p'] : 0;		
+			    $_REQUEST['p'] : 0;
 		$args = $_REQUEST;
-		
+
 		if(!array_key_exists("limit", $args)) {
 			$args["limit"] = $numPerPage;
 		}
@@ -49,59 +50,44 @@ EOT;
 ?>
 
 <div class="bluebox">
-		
-	<table width="100%" border="0" cellpadding="0" cellspacing="0">
-		<tr>
-			<td valign="top" colspan="2">
+	<div id="grid-container">
+		<div id="commands">
+			<div class="floatleft">
 				<? require( 'offensive/assets/pickupLink.inc' ) ?>
-			</td>
-		</tr>
-		<tr>
-			<td valign="top" colspan="2">
-				<table width="100%" id="main">
-            <?php
-        	$result = core_getuploads($args);
-        	foreach( $result as $upload ) {
-              	$css = (isset($css) && $css == "odd_row") ? "even_row" : "odd_row";
-              	$filename = $upload->htmlFilename();
-	      
-              	?>
-                  	<tr class="<?= $css ?>">
-                    <td>
-						<div class="clipr"><a href="pages/pic.php?id=<?= $upload->id() ?>" class="<?= $css ?>" title="uploaded by <?= htmlEscape($upload->uploader()->username()) ?>"><?= $upload->htmlFilename() ?></a>
-							<?
-							if(!file_exists($upload->file())) {
-								echo "(expired)";
-							}
-							?>
-						</div>
-					</td>
-					<td class="<?= $css ?> com_cnt" style="text-align:right;white-space:nowrap">
-						<a href="./?c=comments&fileid=<?= $upload->id() ?>" class="<?= $css ?>"><nobr><?= 
-				$upload->commentLabel();
-			?></nobr></a>
-					</td>
-                  </tr>
-                <?php
-            }
-          ?>
-          </table>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<? if( $page > 0 ) { ?>
-					<a href="./?<?= query_string("p") ?>&p=<?= $page - 1 ?>">&laquo; <b>previous page</b></a></td>
-				<? } ?>
-			</td>
-			<td style="text-align:right">
-				<? if(count($result) == $numPerPage) { ?>
-					<a href="./?<?= query_string("p") ?>&p=<?= $page + 1 ?>"><b>next page</b></a> &raquo;
-				<? } ?>
-			</td>
-		</tr>
-	</table>
-			
+			</div>
+		</div>
+		<div class="grid" id="audio">
+			<ul>
+<?
+			$result = core_getuploads($args);
+			foreach( $result as $upload ) {
+				$css = (isset($css) && $css == "odd_row") ? "even_row" : "odd_row";
+?>
+				<li>
+					<div class="col col1 <?= $css ?>">
+						<a href="pages/pic.php?id=<?= $upload->id() ?>" class="<?= $css ?>" title="uploaded by <?= htmlEscape($upload->uploader()->username()) ?>"><?= $upload->htmlFilename() ?></a>
+						<? if(!file_exists($upload->file())) { echo "(expired)"; } ?>
+					</div>
+					<div class="col col2 <?= $css ?>">
+						<a href="./?c=comments&fileid=<?= $upload->id() ?>" class="<?= $css ?>"><nobr><?= $upload->commentLabel(); ?></nobr></a>
+					</div>
+				</li>
+			<? } ?>
+			</ul>
+			<div id="navigation">
+			<? if( $page > 0 ) { ?>
+				<p id="prevpage">
+					<a href="./?<?= query_string("p") ?>&p=<?= $page - 1 ?>">&laquo; previous page</a>
+				</p>
+			<? } ?>
+			<? if(count($result) == $numPerPage) { ?>
+				<p id="nextpage">
+					<a href="./?<?= query_string("p") ?>&p=<?= $page + 1 ?>">next page</a> &raquo;
+				</p>
+			<? } ?>
+			</div>
+		</div>
+	</div>
 </div>
 
 <?

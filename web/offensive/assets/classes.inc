@@ -655,7 +655,8 @@ class Upload {
 				"vote_bad" => $this->bads(),
 				"vote_tmbo" => $this->tmbos(),
 				"vote_repost" => $this->tiars(),
-				"comments" => $this->comments()
+				"comments" => $this->comments(),
+				"filtered" => $this->filtered()
 			);
 		if($this->type() != "topic" && $this->file() != '') {
 			$ret["link_file"] = $this->URL();

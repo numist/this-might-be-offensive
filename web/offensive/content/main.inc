@@ -2,11 +2,11 @@
 	// Include, and check we've got a connection to the database.
 	require_once( 'admin/mysqlConnectionInfo.inc' );
 	if(!isset($link) || !$link) $link = openDbConnection();
-  
+
 	require_once( 'offensive/assets/tabs.inc' );
 	require_once("offensive/assets/classes.inc");
 	require_once("offensive/assets/core.inc");
-	
+
 	function start() {
 		global $me;
 		mustLogIn();
@@ -14,23 +14,25 @@
 		$me = new User($_SESSION["userid"]);
 		$me->setPref("index", "");
 	}
-	
+
 	function head() {
 		echo <<<EOT
 		<link id="gallery" rel="alternate" href="/offensive/pic_rss.php?gallery=true" type="application/rss+xml" title="PicLens feed" />
 		<link rel="alternate" type="application/rss+xml" title="image stream" href="/offensive/pic_rss.php" />
 		<link rel="alternate" type="application/rss+xml" title="daily archives" href="/offensive/zip_rss.php" />
-		<link href="/styles/main.css" type="text/css" rel="stylesheet" />
+		<link href="/styles/grid.css" type="text/css" rel="stylesheet" />
+		<script type="text/javascript" src="/offensive/js/tmbolib.js?v=0.1"></script>
+		<script type="text/javascript" src="/offensive/js/jquery-1.3.2.min.js"></script>
+		<script type="text/javascript" src="/offensive/js/inview.js?v=1.12"></script>
+    <script type="text/javascript" src="/offensive/js/lazyload_main.js?v=0.88"></script>
 EOT;
 	}
 
 	function body() {
 		$numPerPage = 100;
 
-		$page = isset($_REQUEST['p']) && is_intger($_REQUEST['p']) ?
-			    $_REQUEST['p'] : 0;		
 		$args = $_REQUEST;
-		
+
 		if(!array_key_exists("limit", $args)) {
 			$args["limit"] = $numPerPage;
 		}
@@ -61,10 +63,13 @@ EOT;
 ?>
 
 <div class="bluebox">
-	<div id="pickupbox"><? include( 'offensive/assets/pickupLink.inc' ) ?></div>
-	<div id="textlink"><b><a href="./?c=thumbs<?= query_string("c", "&") ?>">thumbnail view</a></b></div>	
-	<div id="main">
-		<ul>
+	<div id="grid-container">
+		<div id="commands">
+			<div class="floatleft"><? include( 'offensive/assets/pickupLink.inc' ) ?></div>
+			<div class="floatright"><a href="./?c=thumbs<?= query_string("c p", "&") ?>">thumbnail view</a></div>
+		</div>
+		<div class="grid" id="main">
+			<ul>
 			<?php
 				$result = core_getuploads($args);
 				$output = 0;
@@ -72,30 +77,23 @@ EOT;
 					$css = (isset($css) && $css == "odd_row") ? "even_row" : "odd_row";
 					$filename = $upload->htmlFilename();
 			?>
-					<li>
-						<div class="title <?= $css ?>">
-							<a href="pages/pic.php?id=<?= $upload->id() ?>" class="<?= $css ?>" title="uploaded by <?= htmlEscape($upload->uploader()->username()) ?>"><?= $upload->htmlFilename() ?></a>
-						</div>
-						<div class="score <?= $css ?>">
-							<a href="./?c=comments&fileid=<?= $upload->id() ?>"><?= $upload->commentLabel(); ?></a>
-						</div>
-					</li>
+				<li fileid="<?= $upload->id() ?>">
+					<div class="col col1 <?= $css ?>">
+						<a href="pages/pic.php?id=<?= $upload->id() ?>" title="uploaded by <?= htmlEscape($upload->uploader()->username()) ?>"><?= $upload->htmlFilename() ?></a>
+					</div>
+					<div class="col col2 <?= $css ?>">
+						<a href="./?c=comments&fileid=<?= $upload->id() ?>"><?= $upload->commentLabel(); ?></a>
+					</div>
+				</li>
 			<?
 				}
 			?>
-		</ul>
+			</ul>
+		</div>
+		<div id="bottom">
+			<p><a href="">load more…</a></p>
+		</div>
 	</div>
-	<span id="prevpage">&nbsp;
-	<?
-	if( $page > 0 ) { ?>
-		<a href="./?<?= query_string("p") ?>&p=<?= $page - 1 ?>">&laquo; <b>previous page</b></a>
-	<? } ?>
-	</span>
-	<span id="nextpage">&nbsp;
-	<? if(count($result) == $numPerPage) { ?>
-		<a href="./?<?= query_string("p") ?>&p=<?= $page + 1 ?>"><b>next page</b></a> &raquo;
-	<? } ?>
-	</span>
 </div>
 <?
 }

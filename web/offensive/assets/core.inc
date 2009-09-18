@@ -87,7 +87,7 @@
 			$sql .= " AND up.id <= $max";
 		}
 		if($since !== false) {
-			$sql .= " AND up.id >= $since";
+			$sql .= " AND up.id > $since";
 		}
 		if($nsfw !== false) {
 			if($nsfw) {

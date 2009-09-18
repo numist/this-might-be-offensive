@@ -1,0 +1,143 @@
+/* reset all margins and padding */
+#grid-container * {
+  margin: 0;
+  padding: 0;
+}
+#grid-container p {
+  margin: 0;
+}
+
+/* top bar containing some links */
+#commands {
+  font-weight: bold;
+  overflow: hidden;
+}
+
+/* grid for text elements */
+.grid {
+  margin: 5px 0px 15px 0px !important;
+  overflow: hidden;
+  clear: both;
+}
+
+.grid li {
+  display: inline;
+  line-height: 15px;
+}
+
+.grid a {
+  padding: 2px;
+}
+
+/* columns */
+.header .col {
+  text-align: center !important;
+  font-weight: bold;
+  background: #bbbbee;
+}
+
+.col {
+  float: left;
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 2px !important;
+  border-left: 2px solid #CCCCFF;
+}
+
+/* grid for thumb elements */
+.grid_thumbs {
+  overflow: hidden;
+  margin: 5px 0px 15px 20px !important;
+}
+
+.grid_thumbs li {
+  text-align: center;
+  width: 135px;
+  height: 120px;
+  float: left;
+  font-weight: bold;
+  position: relative;
+  list-style: none;
+  zoom: 1;
+}
+
+.grid_thumbs .thumbcontainer {
+  position: absolute;
+  bottom: 0;
+  left:0;
+}
+
+.grid_thumbs img {
+  display: block;
+  margin: 9px auto 0 !important;
+  border: 0;
+}
+
+.grid_thumbs .score {
+  overflow: hidden;
+  width: 130px;
+  height: 15px;
+}
+
+/* navigation */
+#navigation {
+  clear: both;
+}
+
+#nextpage {
+  text-align: right;
+  float: right;
+  font-weight: bold;
+  width: 150px;
+  padding-top: 10px;
+}
+
+#prevpage {
+  text-align: left;
+  font-weight: bold;
+  float: left;
+  width: 150px;
+  padding-top: 10px;
+}
+
+.floatleft {
+  float: left;
+  text-align: left;
+}
+.floatright {
+  float: right;
+  text-align: right;
+}
+
+#bottom {
+  text-align: center;
+}
+
+
+
+/* page specific column widths */
+
+/* main.inc */
+#main .col1 { width: 395px; text-align: left;}
+#main .col2 { width: 150px; text-align: right;}
+
+/* discussions.inc */
+#discussions .col1 { width: 330px; text-align: left;}
+#discussions .col2 { width:  90px; text-align: right;}
+#discussions .col3 { width: 122px; text-align: right;}
+
+/* hof */
+#hof .col1 { width: 24px; text-align: right;}
+#hof .col2 { width: 300px; text-align: left;}
+#hof .col3 { width: 73px; text-align: left;}
+#hof .col4 { width: 57px; text-align: left;}
+#hof .col5 { width: 35px; text-align: left;}
+#hof .col6 { width: 35px; text-align: right;}
+
+/* audio */
+#audio .col1 { width: 430px; text-align: left;}
+#audio .col2 { width: 115px; text-align: right;}
+
+/* subscriptions */
+#subscriptions .col1 {width: 450px; text-align: left; padding: 10px 2px 10px 10px !important;}
+#subscriptions .col2 {width:  80px; text-align: center; padding: 10px 2px 10px 2px !important;}

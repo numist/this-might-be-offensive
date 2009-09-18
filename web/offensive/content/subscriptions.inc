@@ -4,7 +4,7 @@
 	if(!isset($link) || !$link) $link = openDbConnection();
 	require_once( 'offensive/assets/functions.inc' );
 	require_once( 'offensive/assets/tabs.inc' );
-		
+
 	function title() {
 		global $filename;
 		return "[ tmbo ] : subscriptions";
@@ -13,8 +13,14 @@
 	function start() {
 		global $me;
 		mustLogIn();
-		
+
 		$me = new User($_SESSION["userid"]);
+	}
+
+	function head() {
+		echo <<<EOT
+		<link href="/styles/grid.css?v=1.02" type="text/css" rel="stylesheet">
+EOT;
 	}
 
 	function body() {
@@ -34,57 +40,53 @@
 			LIMIT $start, $numPerPage";
 
 		$result = tmbo_query( $sql );
-?>	
+?>
 
 
 		<div class="heading">
 			subscriptions.
 		</div>
-	
+
 <?
 		global $activeTab;
 		$activeTab = "discussions";
 		tabs();
 ?>
-	
-		<div class="bluebox" style="text-align:left">	
+
+		<div class="bluebox">
+			<div id="grid-container">
+				<div class="grid" id="subscriptions">
+					<ul>
 <?
 		while( $row = mysql_fetch_assoc( $result ) ) {
-		  $row['filename'] = htmlEscape($row['filename']);
+			$row['filename'] = htmlEscape($row['filename']);
+			$css = (isset($css) && $css == "odd_row") ? "even_row" : "odd_row";
 			?>
-		
-			<div class="entry" style="<?php echo nextStyle()?>">
-				<a href="subscribe.php?un=1&fileid=<?= $row['fileid'] ?>" style="float:right" title="take this thread off my 'unread comments' watch list.">unsubscribe</a>
-				<a href="./?c=comments&fileid=<?= $row['fileid'] ?>"><?= $row['filename'] ?></a>				
-			</div>
-		
-			<? 		
-		}
-
-	?>
-		<table width="100%">
-			<tr>
-				<td>
+						<li class="grid_row">
+							<div class="col col1 <?= $css ?>">
+								<a href="./?c=comments&fileid=<?= $row['fileid'] ?>"><?= $row['filename'] ?></a>
+							</div>
+							<div class="col col2 <?= $css ?>">
+								<a href="subscribe.php?un=1&fileid=<?= $row['fileid'] ?>" title="take this thread off my 'unread comments' watch list.">unsubscribe</a>
+							</div>
+						</li>
+			<? } ?>
+					</ul>
+					<div id="navigation">
 					<? if( $page > 0 ) { ?>
-						<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'] ?>&p=<?= $page - 1 ?>">&laquo; <b>previous page</b></a></td>
+						<p id="prevpage">
+							<a href="./?<?= query_string("p") ?>&p=<?= $page - 1 ?>">&laquo; previous page</a>
+						</p>
 					<? } ?>
-				</td>
-				<td style="text-align:right">
-					<? if( mysql_num_rows( $result ) == $numPerPage ) { ?>
-						<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'] ?>&p=<?= $page + 1 ?>"><b>next page</b></a> &raquo;
-					<? } ?>
-				</td>
-			</tr>        
-		</table>
+					<? if(mysql_num_rows($result) == $numPerPage) { ?>
+						<p id="nextpage">
+							<a href="./?<?= query_string("p") ?>&p=<?= $page + 1 ?>">next page</a> &raquo;
+						</p>
+						<? } ?>
+					</div>
+				</div>
+			</div>
 		</div>
 	<?
 	}
-
-	function nextStyle() {
-		global $style;
-		$style = $style == "background:#bbbbee;" ? "" : "background:#bbbbee;";
-		return $style;
-	}
-
-
 ?>

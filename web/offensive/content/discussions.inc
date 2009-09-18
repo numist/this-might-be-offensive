@@ -6,118 +6,119 @@
 	require_once( 'offensive/assets/tabs.inc' );
 	require_once("offensive/assets/classes.inc");
 	require_once("offensive/assets/core.inc");
-	
+
 	function start() {
 		global $me;
 		mustLogIn();
-		
+
 		$me = new User($_SESSION["userid"]);
 	}
-	
+
 	function head() {
 		echo <<<EOT
 		<link rel="alternate" type="application/rss+xml" title="discussions" href="/offensive/discuss_rss.php" />
+		<link href="/styles/grid.css?v=1.02" type="text/css" rel="stylesheet">
 EOT;
 	}
 
 	function body() {
 		global $me;
-		
+
 		$page = isset($_REQUEST['p']) && is_intger($_REQUEST['p']) ?
-			    $_REQUEST['p'] : 0;		
+			    $_REQUEST['p'] : 0;
 		$args = $_REQUEST;
 		$args["type"] = "topic";
 		$args["p"] = $page;
-	
+
 ?>
 	<div class="heading">we need to talk.</div>
 <?
 		tabs();
 ?>
 		<div class="bluebox">
-			<div style="font-weight:bold;text-align:right">
-				<a href="./?c=newtopic">new topic</a>
+			<div id="grid-container">
+				<div id="commands">
+					<div class="floatright">
+						<a href="./?c=newtopic">new topic</a>
+					</div>
+				</div>
+<?
+		$defaultSort = $me->getPref("sortorder_discussions")
+										? $me->getPref("sortorder_discussions")
+										: "date_desc";
+		if(strpos($defaultSort, "_") == false) $defaultSort = "date_desc";
+			$args = $_REQUEST;
+			if(!array_key_exists("sort", $args)) {
+				$args["sort"] = $defaultSort;
+			}
+
+			$numPerPage = 100;
+			if(!array_key_exists("limit", $args)) {
+				$args["limit"] = $numPerPage;
+			}
+			if(!array_key_exists("type", $args)) {
+				$args["type"] = "topic";
+			}
+
+			// if any of the args have incorrect values, core_getuploads will kill us here
+			$result = core_getuploads($args);
+
+			// if we made it this far, sort is valid, so we don't have to check it
+			if($args["sort"] != $defaultSort) {
+				$me->setPref("sortorder_discussions", $args["sort"]);
+			}
+?>
+				<div class="grid" id="discussions">
+					<ul>
+						<li class="header">
+							<div class="col col1">
+									<?= ($args["sort"] !== "date_desc"
+												? '<a href="./?'.query_string("sort").'&sort=date_desc">sort by thread creation date</a>'
+												: 'sort by thread creation date' ) ?>
+							</div>
+							<div class="col col2">
+									<?= ($args["sort"] !== "comments_desc"
+												? '<a href="./?'.query_string("sort").'&sort=comments_desc">comment count</a>'
+												: 'comment count' )?>
+							</div>
+							<div class="col col3">
+									<?= ($args["sort"] !== "activity_desc"
+												? '<b><a href="./?'.query_string("sort").'&sort=activity_desc">latest comment</a></b>'
+												: 'latest comment' ) ?>
+							</div>
+						</li>
+<?
+						foreach( $result as $upload ) {
+							$css = (isset($css) && $css == "even_row") ? "odd_row" : "even_row";
+?>
+						<li>
+							<div class="col col1 <?= $css ?>">
+								<a href="./?c=comments&fileid=<?= $upload->id() ?>"><?= $upload->htmlFilename() ?></a>
+							</div>
+							<div class="col col2 <?= $css ?>">
+								<a href="./?c=comments&fileid=<?= $upload->id() ?>">(<?=$upload->commentLabel(false);?>)</a>
+							</div>
+							<div class="col col3 <?= $css ?>">
+									<?= $upload->last_active() ?>
+							</div>
+						</li>
+						<? } ?>
+					</ul>
+					<div id="navigation">
+					<? if( $page > 0 ) { ?>
+						<p id="prevpage">
+							<a href="./?<?= query_string("p") ?>&p=<?= $page - 1 ?>">&laquo; previous page</a>
+						</p>
+					<? } ?>
+					<? if(count($result) == $numPerPage) { ?>
+						<p id="nextpage">
+							<a href="./?<?= query_string("p") ?>&p=<?= $page + 1 ?>">next page</a> &raquo;
+						</p>
+						<? } ?>
+					</div>
+				</div>
 			</div>
-			<?
-					$defaultSort = $me->getPref("sortorder_discussions") ?
-					               $me->getPref("sortorder_discussions") :
-					               "date_desc";
-					if(strpos($defaultSort, "_") == false) $defaultSort = "date_desc";
-					$args = $_REQUEST;
-					if(!array_key_exists("sort", $args)) {
-						$args["sort"] = $defaultSort;
-					}
-					
-					$numPerPage = 100;
-					if(!array_key_exists("limit", $args)) {
-						$args["limit"] = $numPerPage;
-					}
-					if(!array_key_exists("type", $args)) {
-						$args["type"] = "topic";
-					}
-					
-					// if any of the args have incorrect values, core_getuploads will kill us here
-					$result = core_getuploads($args);
-					
-					// if we made it this far, sort is valid, so we don't have to check it
-					if($args["sort"] != $defaultSort) {
-						$me->setPref("sortorder_discussions", $args["sort"]);
-					}
-					
-					?>
-					<table width="100%" id="discussions">
-
-						<tr style="background:#bbbbee;text-align:center;">
-							<td><b><?= ($args["sort"] !== "date_desc"
-								? '<a href="./?'.query_string("sort").'&sort=date_desc">sort by thread creation date</a>'
-								: 'sort by thread creation date' ) ?></b></td>
-							<td><b><?= ($args["sort"] !== "comments_desc"
-								? '<a href="./?'.query_string("sort").'&sort=comments_desc">comment count</a>'
-							    : 'comment count' )?></b></td>
-							<td><b><?= ($args["sort"] !== "activity_desc"
-								? '<b><a href="./?'.query_string("sort").'&sort=activity_desc">latest comment</a></b>'
-							    : 'latest comment' ) ?></b></td>
-						</tr>
-
-					<?
-					
-					foreach( $result as $upload ) {
-						$css = (isset($css) && $css == "even_row") ? "odd_row" : "even_row";
-
-						?>
-							<tr class="<?= $css ?>">
-								<td><div class="clipr"><a href="./?c=comments&fileid=<?= $upload->id() ?>"><?= $upload->htmlFilename() ?></a></div></td>
-								<td class="com_cnt"><a href="./?c=comments&fileid=<?= $upload->id() ?>">(<?=
-									$upload->commentLabel(false);
-									?>)</a></td>
-								<td class="dater"><?= $upload->last_active() ?></td>
-							</tr>
-						<?
-					}
-
-
-					?>
-						<tr>
-							<td>
-								<? if( $page > 0 ) { ?>
-									<a href="./?<?= query_string("p") ?>&p=<?= $page - 1 ?>">&laquo; <b>previous page</b></a></td>
-								<? } ?>
-							</td>
-							<td></td>
-							<td style="text-align:right">
-								<? if(count($result) == $numPerPage) { ?>
-									<a href="./?<?= query_string("p") ?>&p=<?= $page + 1 ?>"><b>next page</b></a> &raquo;
-								<? } ?>
-							</td>
-						</tr>
-
-				</table>
 		</div>
 <?
-	}
-
-	function discussionList() {
-		global $me;
-
 	}
 ?>

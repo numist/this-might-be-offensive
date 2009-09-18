@@ -8,14 +8,19 @@
 	require_once('offensive/assets/functions.inc');
 	require_once("offensive/assets/classes.inc");
 	require_once("offensive/assets/core.inc");
-	
+
 	function start() {
 		global $me;
 		mustLogIn();
-		
+
 		$me = new User($_SESSION["userid"]);
 	}
 
+	function head() {
+		echo <<<EOT
+		<link href="/styles/grid.css?v=1.01" type="text/css" rel="stylesheet">
+EOT;
+	}
 	function body() {
 
 		$view = isset( $_REQUEST['t'] ) ? sqlEscape( $_REQUEST['t'] ) : 'hof';	
@@ -30,26 +35,26 @@
 			<div class="tabspacer" style="background:none">&nbsp;</div>
 		</div>
 
-				
+
 		<div class="bluebox">
-
-			<table width="100%">
-
-			<tr class="<? $css = "evenfile"; echo $css ?>">
-				<td style="text-align:right"><b>rank</b></td>
-				<td><b>filename</b></td>
-				<td><b>uploaded&nbsp;by</b></td>
-				<td><b>comments</b></td>
-				<td><b>votes</b></td>
-				<td><b><? if($view=="today") { ?> hours <? } else { ?> weeks <? } ?></b></td> 
-			</tr>
+			<div id="grid-container">
+				<div class="grid" id="hof">
+					<ul>
+						<li class="header">
+							<div class="col col1">rank</div>
+							<div class="col col2">filename</div>
+							<div class="col col3">uploaded by</div>
+							<div class="col col4">comments</div>
+							<div class="col col5">votes</div>
+							<div class="col col6"><? if($view=="today") { ?> hours <? } else { ?> weeks <? } ?></div>
+						</li>
 
 <?
 		$numPerPage = 100;
 		$page = isset($_REQUEST['p']) && is_intger($_REQUEST['p']) ?
-			    $_REQUEST['p'] : 0;		
+			    $_REQUEST['p'] : 0;
 		$args = $_REQUEST;
-		
+
 		if(!array_key_exists("sort", $args)) {
 			$args["sort"] = "votes_desc";
 		}
@@ -62,37 +67,46 @@
 		if(!array_key_exists("type", $args)) {
 			$args["type"] = "image";
 		}
-		
+
 		$result = core_getuploads($args);
 		$count = $page * $numPerPage;
 		foreach($result as $upload) {
 			$css = strpos($css, "even") !== false ? "oddfile odd_row" : "evenfile even_row";
-			
+
 			if( $upload->uploader()->id() == $_SESSION['userid'] ) {
 				$css = "my_hof ".(strpos($css, "even") !== false ? "even_row" : "odd_row");
 			}
-			
+
 			if($view=="today") $timeSince=hoursSince($upload->timestamp());
 			if($view=="hof") $timeSince = weeksSince($upload->timestamp());
 			$cssw = $view == 'hof' ? "$css weeks_$timeSince" : $css;
 ?>
-			<tr class="<? echo $cssw ?>">
-				<td style="text-align:right"><? echo ++$count ?>.</td>
-				<td><div style="white-space:nowrap;width:312px;overflow:hidden;"><a class="<? echo $cssw ?>" href="pages/pic.php?id=<?= $upload->id() ?>"><?= $upload->htmlFilename()
-			    ?></a></td></div>
-				<td><a class="<? echo $cssw ?>" href="./?c=user&userid=<?= $upload->uploader()->id() ?>"><?= htmlEscape($upload->uploader()->username()) ?></a></td>
-				<td><a class="<? echo $cssw ?>" href="./?c=comments&fileid=<?= $upload->id() ?>"><?= $upload->comments() ?></a></td>
-				<td>(+<?= $upload->goods() ?>)</td>
-				<td style="text-align:right"><?= $timeSince ?></td>
-			</tr>
-<?
-		}
-?>
-
-
-			</table>
-
-
+						<li>
+							<div class="col col1 <?= $cssw ?>">
+								<? echo ++$count ?>.
+							</div>
+							<div class="col col2 <?= $cssw ?>">
+								<a href="pages/pic.php?id=<?= $upload->id() ?>"><?= $upload->htmlFilename()?></a>
+							</div>
+							<div class="col col3 <?= $cssw ?>">
+								<a href="./?c=user&userid=<?= $upload->uploader()->id() ?>"><?= htmlEscape($upload->uploader()->username()) ?></a>
+							</div>
+							<div class="col col4 <?= $cssw ?>">
+								<a href="./?c=comments&fileid=<?= $upload->id() ?>"><?= $upload->comments() ?></a>
+							</div>
+							<div class="col col5 <?= $cssw ?>">
+								+<?= $upload->goods() ?>
+							</div>
+							<div class="col col6 <?= $cssw ?>">
+								<?= $timeSince ?>
+							</div>
+						</li>
+						<?
+								}
+						?>
+					</ul>
+				</div>
+			</div>
 	</div>
 <?
 	}
