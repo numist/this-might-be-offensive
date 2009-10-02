@@ -403,10 +403,12 @@ $timelimit = 10;
 		$result = tmbo_query( $sql );
 		
 		if( mysql_num_rows( $result ) == 0 ) {
-			return;
+			$hidden = "none";
+		} else {
+			$hidden = "block";
 		} ?>
 		
-		<div class="contentbox">
+		<div id="unread" class="contentbox" style="display: <?= $hidden ?>;">
 			<div class="blackbar"></div>
 			<div class="heading">unread comments:</div>
 			<div class="bluebox">

@@ -496,27 +496,27 @@
 
 	function core_unreadcomments($args) {
 		global $commentsql;
-		
+
 		if(!is_array($args)) {
 			trigger_error("args is not an array", E_USER_ERROR);
 		}
-		
+
 		$sort = check_arg("sort", "string", $method, false, array("comment_desc", "comment_asc", "file_asc", "file_desc"));
 		$limit = check_arg("limit", "limit", $method, false);
 		handle_errors();
-		
+
 		if($sort === false) $sort = "file_asc";
-		
+
 		$sql = $commentsql;
-		
+
 		if(!isset($_SESSION) || !array_key_exists("userid", $_SESSION)) {
 			trigger_error("must be logged in to use this function", E_USER_ERROR);
 		}
 		$userid = $_SESSION['userid'];
-		
+
 		/*	$commentsql = "SELECT com.*,
 		             u.username as user_username, u.account_status as user_account_status, u.userid as user_userid,
-		        	 up.userid as upload_userid, up.id as upload_id, up.filename as upload_filename,
+					 up.userid as upload_userid, up.id as upload_id, up.filename as upload_filename,
 		             up.timestamp as upload_timestamp, up.nsfw as upload_nsfw, up.tmbo as upload_tmbo,
 		             up.type as upload_type, up.status as upload_status
 		       FROM offensive_comments com, users u, offensive_uploads up
@@ -525,7 +525,7 @@
 		$sql = str_replace("FROM offensive_comments com", 
 		                   "FROM offensive_subscriptions sub, offensive_comments com", $sql);
 		$sql .= " AND sub.userid = $userid AND up.id = sub.fileid AND sub.commentid IS NOT NULL ORDER BY ";
-		
+
 		switch($sort) {
 			case "comment_desc":
 				$sql .= "sub.commentid DESC";
@@ -543,18 +543,18 @@
 				trigger_error("ASSERT: impossible order!", E_USER_ERROR);
 				exit;
 		}
-		
+
 		$sql .= " LIMIT $limit";
-		
+
 		$result = tmbo_query($sql);
-		
+
 		$ret = array();
-		
+
 		while($row = mysql_fetch_assoc($result)) {
 			$ret[] = new Comment($row);
 		}
-		
+
 		return $ret;
 	}
-	
+
 ?>

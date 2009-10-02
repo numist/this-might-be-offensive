@@ -25,7 +25,7 @@
 		<script type="text/javascript" src="/offensive/js/tmbolib.js?v=0.1"></script>
 		<script type="text/javascript" src="/offensive/js/jquery-1.3.2.min.js"></script>
 		<script type="text/javascript" src="/offensive/js/inview.js?v=1.12"></script>
-    <script type="text/javascript" src="/offensive/js/lazyload.js?v=0.89"></script>
+    <script type="text/javascript" src="/offensive/js/lazyload.js?v=0.93"></script>
 EOT;
 	}
 

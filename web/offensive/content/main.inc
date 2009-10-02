@@ -24,7 +24,7 @@
 		<script type="text/javascript" src="/offensive/js/tmbolib.js?v=0.1"></script>
 		<script type="text/javascript" src="/offensive/js/jquery-1.3.2.min.js"></script>
 		<script type="text/javascript" src="/offensive/js/inview.js?v=1.12"></script>
-    <script type="text/javascript" src="/offensive/js/lazyload_main.js?v=0.88"></script>
+    <script type="text/javascript" src="/offensive/js/lazyload_main.js?v=0.93"></script>
 EOT;
 	}
 
@@ -82,7 +82,7 @@ EOT;
 						<a href="pages/pic.php?id=<?= $upload->id() ?>" title="uploaded by <?= htmlEscape($upload->uploader()->username()) ?>"><?= $upload->htmlFilename() ?></a>
 					</div>
 					<div class="col col2 <?= $css ?>">
-						<a href="./?c=comments&fileid=<?= $upload->id() ?>"><?= $upload->commentLabel(); ?></a>
+						<span class="score"><a href="./?c=comments&fileid=<?= $upload->id() ?>"><?= $upload->commentLabel(); ?></a></span>
 					</div>
 				</li>
 			<?
