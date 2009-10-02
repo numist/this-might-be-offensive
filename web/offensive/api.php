@@ -161,7 +161,7 @@
 	function api_getupload() {
 		global $uploadsql;
 		
-		$upload = check_arg("upload", "integer");
+		$upload = check_arg("fileid", "integer");
 		handle_errors();
 		
 		$upload = new Upload($upload);

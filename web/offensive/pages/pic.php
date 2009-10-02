@@ -56,17 +56,17 @@
 			$cookiename = $me->id()."lastavatar";
 			$prefname = "ypickup";
 	}
-	
+
 	// update the pickup cookie
 	if(!array_key_exists($cookiename, $_COOKIE) ||
-   	   !is_intger($_COOKIE[$cookiename]) ||
-   	   $_COOKIE[$cookiename] < $upload->id()) {
+	   !is_intger($_COOKIE[$cookiename]) ||
+	   $_COOKIE[$cookiename] < $upload->id()) {
 		setcookie( $cookiename, $upload->id(), time() + 3600*24*365*10, "/offensive/");
 	}
-	
+
 	global $autoplay;
 	$autoplay = false;
-	
+
 	// update the pickup db entry
 	if($me->getPref($prefname) == false || $me->getPref($prefname) < $upload->id()) {
 		// if this account has not been this far forward in the stream before, autoplay.
@@ -80,7 +80,7 @@
 	###########################################################################
 	function get_random_id($upload) {
 		global $me;
-		
+
 		switch($upload->type()) {
 			case "image":
 				$cookiename = $me->id()."lastpic";
@@ -92,7 +92,7 @@
 				$cookiename = $me->id()."lastavatar";
 				break;
 		}
-		
+
 		if(array_key_exists($cookiename, $_COOKIE)) {
 			$cookiepic = $_COOKIE[$cookiename];
 		} else {
@@ -100,7 +100,7 @@
 			// pic.php at least once with an id argument in order to use random.
 			$cookiepic = 0;
 		}
-		
+
 		/*
 		 * since pic.php sets the ipickup db preference and the pickupid in the cookie
 		 * at the beginning of execution if they are invalid, it's safe to skip
@@ -470,33 +470,33 @@
 					<span style=\"color:#990000\">x<?= $upload->tmbos() ?></span>
 				<? } ?>)
 				&nbsp;(<a id="quickcomment" class="jqModal" href="#">quick</a>)
-    	
+
 				<!--
 					voting block
 				-->
 				<span style="margin-left:40px;">
 					<?
 					if(canVote($upload->id()) && $upload->file()) {
-						$good_href = "href=\"/offensive/?c=comments&submit=submit&fileid=$id&vote=this%20is%20good&redirect=true\"";	
+						$good_href = "href=\"/offensive/?c=comments&submit=submit&fileid=$id&vote=this%20is%20good&redirect=true\"";
 						$bad_href = "href=\"/offensive/?c=comments&submit=submit&fileid=$id&vote=this%20is%20bad&redirect=true\"";
 						$class = "on";
 					} else {
 						$good_href = $bad_href = "";
 						$class = "off";
 					}
-						
+
 					?>
 					<span id="votelinks" class="<?= $class ?>">
 						vote: <a name="<?= $upload->id() ?>" id="good" class="votelink" <?= $good_href ?>>[ this is good ]</a> .
 						<a name="<?= $upload->id() ?>" id="bad" class="votelink" <?= $bad_href ?>>[ this is bad ]</a>
 					</span>
 				</span>
-    	
+
 				<!--
 					subscribe block
 				-->
 				<span style="margin-left:48px;">
-					<?	
+					<?
 					if($upload->subscribed()) { ?>
 						<a class="subscribe_toggle" id="unsubscribeLink" href="/offensive/subscribe.php?un=1&fileid=<?= $id ?>" title="take this file off my 'unread comments' watch list.">unsubscribe</a>
 					<?	} else { ?>
@@ -504,27 +504,27 @@
 					<?	} ?>
 				</span>
 
-	    		<!--
-	    		    filter block
-	    		-->
-	    		<span style="margin-left:48px;">filters:</span>
+				<!--
+				    filter block
+				-->
+				<span style="margin-left:48px;">filters:</span>
 				<span style="margin-left:5px;"><?
-	    		        if($me->getPref("hide_nsfw") == 1) { ?>
-	    		                <a href="/offensive/setPref.php?p=hide_nsfw&v=">nsfw(on)</a>
-	    		        <? } else { ?>
-	    		                <a href="/offensive/setPref.php?p=hide_nsfw&v=1">nsfw(off)</a>
-	    		        <? } ?>
-	    		</span>
-            	
-	    		<span style="margin-left:5px;"><?
-	    		        if($me->getPref("hide_tmbo") == 1) { ?>
-	    		                        <a href="/offensive/setPref.php?p=hide_tmbo&v=">tmbo(on)</a>
-	    		        <? } else { ?>
-	    		                        <a href="/offensive/setPref.php?p=hide_tmbo&v=1">tmbo(off)</a>
-	    		        <? } ?>
-	    		</span>
+				        if($me->getPref("hide_nsfw") == 1) { ?>
+				                <a href="/offensive/setPref.php?p=hide_nsfw&v=">nsfw(on)</a>
+				        <? } else { ?>
+				                <a href="/offensive/setPref.php?p=hide_nsfw&v=1">nsfw(off)</a>
+				        <? } ?>
+				</span>
+
+				<span style="margin-left:5px;"><?
+				        if($me->getPref("hide_tmbo") == 1) { ?>
+				                        <a href="/offensive/setPref.php?p=hide_tmbo&v=">tmbo(on)</a>
+				        <? } else { ?>
+				                        <a href="/offensive/setPref.php?p=hide_tmbo&v=1">tmbo(off)</a>
+				        <? } ?>
+				</span>
 			</div>
-	
+
 			<br />
 
 			<!--
@@ -538,33 +538,25 @@
 				if($upload->is_tmbo()) { ?>
 					<a style="color:#990000;" href="/offensive/setPref.php?p=hide_tmbo&v=<?= $me->getPref("hide_tmbo") == 1 ? "" : "1" ?>" title="<?= $me->getPref("hide_tmbo") == 1 ? "show" : "hide" ?> images that might be offensive">[tmbo]</a><?
 				}
-				
+
 				$style = ($upload->is_tmbo() || $upload->is_nsfw()) ? "style=\"margin-left:.3em\"" : "";
-				
-				if($upload->type() == "audio") {
-						echo "<a href=\"".$upload->URL()."\">";
-				}
-				
-				echo "<span $style>" . htmlEscape($upload->filename()) . "</span>" ;
-				
-				if($upload->type() == "audio") {
-						echo "</a>";
-				}
-				
+
+				echo "<a href=\"".$upload->URL()."\" target="_blank"><span $style>" . htmlEscape($upload->filename()) . "</span></a>";
+
 			?>
-			<span style="color:#999999"><? 
+			<span style="color:#999999"><?
 				if($upload->file() != "")
 					echo getFileSize($upload->file());
 			?></span>
 			<br/>
-				
+
 			<!--
 				username/time block
 			-->
 			<span style="color:#999999">
 				uploaded by <a id="userLink" href="../?c=user&userid=<?= $upload->uploader()->id() ?>"><?= $upload->uploader()->username() ?></a> @ <?= $upload->timestamp() ?>
 			</span>
-			
+
 			<!--
 				squelch block
 			-->
