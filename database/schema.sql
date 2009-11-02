@@ -440,7 +440,7 @@ CREATE TABLE `users` (
   `email` varchar(60) default NULL,
   `username` varchar(50) default NULL,
   `created` datetime NOT NULL default '0000-00-00 00:00:00',
-  `account_status` set('admin','normal','locked','awaiting activation') NOT NULL default 'awaiting activation',
+  `account_status` set('admin','normal','locked','awaiting activation','memoriam') NOT NULL default 'awaiting activation',
   `ip` varchar(16) default NULL,
   `last_login_ip` varchar(15) default NULL,
   `timestamp` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,

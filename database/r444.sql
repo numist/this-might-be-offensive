@@ -1,0 +1,1 @@
+ALTER TABLE users MODIFY account_status set('admin','normal','locked','awaiting activation','memoriam') NOT NULL DEFAULT "awaiting activation";
