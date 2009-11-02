@@ -81,6 +81,9 @@
 			case "awaiting activation":
 				$accountMessage = "$name has not picked up the keys yet.";
 			break;
+      case "memoriam":
+        $accountMessage = "$name will always be missed.";
+      break;
 			case "admin":
 			default:
 				if(strtotime($them->timestamp()) < time() - 60 * 60 * 24 * 365) {
