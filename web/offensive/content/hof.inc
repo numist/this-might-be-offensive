@@ -89,7 +89,7 @@ EOT;
 								<a href="pages/pic.php?id=<?= $upload->id() ?>"><?= $upload->htmlFilename()?></a>
 							</div>
 							<div class="col col3 <?= $cssw ?>">
-								<a href="./?c=user&userid=<?= $upload->uploader()->id() ?>"><?= htmlEscape($upload->uploader()->username()) ?></a>
+								<?= $upload->uploader()->htmlUsername(); ?>
 							</div>
 							<div class="col col4 <?= $cssw ?>">
 								<a href="./?c=comments&fileid=<?= $upload->id() ?>"><?= $upload->comments() ?></a>

@@ -541,7 +541,7 @@
 
 				$style = ($upload->is_tmbo() || $upload->is_nsfw()) ? "style=\"margin-left:.3em\"" : "";
 
-				echo "<a href=\"".$upload->URL()."\" target="_blank"><span $style>" . htmlEscape($upload->filename()) . "</span></a>";
+				echo "<a href=\"".$upload->URL()."\" target=\"_blank\"><span $style>" . htmlEscape($upload->filename()) . "</span></a>";
 
 			?>
 			<span style="color:#999999"><?
@@ -554,7 +554,7 @@
 				username/time block
 			-->
 			<span style="color:#999999">
-				uploaded by <a id="userLink" href="../?c=user&userid=<?= $upload->uploader()->id() ?>"><?= $upload->uploader()->username() ?></a> @ <?= $upload->timestamp() ?>
+				uploaded by <?= $upload->uploader()->htmlUsername() ?> @ <?= $upload->timestamp() ?>
 			</span>
 
 			<!--

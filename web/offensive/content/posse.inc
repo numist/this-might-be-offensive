@@ -17,17 +17,13 @@
 	
 	function body() {
 		$usrid = $_REQUEST['userid'];
-
-		$sql = "SELECT username
-					FROM users WHERE userid={$usrid}";
-		$result = tmbo_query( $sql );
-		list($username) = mysql_fetch_array( $result );
+		$them = new User($usrid);
 
 ?>
 
 					<div class="heading">
 						<span style="color:#666699">
-							<a href="./?c=user&userid=<?=$usrid?>"><?= $username?></a> has a posse.
+							<?= $them->htmlUsername() ?> has a posse.
 						</span>
 					</div>
 					<? tabs(); ?>
@@ -42,20 +38,14 @@
 							}
 						</style>
 						<div class="piletitle">
-							<a href="./?c=user&userid=<?=$usrid?>"><?= $username?></a> has a posse.
+							<?= $them->htmlUsername() ?> has a posse.
 						</div>
 						<ol>
 	<?
-				
-			$sql = "SELECT username, account_status, created, userid, 
-						(select username from users where userid={$usrid}) AS referrer
-						FROM users WHERE referred_by=$usrid AND userid != $usrid
-						ORDER BY username";
-			$result = tmbo_query( $sql );
-	
-		
-			while( list($name, $status, $created, $userid, $referrer) = mysql_fetch_array($result)) {
-				?><li><a class="username <?=$status?>" href="./?c=user&userid=<?=$userid?>"><?= $name ?></a> (<?= $status ?>)</li>
+			
+			$posse = $them->posse();
+			foreach($posse as $accomplice) {
+				?><li><?= $accomplice->htmlUsername() ?> (<?= $accomplice->status() ?>)</li>
 <?
 			}
 	?>											

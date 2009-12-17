@@ -167,11 +167,11 @@
 
 		echo htmlEscape($upload->filename());
 
-		?><br/><span style="color:#666699"><?= $prefix ?> <a href="./?c=user&userid=<?= $uploader->id() ?>" style="color:#666699"><?= $uploader->username() ?></a> started it.</span><br/>
+		?><br/><span style="color:#666699"><?= $prefix ?> <?= $uploader->htmlUsername() ?></a> started it.</span><br/>
 <?
 	} else {
 ?>
-		<a class="heading" id="pic" href="<?= $href ?>"><?= $upload->htmlFilename() ?></a><br/><span style="color:#666699">uploaded by <a href="./?c=user&userid=<?= $uploader->id() ?>" style="color:#666699"><?= $uploader->username() ?></a></span><br/>
+		<a class="heading" id="pic" href="<?= $href ?>"><?= $upload->htmlFilename() ?></a><br/><span style="color:#666699">uploaded by <?= $uploader->htmlUsername() ?></a></span><br/>
 <?
 	}	
 ?></div>
@@ -214,7 +214,7 @@
 				<br />
 				<div class="timestamp"><a href="#<?= $comment->id() ?>"><?= $comment->timestamp() ?></a></div>
 				
-				&raquo; <a href="./?c=user&userid=<?= $commenter->id() ?>"><?= $commenter->username() ?></a>
+				&raquo; <?= $commenter->htmlUsername() ?></a>
 				
 				<?
 							

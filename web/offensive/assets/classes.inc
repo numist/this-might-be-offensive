@@ -1217,6 +1217,30 @@ class User {
 	}
 	
 	/*
+	 * string slinging code
+	 */
+
+	public function htmlUsername() {
+		$color = null;
+		switch($this->status()) {
+			case "locked":
+				$color = "red";
+				break;
+			case "awaiting activation":
+				$color = "green";
+				break;
+		}
+		$ret = "<a id=\"userLink\" href=\"/offensive/?c=user&userid=".$this->id()."\">";
+		if($color) {
+			$ret .= "<span style=\"color: $color;\">".$this->username()."</span>";
+		} else {
+			$ret .= $this->username();
+		}
+
+		return $ret."</a>";
+	}
+
+	/*
 	 * preferences
 	 */
 	public function getPref($name) {

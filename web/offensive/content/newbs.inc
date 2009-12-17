@@ -39,11 +39,18 @@
 		}
 		$start = ($page * $numPerPage);
 
-		$sql = "SELECT userid, username, account_status, created,
-					(select username from users ref where users.referred_by=ref.userid) AS referredby,
-					(select userid from users ref where users.referred_by=ref.userid) AS referrerid					
+		// XXX: really want to use the class system here to reduce code size,
+		// but this isn't a workload it's optimized for yet.  if this page ever
+		// gets linked from the index, it will need to be optimized to run
+		// within the normal dozen-query limit or so.
+		$sql = "SELECT *
 					FROM users
-					ORDER BY created DESC LIMIT 100";
+					ORDER BY created DESC LIMIT $start,100";
+//		$sql = "SELECT userid, username, account_status, created,
+//					(select username from users ref where users.referred_by=ref.userid) AS referredby,
+//					(select userid from users ref where users.referred_by=ref.userid) AS referrerid					
+//					FROM users
+//					ORDER BY created DESC LIMIT 100";
 					
 		$result = tmbo_query($sql);
 
@@ -56,13 +63,14 @@
 <?
 
 		while( $row = mysql_fetch_assoc( $result ) ) {
+			$newb = new User($row);
 			$css = (isset($css) && $css == "even_row") ? "odd_row" : "even_row";
 
 			?>
 				<tr class="<?= $css ?>">
-					<td><div class="clipper"><a href="./?c=user&userid=<?= $row['userid'] ?>"><?= $row['username'] ?></a></div></td>
-					<td><?= $row['created']?></td>
-					<td style="text-align:right;white-space:nowrap"><a href="./?c=user&userid=<?= $row['referrerid'] ?>"><?= $row['referredby'] ?></a></td>
+				<td><div class="clipper"><?= $newb->htmlUsername() ?></div></td>
+					<td><?= $newb->created() ?></td>
+					<td style="text-align:right;white-space:nowrap"><?= $newb->referred_by()->htmlUsername() ?></td>
 				</tr>
 			<?
 		}

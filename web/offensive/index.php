@@ -198,7 +198,7 @@ $timelimit = 10;
 					<div class="blackbar"></div>
 						<div class="heading">your stuff:</div>
 						<div class="bluebox">
-							<p>hi <b><a href="index.php?c=user&userid=<?= $me->id() ?>"><?= $me->username() ?></a></b>!</p>
+							<p>hi <b><?= $me->htmlUsername() ?></b>!</p>
 							
 							<p><a href="index.php?c=upload">upload</a></p>
 							
