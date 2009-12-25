@@ -1230,7 +1230,7 @@ class User {
 				$color = "green";
 				break;
 		}
-		$ret = "<a id=\"userLink\" href=\"/offensive/?c=user&userid=".$this->id()."\">";
+		$ret = "<a class=\"userLink\" href=\"/offensive/?c=user&userid=".$this->id()."\">";
 		if($color) {
 			$ret .= "<span style=\"color: $color;\">".$this->username()."</span>";
 		} else {
