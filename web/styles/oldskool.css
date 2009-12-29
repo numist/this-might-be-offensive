@@ -4,13 +4,20 @@ body {
 	margin: 0px;
 }
 
-A {
+a,
+#pic a.userLink
+{
 	text-decoration:underline;
 	color:#000099;
 }
 
-A:visited {
+a:visited,
+#pic a.userLink {
 	color:#333366;
+}
+
+a.userLink {
+	color:#666699;
 }
 
 #content {

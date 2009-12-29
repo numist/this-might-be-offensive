@@ -391,7 +391,7 @@
 
 		</script>
 	</head>
-	<body>
+	<body id="pic">
 		<!-- message -->
 		<div style="white-space:nowrap;overflow:hidden;padding:3px;margin-bottom:0px;background:#000033;color:#ff6600;font-size:10px;font-weight:bold;padding-left:4px;">
 			<? if(count($prefs) == 0) { ?>
