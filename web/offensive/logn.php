@@ -9,7 +9,7 @@
 	} else {
 		$server = "https://".$_SERVER["SERVER_NAME"];
 	}
-	
+
 	/* the user can specify the redirect in the $_REQUEST['redirect'] variable.
 	 * the location the redirect defaults to is /offensive/?c=main
 	 */
@@ -84,7 +84,7 @@
 </head>
 
 
-<body bgcolor="#ffffff">
+<body bgcolor="#ffffff" onLoad="document.forms[0].username.focus();">
 
 	<table border="0" cellpadding="0" cellspacing="0" height="400" width="100%">
 		<tr>
