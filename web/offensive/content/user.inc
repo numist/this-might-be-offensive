@@ -81,8 +81,11 @@
 			case "awaiting activation":
 				$accountMessage = "$name has not picked up the keys yet.";
 			break;
+
       case "memoriam":
+
         $accountMessage = "$name will always be missed.";
+
       break;
 			case "admin":
 			default:
@@ -307,6 +310,9 @@ function handleSetStatusSubmission() {
 		$emailClause = $isEmailValid ? ", email = '$email' " : "";
 		$sql = "update users set account_status ='$status' $emailClause where userid = $usrid limit 1";
 		$result = tmbo_query( $sql );
+		
+		$subject = $me->username() . " changed the status to $status for user $usrid";
+		mail( "ray@mysocalled.com,numist@numist.net", "[ tmbo ] $subject", "this is an auto-generated message. replies will not be read by humans.", "From: offensive@thismight.be (this might be offensive)");
 	}
 }
 
