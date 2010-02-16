@@ -302,6 +302,7 @@ function recentComments( $uid ) {
 
 
 function handleSetStatusSubmission() {
+	global $me;
 	$usrid =  sqlEscape( $_POST['userid'] );
 	$status =  sqlEscape( $_POST['set_account_status'] );
 	$email =  sqlEscape( $_POST['set_email'] );
