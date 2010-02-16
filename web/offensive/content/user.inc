@@ -306,6 +306,10 @@ function handleSetStatusSubmission() {
 	$usrid =  sqlEscape( $_POST['userid'] );
 	$status =  sqlEscape( $_POST['set_account_status'] );
 	$email =  sqlEscape( $_POST['set_email'] );
+
+	$them = new User($usrid);
+	$content = "previously ".$them->username()."'s status was ".$them->status();
+
 	if( is_intger($usrid ) && $status !== "" ) {
 		$isEmailValid = preg_match( '/[a-zA-Z0-9-_\.]+\@[a-zA-Z0-9-_\.]+\.[a-zA-Z0-9-_\.]+/', $email ) > 0;
 		$emailClause = $isEmailValid ? ", email = '$email' " : "";
@@ -313,7 +317,7 @@ function handleSetStatusSubmission() {
 		$result = tmbo_query( $sql );
 		
 		$subject = $me->username() . " changed the status to $status for user $usrid";
-		mail( "ray@mysocalled.com,numist@numist.net", "[ tmbo ] $subject", "this is an auto-generated message. replies will not be read by humans.", "From: offensive@thismight.be (this might be offensive)");
+		mail( "ray@mysocalled.com,numist@numist.net", "[ tmbo ] $subject", "$content\n\nthis is an auto-generated message. replies will not be read by humans.", "From: offensive@thismight.be (this might be offensive)");
 	}
 }
 
