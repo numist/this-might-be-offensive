@@ -156,15 +156,21 @@
 				trigger_error("impossible order: $sort", E_USER_ERROR);
 				exit;
 		}
-		
-		$numPerPage = 100;
+
+        global $numPerPage;
+        if(!isset($numPerPage)) {
+            $numPerPage = 100;
+        }
+        if(!array_key_exists('limit', $args)) {
+            $limit = "$numPerPage";
+        }
 		if($p !== false && $p > 0) {
 			$start = $p * $numPerPage;
 			$limit = "$start, $numPerPage";
-		}
-		
+        }
+
 		$sql .= " LIMIT $limit";
-	
+
 		$result = tmbo_query($sql);
 		$ret = array();
 		while($row = mysql_fetch_assoc($result)) {
