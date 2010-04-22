@@ -563,4 +563,14 @@
 		return $ret;
 	}
 
+	function core_getadmins() {
+		$sql = "SELECT * FROM users WHERE account_status = 'admin'";
+		$result = tmbo_query($sql);
+		$ret = array();
+		while($row = mysql_fetch_assoc($result)) {
+			$ret[] = new User($row);
+		}
+		return $ret;
+	}
+
 ?>

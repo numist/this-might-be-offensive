@@ -2,6 +2,7 @@
 
 	require_once( 'offensive/assets/tabs.inc' );
 	require_once( 'offensive/assets/functions.inc' );
+	require_once( 'offensive/assets/core.inc' );
 	require_once( 'admin/mysqlConnectionInfo.inc' );
 	if(!isset($link) || !$link) $link = openDbConnection();
 	
@@ -60,8 +61,6 @@
 		    $_REQUEST['set_account_status'] ) {
 			handleSetStatusSubmission();
 		}
-
-//		list($name, $status, $email, $created, $referredby, $refid, $ip, $timestamp) = mysql_fetch_array( $res );
 
 		$usrid = $them->id();
 		$avatar = $them->yearbook();
@@ -310,14 +309,24 @@ function handleSetStatusSubmission() {
 	$them = new User($usrid);
 	$content = "previously ".$them->username()."'s status was ".$them->status();
 
+	$changed = $them->status() != $status;
+
 	if( is_intger($usrid ) && $status !== "" ) {
 		$isEmailValid = preg_match( '/[a-zA-Z0-9-_\.]+\@[a-zA-Z0-9-_\.]+\.[a-zA-Z0-9-_\.]+/', $email ) > 0;
 		$emailClause = $isEmailValid ? ", email = '$email' " : "";
 		$sql = "update users set account_status ='$status' $emailClause where userid = $usrid limit 1";
 		$result = tmbo_query( $sql );
-		
-		$subject = $me->username() . " changed the status to $status for user $usrid";
-		mail( "ray@mysocalled.com,numist@numist.net", "[ tmbo ] $subject", "$content\n\nthis is an auto-generated message. replies will not be read by humans.", "From: offensive@thismight.be (this might be offensive)");
+
+		if($changed) {
+			$emails = array();
+			$admins = core_getadmins();
+			var_dump($admins);
+			foreach($admins as $admin) {
+				$emails[] = $admin->email();
+			}
+			$subject = $me->username() . " changed the status to $status for user $usrid";
+			mail( implode(",", $emails), "[ tmbo ] $subject", "$content\n\nthis is an auto-generated message. replies will not be read by humans.", "From: offensive@thismight.be (this might be offensive)");
+		}
 	}
 }
 
