@@ -26,7 +26,7 @@ if($avatar == false) {
 	$info = getimagesize($avatar->thumb());
 	
 	// XXX: this could do with some filtering.
-	$thumb = "<a href='/offensive/pages/pic.php?id=$id' target='_blank'><img src='" . $avatar->thumbURL() . "' ".$info[3]." border='0' /></a>";
+	$thumb = "<a href='/offensive/pages/pic.php?id=".$avatar->id()."' target='_blank'><img src='" . $avatar->thumbURL() . "' ".$info[3]." border='0' /></a>";
 }
 
 $referer = $user->referred_by();
