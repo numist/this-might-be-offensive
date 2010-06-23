@@ -216,6 +216,21 @@ function upload() {
 		ensureDirExists($tmpdir);
 		move_uploaded_file($_FILES['image']['tmp_name'], $tmpdir."/".$postdata['tmpname']) or trigger_error("", E_USER_ERROR);
 		chmod($tmpdir."/".$postdata['tmpname'], 0644);
+
+		/*
+		 * prevent filenames ending in .php from getting through--the webserver will try executing them as scripts and there is a
+		 * potential for a security compromise if someone comes up with a polyglot that is valid PHP and manages to fool our
+		 * filetype detection into thinking that it's a valid image.
+		 */
+		if($postdata['file_extension'] == '.php') {
+			killUpload($postdata);
+			unset($postdata);
+			unset($_SESSION['postdata']);
+			$message = "sorry, filenames can't end in .php";
+			box($message);
+			uploadForm();
+			return;
+		}
 	}
 
 	switch(upload_type($postdata)) {
