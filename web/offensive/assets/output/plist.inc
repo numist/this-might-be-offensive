@@ -43,7 +43,7 @@ function tmbo_plist_encode($data) {
 // EXAMPLE USAGE:
 if(false) {
     $arr = array("foo&", "<bar>", "<baz>" => "qux", 
-            array(false, 1, 2, 3.14, date("c")));
+            array(false, 1, 2, 3.14, gmdate("c")));
 
     // convert the php data into a plist string
     $plist = plist_encode($arr);
@@ -141,7 +141,7 @@ function plist_gen_string($val) {
     // strings might be dates in disguise...
     // this is pretty inexact for now, not easy to make better.
 	$time = strtotime($val);
-	if($time !== false && date("c", $time) == $val) {
+	if($time !== false && gmdate("c", $time) == $val) {
         return plist_gen_date($val);
     } else {
         return "<string>".htmlEscape($val)."</string>\n";

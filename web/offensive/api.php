@@ -92,7 +92,7 @@
 		 * due to spec restrictions.
 		 */
 		} else if(strtotime($data) > 0 && $rtype == "plist") {
-			$data = date('c', strtotime($data));
+			$data = gmdate('c', strtotime($data));
 		} else if(is_numeric($data)) {
 			if(is_intger($data)) {
 				$data = (int)$data;
