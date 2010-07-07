@@ -91,7 +91,7 @@
 		/* plists get a special date format as their output,
 		 * due to spec restrictions.
 		 */
-		} else if(strtotime($data) > 0 && $rtype == "plist") {
+		} else if(strtotime($data) > 0 && !is_numeric($data) && $rtype == "plist") {
 			$data = gmdate('c', strtotime($data));
 		} else if(is_numeric($data)) {
 			if(is_intger($data)) {
