@@ -33,7 +33,7 @@ all must be loaded from the database.
 class Upload {
 	private static $gdata = array();
 	private $data;
-	
+
 	public function __construct($info) {
 		/*
 		 * info must be an id or aggregate array.  for more information about aggregate arrays,
@@ -44,14 +44,14 @@ class Upload {
 		if(is_array($info)) {
 			if(!array_key_exists("id", $info))
 				trigger_error("cannot prepopulate an Upload object without an id", E_USER_ERROR);
-			
+
 			// set up the object alias for this object's data in the global data structure
 			if(!array_key_exists($info['id'], self::$gdata)) {
 				// create if it doesn't already exist
 				self::$gdata[$info['id']] = array('exists' => null);
 			}
 			$this->data =& self::$gdata[$info['id']];
-			
+
 			/*
 			 * strip out keys that start with user_ into their own array,
 			 * to be used to prepopulate a member User object in this Upload object
@@ -64,7 +64,7 @@ class Upload {
 					$this->data[$key] = $val;
 				}
 			}
-			
+
 			/*
 			 * grab the userid from the data as well, if available.  this will help
 			 * rescue the failure case where user data not including the userid
@@ -73,7 +73,7 @@ class Upload {
 			 */
 			if(array_key_exists("userid", $this->data))
 				$userarr["userid"] = $this->data["userid"];
-				
+
 			// if we found any user data, create a User object from it.
 			if(count($userarr) > 0) {
 				$this->data["uploader"] = new User($userarr);
@@ -93,7 +93,7 @@ class Upload {
 			trigger_error("type mismatch: constructor argument must be an integer or array", E_USER_ERROR);
 		}
 	}
-	
+
 	private function getUploadRow($element=false) {
 		// if we haven't hit the db for this upload already, do it
 		if(($element == false || !array_key_exists($element, $this->data)) &&
@@ -938,17 +938,28 @@ class Comment {
 	}
 
 	public function api_data() {
-		return array(
+		$ret = array(
 			"fileid" => $this->upload()->id(),
 			"id" => $this->id(),
-			"comment" => $this->text(),
 			"timestamp" => $this->timestamp(),
 			"userid" => $this->commenter()->id(),
-			"username" => $this->commenter()->username(),
-			"vote" => $this->vote(),
-			"tmbo" => $this->tmbo(),
-			"tiar" => $this->tiar()
-			); 
+			"username" => $this->commenter()->username()
+		);
+
+		if($this->vote()) {
+			$ret["vote"] = $this->vote();
+		}
+		if($this->tmbo()) {
+			$ret["tmbo"] = $this->tmbo();
+		}
+		if($this->tiar()) {
+			$ret["tiar"] = $this->tiar();
+		}
+		if($this->text()) {
+			$ret["comment"] = $this->text();
+		}
+
+		return $ret;
 	}
 }
 
@@ -1313,6 +1324,64 @@ class User {
 		}
 		
 		return $ret;
+	}
+}
+
+class Link {
+	// pagination links (search query_string)
+	static function content($page) {
+		assert('is_string($page)');
+		return "/offensive/?c=$page";
+	}
+
+	static function upload($upload) {
+		if(!is_object($upload)) {
+			$upload = new Upload($upload);
+		}
+
+		if($upload->type() == "topic") {
+			return Link::thread($upload);
+		}
+
+		return "/offensive/pages/pic.php?id=".$upload->id();
+	}
+
+	static function comment($comment) {
+		if(!is_object($comment)) {
+			$comment = new Comment($comment);
+		}
+
+		return Link::thread($comment->upload())."#".$comment->id();
+	}
+
+	static function user($user) {
+		if(!is_object($user)) {
+			$user = new User($user);
+		}
+
+		return Link::content("user")."&userid=".$user->id();
+	}
+
+	static function thread($upload) {
+		if(!is_object($upload)) {
+			$upload = new Upload($upload);
+		}
+		return Link::content("comments")."&fileid=".$upload->id();
+	}
+
+	static function file($upload) {
+		if(!is_object($upload)) {
+			$upload = new Upload($upload);
+		}
+		assert('$upload->type() != "topic"');
+
+		return $upload->URL();
+	}
+
+	static function rss($type) {
+		assert('in_array($type, array("audio", "zip", "pic"))');
+
+		return "/offensive/".$type."_rss.php";
 	}
 }
 
