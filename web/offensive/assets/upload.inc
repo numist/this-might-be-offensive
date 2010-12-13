@@ -956,7 +956,10 @@ function upload_insert_file($postdata) {
 		ensureDirExists("$path/thumbs");
 
 		// generate the thumbnail
-		$cmd = "convert -resize 100x100 $tmpdir/".$postdata['tmpname']." $tmpdir/th".$postdata['tmpname'];
+
+		#$cmd = "convert -resize 100x100 $tmpdir/".$postdata['tmpname']." $tmpdir/th".$postdata['tmpname'];		
+		$cmd = "convert -define jpeg:size=200x200 $tmpdir/".$postdata['tmpname']."[0] -thumbnail 100x100^ -gravity center -extent 100x100 $tmpdir/th".$postdata['tmpname'];
+		
 		$err = shell_exec($cmd);
 		if(strlen($err) > 0) trigger_error("ImageMagick failed: $err", E_USER_ERROR);
 
