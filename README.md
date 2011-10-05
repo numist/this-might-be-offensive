@@ -9,6 +9,8 @@ The easiest way to get started is to download the development VM, which can be f
 All user-level passwords are set to `[tmbo]`. This includes the web site's unprivileged account (asdf) and the machine user thismightbe.
 All root-level passwords are set to `[nsfw]`. This includes the web site's admin account (admin) and the SSL certificate.
 
+The codebase can be found in ~thismightbe/this-might-be-offensive as a read-only clone of this repo.
+
 Rolling Your Own
 ----------------
 
@@ -58,7 +60,22 @@ tmbo's content protection is the same in development as it is in production, whi
 
     192.168.231.128 dev.thismight.be
 
+Developing using GitHub
+-----------------------
+
+If you want to fork the project to contribute changes via github:
+
+    cd ~thismightbe
+    rm this-might-be-offensive
+    git clone git://github.com/USERNAME/this-might-be-offensive.git
+    su -c "chgrp -R www-data ~thismightbe/this-might-be-offensive/web" -
+    chmod -R g+w this-might-be-offensive/web
+
+You'll need to build a replacement `admin/.config` file as detailed above.
+
 Help!
 -----
+
+Problems with the web site are frequently well-documented by error messages emitted by trigger-error. Administrators see this output as part of the rendered page, but it is also recorded to the httpd's logs. On the VM they are located in `~thismightbe/logs/`.
 
 If you need anything to get running, help can usually be had in #tmbotech on EFnet.
