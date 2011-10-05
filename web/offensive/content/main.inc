@@ -10,6 +10,11 @@
 	function start() {
 		global $me;
 		mustLogIn();
+		
+		if(date("m-d") == "04-01") {
+			//header("Location: …");
+			//exit;
+		}
 
 		$me = new User($_SESSION["userid"]);
 		$me->setPref("index", "");
@@ -24,7 +29,7 @@
 		<script type="text/javascript" src="/offensive/js/tmbolib.js?v=0.1"></script>
 		<script type="text/javascript" src="/offensive/js/jquery-1.3.2.min.js"></script>
 		<script type="text/javascript" src="/offensive/js/inview.js?v=1.12"></script>
-    <script type="text/javascript" src="/offensive/js/lazyload_main.js?v=0.93"></script>
+    <script type="text/javascript" src="/offensive/js/lazyload_new.js?v=0.98"></script>
 EOT;
 	}
 
@@ -72,6 +77,7 @@ EOT;
 			<ul>
 			<?php
 				$result = core_getuploads($args);
+				$revision = currentChange();
 				$output = 0;
 				foreach( $result as $upload ) {
 					$css = (isset($css) && $css == "odd_row") ? "even_row" : "odd_row";
@@ -95,6 +101,9 @@ EOT;
 		</div>
 	</div>
 </div>
+<script>
+	var update_index = <?= $revision ?>;
+</script>
 <?
 }
 ?>

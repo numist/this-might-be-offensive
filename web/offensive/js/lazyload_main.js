@@ -11,7 +11,7 @@ $(document).ready(function() {
   $('#commands').bind('inview', function (event, visible) {
     if (visible == true) {
       clearInterval(lazy_interval_top);
-      lazy_interval_top = setInterval(lazyload_top,lazy_timeout);
+      //lazy_interval_top = setInterval(lazyload_top,lazy_timeout);
     } else {
       clearInterval(lazy_interval_top);
     }

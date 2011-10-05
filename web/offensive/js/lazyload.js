@@ -11,7 +11,7 @@ $(document).ready(function() {
   $('#commands').bind('inview', function (event, visible) {
     if (visible == true) {
       clearInterval(lazy_interval_top);
-      lazy_interval_top = setInterval(lazyload_top,lazy_timeout);
+      //lazy_interval_top = setInterval(lazyload_top,lazy_timeout);
     } else {
       clearInterval(lazy_interval_top);
     }
@@ -73,12 +73,17 @@ function lazyload_top() {
 
 function lazyload_bottom() {
   var last_on_page = parseInt($('#grid-container ul li:last').attr('fileid'))-1;
-  $.getJSON('/offensive/api.php/getuploads.json', {
-    'type': "image",
-    'max': last_on_page,
-    'sort': 'date_desc',
-    'limit': lazy_limit
-  }, function(data) {
+  var opts = {
+     'type': "image",
+     'max': last_on_page,
+     'sort': 'date_desc',
+     'limit': lazy_limit
+  };
+  var userid_match = window.location.search.match(/userid=(\d+)/);
+  if (userid_match) {
+    opts.userid = userid_match[1];
+  }
+  $.getJSON('/offensive/api.php/getuploads.json', opts, function(data) {
     $.each(data, function(i, upload) {
       html = get_element(upload);
       $('#thumbnails ul').append(html);
