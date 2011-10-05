@@ -51,6 +51,13 @@ You'll also want to put the following lines in your crontab:
     3 1 * * * $THEMAXX/offensive/deleteOldFiles.pl 2 quarantine > /dev/null
     0 * * * * /usr/bin/nice /usr/bin/php5 $THEMAXX/admin/commentIndexer.php
 
+Client-side Configuration
+-------------------------
+
+tmbo's content protection is the same in development as it is in production, which means if you browse to your instance by IP, you're not going to see any images. Putting a thismight.be subdomain in your hosts file will work around this problem. For example:
+
+    192.168.231.128 dev.thismight.be
+
 Help!
 -----
 
