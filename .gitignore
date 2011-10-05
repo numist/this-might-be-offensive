@@ -3,3 +3,4 @@ web/offensive/pages/top100/*
 web/offensive/uploads/*
 web/offensive/zips/*
 .DS_Store
+.config
