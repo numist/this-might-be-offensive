@@ -27,7 +27,7 @@
 	}
 	
 	// output correct pickuplink
-	if($dbpic !== false && $dbpic == $cookiepic) {
+	if($dbpic != null && $dbpic == $cookiepic) {
 		?><div><b><a href="pages/pic.php?id=<?= $dbpic ?>" id="pickUp">click here to pick up where you left off</a></b></div><?
 	} else if ($dbpic && $cookiepic){
 		?><div><b>pick up where you left off 
