@@ -157,6 +157,22 @@
 	function api_getuploads() {
 		send(core_getuploads($_REQUEST));
 	}
+	
+	function api_getchanges() {
+		global $redislink;
+		$since = check_arg("since", "integer");
+		$changes = $redislink->lrange("changelog", 0, 100);
+		$ret_changes = array();
+		foreach ($changes as $change) {
+			$entry = explode(":", $change, 3);
+			if ($since < $entry[1]) {
+				$ret_changes[$entry[1]] = $entry[2];
+			} else {
+				break;
+			}
+		}
+		send($ret_changes);
+	}	
 
 	function api_getupload() {
 		global $uploadsql;

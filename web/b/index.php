@@ -13,8 +13,7 @@ $me = new User($_SESSION["userid"]);
 
 $p = array_key_exists("p", $_REQUEST) ? $_REQUEST['p'] : 0 ;
 
-
-function poast($comment, $image) {
+function poast($comment, $image, $upload) {
 	global $me;
 	
 	$comment = new Comment($comment['commentid']);
@@ -36,7 +35,6 @@ function poast($comment, $image) {
 	}
 }
 
-
 ?><html><head>
 <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 <meta name="robots" content="noarchive"/>
@@ -46,7 +44,7 @@ function poast($comment, $image) {
 <link rel="alternate stylesheet" type="text/css" href="yotsublue.7.css" title="Yotsuba B">
 <link rel="alternate stylesheet" type="text/css" href="futaba.7.css" title="Futaba">
 <link rel="alternate stylesheet" type="text/css" href="burichan.7.css" title="Burichan">
-<title>/tmbo/ - This Might be Offensive</title>
+<title>/tmbo/ - This Might Be Offensive</title>
 
 <script type="text/javascript">
 function setActiveStyleSheet(title) {
@@ -246,7 +244,7 @@ echo $info[0]."x".$info[1];
 	if($comment['userid'] == $upload->uploader()->id()) {
 		$op = 1;
 		echo "<blockquote>";
-		poast($comment, $image);
+		poast($comment, $image, $upload);
 		echo "</blockquote>";
 	}
 	 
@@ -286,7 +284,7 @@ echo $info[0]."x".$info[1];
 				<a href="/offensive/?c=comments&fileid=<?= $upload->id() ?>#<?= $comment['commentid'] ?>" class="quotejs">No.<?= $comment['commentid'] ?></a>
 			</span>
 			<blockquote><?
-				poast($comment, $image);
+				poast($comment, $image, $upload);
 			?>
 			</blockquote>
 		</td>
@@ -303,7 +301,7 @@ echo $info[0]."x".$info[1];
 <!-- /loopy -->
 
 <?php
-	}
+}
 ?>
 
 <table align=right>
@@ -321,13 +319,13 @@ echo $info[0]."x".$info[1];
 		<td>Previous</td>
 		<td>
 <?
-	for($i = 0; $i < 10; $i++) {
-		if($p == $i) {
-			echo "[<b>".($i + 1)."</b>]";
-		} else {
-			echo "[<a href=\"/tmbo/?p=$i\">".($i + 1)."</a>]";
-		}
+for($i = 0; $i < 10; $i++) {
+	if($p == $i) {
+		echo "[<b>".($i + 1)."</b>]";
+	} else {
+		echo "[<a href=\"/tmbo/?p=$i\">".($i + 1)."</a>]";
 	}
+}
 ?>
 		</td>
 		<form action="/tmbo/" method=get>

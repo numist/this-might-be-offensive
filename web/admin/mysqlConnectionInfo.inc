@@ -7,13 +7,14 @@ if(!($config = parse_ini_file("admin/.config"))) {
 	exit;
 }
 
+require("redis.php");
 // Set $link null
 $link = null;
+$redislink = null;
 
 // Generic database connection function
 function openDbConnection() {
-		// Globalise $config and $link
-		global $config, $link;
+		global $config, $link, $redislink;
 
 		// If there isn't $link currently, then open up the connection, if it fails then forward the user
 		// to the out of order URL.
@@ -26,6 +27,12 @@ function openDbConnection() {
 			if(!mysql_select_db($config["database_name"],$link)) {
 				trigger_error(mysql_error(), E_USER_ERROR);
 			}
+		}
+		
+		// Overloading this into the db connect since the combination is our "database"
+		if(!$redislink) {
+			$redislink = new Redis();
+			$redislink->connect();
 		}
 		return $link;		
 }

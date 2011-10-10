@@ -116,8 +116,8 @@
 				$sql .= " ORDER BY up.timestamp ASC, 
 						  up.id ASC";
 				// force the correct index usage
-				$sql = str_replace("offensive_uploads up", "offensive_uploads up USE KEY (t_t_id)", $sql);
-				$sql = str_replace("users u", "users u USE KEY (PRIMARY)", $sql);
+				// $sql = str_replace("offensive_uploads up", "offensive_uploads up USE KEY (t_t_id)", $sql);
+				// $sql = str_replace("users u", "users u USE KEY (PRIMARY)", $sql);
 				break;
 			case "votes_asc":
 				$sql .= " ORDER BY ca.good ASC";
