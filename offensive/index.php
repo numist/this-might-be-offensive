@@ -274,7 +274,7 @@ $timelimit = 10;
 						$fileList = array();
 						$path = "zips";
 						$dir = opendir( $path );
-						while( ($file = readdir($dir) ) !== false)
+						while( $dir && ($file = readdir($dir) ) !== false)
 							if( strpos( $file, ".zip" ) !== false )
 								$fileList[] = $file;
 

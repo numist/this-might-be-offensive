@@ -31,7 +31,7 @@ You'll want to enable mod_rewrite and mod_ssl and configure them as appropriate.
 * Image::Size
 * ConfigReader::Simple
 
-Point your webroot at $repo/web/ and create a new file in the 'web/admin' directory named '.config' - this is where you will store your
+Point your webroot at the repository and create a new file in the `admin` directory named `.config` - this is where you will store your
 database credentials.
 
 The file follows .ini syntax, and should look something like this:
@@ -68,8 +68,8 @@ If you want to fork the project to contribute changes via github:
     cd ~thismightbe
     rm this-might-be-offensive
     git clone git://github.com/USERNAME/this-might-be-offensive.git
-    su -c "chgrp -R www-data ~thismightbe/this-might-be-offensive/web" -
-    chmod -R g+w this-might-be-offensive/web
+    su -c "chgrp -R www-data ~thismightbe/this-might-be-offensive" -
+    chmod -R g+w this-might-be-offensive
 
 You'll need to build a replacement `admin/.config` file as detailed above.
 
