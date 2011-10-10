@@ -1,0 +1,5 @@
+IndexIgnore *
+DirectoryIndex index.php index.cgi index.shtml index.html index.htm /goAway.html
+#php_flag zend.ze1_compatibility_mode 	1
+#php_flag magic_quotes_gpc		0
+#php_flag register_globals		1
