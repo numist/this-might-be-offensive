@@ -919,6 +919,7 @@ function upload_largerthan($postdata, $bytes) {
 ###############################################################################
 function upload_insert_file($postdata) {
 	global $tmpdir;
+	global $me;
 
 	// it's possible (it's happened in the past!) for the time in sql to differ from PHP
 	// use the SQL server's time as the trusted source
@@ -1015,10 +1016,13 @@ function upload_insert_file($postdata) {
 	// all set, let's go
 	$sql = "UPDATE offensive_uploads SET status = 'normal' where id = $fileid";
 	tmbo_query($sql);
+	insertChange("upload", $fileid, upload_type($postdata) . ":" . $me->username() . ":" . $postdata['filename']);
 
 	$sql = "INSERT INTO offensive_subscriptions (userid, fileid )
 	        VALUES ( " . $_SESSION['userid'] . ", $fileid ) ";
 	tmbo_query( $sql );
+
+	unset($_SESSION['postdata']);
 
 	$message = "<p>
 		Thanks. Your upload can be viewed <a href=\"./pages/pic.php?id=$fileid\">here</a>.
@@ -1032,8 +1036,6 @@ function upload_insert_file($postdata) {
 	box($message, "yummy.");
 	if(upload_type($postdata) != "avatar")
 		uploadForm(true);
-
-	unset($_SESSION['postdata']);
 }
 
 function upload_insert_topic() {

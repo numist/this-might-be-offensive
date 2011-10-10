@@ -10,6 +10,11 @@
 		global $me;
 		mustLogIn();
 
+		if(date("m-d") == "04-01") {
+			//header("Location: …");
+			//exit;
+		}
+
 		$me = new User($_SESSION["userid"]);
 
 		if(!array_key_exists("userid", $_REQUEST))

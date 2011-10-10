@@ -1255,22 +1255,12 @@ class User {
 	 * preferences
 	 */
 	public function getPref($name) {
-		if(!array_key_exists("prefs", $this->data)) {
-			$this->data["prefs"] = array();
-			$sql = "SELECT prefname, value FROM user_preferences WHERE userid = ".$this->id();
-			$result = tmbo_query($sql);
-			
-			while(false !== ($row = mysql_fetch_assoc($result))) {
-				$this->data["prefs"][$row["prefname"]] = $row["value"];
-			}
-		}
-		
-		if(!array_key_exists("$name", $this->data["prefs"]))
-			return false;
-		return $this->data["prefs"]["$name"];
+		global $redislink;
+		return $redislink->get($this->id().':'.$name);
 	}
 	
 	public function setPref($name, $value) {
+		global $redislink;
 		require("offensive/data/preferences.inc");
 		if(!in_array($name, $prefnames))
 			trigger_error("$name is not a valid preference name!", E_USER_ERROR);
@@ -1278,28 +1268,10 @@ class User {
 			trigger_error("user(".$this->id().") does not exist", E_USER_ERROR);
 		
 		if(strlen($value) > 0) {
-			// check if preference is already set
-			if($this->getPref($name) === false) {
-				$sql = "INSERT INTO user_preferences(userid, prefname, value)
-			        	VALUES(".$this->id().", '$name', '".sqlEscape($value)."')";
-			} else {
-				$sql = "UPDATE user_preferences SET value = '".sqlEscape($value)."'
-			        	WHERE userid = ".$this->id()." AND prefname = '$name'";
-			}
+			$redislink->set($this->id().':'.$name, $value);
 		} else {
-			// if we're deleting, and the pref doesn't exist anyway, we're done.
-			if($this->getPref($name) === false) {
-				return;
-			}
-			// if the value is blank, we're deleting
-			$sql = "DELETE FROM user_preferences WHERE prefname = '$name' AND userid = ".$this->id();
+			$redislink->delete($this->id().':'.$name);
 		}
-		
-		// write to cache
-		$this->data["prefs"]["$name"] = $value;
-		
-		// write through cache
-		tmbo_query($sql);
 	}
 
 	public function api_data() {

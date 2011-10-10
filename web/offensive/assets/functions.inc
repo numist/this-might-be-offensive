@@ -38,6 +38,21 @@ function ensureDirExists( $path ) {
 	}
 }
 
+function insertChange($command, $id, $data = null) {
+	global $redislink;
+	$count = $redislink->incr("changelog:counter");
+	$time = microtime(true);
+	$insert = $time . ':' . $count . ':' . $command . ':' . $id;
+	$insert .= $data != null ? ':'.$data : '';
+	$redislink->lpush("changelog", $insert);
+	$redislink->ltrim("changelog", 0, 100);
+}
+
+function currentChange() {
+	global $redislink;
+	return $redislink->get("changelog:counter");
+}
+
 // XXX: fix: missing blackbar
 function box($message, $title="hmm:") {
 	?>

@@ -18,7 +18,6 @@ function tmbo_json_encode($data) {
 			$data = $data->api_data();
 		}
 	}
-	format_data($data);
 	return json_encode($data);
 }
 

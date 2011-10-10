@@ -91,7 +91,7 @@ function updateCommentCount($fileid, $good, $bad, $repost, $tmbo, $comment) {
 						repost = repost + $repost,
 						tmbo = tmbo + $tmbo,
 						comments = comments + $comment";
-	
+	insertChange("comment", $fileid, "{$good}:{$bad}:{$repost}:{$tmbo}:$comment");
 	tmbo_query( $sql );
 }
 
@@ -115,7 +115,7 @@ function postComment($fileid, $vote, $repost, $offensive, $comment, $subscribe=n
 	if($vote != "this is good" && $vote != "this is bad" && $vote != "") {
 		trigger_error("invalid vote $vote", E_USER_ERROR);
 	}
-
+	
 	$comment = trim($comment);
 
 	// check to see if the fileid is valid
@@ -134,9 +134,14 @@ function postComment($fileid, $vote, $repost, $offensive, $comment, $subscribe=n
 		return false;
 	}
 
-	// protect the changeblog
+	// changeblog
 	if($fileid == "211604" && $_SESSION['status'] != "admin") {
-		trigger_error("user not allowed to post to changeblog", E_USER_NOTICE);
+		trigger_error("user ".$me->username()." not allowed to post to changeblog", E_USER_NOTICE);
+		return false;
+	}
+
+	// rhi-rhi needs ipod
+	if($fileid == "197431") {
 		return false;
 	}
 
