@@ -1,7 +1,0 @@
-IndexIgnore *
-DirectoryIndex index.php index.cgi index.shtml index.html index.htm
-
-Order Allow,Deny
-Allow from All
-Deny from 68.238.120.217 68.238.118.252 12.219.211.55 68.238.117.154 cox.net
-ErrorDocument 403 /fuckoff.php
