@@ -324,7 +324,7 @@ class Upload {
 	}
 	
 	public function next_filtered() {
-		global $me;
+		$me = me();
 		if(!$me) return $this->next();
 		
 		if(!array_key_exists("next_filtered", $this->data)) {			
@@ -364,7 +364,7 @@ class Upload {
 	}
 
 	public function prev_filtered() {
-		global $me;
+		$me = me();
 		if(!$me) return $this->prev();
 
 		if(!array_key_exists("prev_filtered", $this->data)) {
@@ -1092,7 +1092,7 @@ class User {
 	 * token data
 	 */
 	public function token() {
-		$me;
+		$me = me();
 		if(array_key_exists("token", $this->data) &&
 		   !is_object($this->data["token"])) {
 			$this->data["token"] = new Token($this->data["token"]);
@@ -1380,13 +1380,13 @@ class Token {
 	 * info must be a tokenid or row from tokens table.
 	 */
 	public function __construct($info=null) {
-		global $me;
+		$me = me();
 		
 		if($info === null) {
 			/*
 			 * get a site token for the currently-logged-in user.
 			 */
-			assert('isset($me)');
+			assert('$me');
 			if(!array_key_exists("userid:".$me->id(), self::$gdata)) {
 				self::$gdata["userid:".$me->id()] = array("userid" => $me->id());
 			}
