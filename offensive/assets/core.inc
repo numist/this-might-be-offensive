@@ -573,4 +573,84 @@
 		return $ret;
 	}
 
+	function core_createtoken($issuee) {
+		global $me;
+
+		if(!is_string($issuee)) {
+			trigger_error("issuee is not a string", E_USER_ERROR);
+		}
+		
+		if($issuee == " tmbo") {
+			/*
+			 * using new Token() here creates a possible infinite loop if no default
+			 * token exists, because the Token class calls back to core_createtoken
+			 * to create a token if a default token does not already exist.
+			 * 
+			 * this method is slightly slower, but it's uncommon to create a new
+			 * token for " tmbo", and we want to be paranoid about duplicates for
+			 * this special case.
+			 */
+			$tokens = core_gettokens();
+			foreach($tokens as $token) {
+				if($token->issued_to() == " tmbo") {
+					trigger_error("token already exists for user, using existing token ".$token->tokenid(), E_USER_WARNING);
+					return $token;
+				}
+			}
+		}
+		
+		do {
+			$tokenid = "";
+			for($i = 0; $i < 32; $i++) {
+				$tokenid .= base_convert(rand(0, 35), 10, 36);
+			}
+			$dupcheck = new Token($tokenid);
+		} while($dupcheck->exists());
+		unset($dupcheck);
+		
+		$sql = "INSERT INTO tokens (tokenid, userid, issued_to, issue_date) VALUES (\"$tokenid\", ".$me->id().", \"".sqlEscape($issuee)."\", NOW())";
+		
+		tmbo_query($sql);
+		
+		$token = new Token($tokenid);
+		$token->reset_validity();
+		
+		return $token;
+	}
+	
+	function core_gettokens() {
+		global $me;
+		$sql = "SELECT * FROM tokens WHERE userid = ".$me->id();
+		$result = tmbo_query($sql);
+
+		$ret = array();
+
+		while($row = mysql_fetch_assoc($result)) {
+			$ret[] = new Token($row);
+		}
+
+		return $ret;
+	}
+	
+	function core_destroytoken($token) {
+		global $me;
+		
+		if(is_string($token)) {
+			$token = new Token($token);
+			if(!$token->exists()) {
+				trigger_error("token is not valid", E_USER_ERROR);
+			}
+		}
+		
+		if(!is_object($token) || $token->exists() == false) {
+			trigger_error("token is not valid", E_USER_ERROR);
+		}
+		if($token->userid() != $me->id()) {
+			trigger_error("token does not belong to the current user", E_USER_ERROR);
+		}
+		
+		$sql = "DELETE FROM tokens WHERE tokenid = \"".$token->id()."\"";
+		tmbo_query($sql);
+	}
+
 ?>
