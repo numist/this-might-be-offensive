@@ -58,7 +58,28 @@ function loginFromQueryResult( $result ) {
 	else {
 		session_unset();
 	}
+	
+	return false;
+}
 
+function canLogIn() {
+	// check to see if this person has had too many login attempts in the last 30 minutes already.
+	$ip = $_SERVER['REMOTE_ADDR'];
+	$sql = "SELECT count( id ) as numFailed from failed_logins WHERE ip='$ip' AND timestamp > date_sub( now(), interval 30 minute )";
+	$result = tmbo_query( $sql );
+
+	$row = @mysql_fetch_assoc( $result );
+
+	if( $row['numFailed'] > 5 ) {
+		return false;
+	}
+	return true;
+}
+
+function failedLogIn($name) {
+	$ip = $_SERVER['REMOTE_ADDR'];
+	$sql = "insert into failed_logins (username,ip) VALUES ( '".sqlEscape($name)."', '$ip' )";
+	tmbo_query( $sql );
 }
 
 /* Returns:
@@ -81,14 +102,7 @@ function login( $name=null, $pw=null ) {
 	if(loggedin(false)) return true;
 
 	if($name !== null && $pw !== null) {
-		// check to see if this person has had too many login attempts in the last 30 minutes already.
-		$ip = $_SERVER['REMOTE_ADDR'];
-		$sql = "SELECT count( id ) as numFailed from failed_logins WHERE ip='$ip' AND timestamp > date_sub( now(), interval 30 minute )";
-		$result = tmbo_query( $sql );
-
-		$row = @mysql_fetch_assoc( $result );
-
-		if( $row['numFailed'] > 5 ) {
+		if(!canLogIn()) {
 			$login_message = "give it a rest.";
 			return null;
 		}
@@ -101,38 +115,36 @@ function login( $name=null, $pw=null ) {
 
 		// set rememberme cookie if the user requested it
 		if(mysql_num_rows($result) > 0 && loginFromQueryResult( $result ) === true) {
-			if(array_key_exists("rememberme", $_REQUEST) && $_REQUEST['rememberme'])
+			if(array_key_exists("rememberme", $_REQUEST) && $_REQUEST['rememberme']) {
 				setcookie("remember", 
 				          tmbohash($_SESSION['userid'], 
 				                   $_SESSION['username'].$salt ), 
 				                   time()+60*60*24*365*5, "/" );
+			}
 			return true;
 		}
 
 		// log a failure if a username and password did not result in success
 		// this only applies to people not using http_auth for now, due to some weird client bugs locking people out.
 		if(!isset($_SERVER["PHP_AUTH_USER"]) || strlen($_SERVER["PHP_AUTH_USER"]) == 0) {
-			$ip = $_SERVER['REMOTE_ADDR'];
-			$sql = "insert into failed_logins (username,ip) VALUES ( '".sqlEscape($name)."', '$ip' )";
-			tmbo_query( $sql );
-        	
-			$sql = "select count(id) as thecount from failed_logins where ip='$ip' and timestamp > date_sub( now(), interval 1 day )";
-			$result = tmbo_query( $sql );
-			$row = mysql_fetch_assoc( $result );
-			$count = $row['thecount'];
-			if( $count > 3 && isset( $_REQUEST['username'] ) && $_REQUEST['username'] != null && $_REQUEST['username'] != '') {
-				ob_start();
-				echo "Username on this attempt: " . $_REQUEST['username'] . "\n\n";
-				var_dump( $_SERVER );
-				var_dump( $_REQUEST );		
-				$string = ob_get_contents();
-				ob_end_clean();
-					
-				// mail( "ray@sneakymeans.com", "[" . $_SERVER["REMOTE_ADDR"] . "] - $count FAILED LOGIN ATTEMPTS TODAY!!! ", $string, "From: offensive@themaxx.com (this might be offensive)\r\nPriority: urgent" );
-			}
+			failedLogIn($name);
 		}
 	}
 	
+	$cookiestatus = loginWithCookie();
+	if($cookiestatus !== null) {
+		return $cookiestatus;
+	}
+	
+	// if the login failed (as opposed to being snubbed) set a helpful message for the user
+	if($pw && strlen($login_message) == 0) {
+		$login_message = '<a href="/offensive/pwreset.php">tried resetting your password?</a>';
+	}
+	
+	return false;
+}
+
+function loginWithCookie() {
 	// last chance -- log in using the user's cookie
 	// this is the only check that happens if the call did not include a username and password.
 	if(isset($_COOKIE['remember'])) {
@@ -153,13 +165,28 @@ function login( $name=null, $pw=null ) {
 			}
 		}
 	}
-	
-	// if the login failed (as opposed to being snubbed) set a helpful message for the user
-	if($pw && strlen($login_message) == 0) {
-		$login_message = '<a href="/offensive/pwreset.php">tried resetting your password?</a>';
+	return null;
+}
+
+/* Returns:
+ * true: token is valid for user
+ * false: token is invalid
+ * null: auth attempt from host (not token!) ignored -- usually due to flood limiting
+ */
+function loginWithToken($tokenid) {
+	if(!canLogIn()) {
+		$login_message = "give it a rest.";
+		return null;
 	}
 	
-	return false;
+	$token = new Token($tokenid);
+	if(!$token->exists()) {
+		failedLogIn("");
+		return false;
+	}
+	global $me;
+	$me = new User(array("userid" => $token->userid(), "token" => $token));
+	return true;
 }
 
 ?>
