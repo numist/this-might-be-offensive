@@ -1407,7 +1407,9 @@ class Token {
 			$this->data =& self::$gdata["tokenid:".$info["tokenid"]];
 
 			foreach($info as $key => $val) {
-				$this->data[$key] = $val;
+				if($key != "exists") {
+					$this->data[$key] = $val;
+				}
 			}
 		} else if(is_string($info)) {
 			/*
@@ -1430,7 +1432,7 @@ class Token {
 				$sql = "SELECT * FROM tokens WHERE tokenid = \"".sqlEscape($this->data["tokenid"])."\"";
 			} else {
 				assert('array_key_exists("userid", $this->data)');
-				$sql = "SELECT * FROM tokens WHERE issuing_user_agent = \" tmbo\" AND userid = ".$this->data["userid"];
+				$sql = "SELECT * FROM tokens WHERE issued_to = \" tmbo\" AND userid = ".$this->data["userid"];
 			}
 			$result = tmbo_query($sql);
 			
@@ -1439,12 +1441,14 @@ class Token {
 				// there should never be more than one result for a token that matches either
 				// query of "userid issued by ' tmbo'" or "tokenid".
 				assert('mysql_num_rows($result) == 0');
-				
-				if(!array_key_exists("userid", $this->data)) {
-					// XXX: create site token for user using core_newtoken and recurse.
+				if(!array_key_exists("tokenid", $this->data) &&
+				   array_key_exists("userid", $this->data)) {
+					$token = core_createtoken(" tmbo");
+					$this->data =& self::$gdata["tokenid:".$token->tokenid()];
+					$this->data['exists'] = true;
+				} else {
+					$this->data['exists'] = false;
 				}
-
-				$this->data['exists'] = false;
 			} else {
 				$row = mysql_fetch_assoc($result);
 				foreach($row as $key => $val) {
@@ -1489,6 +1493,10 @@ class Token {
 	
 	public function last_used() {
 		return $this->getTokenRow("last_used");
+	}
+	
+	public function reset_validity() {
+		unset($this->data["exists"]);
 	}
 	
 	public function api_data() {
