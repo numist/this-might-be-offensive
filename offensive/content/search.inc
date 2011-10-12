@@ -219,26 +219,20 @@
 		<div class="entry" style="background:#bbbbee">
 				<form action="./">
 					<input type="hidden" name="c" value="search"/>
-					<input type="text" name="find" value="<?= $value ?>"/>
+					<input type="text" name="find" value="<?= $find ?>"/>
 					<input type="submit" value="search comments"/>				
 				</form>
 		</div>
 		<div class="entry">
 		<form action="finduser.php">
-			<input type="text" name="finduser" value="<?
-				echo (array_key_exists("finduser", $_REQUEST) ? 
-				$_REQUEST['finduser'] : ""); 
-			?>"/>
+			<input type="text" name="finduser" value="<?= array_key_exists("finduser", $_REQUEST) ? $_REQUEST['finduser'] : "" ?>"/>
 			<input type="submit" value="find user"/>
 		</form>
 
 		</div>
 		<div class="entry" style="background:#bbbbee">
 		<form action="./">
-			<input type="text" name="findfile" value="<?
-				echo (array_key_exists("findfile", $_REQUEST) ?
-				$_REQUEST['findfile'] : "");
-			?>"/>
+			<input type="text" name="findfile" value="<?= array_key_exists("findfile", $_REQUEST) ? $_REQUEST['findfile'] : "" ?>"/>
 			<input type="hidden" name="c" value="findfile"/>
 			<input type="submit" value="find file or topic"/>
 		</form>
