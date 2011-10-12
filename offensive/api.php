@@ -221,7 +221,7 @@
 	function api_login() {
 		$username = check_arg("username", "string");
 		$password = check_arg("password", "string");
-		$token = check_arg("gettoken", "integer", null, false);
+		$token = check_arg("gettoken", "integer", null, false, array("0", "1"));
 		handle_errors();
 		session_unset();
 		
