@@ -31,6 +31,7 @@ if($avatar == false) {
 }
 
 $referer = $user->referred_by();
+$refer = "";
 
 if($referer) {
 	if($referer->location()) {
