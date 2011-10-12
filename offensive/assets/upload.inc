@@ -62,11 +62,6 @@ function numUploadsToday() {
 function numAllowedUploads() {
 	if(!me()) return 0;
 
-	// Fipi Lele is allowed (effectively) unlimited uploads.
-	if(me()->id() == 143) {
-		return 9999;
-	}
-
 	$sql = "SELECT COUNT( vote ) AS thecount, vote
 				FROM offensive_comments, offensive_uploads
 				WHERE vote
