@@ -289,7 +289,7 @@ function loginWithToken($nothing) {
 			return false;
 		}
 		
-		return logInUser(new User(array("userid" => $token->userid(), "token" => $token)));
+		return logInUser(new User(array("userid" => $token->userid())));
 	}
 	return null;
 }
