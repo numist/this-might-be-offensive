@@ -1380,12 +1380,11 @@ class Token {
 	 * info must be a tokenid or row from tokens table.
 	 */
 	public function __construct($info=null) {
-		$me = me();
-		
 		if($info === null) {
 			/*
 			 * get a site token for the currently-logged-in user.
 			 */
+			$me = me();
 			assert('$me');
 			if(!array_key_exists("userid:".$me->id(), self::$gdata)) {
 				self::$gdata["userid:".$me->id()] = array("userid" => $me->id());
