@@ -35,8 +35,8 @@ function alreadyVoted($fileid, $userid) {
  *  * the user commented on the file
  *  * the user voted "this is bad" on the file
  */
-function subscribe($fileid, $userid=null) {
-	if($userid == null) $userid = me() ? me()->id() : null;
+function subscribe($fileid) {
+	$userid = me() ? me()->id() : null;
 	if($userid == null) return false;
 		
 	// check if the user is already subscribed
@@ -56,8 +56,8 @@ function subscribe($fileid, $userid=null) {
 /*
  * unsubscribes a user from a thread.
  */
-function unsubscribe($fileid, $userid=null) {
-	if($userid == null) $userid = me() ? me()->id() : null;
+function unsubscribe($fileid) {
+	$userid = me() ? me()->id() : null;
 	if($userid == null) return false;
 		
 	$sql = "DELETE FROM offensive_subscriptions WHERE userid=$userid AND fileid=$fileid";

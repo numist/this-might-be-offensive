@@ -7,14 +7,13 @@
 
 	mustLogIn();
 
-	$uid = array_key_exists("userid", $_SESSION) ? $_SESSION['userid'] : "";
 	$fileid = array_key_exists("fileid", $_REQUEST) ? $_REQUEST['fileid'] : "";
 	
 	if( array_key_exists("un", $_REQUEST) && $_REQUEST['un'] == 1 ) {
-		unsubscribe( $uid, $fileid );
+		unsubscribe($fileid);
 	}
 	else {
-		subscribe( $uid, $fileid );
+		subscribe($fileid);
 	}
 
 	if(array_key_exists("HTTP_REFERER", $_SERVER)) {
@@ -24,16 +23,16 @@
 	}
 	exit;
 
-	function subscribe( $uid, $fid ) {
-		$sql = "SELECT * FROM offensive_subscriptions WHERE userid = $uid AND fileid = $fid";
+	function subscribe($fid) {
+		$sql = "SELECT * FROM offensive_subscriptions WHERE userid = ".me()->id()." AND fileid = $fid";
 		if(mysql_num_rows(tmbo_query($sql)) > 0) return;
 
-		$sql = "INSERT INTO offensive_subscriptions (userid, fileid) VALUES ( $uid, $fid )";
+		$sql = "INSERT INTO offensive_subscriptions (userid, fileid) VALUES (".me()->id().", $fid )";
 		tmbo_query( $sql );
 	}
 
-	function unsubscribe( $uid, $fid ) {
-		$sql = "DELETE FROM offensive_subscriptions WHERE userid=$uid AND fileid=$fid";
+	function unsubscribe($fid) {
+		$sql = "DELETE FROM offensive_subscriptions WHERE userid=".me()->id()." AND fileid=$fid";
 		tmbo_query( $sql );
 	}
 
