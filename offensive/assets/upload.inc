@@ -193,6 +193,13 @@ function upload() {
 	} else if(!uploading_file() && array_key_exists("submit", $_POST) && array_key_exists("topic", $_POST)) {
 		return upload_topic();
 	} else if(!uploading_file()) {
+		if(array_key_exists("image", $_FILES) &&
+		   is_array($_FILES['image']) &&
+		   array_key_exists("size", $_FILES['image']) &&
+		   $_FILES['image']['size'] == 0) {
+			box("that file is way too big. try something else", "boom.");
+		}
+		
 		uploadForm();
 		return null;
 	} else {
@@ -222,8 +229,8 @@ function upload() {
 			killUpload($postdata);
 			unset($postdata);
 			unset($_SESSION['postdata']);
-			$message = "sorry, filenames can't end in .php";
-			box($message);
+			$message = "filenames can't end in .php";
+			box($message, "nice try.");
 			uploadForm();
 			return;
 		}
@@ -592,7 +599,7 @@ function upload_type(&$postdata) {
 					$postdata['avatar'] = true;
 					$info['group'] = "avatar";
 			} else if(array_key_exists('avatar', $_POST)) {
-				box("avatars must be image files", "hard to look at anything else");
+				box("avatars must be image files", "hard to look at anything else.");
 				return "";
 			}
 			$upload_identified_key = $format_name;
@@ -754,7 +761,7 @@ function upload_checksize(&$postdata) {
 		</form>";
 	if($postdata['format'] == 'gif') $message .= "<br /><br />(If this is an animated gif, don't click the \"Compress\" button!)";
 
-	box($message, "whoa, nelly");
+	box($message, "whoa, nelly.");
 	$_SESSION['postdata'] = serialize($postdata);
 	return true;
 }
@@ -907,7 +914,7 @@ function upload_largerthan($postdata, $bytes) {
 	if($filesize <= $bytes) return false;
 
 	killUpload($postdata);
-	box("that file is too big to upload, try something else", "WHARRGARBL");
+	box("that file is too big to upload, try something else", "no fishing stories.");
 	uploadForm();
 	return true;
 }
