@@ -57,7 +57,6 @@
 		send(new Error("the function you requested ($func) was not found on this server."));
 	}
 	
-	$me = false;
 	// authentication
 	if($func != "login") {
 		mustLogIn(array("prompt" => "http",
@@ -265,9 +264,7 @@
 		$repost = check_arg("repost", "integer", $_POST, false, array("1", "0"));
 		$subscribe = check_arg("subscribe", "integer", $_POST, false, array("1", "0"));
 		handle_errors();
-		
 		assert('me()');
-		$me = me();
 		
 		// if no comment, vote, offensive, or repost, then why are you here?
 		if(!($comment || $vote || $offensive || $repost || $subscribe)) {

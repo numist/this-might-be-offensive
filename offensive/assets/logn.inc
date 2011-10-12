@@ -66,31 +66,31 @@ function mustLogIn($methods=array()) {
  *  * $prompt is whether or not the user is allowed to log in 
  *            (whether a login prompt should be shown)
  */
-function checkUser($me) {
+function checkUser($myself) {
 	global $login_message, $prompt;
 
-	if($me->status() == "normal" || $me->status() == "admin") {
+	if($myself->status() == "normal" || $myself->status() == "admin") {
 		// don't update the user's row unless the IP has changed or it's been a minute since the last update.
 
-		if(strtotime($me->timestamp()) < time() - 60 ||
-		   $me->last_login_ip() != $_SERVER['REMOTE_ADDR']) {
-			$sql = "UPDATE users SET last_login_ip='" . $_SERVER['REMOTE_ADDR'] . "', timestamp=NOW() WHERE userid=".$me->id();
+		if(strtotime($myself->timestamp()) < time() - 60 ||
+		   $myself->last_login_ip() != $_SERVER['REMOTE_ADDR']) {
+			$sql = "UPDATE users SET last_login_ip='" . $_SERVER['REMOTE_ADDR'] . "', timestamp=NOW() WHERE userid=".$myself->id();
 			tmbo_query( $sql );
 			
 			// update the User cache with the new data.
-			$args = array("userid" => $me->id(),
+			$args = array("userid" => $myself->id(),
 			              "last_login_ip" => $_SERVER['REMOTE_ADDR'],
 			              "timestamp" => date("Y-m-d H:i:s"));
 			new User($args);
 		}
 		
-		$GLOBALS["me"] = $me;
+		$GLOBALS["me"] = $myself;
 		return true;
 	}
 
-	if($me->status() == 'locked') {
+	if($myself->status() == 'locked') {
 		$login_message = "that account is locked.";
-	} else if( $status == 'awaiting activation' ) {
+	} else if( $myself->status() == 'awaiting activation' ) {
 		$login_message = "that account is awaiting activation.";
 	}
 	$prompt = false;
@@ -103,26 +103,26 @@ function checkUser($me) {
  * this function does not do any authentication, it is just a shared resource used by various 
  * authentication mechanisms to process a successful login attempt.
  */
-function logInUser($me, $session=true) {
+function logInUser($myself, $session=true) {
 	global $login_message, $prompt;
 
-	if( $me->status() == 'normal' || $me->status() == 'admin' ) {
-	    if($session) {
-	        if(session_id() == "") {
-        		session_start();
-        	}
-		    $_SESSION['userid'] = $me->id();
-		    $_SESSION['status'] = $me->status();
-		    $_SESSION['username'] = $me->username();
-	    } else {
-	        session_unset();
-	    }
+	if( $myself->status() == 'normal' || $myself->status() == 'admin') {
+		if($session) {
+			if(session_id() == "") {
+				session_start();
+			}
+			$_SESSION['userid'] = $myself->id();
+			$_SESSION['status'] = $myself->status();
+			$_SESSION['username'] = $myself->username();
+	   } else {
+			session_unset();
+	   }
 			
-		$sql = "INSERT INTO ip_history (userid, ip) VALUES ( ".$me->id().", '".$_SERVER['REMOTE_ADDR']."' )";
+		$sql = "INSERT INTO ip_history (userid, ip) VALUES ( ".$myself->id().", '".$_SERVER['REMOTE_ADDR']."' )";
 		tmbo_query( $sql );
 	}
 	
-	return checkUser($me);
+	return checkUser($myself);
 }
 
 /*
@@ -215,8 +215,8 @@ function login($methods=array()) {
  */
 function loginWithSession() {
 	if(array_key_exists('userid', $_SESSION) && is_intger($_SESSION['userid'])) {
-		$me = new User($_SESSION["userid"]);
-		return checkUser($me);
+		$myself = new User($_SESSION["userid"]);
+		return checkUser($myself);
 	}
 	return null;
 }

@@ -574,8 +574,6 @@
 	}
 
 	function core_createtoken($issuee) {
-		global $me;
-
 		if(!is_string($issuee)) {
 			trigger_error("issuee is not a string", E_USER_ERROR);
 		}
@@ -608,7 +606,7 @@
 		} while($dupcheck->exists());
 		unset($dupcheck);
 		
-		$sql = "INSERT INTO tokens (tokenid, userid, issued_to, issue_date) VALUES (\"$tokenid\", ".$me->id().", \"".sqlEscape($issuee)."\", NOW())";
+		$sql = "INSERT INTO tokens (tokenid, userid, issued_to, issue_date) VALUES (\"$tokenid\", ".me()->id().", \"".sqlEscape($issuee)."\", NOW())";
 		
 		tmbo_query($sql);
 		
@@ -619,8 +617,7 @@
 	}
 	
 	function core_gettokens() {
-		global $me;
-		$sql = "SELECT * FROM tokens WHERE userid = ".$me->id();
+		$sql = "SELECT * FROM tokens WHERE userid = ".me()->id();
 		$result = tmbo_query($sql);
 
 		$ret = array();
@@ -633,8 +630,6 @@
 	}
 	
 	function core_destroytoken($token) {
-		global $me;
-		
 		if(is_string($token)) {
 			$token = new Token($token);
 			if(!$token->exists()) {
@@ -645,7 +640,7 @@
 		if(!is_object($token) || $token->exists() == false) {
 			trigger_error("token is not valid", E_USER_ERROR);
 		}
-		if($token->userid() != $me->id()) {
+		if($token->userid() != me()->id()) {
 			trigger_error("token does not belong to the current user", E_USER_ERROR);
 		}
 		

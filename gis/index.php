@@ -6,12 +6,8 @@
 
 	time_start($ptime);
 
-    require_once("offensive/assets/classes.inc");
-    $me = false;
-
-    mustLogIn();
-
-    $me = me();
+	require_once("offensive/assets/classes.inc");
+	mustLogIn();
 
 	// Include, and check we've got a connection to the database.
 	require_once( 'admin/mysqlConnectionInfo.inc' );
@@ -21,8 +17,8 @@
 	require_once("offensive/assets/classes.inc");
 	require_once("offensive/assets/core.inc");
 
-    $numPerPage = 36;
-    $args = $_GET;
+	$numPerPage = 36;
+	$args = $_GET;
 
     function randtld($username) {
         if($username == "numist") return ".net";
@@ -35,13 +31,13 @@
     function pickuplink() {
         // <!-- <a href="/offensive/?c=settings">Show options...</a> -->
     	// get db pickuplink
-	    global $me, $activeTab;
+	    global $activeTab;
 	
 		$prefname = "ipickup";
-		$cookiename = $me->id()."lastpic";
+		$cookiename = me()->id()."lastpic";
 	
 	    // get db pickuplink
-	    $dbpic = $me->getPref($prefname);
+	    $dbpic = me()->getPref($prefname);
 
 	    // get cookie pickuplink
 	    if(array_key_exists($cookiename, $_COOKIE) && is_intger($_COOKIE[$cookiename])) {
@@ -359,7 +355,7 @@
                 <span id="gbf" class="gbf">
                 </span>
                 <b class="gb4">
-                    <?= $me->username() ?>@thismight.be
+                    <?= me()->username() ?>@thismight.be
                 </b>
                 | 
                 <span id="gbe">
@@ -412,8 +408,8 @@
                                     </div>
                                     <div id="ss-status" style="float:left;position:relative">
                                         <a class="gb3" style="cursor:pointer;padding-bottom:0" href="/offensive/?c=settings"><u><?
-    if($me->getPref("hide_tmbo") && $me->getPref("hide_nsfw")) echo "Strict";
-    else if(!$me->getPref("hide_tmbo") && !$me->getPref("hide_nsfw")) echo "Off";
+    if(me()->getPref("hide_tmbo") && me()->getPref("hide_nsfw")) echo "Strict";
+    else if(!me()->getPref("hide_tmbo") && !me()->getPref("hide_nsfw")) echo "Off";
     else echo "Moderate";
                                     ?></u> <small>▼</small></a>
                                         <div id="ss-barframe" style="width: 174px; height: 102px; position: absolute; top: 16px; visibility: hidden; ">

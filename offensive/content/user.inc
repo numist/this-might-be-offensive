@@ -52,8 +52,8 @@
 	}
 	
 	function body() {
-		global $me, $them;
-		if( $me->status() == "admin" && 
+		global $them;
+		if( me()->status() == "admin" && 
 		    array_key_exists("set_account_status", $_REQUEST) && 
 		    $_REQUEST['set_account_status'] ) {
 			handleSetStatusSubmission();
@@ -107,9 +107,9 @@
 								(thanks to <a href="./?c=<?= $_REQUEST['c'] ?>&userid=<?= $referredby->id() ?>" style="color:#666699"><?= $referredby->username() ?></a>.)
 							<? } ?>
 							<? if( isset( $ip ) ) { ?>
-								<br/>Last seen on <?= date( "F d, Y", strtotime($timestamp) ) ?><? if( $me->status() == "admin" ) { ?> from <?= $ip ?> (<a href="./?c=iphistory&uid=<?= $usrid ?>">view history</a>)<? } ?>.
+								<br/>Last seen on <?= date( "F d, Y", strtotime($timestamp) ) ?><? if( me()->status() == "admin" ) { ?> from <?= $ip ?> (<a href="./?c=iphistory&uid=<?= $usrid ?>">view history</a>)<? } ?>.
 								<?
-									if( $me->status() == "admin" ) {
+									if( me()->status() == "admin" ) {
 										$sql = "SELECT DISTINCT userid, username, account_status FROM users WHERE last_login_ip = '$ip' AND userid != $usrid" ;
 										$result = tmbo_query( $sql );
 										if( mysql_num_rows( $result ) > 0 ) {
@@ -130,7 +130,7 @@
 					<div class="bluebox">
 						
 						<?
-							if( $me->status() == "admin" ) {
+							if( me()->status() == "admin" ) {
 								?>
 								<div class="adminControls"><?
 									setStatusForm( $usrid, $status, $email );
@@ -143,7 +143,7 @@
 						
 						<div style="float:right">
 							<?
-								if($me->squelched($usrid)) {
+								if(me()->squelched($usrid)) {
 									?><a href="/offensive/setPref.php?unsq=<?= $usrid ?>">unsquelch</a><?
 								} else {
 									?><a href="/offensive/setPref.php?sq=<?= $usrid ?>">squelch</a><?
@@ -298,7 +298,6 @@ function recentComments( $uid ) {
 
 
 function handleSetStatusSubmission() {
-	global $me;
 	$usrid =  sqlEscape( $_POST['userid'] );
 	$status =  sqlEscape( $_POST['set_account_status'] );
 	$email =  sqlEscape( $_POST['set_email'] );
@@ -321,7 +320,7 @@ function handleSetStatusSubmission() {
 			foreach($admins as $admin) {
 				$emails[] = $admin->email();
 			}
-			$subject = $me->username() . " changed the status to $status for user $usrid";
+			$subject = me()->username() . " changed the status to $status for user $usrid";
 			mail( implode(",", $emails), "[ tmbo ] $subject", "$content\n\nthis is an auto-generated message. replies will not be read by humans.", "From: offensive@thismight.be (this might be offensive)");
 		}
 	}

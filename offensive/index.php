@@ -48,7 +48,7 @@ $timelimit = 10;
 	if(!isset($link) || !$link) $link = openDbConnection();
 	require_once('offensive/assets/functions.inc');
 
-	// initialize global $me information if possible.
+	// attempt session/cookie login.
 	login();
 
 	// set our target to any of the requested content page...

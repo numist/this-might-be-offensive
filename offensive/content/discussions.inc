@@ -18,8 +18,6 @@
 	}
 
 	function body() {
-		global $me;
-
 		$page = isset($_REQUEST['p']) && is_intger($_REQUEST['p']) ?
 			    $_REQUEST['p'] : 0;
 		$args = $_REQUEST;
@@ -39,8 +37,8 @@
 					</div>
 				</div>
 <?
-		$defaultSort = $me->getPref("sortorder_discussions")
-										? $me->getPref("sortorder_discussions")
+		$defaultSort = me()->getPref("sortorder_discussions")
+										? me()->getPref("sortorder_discussions")
 										: "date_desc";
 		if(strpos($defaultSort, "_") == false) $defaultSort = "date_desc";
 			$args = $_REQUEST;
@@ -61,7 +59,7 @@
 
 			// if we made it this far, sort is valid, so we don't have to check it
 			if($args["sort"] != $defaultSort) {
-				$me->setPref("sortorder_discussions", $args["sort"]);
+				me()->setPref("sortorder_discussions", $args["sort"]);
 			}
 ?>
 				<div class="grid" id="discussions">

@@ -10,9 +10,7 @@
 	function start()
 	{
 		global $options;
-		
 		mustLogIn();
-		$me = me();
 		
 		if(array_key_exists("submit", $_POST)) {
 			// check for post for keys
@@ -38,16 +36,16 @@
 					if($prefname == "noselect") continue;
 					
 					if(array_key_exists($prefname, $choices)) {
-						$me->setPref($prefname, serialize($choices[$prefname]));
+						me()->setPref($prefname, serialize($choices[$prefname]));
 					} else {
-						$me->setPref($prefname, "");
+						me()->setPref($prefname, "");
 					}
 				}
 			} else {
 				foreach($prefnames as $prefname) {
 					if($prefname == "noselect") continue;
 					
-					$me->setPref($prefname, "");
+					me()->setPref($prefname, "");
 				}
 			}
 		}
@@ -71,7 +69,7 @@
 
 	function body()
 	{
-		global $me, $options;
+		global $options;
 
 		?><div class="heading">
 				set things up how you like 'em.
@@ -86,7 +84,7 @@
 		<p>use the nsfw and tmbo filters to block images that are not safe for work or potentially offensive.  <br />use the bad filter if you trust the judgement of your fellow maxxers.  10 [this is bad] votes and a ratio of 9 bad for every [this is good] causes the bad filter to activate.</p>
 		<div style="text-align:center">
 			<span><?
-				if($me->getPref("hide_nsfw") == 1) { ?>
+				if(me()->getPref("hide_nsfw") == 1) { ?>
 					<a href="/offensive/setPref.php?p=hide_nsfw&v=">turn nsfw filter off</a>
 				<? } else { ?>
 					<a href="/offensive/setPref.php?p=hide_nsfw&v=1">turn nsfw filter on</a>
@@ -94,7 +92,7 @@
 			</span>
 						
 			<span style="margin-left:48px;"><?
-				if($me->getPref("hide_tmbo") == 1) { ?>
+				if(me()->getPref("hide_tmbo") == 1) { ?>
 					<a href="/offensive/setPref.php?p=hide_tmbo&v=">turn tmbo filter off</a>
 				<? } else { ?>
 					<a href="/offensive/setPref.php?p=hide_tmbo&v=1">turn tmbo filter on</a>
@@ -102,7 +100,7 @@
 			</span>
 			
 			<span style="margin-left:48px;"><?
-				if($me->getPref("hide_bad") == 1) { ?>
+				if(me()->getPref("hide_bad") == 1) { ?>
 					<a href="/offensive/setPref.php?p=hide_bad&v=">turn bad filter off</a>
 				<? } else { ?>
 					<a href="/offensive/setPref.php?p=hide_bad&v=1">turn bad filter on</a>
@@ -147,7 +145,7 @@
 
 					// desc is unused, but required to get the key in a foreach loop.
 					foreach($prefnames as $prefname) {
-						$values = $me->getPref($prefname);
+						$values = me()->getPref($prefname);
 						
 						// possible false values here are false or "", so not checking types.
 						if($values != false) {

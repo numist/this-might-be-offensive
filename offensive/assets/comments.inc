@@ -185,7 +185,7 @@ function postComment($fileid, $vote, $repost, $offensive, $comment, $subscribe=n
 		// update all subscriptions
 		updateSubscriptions($fileid, $commentid);
 		// mark your own as read
-		clearSubscription($fileid, $me->id());
+		clearSubscription($fileid, me()->id());
 	}
 
 	// sometimes, subscribe the commenter.

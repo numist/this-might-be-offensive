@@ -21,7 +21,6 @@
 	function start() {
 		global $upload, $uploader;
 		mustLogIn();
-		$me = me();
 		
 		if( ! is_intger( $_REQUEST['fileid'] ) ){
 			header( "Location: ./" );
@@ -37,12 +36,12 @@
 
 		$uploader = $upload->uploader();
 
-		clearSubscription($upload->id(), $me->id());
+		clearSubscription($upload->id(), me()->id());
 
 		// update pickuplink for discussions
 	    if($upload->type() == "topic") {
 	    	// update the pickup cookie
-        	$cookiename = $me->id()."lasttopic";
+        	$cookiename = me()->id()."lasttopic";
         	if(!array_key_exists($cookiename, $_COOKIE) ||
         	   !is_intger($_COOKIE[$cookiename]) ||
         	   $_COOKIE[$cookiename] < $upload->id()) {
@@ -50,8 +49,8 @@
 			}
 
 			// update the pickup db entry
-			if($me->getPref("tpickup") == false || $me->getPref("tpickup") < $upload->id()) {
-				$me->setPref("tpickup", $upload->id());
+			if(me()->getPref("tpickup") == false || me()->getPref("tpickup") < $upload->id()) {
+				me()->setPref("tpickup", $upload->id());
 			}
         }
 
@@ -126,10 +125,8 @@
 	}
 	
 	function toggleThumbnailLink() {
-		global $me;
-
 		?><div style="margin:4px;font-weight:bold"><?
-			if($me->getPref("thumbnails_in_comments") == 1 || $me->getPref("thumbnails_in_comments") === false) {
+			if(me()->getPref("thumbnails_in_comments") == 1 || me()->getPref("thumbnails_in_comments") === false) {
 				?><a href="setPref.php?p=thumbnails_in_comments&v=0">hide thumbnail</a><?
 			}
 			else {
@@ -140,7 +137,7 @@
 	}
 
 	function body() {
-		global $upload, $uploader, $me;
+		global $upload, $uploader;
 	
 		$subscribed = subscribed($upload->id());
 
@@ -202,7 +199,7 @@
     	
 				<?php
     	
-					if(!$me->squelched($commenter) && strlen($comment->text()) > 0) {
+					if(!me()->squelched($commenter) && strlen($comment->text()) > 0) {
 						echo $comment->HTMLcomment();
 					}
 					else if(strlen($comment->text()) > 0) {
@@ -250,7 +247,7 @@
 				<div style="background:#ccccff; border-top:1px solid #000033">
 					<div style="float:right"><? toggleThumbnailLink() ?></div>
 					<?
-						if($me->getPref("thumbnails_in_comments") == 1 || $me->getPref("thumbnails_in_comments") === false) {
+						if(me()->getPref("thumbnails_in_comments") == 1 || me()->getPref("thumbnails_in_comments") === false) {
 							?>
 							
 							<a href="<?= $href ?>"

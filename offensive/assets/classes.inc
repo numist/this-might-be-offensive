@@ -324,17 +324,16 @@ class Upload {
 	}
 	
 	public function next_filtered() {
-		$me = me();
-		if(!$me) return $this->next();
+		if(!me()) return $this->next();
 		
 		if(!array_key_exists("next_filtered", $this->data)) {			
-			$tmbo_sql = $me->getPref("hide_tmbo") ? " AND NOT tmbo " : "";
-			$nsfw_sql = $me->getPref("hide_nsfw") ? " AND NOT nsfw " : "";
+			$tmbo_sql = me()->getPref("hide_tmbo") ? " AND NOT tmbo " : "";
+			$nsfw_sql = me()->getPref("hide_nsfw") ? " AND NOT nsfw " : "";
         
 			$sql = "SELECT * FROM offensive_uploads WHERE id > {$this->id()} AND type='{$this->type()}' AND status='normal'
 					$tmbo_sql
 					$nsfw_sql
-					AND userid NOT IN (SELECT squelched FROM offensive_squelch WHERE userid = {$me->id()} )
+					AND userid NOT IN (SELECT squelched FROM offensive_squelch WHERE userid = ".me()->id()." )
 					ORDER BY id ASC LIMIT 1";
 			$result = tmbo_query($sql);
 			if(mysql_num_rows($result) == 0) {
@@ -364,17 +363,16 @@ class Upload {
 	}
 
 	public function prev_filtered() {
-		$me = me();
-		if(!$me) return $this->prev();
+		if(!me()) return $this->prev();
 
 		if(!array_key_exists("prev_filtered", $this->data)) {
-			$tmbo_sql = $me->getPref("hide_tmbo") ? " AND NOT tmbo " : "";
-			$nsfw_sql = $me->getPref("hide_nsfw") ? " AND NOT nsfw " : "";
+			$tmbo_sql = me()->getPref("hide_tmbo") ? " AND NOT tmbo " : "";
+			$nsfw_sql = me()->getPref("hide_nsfw") ? " AND NOT nsfw " : "";
       
 			$sql = "SELECT * FROM offensive_uploads WHERE id < {$this->id()} AND type='{$this->type()}' AND status='normal'
           			$tmbo_sql
           			$nsfw_sql
-					AND userid NOT IN (SELECT squelched FROM offensive_squelch WHERE userid = {$me->id()} )
+					AND userid NOT IN (SELECT squelched FROM offensive_squelch WHERE userid = ".me()->id()." )
 					ORDER BY id DESC LIMIT 1";
 			$result = tmbo_query($sql);
 			if(mysql_num_rows($result) == 0) {
@@ -1089,12 +1087,11 @@ class User {
 	 * token data
 	 */
 	public function token() {
-		$me = me();
 		if(array_key_exists("token", $this->data) &&
 		   !is_object($this->data["token"])) {
 			$this->data["token"] = new Token($this->data["token"]);
 		} else {
-			assert('$me->id() == $this->id()');
+			assert('me()->id() == $this->id()');
 			$this->data["token"] = new Token();
 		}
 		return $this->data["token"];
@@ -1407,10 +1404,9 @@ class Token {
 				/*
 				 * get a token by application
 				 */
-				$me = me();
-				assert('$me');
+				assert('me()');
 				if(!array_key_exists("app:$info", self::$gdata)) {
-					self::$gdata["app:$info"] = array("userid" => $me->id(), "issued_to" => $info);
+					self::$gdata["app:$info"] = array("userid" => me()->id(), "issued_to" => $info);
 				}
 				$this->data =& self::$gdata["app:$info"];
 			} else {

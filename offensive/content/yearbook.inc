@@ -38,11 +38,9 @@ EOT;
 	}
 
 	function yearbook() {
-		global $me;
-
 		// get the default from user prefs
-		$defaultSort = $me->getPref("sortorder_yearbook") ?
-		               $me->getPref("sortorder_yearbook") :
+		$defaultSort = me()->getPref("sortorder_yearbook") ?
+		               me()->getPref("sortorder_yearbook") :
 		               "uname_asc";
 
 		$numPerPage = 100;
@@ -68,7 +66,7 @@ EOT;
 
 		// if we made it this far, sort is valid, so we don't have to check it
 		if($args["sort"] != $defaultSort) {
-			$me->setPref("sortorder_yearbook", $args["sort"]);
+			me()->setPref("sortorder_yearbook", $args["sort"]);
 		}
 ?>
 		<div id="grid-container">
