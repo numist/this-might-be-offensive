@@ -282,8 +282,8 @@ $timelimit = 10;
 					<div class="blackbar"></div>
 					<div class="heading">rss:</div>
 					<div class="bluebox" style="text-align:center">
-						<a href="pic_rss.php"><img src="graphics/rss_pics.gif" border="0" alt="rss: pics" width="77" height="15" style="margin-bottom:6px"></a><br/>
-						<a href="zip_rss.php"><img src="graphics/rss_zips.gif" border="0" alt="rss: zips" width="77" height="15"></a>
+						<a href="<?= Link::rss("pic") ?>"><img src="graphics/rss_pics.gif" border="0" alt="rss: pics" width="77" height="15" style="margin-bottom:6px"></a><br/>
+						<a href="<?= Link::rss("zip") ?>"><img src="graphics/rss_zips.gif" border="0" alt="rss: zips" width="77" height="15"></a>
 					</div>			
 					<div class="blackbar"></div>
 				</div>

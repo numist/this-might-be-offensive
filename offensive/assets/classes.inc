@@ -1363,9 +1363,9 @@ class Link {
 	}
 
 	static function rss($type) {
-		assert('in_array($type, array("audio", "zip", "pic"))');
+		assert('in_array($type, array("audio", "zip", "pic", "discuss"))');
 
-		return "/offensive/".$type."_rss.php";
+		return "/offensive/".$type."_rss.php?token=".me()->token()->tokenid();
 	}
 }
 
