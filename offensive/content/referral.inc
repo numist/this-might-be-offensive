@@ -12,7 +12,7 @@
 
 		if( array_key_exists("invite", $_REQUEST) &&
 		    isValidEmail( $_REQUEST['invite'] )) {
-			if(!canInvite(me()->id())) {
+			if(!canInvite()) {
 				trigger_error(me()->username()." tried to send invite, is not allowed!", E_USER_ERROR);
 				exit;
 			}
@@ -28,7 +28,8 @@
 		return $valid;
 	}
 
-	function canInvite( $uid ) {
+	function canInvite() {
+		$uid = me()->id();
 		// member for a month
 		$sql = "SELECT (created < DATE_SUB( NOW(), INTERVAL 1 MONTH )) AS canInvite
 					FROM users WHERE userid=$uid";
@@ -136,7 +137,7 @@ Enjoy.
 
 		<div class="entry odd_row">
 			<?
-				if( canInvite( me()->id() ) ) {
+				if( canInvite() ) {
 			?>
 			<p>enter the email address of a friend below to send them an account invitation.<br/>
 			please use it wisely.</p>
