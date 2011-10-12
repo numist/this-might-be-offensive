@@ -5,7 +5,8 @@
 	require_once( 'admin/mysqlConnectionInfo.inc' );
 	if(!isset($link) || !$link) $link = openDbConnection();
 	
-	mustLogIn("http");
+	mustLogIn(array("method" => "http",
+	                "token" => null));
 	
 	require_once("offensive/assets/conditionalGet.inc");
 	

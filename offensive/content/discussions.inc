@@ -15,10 +15,9 @@
 	}
 
 	function head() {
-		echo <<<EOT
-		<link rel="alternate" type="application/rss+xml" title="discussions" href="/offensive/discuss_rss.php" />
-		<link href="/styles/grid.css?v=1.02" type="text/css" rel="stylesheet">
-EOT;
+		echo '
+		<link rel="alternate" type="application/rss+xml" title="discussions" href="/offensive/'.Link::rss("discuss").'" />
+		<link href="/styles/grid.css?v=1.02" type="text/css" rel="stylesheet">';
 	}
 
 	function body() {

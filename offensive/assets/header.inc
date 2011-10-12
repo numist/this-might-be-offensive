@@ -23,8 +23,14 @@ $upgrading = false;
 
 /*****************************************************************************/
 
-/* all pages require an active session eventually */
+// force ssl.
+if(!ssl()) {
+	// TODO: if a token was present in the URI, it should be invalidated.
+	header("Location: https://".$_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"], 301);
+	exit;
+}
 
+/* all pages require an active session eventually */
 session_start();
 
 /*  _                   _
@@ -173,92 +179,6 @@ function tmbo_query($sql, $timeout=2) {
 	return $result;
 }
 
-/* accurate timekeeping */
-function record_hit() {
-	if(loggedin()) {
-		tmbo_query("UPDATE users SET timestamp=now() WHERE userid=".$_SESSION['userid']." LIMIT 1");
-	}
-}
-
-function loggedin($lite=true) {
-	if(!array_key_exists('userid', $_SESSION) || !is_intger($_SESSION['userid'])) return false;
-	
-	/* lite checks do not make a round trip to the database.  this is good enough for code
-	 * sanity checks, but not good enough for authorization checks that may want to check
-	 * the user's status against the server.
-	 * for instance, in the event a user gets banned, the lite sanity check will pass (code
-	 * is ok to execute -- it will not break), but a heavy check will notice that the user
-	 * has been banned and fail (user is not ok to continue -- user has been banned)
-	 */
-	if($lite) {
-		return true;
-	}
-	
-	$result = tmbo_query("SELECT * FROM users WHERE userid = ".$_SESSION['userid']);
-	if(mysql_num_rows($result) == 0) return false;
-	$row = mysql_fetch_assoc($result);
-	
-	if($row['account_status'] == 'locked' || $row['account_status'] == 'awaiting activation') return false;
-	
-	// initialize a User object so we don't have to go to the DB again later for it
-	$throwaway = new User($row);
-	
-	if($_SESSION['username'] != $row['username']) $_SESSION['username'] = $row['username'];
-	if($_SESSION['status'] != $row['account_status']) $_SESSION['status'] = $row['account_status'];
-	
-	return true;
-}
-
-/* 
- * this function ONLY returns if the user is logged in.  
- * if the user is not logged in (or fails to authenticate, in the case of HTTP
- * auth), mustLogIn will exit the script.
- */
-// logn.inc is needed for the call to login().
-require_once("offensive/assets/logn.inc");
-function mustLogIn($type="logn") {
-	// login checks are authorization checks, so a heavy loggedin() request is required.
-	if(loggedin(false)) {
-		return;
-	}
-	// check for rememberme cookie
-	if(login()) {
-		return;
-	}
-	
-	if(!isset($_SERVER["HTTPS"]) || $_SERVER["HTTPS"] != "on") {
-		$server = "http://".$_SERVER["SERVER_NAME"];
-	} else {
-		$server = "https://".$_SERVER["SERVER_NAME"];
-	}
-	$redirect = (isset($_REQUEST['redirect']) ? $_REQUEST['redirect'] : $server.urlencode($_SERVER['REQUEST_URI']));
-
-	ob_end_clean();
-	
-	session_unset();
-	
-	if($type == "http") {
-		if (isset($_SERVER['PHP_AUTH_USER']) && strlen($_SERVER['PHP_AUTH_USER']) > 0) {
-			require_once('offensive/assets/logn.inc');
-			global $login_message;
-			
-			if(login($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']) === true) return;
-
-			header('HTTP/1.0 401 Not Found');
-	    	echo $login_message;
-			exit;
-		}
-		// logout business, 403.
-		header('WWW-Authenticate: Basic realm="[this might be offensive]"');
-	    header('HTTP/1.0 401 Unauthorized');
-	    echo 'anon is not welcome here.';
-	    exit;
-	} else {
-		header("Location: https://".$_SERVER["SERVER_NAME"]."/offensive/logn.php?redirect=".$redirect);
-		exit;
-	}
-}
-
 function byte_format($size, $digits=0) {	
 	if($size > (1073741824 * 4)) {
 		return number_format(($size / 1073741824), $digits)."GB";
@@ -272,17 +192,25 @@ function byte_format($size, $digits=0) {
 }
 
 function me() {
-	global $me;
+	global $me, $login_called;
 	// get the User object for the logged-in user
 	if(is_object($me)) return $me;
 	
 	if(array_key_exists('userid', $_SESSION)) {
+		trigger_error("was able to get user from session—".
+		              "should have called login() already!",
+		              E_USER_WARNING);
 		$me = new User($_SESSION['userid']);
 		return $me;
 	}
 	
-	trigger_error("user not discernable", E_USER_WARNING);
+	if(!$login_called) {
+		trigger_error("call login() before me()", E_USER_WARNING);
+	}
 	return null;
 }
+
+// logn.inc is needed for all authentication
+require_once("offensive/assets/logn.inc");
 
 ?>

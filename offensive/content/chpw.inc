@@ -2,11 +2,6 @@
 require_once( 'admin/mysqlConnectionInfo.inc' );
 if(!isset($link) || !$link) $link = openDbConnection();
 
-if(!isset($_SERVER["HTTPS"]) || $_SERVER["HTTPS"] != "on") {
-	header("Location: https://".$_SERVER["SERVER_NAME"]."/offensive/?c=chpw", 301);
-	exit;
-}
-
 	function start() {
 		global $me;
 		mustLogIn();

@@ -3,6 +3,7 @@
 	require_once( 'admin/mysqlConnectionInfo.inc' );
 	if(!isset($link) || !$link) $link = openDbConnection();
 	require_once("offensive/assets/classes.inc");
+	require_once("offensive/assets/core.inc");
 
 	require("offensive/data/keynav.inc");
 
@@ -49,6 +50,12 @@
 					$me->setPref($prefname, "");
 				}
 			}
+		}
+		
+		if(array_key_exists("revoke", $_REQUEST)) {
+			core_destroytoken($_REQUEST["revoke"]);
+			header("Location: /offensive/?c=settings");
+			exit;
 		}
 	}
 
@@ -194,6 +201,35 @@
 			</form>
 		</div>
 	</div>
+
+	<div class="heading">tokens:</div>
+	<div class="bluebox">
+		<p>RSS feeds, the web site, and external applications use tokens to log in as you. Here you can see all of your tokens, when they were issued, for whom they were issued, and when they were last used. You can also revoke them here.</p>
+
+			<div align="center" style="padding:1em;">
+			<?
+				$tokens = core_gettokens();
+				foreach($tokens as $token) {
+			?>
+			<table>
+				<tr>
+					<td colspan="2">application: <?= (strlen($token->issued_to()) > 64) ? substr($token->issued_to(), 0, 61)."…" : $token->issued_to() ?></td>
+				</tr>
+				<tr>
+					<td colspan="2">token: <?= $token->tokenid() ?></td>
+				</tr>
+				<tr>
+					<td>issued date: <?= $token->issue_date() ?></td>
+					<td>last used: <?= $token->last_used() ?></td>
+				</tr>
+				<tr>
+					<td colspan="2" style="text-align: center;"><a href="<?= $_SERVER["REQUEST_URI"] ?>&revoke=<?= $token->tokenid() ?>">revoke this token</a></td>
+				</tr>
+			</table>
+			<? } ?>
+			</div>
+	</div>
+
 <?
 	}
 	
