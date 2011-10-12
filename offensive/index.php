@@ -26,15 +26,7 @@ $timelimit = 10;
 
 	// if we're logged in, we'll want access to the user object for the logged in user
 	require_once("offensive/assets/classes.inc");
-	$me = false;
-	// XXX: eventually the entire index purple pages should all be members only!
-	if(loggedin()) {
-		$me = new User(array(
-			"userid" => $_SESSION["userid"],
-			"username" => $_SESSION["username"],
-			));
-	}
-	
+
 	// in an upgrade, break glass:
 	if( $upgrading &&
 	    (!array_key_exists("status", $_SESSION) ||
@@ -56,13 +48,9 @@ $timelimit = 10;
 	if(!isset($link) || !$link) $link = openDbConnection();
 	require_once('offensive/assets/functions.inc');
 
-	// LEGACY: moves from cookie-based landing page to db-based
-	if($me && array_key_exists("thumbnails", $_COOKIE) && 
-	    $_COOKIE["thumbnails"] === "yes") {
-		$me->setPref("index", "thumbs");
-		setcookie( 'thumbnails', "no", time()-3600, "/offensive/" );
-	}
-	
+	// attempt session/cookie login.
+	login();
+
 	// set our target to any of the requested content page...
 	if(isset($_REQUEST['c']) &&
 		// if it exists
@@ -75,13 +63,11 @@ $timelimit = 10;
 	} else {
 		// or the default landing page for this session.
 		// if not logged in, force it.
-		// XXX: eventually the entire index purple pages should all be members only!
-		if(!isset($me) || !is_object($me)) {
+		if(!me()) {
 			mustLogIn();
-			$me = new User($_SESSION["userid"]);
 		}
 		
-		$c = ($me->getPref("index") == "thumbs") ? 
+		$c = (me()->getPref("index") == "thumbs") ? 
 		      "thumbs" : "main";
 		header("Location: ./?c=$c");
 		exit;
@@ -92,8 +78,6 @@ $timelimit = 10;
 
 	if( function_exists( 'start' ) ) {
 		start();
-		// XXX: eventually the entire index purple pages should all be members only!
-		if(loggedin() && !$me) $me = new User($_SESSION['userid']);
 	}
 
 ?>
@@ -193,12 +177,12 @@ $timelimit = 10;
 	
 		<div id="leftcol">
 
-			<? if (loggedin()) { // log in --> get info restricted block ?>
+			<? if (login()) { // log in --> get info restricted block ?>
 				<div class="contentbox">
 					<div class="blackbar"></div>
 						<div class="heading">your stuff:</div>
 						<div class="bluebox">
-							<p>hi <b><?= $me->htmlUsername() ?></b>!</p>
+							<p>hi <b><?= me()->htmlUsername() ?></b>!</p>
 							
 							<p><a href="index.php?c=upload">upload</a></p>
 							
@@ -265,7 +249,7 @@ $timelimit = 10;
 				<div class="blackbar"></div>
 			</div>
 -->
-			<? if(loggedin()) { // archive <--> bottom restricted block ?>
+			<? if(login()) { // archive <--> bottom restricted block ?>
 				<div class="contentbox">
 					<div class="blackbar"></div>
 					<div class="heading">archives:</div>
@@ -298,8 +282,8 @@ $timelimit = 10;
 					<div class="blackbar"></div>
 					<div class="heading">rss:</div>
 					<div class="bluebox" style="text-align:center">
-						<a href="pic_rss.php"><img src="graphics/rss_pics.gif" border="0" alt="rss: pics" width="77" height="15" style="margin-bottom:6px"></a><br/>
-						<a href="zip_rss.php"><img src="graphics/rss_zips.gif" border="0" alt="rss: zips" width="77" height="15"></a>
+						<a href="<?= Link::rss("pic") ?>"><img src="graphics/rss_pics.gif" border="0" alt="rss: pics" width="77" height="15" style="margin-bottom:6px"></a><br/>
+						<a href="<?= Link::rss("zip") ?>"><img src="graphics/rss_zips.gif" border="0" alt="rss: zips" width="77" height="15"></a>
 					</div>			
 					<div class="blackbar"></div>
 				</div>
@@ -314,7 +298,7 @@ $timelimit = 10;
 					</div>
 					<div class="blackbar"></div>
 				</div>
-				<? if($c != "online" && $me->status() == "admin") { ?>
+				<? if($c != "online" && me()->status() == "admin") { ?>
 					<div class="contentbox">
 						<div class="blackbar"></div>
 						<? if($c != "comments") whosOn();
@@ -359,7 +343,7 @@ $timelimit = 10;
 	</div>
 	<?
 	
-	if($me->status() == "admin") {
+	if(me()->status() == "admin") {
 		?>
 		<div class="textlinks"><?= number_format(time_end($ptime), 3)."s php, ".number_format($querytime, 3)."s sql, ".count($queries)." queries\n\n <!--\n\n";
 			var_dump($queries);
@@ -385,12 +369,8 @@ $timelimit = 10;
 <?
 	// XXX: this needs to use core
 	function unread() {
-
-		$uid = $_SESSION['userid'];
-
-		if( ! is_intger( $uid ) ) {
-			return;
-		}
+		if(!me()) return;
+		$uid = me()->id();
 
 		$sql = "SELECT DISTINCT u.*, b.commentid
 					FROM offensive_uploads u, offensive_subscriptions b
@@ -439,8 +419,9 @@ $timelimit = 10;
 		<div class="heading">who's on:</div>
 		<div class="bluebox">
 			<table style="width:100%"><?
+				$uid = me() ? me()->id() : 0;
 				// list out the latest people to do something
-				$sql = "SELECT userid, username FROM users WHERE timestamp > DATE_SUB( now( ) , INTERVAL $timelimit MINUTE) && userid != ".$_SESSION['userid']." ORDER BY timestamp DESC LIMIT $userlimit";
+				$sql = "SELECT userid, username FROM users WHERE timestamp > DATE_SUB( now( ) , INTERVAL $timelimit MINUTE) && userid != $uid ORDER BY timestamp DESC LIMIT $userlimit";
 				$result = tmbo_query($sql);
 				while(false !== (list($userid, $username) = mysql_fetch_array($result))) {
 					$css = (!isset($css) || $css == "odd") ? "even" : "odd"; ?>
@@ -479,7 +460,4 @@ $timelimit = 10;
 				<? } ?>
 			</table>
 		</div>
-	<? }
-	
-	record_hit();
-?>
+	<? } ?>

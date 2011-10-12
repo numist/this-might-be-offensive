@@ -6,7 +6,7 @@
 
 	mustLogIn();
 
-	$uid = $_SESSION['userid'];
+	$uid = me()->id();
 		
 	$sql = "UPDATE offensive_subscriptions SET commentid = NULL WHERE userid=$uid";
 	tmbo_query( $sql );

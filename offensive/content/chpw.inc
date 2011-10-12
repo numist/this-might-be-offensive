@@ -2,16 +2,8 @@
 require_once( 'admin/mysqlConnectionInfo.inc' );
 if(!isset($link) || !$link) $link = openDbConnection();
 
-if(!isset($_SERVER["HTTPS"]) || $_SERVER["HTTPS"] != "on") {
-	header("Location: https://".$_SERVER["SERVER_NAME"]."/offensive/?c=chpw", 301);
-	exit;
-}
-
 	function start() {
-		global $me;
 		mustLogIn();
-		
-		$me = new User($_SESSION["userid"]);
 	}
 
 
@@ -28,7 +20,7 @@ if(!isset($_SERVER["HTTPS"]) || $_SERVER["HTTPS"] != "on") {
 		if( array_key_exists("old", $_REQUEST) ) {
 			$old = $_REQUEST['old'];
 			$new = $_REQUEST['new'];
-			$uid = $_SESSION['userid'];
+			$uid = me()->id();
 			
 			if( isValidPassword( $new ) ) {
 				$encrypted_pw = sha1( $old );

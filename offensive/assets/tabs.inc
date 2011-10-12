@@ -5,14 +5,14 @@
 
 
 	function tabs() {
-		global $activeTab, $me;
+		global $activeTab;
 ?>
 
 
 <div>
 	<div class="<?= cssFor('images') ?>"><a href="/offensive/<? 
-		if($me) {
-			echo "?c=".(($me->getPref("index") == "thumbs") ? 
+		if(me()) {
+			echo "?c=".((me()->getPref("index") == "thumbs") ? 
 	      "thumbs" : "main"); 
 		}
 	?>">images</a></div>

@@ -65,5 +65,12 @@ function box($message, $title="hmm:") {
 	<?
 }
 
+function array_top($arr) {
+	return reset($arr);
+}
+
+function ssl() {
+	return (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on");
+}
 
 ?>

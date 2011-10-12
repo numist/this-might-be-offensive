@@ -8,7 +8,6 @@
 	require_once("offensive/assets/core.inc");
 
 	function start() {
-		global $me;
 		mustLogIn();
 		
 		if(date("m-d") == "04-01") {
@@ -16,21 +15,19 @@
 			//exit;
 		}
 
-		$me = new User($_SESSION["userid"]);
-		$me->setPref("index", "");
+		me()->setPref("index", "");
 	}
 
 	function head() {
-		echo <<<EOT
-		<link id="gallery" rel="alternate" href="/offensive/pic_rss.php?gallery=true" type="application/rss+xml" title="PicLens feed" />
-		<link rel="alternate" type="application/rss+xml" title="image stream" href="/offensive/pic_rss.php" />
-		<link rel="alternate" type="application/rss+xml" title="daily archives" href="/offensive/zip_rss.php" />
+		echo '
+		<link id="gallery" rel="alternate" href="'.Link::rss("pic").'&gallery=true" type="application/rss+xml" title="PicLens feed" />
+		<link rel="alternate" type="application/rss+xml" title="image stream" href="'.Link::rss("pic").'" />
+		<link rel="alternate" type="application/rss+xml" title="daily archives" href="'.Link::rss("zip").'" />
 		<link href="/styles/grid.css" type="text/css" rel="stylesheet" />
 		<script type="text/javascript" src="/offensive/js/tmbolib.js?v=0.1"></script>
 		<script type="text/javascript" src="/offensive/js/jquery-1.3.2.min.js"></script>
 		<script type="text/javascript" src="/offensive/js/inview.js?v=1.12"></script>
-    <script type="text/javascript" src="/offensive/js/lazyload_new.js?v=0.98"></script>
-EOT;
+    <script type="text/javascript" src="/offensive/js/lazyload_new.js?v=0.98"></script>';
 	}
 
 	function body() {

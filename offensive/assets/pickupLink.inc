@@ -1,23 +1,23 @@
 <?
 	// get db pickuplink
-	global $me, $activeTab;
+	global $activeTab;
 	
 	switch($activeTab) {
 		case "yearbook":
 			$prefname = "ypickup";
-			$cookiename = $me->id()."lastavatar";
+			$cookiename = me()->id()."lastavatar";
 			break;
 		case "audio":
 			$prefname = "apickup";
-			$cookiename = $me->id()."lasttrack";
+			$cookiename = me()->id()."lasttrack";
 			break;
 		default:
 			$prefname = "ipickup";
-			$cookiename = $me->id()."lastpic";
+			$cookiename = me()->id()."lastpic";
 	}
 	
 	// get db pickuplink
-	$dbpic = $me->getPref($prefname);
+	$dbpic = me()->getPref($prefname);
 
 	// get cookie pickuplink
 	if(array_key_exists($cookiename, $_COOKIE) && is_intger($_COOKIE[$cookiename])) {

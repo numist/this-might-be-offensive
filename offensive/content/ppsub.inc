@@ -3,10 +3,7 @@ require_once( 'admin/mysqlConnectionInfo.inc' );
 if(!isset($link) || !$link) $link = openDbConnection();
 
 function start() {
-	global $me;
 	mustLogIn();
-	
-	$me = new User($_SESSION["userid"]);
 }
 
 function body() {

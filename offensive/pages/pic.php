@@ -9,10 +9,7 @@
 	require_once("offensive/assets/comments.inc");
 
 	mustLogIn();
-
 	time_start($ptime);
-
-	$me = new User($_SESSION["userid"]);
 
 	$id = "";
 	if(array_key_exists("id", $_REQUEST)) {
@@ -45,15 +42,15 @@
 	// update pickuplinks
 	switch($upload->type()) {
 		case "image":
-			$cookiename = $me->id()."lastpic";
+			$cookiename = me()->id()."lastpic";
 			$prefname = "ipickup";
 			break;
 		case "audio":
-			$cookiename = $me->id()."lasttrack";
+			$cookiename = me()->id()."lasttrack";
 			$prefname = "apickup";
 			break;
 		case "avatar":
-			$cookiename = $me->id()."lastavatar";
+			$cookiename = me()->id()."lastavatar";
 			$prefname = "ypickup";
 	}
 
@@ -68,10 +65,10 @@
 	$autoplay = false;
 
 	// update the pickup db entry
-	if($me->getPref($prefname) == false || $me->getPref($prefname) < $upload->id()) {
+	if(me()->getPref($prefname) == false || me()->getPref($prefname) < $upload->id()) {
 		// if this account has not been this far forward in the stream before, autoplay.
 		$autoplay = !$upload->filtered();
-		$me->setPref($prefname, $upload->id());
+		me()->setPref($prefname, $upload->id());
 	}
 	if(array_key_exists('loop', $_REQUEST)) {
 		$autoplay = true;
@@ -79,17 +76,15 @@
 
 	###########################################################################
 	function get_random_id($upload) {
-		global $me;
-
 		switch($upload->type()) {
 			case "image":
-				$cookiename = $me->id()."lastpic";
+				$cookiename = me()->id()."lastpic";
 				break;
 			case "audio":
-				$cookiename = $me->id()."lasttrack";
+				$cookiename = me()->id()."lasttrack";
 				break;
 			case "avatar":
-				$cookiename = $me->id()."lastavatar";
+				$cookiename = me()->id()."lastavatar";
 				break;
 		}
 
@@ -106,9 +101,9 @@
 		 * at the beginning of execution if they are invalid, it's safe to skip
 		 * existence and type checks at this point.
 		 */
-		$filter = $me->getPref("hide_nsfw") ? " AND nsfw = 0" : "";
-		$filter .= $me ->getPref("hide_tmbo") ? " AND tmbo = 0" : "";
-		$sql = "SELECT id FROM offensive_uploads WHERE type='".$upload->type()."' AND status='normal' AND id < ".min($me->getPref('ipickup'), $cookiepic).$filter." ORDER BY RAND() LIMIT 1";
+		$filter = me()->getPref("hide_nsfw") ? " AND nsfw = 0" : "";
+		$filter .= me()->getPref("hide_tmbo") ? " AND tmbo = 0" : "";
+		$sql = "SELECT id FROM offensive_uploads WHERE type='".$upload->type()."' AND status='normal' AND id < ".min(me()->getPref('ipickup'), $cookiepic).$filter." ORDER BY RAND() LIMIT 1";
 		$res = tmbo_query($sql);
 		$row = mysql_fetch_assoc( $res );
 		return($row['id']);
@@ -164,7 +159,7 @@
 					$prefs = array();
 					foreach($options as $option => $foo) {
 						if($option == "noselect") continue;
-						$val = $me->getPref($option);
+						$val = me()->getPref($option);
 						if($val) {
 							$prefs[$option] = unserialize($val);
 						}
@@ -440,7 +435,7 @@
 						$index = "audio";
 						break;
 					default:
-						$index = $me->getPref("index");
+						$index = me()->getPref("index");
 						if($index == "") {
 							$index = "main";
 						}
@@ -513,7 +508,7 @@
 				-->
 				<span style="margin-left:48px;">filters:</span>
 				<span style="margin-left:5px;"><?
-				        if($me->getPref("hide_nsfw") == 1) { ?>
+				        if(me()->getPref("hide_nsfw") == 1) { ?>
 				                <a href="/offensive/setPref.php?p=hide_nsfw&v=">nsfw(on)</a>
 				        <? } else { ?>
 				                <a href="/offensive/setPref.php?p=hide_nsfw&v=1">nsfw(off)</a>
@@ -521,7 +516,7 @@
 				</span>
 
 				<span style="margin-left:5px;"><?
-				        if($me->getPref("hide_tmbo") == 1) { ?>
+				        if(me()->getPref("hide_tmbo") == 1) { ?>
 				                        <a href="/offensive/setPref.php?p=hide_tmbo&v=">tmbo(on)</a>
 				        <? } else { ?>
 				                        <a href="/offensive/setPref.php?p=hide_tmbo&v=1">tmbo(off)</a>
@@ -537,10 +532,10 @@
 			<br />
 			<?
 				if($upload->is_nsfw()) { ?>
-					<a style="color:#990000;" href="/offensive/setPref.php?p=hide_nsfw&v=<?= $me->getPref("hide_nsfw") == 1 ? "" : "1" ?>" title="<?= $me->getPref("hide_nsfw") == 1 ? "show" : "hide" ?> images that are not safe for work">[nsfw]</a><?
+					<a style="color:#990000;" href="/offensive/setPref.php?p=hide_nsfw&v=<?= me()->getPref("hide_nsfw") == 1 ? "" : "1" ?>" title="<?= me()->getPref("hide_nsfw") == 1 ? "show" : "hide" ?> images that are not safe for work">[nsfw]</a><?
 				}
 				if($upload->is_tmbo()) { ?>
-					<a style="color:#990000;" href="/offensive/setPref.php?p=hide_tmbo&v=<?= $me->getPref("hide_tmbo") == 1 ? "" : "1" ?>" title="<?= $me->getPref("hide_tmbo") == 1 ? "show" : "hide" ?> images that might be offensive">[tmbo]</a><?
+					<a style="color:#990000;" href="/offensive/setPref.php?p=hide_tmbo&v=<?= me()->getPref("hide_tmbo") == 1 ? "" : "1" ?>" title="<?= me()->getPref("hide_tmbo") == 1 ? "show" : "hide" ?> images that might be offensive">[tmbo]</a><?
 				}
 
 				$style = ($upload->is_tmbo() || $upload->is_nsfw()) ? "style=\"margin-left:.3em\"" : "";
@@ -566,7 +561,7 @@
 			-->
 			<span style="margin-left:48px">
 				<?
-				if($me->squelched($upload->uploader()->id())) {
+				if(me()->squelched($upload->uploader()->id())) {
 					?><a id="unsquelchLink" style="color:#999999; text-decoration:underline" href="/offensive/setPref.php?unsq=<?= $upload->uploader()->id() ?>">unsquelch <?= $upload->uploader()->username() ?></a><?
 				} else {
 					?><a id="squelchLink" style="color:#999999; text-decoration:underline" href="/offensive/setPref.php?sq=<?= $upload->uploader()->id() ?>">squelch <?= $upload->uploader()->username() ?></a><?
@@ -714,7 +709,7 @@
 		</div>
     	
 		<?
-		if($me->status() == "admin") {
+		if(me()->status() == "admin") {
 			?>
 			<br />
 		
@@ -736,7 +731,6 @@
 		
 		<br />&nbsp;
     	
-		<? record_hit();
-		include_once("analytics.inc"); ?>
+		<? include_once("analytics.inc"); ?>
 	</body>
 </html>

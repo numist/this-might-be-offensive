@@ -5,7 +5,8 @@ require_once("offensive/assets/header.inc");
 require_once( 'admin/mysqlConnectionInfo.inc' );
 if(!isset($link) || !$link) $link = openDbConnection();
 
-//mustLogIn("http");
+mustLogIn(array("prompt" => "http",
+                "token" => null));
 
 require_once("offensive/assets/conditionalGet.inc");
 require_once("offensive/assets/functions.inc");

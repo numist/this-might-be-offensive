@@ -5,10 +5,7 @@ if(!isset($link) || !$link) $link = openDbConnection();
 
 
 	function start() {
-		global $me;
 		mustLogIn();
-		
-		$me = new User($_SESSION["userid"]);
 	}
 
 	function head() {
@@ -72,7 +69,7 @@ if(!isset($link) || !$link) $link = openDbConnection();
 		>
 
 			<input type="hidden" name="c" value="prefs"/>
-			<? keyBindingsForm( $_SESSION['userid'] ) ?>
+			<? keyBindingsForm() ?>
 			<input type="submit" value="save"/>
 
 		</form>
@@ -82,8 +79,7 @@ if(!isset($link) || !$link) $link = openDbConnection();
 	}
 	
 	
-	function keyBindingsForm( $uid ) {
-		
+	function keyBindingsForm() {
 		$sql = "SELECT * FROM preference_names_values WHERE value like '%_KEY' ORDER BY id";
 		
 		$result = tmbo_query( $sql );
