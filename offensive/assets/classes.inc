@@ -1364,8 +1364,9 @@ class Link {
 
 	static function rss($type) {
 		assert('in_array($type, array("audio", "zip", "pic", "discuss"))');
+        $token = new Token(" rss");
 
-		return "/offensive/".$type."_rss.php?token=".me()->token()->tokenid();
+		return "/offensive/".$type."_rss.php?token=".$token->tokenid();
 	}
 }
 
@@ -1378,16 +1379,10 @@ class Token {
 	 */
 	public function __construct($info=null) {
 		if($info === null) {
-			/*
-			 * get a site token for the currently-logged-in user.
-			 */
-			$me = me();
-			assert('$me');
-			if(!array_key_exists("userid:".$me->id(), self::$gdata)) {
-				self::$gdata["userid:".$me->id()] = array("userid" => $me->id());
-			}
-			$this->data =& self::$gdata["userid:".$me->id()];
-		} else if(is_array($info)) {
+			$info = " tmbo";
+		}
+		
+		if(is_array($info)) {
 			/*
 			 * the caller has passed an array that represents a row from the tokens table.
 			 */
@@ -1408,13 +1403,25 @@ class Token {
 				}
 			}
 		} else if(is_string($info)) {
-			/*
-			 * get a token by id
-			 */
-			if(!array_key_exists("tokenid:".$info, self::$gdata)) {
-				self::$gdata["tokenid:".$info] = array("tokenid" => $info);
+			if(strlen($info) < 16) {
+				/*
+				 * get a token by application
+				 */
+				$me = me();
+				assert('$me');
+				if(!array_key_exists("app:$info", self::$gdata)) {
+					self::$gdata["app:$info"] = array("userid" => $me->id(), "issued_to" => $info);
+				}
+				$this->data =& self::$gdata["app:$info"];
+			} else {
+				/*
+				 * get a token by id
+			 	 */
+				if(!array_key_exists("tokenid:".$info, self::$gdata)) {
+					self::$gdata["tokenid:".$info] = array("tokenid" => $info);
+				}
+				$this->data =& self::$gdata["tokenid:".$info];
 			}
-			$this->data =& self::$gdata["tokenid:".$info];
 		} else {
 			trigger_error("type mismatch: constructor argument must be a tokenid(string), array of token rows, or null", E_USER_ERROR);
 		}
@@ -1428,7 +1435,8 @@ class Token {
 				$sql = "SELECT * FROM tokens WHERE tokenid = \"".sqlEscape($this->data["tokenid"])."\"";
 			} else {
 				assert('array_key_exists("userid", $this->data)');
-				$sql = "SELECT * FROM tokens WHERE issued_to = \" tmbo\" AND userid = ".$this->data["userid"];
+				assert('array_key_exists("issued_to", $this->data)');
+				$sql = "SELECT * FROM tokens WHERE issued_to = \"".sqlEscape($this->data["issued_to"])."\" AND userid = ".$this->data["userid"];
 			}
 			$result = tmbo_query($sql);
 			
@@ -1438,8 +1446,9 @@ class Token {
 				// query of "userid issued by ' tmbo'" or "tokenid".
 				assert('mysql_num_rows($result) == 0');
 				if(!array_key_exists("tokenid", $this->data) &&
-				   array_key_exists("userid", $this->data)) {
-					$token = core_createtoken(" tmbo");
+				   array_key_exists("userid", $this->data) &&
+				   array_key_exists("issued_to", $this->data)) {
+					$token = core_createtoken($this->data["issued_to"]);
 					$this->data =& self::$gdata["tokenid:".$token->tokenid()];
 					$this->data['exists'] = true;
 				} else {
@@ -1493,6 +1502,10 @@ class Token {
 	
 	public function reset_validity() {
 		unset($this->data["exists"]);
+	}
+	
+	public function readonly() {
+	    return ($this->issued_to() == " rss");
 	}
 	
 	public function api_data() {

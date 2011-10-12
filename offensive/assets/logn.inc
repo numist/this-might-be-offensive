@@ -103,17 +103,20 @@ function checkUser($me) {
  * this function does not do any authentication, it is just a shared resource used by various 
  * authentication mechanisms to process a successful login attempt.
  */
-function logInUser($me) {
+function logInUser($me, $session=true) {
 	global $login_message, $prompt;
 
-	if(session_id() == "") {
-		session_start();
-	}
-
 	if( $me->status() == 'normal' || $me->status() == 'admin' ) {
-		$_SESSION['userid'] = $me->id();
-		$_SESSION['status'] = $me->status();
-		$_SESSION['username'] = $me->username();
+	    if($session) {
+	        if(session_id() == "") {
+        		session_start();
+        	}
+		    $_SESSION['userid'] = $me->id();
+		    $_SESSION['status'] = $me->status();
+		    $_SESSION['username'] = $me->username();
+	    } else {
+	        session_unset();
+	    }
 			
 		$sql = "INSERT INTO ip_history (userid, ip) VALUES ( ".$me->id().", '".$_SERVER['REMOTE_ADDR']."' )";
 		tmbo_query( $sql );
@@ -306,7 +309,12 @@ function loginWithToken($nothing) {
 			tmbo_query($sql);
 		}
 		
-		return logInUser(new User(array("userid" => $token->userid())));
+		if($token->readonly()) {
+			global $readonly;
+			$readonly = true;
+		}
+		
+		return logInUser(new User(array("userid" => $token->userid())), false);
 	}
 	return null;
 }
