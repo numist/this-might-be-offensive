@@ -1,6 +1,6 @@
-web/offensive/pages/picpile/*
-web/offensive/pages/top100/*
-web/offensive/uploads/*
-web/offensive/zips/*
+offensive/data/comments.db*
+offensive/quarantine
+offensive/uploads
+offensive/zips
 .DS_Store
-.config
+admin/.config
