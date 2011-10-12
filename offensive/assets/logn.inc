@@ -164,6 +164,16 @@ function failedLogIn($name) {
  */
 function login($methods=array()) {
 	global $login_called;
+
+	/* Avoid unnecessary work
+	 * Sometimes login is called once without any arguments in case a session or
+	 * cookie is lying around and later with actual credentials. Check both that
+	 * this is a duplicate call *and* that a user is actually logged in before
+	 * short-circuiting.
+	 */
+	if($login_called && me()) {
+		return true;
+	}
 	$login_called = true;
 	
 	assert('is_array($methods)');
