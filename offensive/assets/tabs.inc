@@ -11,7 +11,7 @@
 
 <div>
 	<div class="<?= cssFor('images') ?>"><a href="/offensive/<? 
-		if($me) {
+		if(me()) {
 			echo "?c=".((me()->getPref("index") == "thumbs") ? 
 	      "thumbs" : "main"); 
 		}
