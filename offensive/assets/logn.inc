@@ -70,6 +70,20 @@ function checkUser($me) {
 	global $login_message, $prompt;
 
 	if($me->status() == "normal" || $me->status() == "admin") {
+		// don't update the user's row unless the IP has changed or it's been a minute since the last update.
+
+		if(strtotime($me->timestamp()) < time() - 60 ||
+		   $me->last_login_ip() != $_SERVER['REMOTE_ADDR']) {
+			$sql = "UPDATE users SET last_login_ip='" . $_SERVER['REMOTE_ADDR'] . "', timestamp=NOW() WHERE userid=".$me->id();
+			tmbo_query( $sql );
+			
+			// update the User cache with the new data.
+			$args = array("userid" => $me->id(),
+			              "last_login_ip" => $_SERVER['REMOTE_ADDR'],
+			              "timestamp" => date("Y-m-d H:i:s"));
+			new User($args);
+		}
+		
 		$GLOBALS["me"] = $me;
 		return true;
 	}
@@ -95,9 +109,6 @@ function logInUser($me) {
 	if(session_id() == "") {
 		session_start();
 	}
-
-	$sql = "UPDATE users SET last_login_ip='" . $_SERVER['REMOTE_ADDR'] . "', timestamp=NOW() WHERE userid=".$me->id()." LIMIT 1";
-	tmbo_query( $sql );
 
 	if( $me->status() == 'normal' || $me->status() == 'admin' ) {
 		$_SESSION['userid'] = $me->id();
@@ -289,8 +300,11 @@ function loginWithToken($nothing) {
 			return false;
 		}
 		
-		$sql = "UPDATE tokens SET last_used = NOW() WHERE tokenid = \"".$token->tokenid()."\"";
-		tmbo_query($sql);
+		// don't update the token's row unless it's been a minute since the last update.
+		if(strtotime($token->last_used()) < time() - 60) {
+			$sql = "UPDATE tokens SET last_used = NOW() WHERE tokenid = \"".$token->tokenid()."\"";
+			tmbo_query($sql);
+		}
 		
 		return logInUser(new User(array("userid" => $token->userid())));
 	}

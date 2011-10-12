@@ -463,7 +463,4 @@ $timelimit = 10;
 				<? } ?>
 			</table>
 		</div>
-	<? }
-	
-	record_hit();
-?>
+	<? } ?>

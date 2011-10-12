@@ -156,6 +156,8 @@ function tmbo_query($sql, $timeout=2) {
 		return;
 	}
 
+var_dump($sql);
+
 	time_start($time);
 		
 	$result = mysql_query($sql, $link) or 
@@ -177,13 +179,6 @@ function tmbo_query($sql, $timeout=2) {
 
 	$queries[] = array($sql, $time);
 	return $result;
-}
-
-/* accurate timekeeping */
-function record_hit() {
-	if(login()) {
-		tmbo_query("UPDATE users SET timestamp=now() WHERE userid=".$_SESSION['userid']." LIMIT 1");
-	}
 }
 
 function byte_format($size, $digits=0) {	

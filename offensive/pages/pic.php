@@ -736,7 +736,6 @@
 		
 		<br />&nbsp;
     	
-		<? record_hit();
-		include_once("analytics.inc"); ?>
+		<? include_once("analytics.inc"); ?>
 	</body>
 </html>
