@@ -49,6 +49,7 @@ if(count($possearr) == 0) {
 	$posse = "<p style='line-height: 10px; margin: 4px 0px 3px 0px;'><a style='text-decoration: none;' href='/offensive/?c=posse&amp;userid=".$user->id()."'>".$user->username()." has a posse</a>";
 	
 	$posse_markers = 0;
+	$posse_list = "";
 	foreach($possearr as $posser) {
 		if($posser->location()) {
 			$posse_markers++;
