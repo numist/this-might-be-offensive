@@ -3,5 +3,5 @@
 	session_unset();
 	setcookie( "remember", false, time()-4200, "/" );
 	// redirect to the main page
-	header("Location: ./");
+	header("Location: ./logn.php");
 ?>
