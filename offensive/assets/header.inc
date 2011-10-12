@@ -30,9 +30,6 @@ if(!ssl()) {
 	exit;
 }
 
-/* all pages require an active session eventually */
-session_start();
-
 /*  _                   _
  * | | ___   __ _  __ _(_)_ __   __ _
  * | |/ _ \ / _` |/ _` | | '_ \ / _` |
@@ -42,6 +39,7 @@ session_start();
  */
 
 // if we are not an admin, buffer output until the end in case of fatal errors.
+session_start();
 if(!array_key_exists("status", $_SESSION) || $_SESSION['status'] != "admin") {
         ob_start(null, 0);
 }

@@ -515,10 +515,10 @@
 
 		$sql = $commentsql;
 
-		if(!isset($_SESSION) || !array_key_exists("userid", $_SESSION)) {
+		if(!me()) {
 			trigger_error("must be logged in to use this function", E_USER_ERROR);
 		}
-		$userid = $_SESSION['userid'];
+		$userid = me()->id();
 
 		/*	$commentsql = "SELECT com.*,
 		             u.username as user_username, u.account_status as user_account_status, u.userid as user_userid,

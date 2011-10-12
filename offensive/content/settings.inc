@@ -9,10 +9,10 @@
 
 	function start()
 	{
-		global $options, $me;
+		global $options;
 		
 		mustLogIn();
-		$me = new User($_SESSION["userid"]);
+		$me = me();
 		
 		if(array_key_exists("submit", $_POST)) {
 			// check for post for keys

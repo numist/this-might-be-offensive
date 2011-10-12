@@ -369,12 +369,8 @@ $timelimit = 10;
 <?
 	// XXX: this needs to use core
 	function unread() {
-
-		$uid = $_SESSION['userid'];
-
-		if( ! is_intger( $uid ) ) {
-			return;
-		}
+		if(!me()) return;
+		$uid = me()->id();
 
 		$sql = "SELECT DISTINCT u.*, b.commentid
 					FROM offensive_uploads u, offensive_subscriptions b
@@ -423,8 +419,9 @@ $timelimit = 10;
 		<div class="heading">who's on:</div>
 		<div class="bluebox">
 			<table style="width:100%"><?
+				$uid = me() ? me()->id() : 0;
 				// list out the latest people to do something
-				$sql = "SELECT userid, username FROM users WHERE timestamp > DATE_SUB( now( ) , INTERVAL $timelimit MINUTE) && userid != ".$_SESSION['userid']." ORDER BY timestamp DESC LIMIT $userlimit";
+				$sql = "SELECT userid, username FROM users WHERE timestamp > DATE_SUB( now( ) , INTERVAL $timelimit MINUTE) && userid != $uid ORDER BY timestamp DESC LIMIT $userlimit";
 				$result = tmbo_query($sql);
 				while(false !== (list($userid, $username) = mysql_fetch_array($result))) {
 					$css = (!isset($css) || $css == "odd") ? "even" : "odd"; ?>

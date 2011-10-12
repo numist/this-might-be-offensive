@@ -23,8 +23,7 @@
 		 * user's preferences.
 		 */
 		if($redirect == "") {
-			$me = new User($_SESSION["userid"]);
-			$redirect = '/offensive/?c='.(($me->getPref("index") == "thumbs") ? 
+			$redirect = '/offensive/?c='.((me()->getPref("index") == "thumbs") ? 
 			      "thumbs" : "main");
 		}
 		header( "Location: " . $redirect );
@@ -41,8 +40,7 @@
 		 * user's preferences.
 		 */
 		if(!$redirect) {
-			$me = new User($_SESSION["userid"]);
-			$redirect = '/offensive/?c='.(($me->getPref("index") == "thumbs") ? 
+			$redirect = '/offensive/?c='.((me()->getPref("index") == "thumbs") ? 
 			      "thumbs" : "main");
 		}
 		header( "Location: " . $redirect );

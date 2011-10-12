@@ -13,10 +13,7 @@
 	set_include_path($tmboroot);
 
 	function start() {
-		global $me;
 		mustLogIn();
-
-		$me = new User($_SESSION["userid"]);
 	}
 	
 

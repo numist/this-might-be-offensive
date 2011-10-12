@@ -6,10 +6,7 @@
 	require_once 'offensive/assets/tabs.inc';
 
 	function start() {
-		global $me;
 		mustLogIn();
-		
-		$me = new User($_SESSION["userid"]);
 	}
 
 	function body() {
@@ -122,13 +119,13 @@
 				<td style="text-align:right"><?= $count ?>.</td>
 				<td>
 					<?
-						if( $row['userid'] == $_SESSION['userid'] ) {
+						if( $row['userid'] == me()->id() ) {
 							echo "<b>";
 						}
 					?>
 					<a href="./?c=user&userid=<?= $row['userid'] ?>"><?= $row['username'] ?>
 					<?
-						if( $row['userid'] == $_SESSION['userid'] ) {
+						if( $row['userid'] == me()->id() ) {
 							echo "</b>";
 						}
 					?>

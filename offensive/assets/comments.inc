@@ -9,7 +9,8 @@ require_once("offensive/assets/classes.inc");
  *  2. the user has already voted
  */
 function canVote($fileid, $userid=null) {
-	if($userid == null) $userid = $_SESSION['userid'];
+	if($userid == null) $userid = me() ? me()->id() : null;
+	if($userid == null) return false;
 
 	if(alreadyVoted($fileid, $userid)) return false;
 
@@ -23,9 +24,7 @@ function canVote($fileid, $userid=null) {
  * if a user has already voted on the file in the arguments, this function
  * will return true.
  */
-function alreadyVoted($fileid, $userid=null) {
-	if($userid == null) $userid = $_SESSION['userid'];
-	
+function alreadyVoted($fileid, $userid) {
 	$sql = "SELECT vote AS thecount FROM offensive_comments 
 	        WHERE fileid=$fileid AND userid=$userid AND vote LIKE 'this%'";
 	return (mysql_num_rows(tmbo_query($sql)) > 0);
@@ -37,8 +36,9 @@ function alreadyVoted($fileid, $userid=null) {
  *  * the user voted "this is bad" on the file
  */
 function subscribe($fileid, $userid=null) {
-	if($userid == null) $userid = $_SESSION['userid'];
-	
+	if($userid == null) $userid = me() ? me()->id() : null;
+	if($userid == null) return false;
+		
 	// check if the user is already subscribed
 	$sql = "SELECT * FROM offensive_subscriptions WHERE userid = $userid AND fileid = $fileid";
 	if(mysql_num_rows(tmbo_query($sql)) > 0) return true;
@@ -57,8 +57,9 @@ function subscribe($fileid, $userid=null) {
  * unsubscribes a user from a thread.
  */
 function unsubscribe($fileid, $userid=null) {
-	if($userid == null) $userid = $_SESSION['userid'];
-	
+	if($userid == null) $userid = me() ? me()->id() : null;
+	if($userid == null) return false;
+		
 	$sql = "DELETE FROM offensive_subscriptions WHERE userid=$userid AND fileid=$fileid";
 	tmbo_query($sql);
 
@@ -96,7 +97,8 @@ function updateCommentCount($fileid, $good, $bad, $repost, $tmbo, $comment) {
 }
 
 function subscribed($fileid, $userid=null) {
-	if($userid == null) $userid = $_SESSION['userid'];
+	if($userid == null) $userid = me() ? me()->id() : null;
+	if($userid == null) return false;
 	
 	$sql = "SELECT * FROM offensive_subscriptions
 		WHERE userid=$userid AND fileid=$fileid";
@@ -109,8 +111,8 @@ function getUnreadComments($userid) {
 }
 
 function postComment($fileid, $vote, $repost, $offensive, $comment, $subscribe=null) {
-	global $me;
-	$userid = $_SESSION['userid'];
+	$userid = me() ? me()->id() : null;
+	if($userid == null) return false;
 
 	if($vote != "this is good" && $vote != "this is bad" && $vote != "") {
 		trigger_error("invalid vote $vote", E_USER_ERROR);
@@ -135,8 +137,8 @@ function postComment($fileid, $vote, $repost, $offensive, $comment, $subscribe=n
 	}
 
 	// changeblog
-	if($fileid == "211604" && $_SESSION['status'] != "admin") {
-		trigger_error("user ".$me->username()." not allowed to post to changeblog", E_USER_NOTICE);
+	if($fileid == "211604" && me()->status() != "admin") {
+		trigger_error("user ".me()->username()." not allowed to post to changeblog", E_USER_NOTICE);
 		return false;
 	}
 

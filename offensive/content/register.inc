@@ -100,16 +100,16 @@
 	function createAccount( $uName, $pw, $email, $referral ) {
 		$returnMessage = "OK";
 		
-	    $query = "SELECT count(*) AS theCount FROM users WHERE username = '" . $uName . "'";
+		$query = "SELECT count(*) AS theCount FROM users WHERE username = '" . $uName . "'";
 
-	    $result = tmbo_query($query);
+		$result = tmbo_query($query);
 
 		// get the results of the query as an associative array, indexed by column name
 		$row = mysql_fetch_array( $result, MYSQL_ASSOC );
 		
 		if( $row['theCount'] == 0 ) {
 
-			$sql = "select * from referrals where referral_code = '$referral'";
+			$sql = "SELECT * FROM referrals WHERE referral_code = '$referral'";
 
 			$result = tmbo_query( $sql );
 			$row = mysql_fetch_assoc( $result );
@@ -122,15 +122,16 @@
 
 			$result = tmbo_query("SELECT userid,account_status from users where username = '$uName'"); 
 			$row = mysql_fetch_array( $result, MYSQL_ASSOC );
+			
+			// XXX: this shouldn't be reachable—users are inserted into awaiting activation state, not normal.
 			if( $row['account_status'] == 'normal' ) {
 				$_SESSION['userid'] = $row['userid'];
-				$_SESSION['username'] = $uName;
+				login();
 			}
 			
 			$activationMessage = activationMessageFor( $row['userid'], $_POST['email'] );
 			
 			mail( $_POST['email'], "themaxx.com account activation", "$activationMessage", "From: offensive@themaxx.com (this might be offensive)");
-#			mail( "ray@mysocalled.com", "[" . $_SERVER["REMOTE_ADDR"] . "] - themaxx.com account created: $uName", $_POST['email'], "From: offensive@themaxx.com (this might be offensive)");
 		} else {
 		 	$returnMessage = "The username you've chosen, \"" . $uName . "\", is not available.";
 		}

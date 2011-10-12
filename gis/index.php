@@ -11,10 +11,7 @@
 
     mustLogIn();
 
-    $me = new User(array(
-        "userid" => $_SESSION["userid"],
-        "username" => $_SESSION["username"],
-        ));
+    $me = me();
 
 	// Include, and check we've got a connection to the database.
 	require_once( 'admin/mysqlConnectionInfo.inc' );

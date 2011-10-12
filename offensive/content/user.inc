@@ -8,10 +8,7 @@
 	
 
 	function start() {
-		global $me;
 		mustLogIn();
-		
-		$me = new User($_SESSION["userid"]);
 		
 		if(!isset($_REQUEST['userid']) ||
 		   $_REQUEST['userid'] == "0" ||
@@ -39,7 +36,7 @@
 
 			<input type="hidden" name="avatar" value="1"/>
 			<input type="hidden" name="c" value="upload"/>
-			<input type="hidden" name="redirect" value="./?c=user&userid=<?= $_SESSION['userid']?>"/>
+			<input type="hidden" name="redirect" value="./?c=user&userid=<?= me()->id() ?>"/>
 		
 			<input type="file" name="image"/>
 			<input type="submit" value="upload yearbook picture"/>
@@ -168,7 +165,7 @@
 								}
 							}
 							
-							if( $_SESSION['userid'] == $usrid ) {
+							if( me()->id() == $usrid ) {
 								uploadAvatarForm();
 							}
 							

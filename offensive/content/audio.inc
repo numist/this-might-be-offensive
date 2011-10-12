@@ -8,10 +8,7 @@
 	require_once("offensive/assets/core.inc");
 
 	function start() {
-		global $me;
 		mustLogIn();
-
-		$me = new User($_SESSION["userid"]);
 	}
 
 	function head() {

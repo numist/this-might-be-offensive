@@ -2,7 +2,7 @@
 	set_include_path("..");
 	require_once( 'offensive/assets/header.inc' );
 
-	if( isset( $_SESSION['userid'] )) {
+	if(login()) {
 		header( "Location: ./" );
 		exit;	
 	}
@@ -101,11 +101,7 @@
 
 			$result = tmbo_query("SELECT userid,account_status from users where username = '$uName'"); 
 			$row = mysql_fetch_assoc( $result );
-			if( $row['account_status'] == 'normal' ) {
-				$_SESSION['userid'] = $row['userid'];
-				$_SESSION['username'] = $uName;
-			}
-			
+			assert($row['account_status'] == 'awaiting activation');			
 			$activationMessage = activationMessageFor( $row['userid'], $_POST['email'] );
 			
 			mail( $_POST['email'], "[ this might be offensive ] account activation", "$activationMessage", "From: offensive@thismight.be (this might be offensive)");

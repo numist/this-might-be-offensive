@@ -8,15 +8,12 @@
 	require_once( 'offensive/assets/functions.inc' );
 
 	function start() {
-		global $me;
 		mustLogIn();
-		
-		$me = new User($_SESSION["userid"]);
 
 		if( array_key_exists("invite", $_REQUEST) &&
 		    isValidEmail( $_REQUEST['invite'] )) {
-			if(!canInvite( $_SESSION['userid'] )) {
-				trigger_error($_SESSION["username"]." tried to send invite, is not allowed!", E_USER_ERROR);
+			if(!canInvite(me()->id())) {
+				trigger_error(me()->username()." tried to send invite, is not allowed!", E_USER_ERROR);
 				exit;
 			}
 			sendInvitation( $_REQUEST['invite'] );
@@ -68,8 +65,8 @@
 
 	function sendInvitation( $email ) {
 
-		$username = $_SESSION['username'];
-		$referralCode = generateReferralCode( $_SESSION['userid'], $email );
+		$username = me()->username();
+		$referralCode = generateReferralCode( me()->id(), $email );
 	
 		$message = "
 
@@ -139,7 +136,7 @@ Enjoy.
 
 		<div class="entry odd_row">
 			<?
-				if( canInvite( $_SESSION['userid'] ) ) {
+				if( canInvite( me()->id() ) ) {
 			?>
 			<p>enter the email address of a friend below to send them an account invitation.<br/>
 			please use it wisely.</p>

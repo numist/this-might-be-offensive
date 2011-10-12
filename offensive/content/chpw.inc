@@ -3,10 +3,7 @@ require_once( 'admin/mysqlConnectionInfo.inc' );
 if(!isset($link) || !$link) $link = openDbConnection();
 
 	function start() {
-		global $me;
 		mustLogIn();
-		
-		$me = new User($_SESSION["userid"]);
 	}
 
 
@@ -23,7 +20,7 @@ if(!isset($link) || !$link) $link = openDbConnection();
 		if( array_key_exists("old", $_REQUEST) ) {
 			$old = $_REQUEST['old'];
 			$new = $_REQUEST['new'];
-			$uid = $_SESSION['userid'];
+			$uid = me()->id();
 			
 			if( isValidPassword( $new ) ) {
 				$encrypted_pw = sha1( $old );

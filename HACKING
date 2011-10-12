@@ -72,7 +72,8 @@ The second line is a require_once("offensive/assets/header.inc");  The header.in
 -------------------------------------------------------------------------------
 Code used within multiple .php files should be split off into a file for inclusion.  
 These files are (and should always be) allowed to make certain assumptions:
-* a session has been started, a user's online status can be determined by checking if $_SESSION['userid'] is set.
+* a session has been started.
+* if a user is logged in their object is accessible by calling me().
 * using get_include_path() as part of a path will put you at the web root.  For example, to open index.php, you could file_get_contents(get_include_path()."/offensive/index.php"); from anywhere in the codebase.
 
 ###############################################################################
@@ -113,7 +114,7 @@ This function returns a safed html string, with provisions for a few idiosyncras
                                                      |___/ 
 -------------------------------------------------------------------------------
 For all error reporting, please use trigger_error(), with an E_USER_* error code.  Only administrators can see errors on the site, and fatal errors will redirect users to a kaboom page (/offensive/index.outoforder.php).  All errors are sent to the apache log.
-Codes available for reporting errors are: E_USER_NOTICE - little tidbits of error, E_USER_WARNING - a recoverable error, and E_USER_ERROR - a fatal error.
+Codes available for reporting errors are: E_USER_NOTICE - something doesn't feel right, E_USER_WARNING - something isn't right, and E_USER_ERROR - I can't go on safely.
 
 All queries must use tmbo_query().  This function not only provides error reporting on failed queries, but also instruments queries so an effective measure of the number of queries, and how long they take can be kept.  The only queries that do not currently use tmbo_query() are ones that are in legacy code that is slated to be rewritten.
 

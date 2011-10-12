@@ -8,10 +8,7 @@
 	require_once( 'offensive/assets/core.inc' );
 
 	function start() {
-		global $me;
 		mustLogIn();
-
-		$me = new User($_SESSION["userid"]);
 
 		// support for conditional GETs, since the yearbook doesn't change often
 		$sql = "SELECT timestamp FROM offensive_uploads	WHERE type='avatar'

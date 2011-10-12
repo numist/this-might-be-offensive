@@ -7,10 +7,7 @@
 
 	function start()
 	{
-		global $me;
 		mustLogIn();
-		
-		$me = new User($_SESSION["userid"]);
 	}
 
 	function head()
@@ -38,7 +35,7 @@
 		tabs();
 		
 		$edit = (isset($_GET['action']) && ($_GET['action'] == 'edit')) ? true : false;
-		$userid = $_SESSION['userid'];
+		$userid = me()->id();
 ?>
 		<div id="map" style="width: auto; height: 500px;"></div>
 <?php if(!$edit) {?>

@@ -9,12 +9,11 @@ require_once('offensive/assets/functions.inc');
 mustLogIn();
 
 require_once("offensive/assets/classes.inc");
-$me = new User($_SESSION["userid"]);
 
 $p = array_key_exists("p", $_REQUEST) ? $_REQUEST['p'] : 0 ;
 
 function poast($comment, $image, $upload) {
-	global $me;
+	$me = me();
 	
 	$comment = new Comment($comment['commentid']);
 	if(!$me->squelched($comment->commenter()->id())) {

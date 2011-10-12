@@ -9,10 +9,9 @@
 	require_once("offensive/assets/comments.inc");
 
 	mustLogIn();
-
+	$me = me();
+	
 	time_start($ptime);
-
-	$me = new User($_SESSION["userid"]);
 
 	$id = "";
 	if(array_key_exists("id", $_REQUEST)) {

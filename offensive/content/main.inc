@@ -8,7 +8,6 @@
 	require_once("offensive/assets/core.inc");
 
 	function start() {
-		global $me;
 		mustLogIn();
 		
 		if(date("m-d") == "04-01") {
@@ -16,8 +15,7 @@
 			//exit;
 		}
 
-		$me = new User($_SESSION["userid"]);
-		$me->setPref("index", "");
+		me()->setPref("index", "");
 	}
 
 	function head() {

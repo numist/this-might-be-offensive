@@ -1302,7 +1302,7 @@ class User {
 			$ret["referer"] = $this->referred_by()->username();
 		}
 		
-		if($_SESSION["status"] == "admin") {
+		if($this->status() == "admin") {
 			$ret["ip"] = $this->last_login_ip();
 			$ret["email"] = $this->email();
 		}

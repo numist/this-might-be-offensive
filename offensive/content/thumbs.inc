@@ -7,7 +7,6 @@
 	require_once("offensive/assets/core.inc");
 
 	function start() {
-		global $me;
 		mustLogIn();
 
 		if(date("m-d") == "04-01") {
@@ -15,10 +14,9 @@
 			//exit;
 		}
 
-		$me = new User($_SESSION["userid"]);
-
+		// prevent changing preferred view if certain arguments are set
 		if(!array_key_exists("userid", $_REQUEST))
-			$me->setPref("index", "thumbs");
+			me()->setPref("index", "thumbs");
 	}
 
 	function head() {

@@ -5,10 +5,7 @@ if(!isset($link) || !$link) $link = openDbConnection();
 
 
 	function start() {
-		global $me;
 		mustLogIn();
-		
-		$me = new User($_SESSION["userid"]);
 	}
 
 	function head() {
@@ -72,7 +69,7 @@ if(!isset($link) || !$link) $link = openDbConnection();
 		>
 
 			<input type="hidden" name="c" value="prefs"/>
-			<? keyBindingsForm( $_SESSION['userid'] ) ?>
+			<? keyBindingsForm(me()->id()) ?>
 			<input type="submit" value="save"/>
 
 		</form>

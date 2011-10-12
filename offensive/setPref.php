@@ -9,7 +9,7 @@
 	require_once('offensive/assets/functions.inc');
 	require_once("offensive/assets/classes.inc");
 	
-	$me = new User($_SESSION["userid"]);
+	$me = me();
 
 	$prefname = sqlEscape( array_key_exists("p", $_REQUEST) ? $_REQUEST['p'] : "");
 	$value = sqlEscape( array_key_exists("v", $_REQUEST) ?$_REQUEST['v'] : "");

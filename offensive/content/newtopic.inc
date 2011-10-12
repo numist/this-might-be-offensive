@@ -6,17 +6,14 @@
 	require_once( 'offensive/assets/comments.inc' );
 
 	function start() {
-		global $me;
 		mustLogIn();
-		
-		$me = new User($_SESSION["userid"]);
 
 		if( array_key_exists("submit", $_REQUEST) && array_key_exists("topic", $_REQUEST) ) {
 			$topic = trim( $_REQUEST['topic'] );
 			if( strlen( $topic ) > 0 ) {
-				$tid = createTopic( $topic, $_SESSION['userid'] );
+				$tid = createTopic($topic);
 				
-				subscribe( $tid, $_SESSION['userid'] );
+				subscribe($tid);
 				
 				if(array_key_exists("comment", $_REQUEST)) {
 					postComment($tid, "", 0, 0, $_REQUEST['comment'], true);
@@ -27,9 +24,8 @@
 		}
 	}
 	
-	function createTopic( $topic, $uid ) {
-		global $me;
-		
+	function createTopic($topic) {
+		$uid = me()->id();
 		$sql = "INSERT INTO offensive_uploads ( userid, filename, ip, type )
 					VALUES ( $uid, '".sqlEscape($topic)."', '" . $_SERVER['REMOTE_ADDR'] . "', 'topic' )";
 		tmbo_query($sql);

@@ -20,24 +20,22 @@
 
 	function start() {
 		global $upload, $uploader;
-	
-		global $me;
 		mustLogIn();
+		$me = me();
 		
-		$me = new User($_SESSION["userid"]);
-
 		if( ! is_intger( $_REQUEST['fileid'] ) ){
 			header( "Location: ./" );
 			exit;
 		}
 		
 		$upload = new Upload($_REQUEST['fileid']);
-		$uploader = $upload->uploader();
 
 		if(!$upload->exists()) {
 			require("offensive/404.php");
 			exit;
 		}
+
+		$uploader = $upload->uploader();
 
 		clearSubscription($upload->id(), $me->id());
 
@@ -71,7 +69,7 @@
 	    }
 	    
 	    // quietly snub them if they are not an admin and they are trying to post to the changeblog
-	    if(array_key_exists("submit", $_REQUEST) && $upload->id() == "211604" && $_SESSION['status'] != "admin") {
+	    if(array_key_exists("submit", $_REQUEST) && $upload->id() == "211604" && me()->status() != "admin") {
 	        return;
 	    }
 	    
@@ -307,7 +305,7 @@
 
 <?php
     // changeblog shouldn't tease the users with a comment field
-    if($upload->id() != "211604" || $_SESSION['status'] == "admin") {
+    if($upload->id() != "211604" || me()->status() == "admin") {
 ?>
 
 	<div class="contentbox">

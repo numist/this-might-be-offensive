@@ -10,10 +10,7 @@
 	require_once("offensive/assets/core.inc");
 
 	function start() {
-		global $me;
 		mustLogIn();
-
-		$me = new User($_SESSION["userid"]);
 	}
 
 	function head() {
@@ -73,7 +70,7 @@ EOT;
 		foreach($result as $upload) {
 			$css = strpos($css, "even") !== false ? "oddfile odd_row" : "evenfile even_row";
 
-			if( $upload->uploader()->id() == $_SESSION['userid'] ) {
+			if( $upload->uploader()->id() == me()->id()) {
 				$css = "my_hof ".(strpos($css, "even") !== false ? "even_row" : "odd_row");
 			}
 

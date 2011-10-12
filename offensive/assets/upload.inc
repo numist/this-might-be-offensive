@@ -19,14 +19,14 @@ $filetypes = array("jpg", "jpeg", "gif", "png");
  * Result: boolean, is there a file to attempt uploading.
  */
 function uploading_file() {
+	if(!me()) return false;
 	if(array_key_exists("image", $_FILES) &&
 		is_array($_FILES['image']) &&
 		array_key_exists("name", $_FILES['image']) &&
 		$_FILES['image']['name'] != "" &&
 		array_key_exists("size", $_FILES['image']) &&
 		$_FILES['image']['size'] > 0 &&
-		!exceededUploadLimit($_SESSION['userid'])) {
-
+		!exceededUploadLimit()) {
 		return true;
 	}
 	return false;
@@ -39,30 +39,31 @@ function getHash( $filePath ) {
 	return md5( $filedata );
 }
 
-function exceededUploadLimit($uid) {
-	return (numUploadsRemaining( $uid ) === 0 && $_SESSION['status'] != 'admin');
+function exceededUploadLimit() {
+	if(!me()) return true;
+	return (numUploadsRemaining() === 0 && me()->status() != "admin");
 }
 
-function numUploadsRemaining( $uid ) {
-	$limit = numAllowedUploads( $_SESSION['userid'] );
-	$used = numUploadsToday( $_SESSION['userid'] );
+function numUploadsRemaining() {
+	if(!me()) return 0;
+	$limit = numAllowedUploads();
+	$used = numUploadsToday();
 	return ($limit - $used ) > 0 ? ($limit - $used ) : 0;
 }
 
-function numUploadsToday( $uid ) {
-	$sql = "SELECT count( id ) as thecount FROM offensive_uploads WHERE userid = " . $_SESSION['userid'] . " AND timestamp > DATE_SUB( NOW(), INTERVAL 1 DAY ) AND type='image'";
+function numUploadsToday() {
+	if(!me()) return 0;
+	$sql = "SELECT count( id ) as thecount FROM offensive_uploads WHERE userid = ".me()->id()." AND timestamp > DATE_SUB( NOW(), INTERVAL 1 DAY ) AND type='image'";
 	$result = tmbo_query( $sql );
-
 	$row = mysql_fetch_assoc( $result );
-
 	return $row[ 'thecount' ];
-
 }
 
-function numAllowedUploads( $uid ) {
+function numAllowedUploads() {
+	if(!me()) return 0;
 
 	// Fipi Lele is allowed (effectively) unlimited uploads.
-	if($uid == 143) {
+	if(me()->id() == 143) {
 		return 9999;
 	}
 
@@ -70,7 +71,7 @@ function numAllowedUploads( $uid ) {
 				FROM offensive_comments, offensive_uploads
 				WHERE vote
 					AND offensive_comments.fileid = offensive_uploads.id
-					AND offensive_uploads.userid = $uid
+					AND offensive_uploads.userid = ".me()->id()."
 					AND offensive_uploads.timestamp > DATE_SUB( NOW(), INTERVAL 6 MONTH )
 				GROUP  BY vote";
 
@@ -247,7 +248,7 @@ function upload() {
 	box("acceptable file types: ".implode(", ", $filetypes).".", "sorry.");
 
 	mail( "thismightbe@numist.net",
-	      "[" . $_SERVER["REMOTE_ADDR"] . "] - SUSPICIOUS UPLOAD!!! " . $_SESSION['username'] .
+	      "[" . $_SERVER["REMOTE_ADDR"] . "] - SUSPICIOUS UPLOAD!!! ".me()->username().
 	      $postdata['tmpname'], requestDetail(),
 	      "From: offensive@thismight.be (this might be offensive)\r\n" );
 

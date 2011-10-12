@@ -189,8 +189,9 @@
 		$userid = check_arg("userid", "integer", null, false);
 		handle_errors();
 
-		if(!$userid && isset($_SESSION) && array_key_exists('userid', $_SESSION)) {
-			$userid = $_SESSION['userid'];
+		if(!$userid) {
+			assert('me()');
+			$userid = me()->id();
 		}
 		
 		$ret = new User($userid);
@@ -207,7 +208,8 @@
 		handle_errors();
 		
 		if($userid === false) {
-			$userid = $_SESSION['userid'];
+			assert('me()');
+			$userid = me()->id();
 		}
 		
 		$user = new User($userid);
@@ -240,7 +242,8 @@
 		if($token) {
 			send(core_createtoken(trim($_SERVER['HTTP_USER_AGENT'])));
 		} else {
-			$_REQUEST['userid'] = $_SESSION['userid'];
+			assert('me()');
+			$_REQUEST['userid'] = me()->id();
 			api_getuser();
 		}
 	}
@@ -263,7 +266,8 @@
 		$subscribe = check_arg("subscribe", "integer", $_POST, false, array("1", "0"));
 		handle_errors();
 		
-		$me = new User($_SESSION['userid']);
+		assert('me()');
+		$me = me();
 		
 		// if no comment, vote, offensive, or repost, then why are you here?
 		if(!($comment || $vote || $offensive || $repost || $subscribe)) {
@@ -371,7 +375,8 @@
 	function api_setlocation() {
 		$lat = check_arg("lat", "float");
 		$long = check_arg("long", "float");
-		$userid = $_SESSION['userid'];
+		assert('me()');
+		$userid = me()->id();
 		handle_errors();
 		
 		$sql = "REPLACE INTO maxxer_locations (userid, x, y, mapversion) VALUES( $userid, $lat, $long, 'google' )";
