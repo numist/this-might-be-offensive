@@ -289,6 +289,9 @@ function loginWithToken($nothing) {
 			return false;
 		}
 		
+		$sql = "UPDATE tokens SET last_used = NOW() WHERE tokenid = \"".$token->tokenid()."\"";
+		tmbo_query($sql);
+		
 		return logInUser(new User(array("userid" => $token->userid())));
 	}
 	return null;
