@@ -1,7 +1,6 @@
 <?php
 	set_include_path("..");
 	require_once('offensive/assets/header.inc');
-	require_once('offensive/assets/logn.inc');
 	require_once("offensive/assets/classes.inc");
 
 	if(!isset($_SERVER["HTTPS"]) || $_SERVER["HTTPS"] != "on") {
@@ -33,7 +32,7 @@
 	}
 
 	// if the user is logged in already, redirect.
-	if(loggedin()) {
+	if(login()) {
 		/*
 		 * if no redirect was requested, use the correct one from the
 		 * user's preferences.
@@ -47,13 +46,11 @@
 		exit;
 	}
 
-	$login_message = "";
-	$prompt = true;
 	$success = false;
 	
 	$name = isset($_REQUEST['username']) ? $_REQUEST['username'] : null;
 	$pw = isset($_REQUEST['password']) ? $_REQUEST['password'] : null;
-	if(login($name, $pw)) {
+	if(login(array("u/p" => array($name, $pw)))) {
 		/*
 		 * if no redirect was requested, use the correct one from the
 		 * user's preferences.

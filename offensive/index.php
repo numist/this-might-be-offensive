@@ -26,15 +26,7 @@ $timelimit = 10;
 
 	// if we're logged in, we'll want access to the user object for the logged in user
 	require_once("offensive/assets/classes.inc");
-	$me = false;
-	// XXX: eventually the entire index purple pages should all be members only!
-	if(loggedin()) {
-		$me = new User(array(
-			"userid" => $_SESSION["userid"],
-			"username" => $_SESSION["username"],
-			));
-	}
-	
+
 	// in an upgrade, break glass:
 	if( $upgrading &&
 	    (!array_key_exists("status", $_SESSION) ||
@@ -56,10 +48,13 @@ $timelimit = 10;
 	if(!isset($link) || !$link) $link = openDbConnection();
 	require_once('offensive/assets/functions.inc');
 
+	// initialize global $me information if possible.
+	login();
+
 	// LEGACY: moves from cookie-based landing page to db-based
-	if($me && array_key_exists("thumbnails", $_COOKIE) && 
+	if(me() && array_key_exists("thumbnails", $_COOKIE) && 
 	    $_COOKIE["thumbnails"] === "yes") {
-		$me->setPref("index", "thumbs");
+		me()->setPref("index", "thumbs");
 		setcookie( 'thumbnails', "no", time()-3600, "/offensive/" );
 	}
 	
@@ -75,13 +70,11 @@ $timelimit = 10;
 	} else {
 		// or the default landing page for this session.
 		// if not logged in, force it.
-		// XXX: eventually the entire index purple pages should all be members only!
-		if(!isset($me) || !is_object($me)) {
+		if(!me()) {
 			mustLogIn();
-			$me = new User($_SESSION["userid"]);
 		}
 		
-		$c = ($me->getPref("index") == "thumbs") ? 
+		$c = (me()->getPref("index") == "thumbs") ? 
 		      "thumbs" : "main";
 		header("Location: ./?c=$c");
 		exit;
@@ -92,8 +85,6 @@ $timelimit = 10;
 
 	if( function_exists( 'start' ) ) {
 		start();
-		// XXX: eventually the entire index purple pages should all be members only!
-		if(loggedin() && !$me) $me = new User($_SESSION['userid']);
 	}
 
 ?>
@@ -193,12 +184,12 @@ $timelimit = 10;
 	
 		<div id="leftcol">
 
-			<? if (loggedin()) { // log in --> get info restricted block ?>
+			<? if (login()) { // log in --> get info restricted block ?>
 				<div class="contentbox">
 					<div class="blackbar"></div>
 						<div class="heading">your stuff:</div>
 						<div class="bluebox">
-							<p>hi <b><?= $me->htmlUsername() ?></b>!</p>
+							<p>hi <b><?= me()->htmlUsername() ?></b>!</p>
 							
 							<p><a href="index.php?c=upload">upload</a></p>
 							
@@ -265,7 +256,7 @@ $timelimit = 10;
 				<div class="blackbar"></div>
 			</div>
 -->
-			<? if(loggedin()) { // archive <--> bottom restricted block ?>
+			<? if(login()) { // archive <--> bottom restricted block ?>
 				<div class="contentbox">
 					<div class="blackbar"></div>
 					<div class="heading">archives:</div>
@@ -314,7 +305,7 @@ $timelimit = 10;
 					</div>
 					<div class="blackbar"></div>
 				</div>
-				<? if($c != "online" && $me->status() == "admin") { ?>
+				<? if($c != "online" && me()->status() == "admin") { ?>
 					<div class="contentbox">
 						<div class="blackbar"></div>
 						<? if($c != "comments") whosOn();
@@ -359,7 +350,7 @@ $timelimit = 10;
 	</div>
 	<?
 	
-	if($me->status() == "admin") {
+	if(me()->status() == "admin") {
 		?>
 		<div class="textlinks"><?= number_format(time_end($ptime), 3)."s php, ".number_format($querytime, 3)."s sql, ".count($queries)." queries\n\n <!--\n\n";
 			var_dump($queries);

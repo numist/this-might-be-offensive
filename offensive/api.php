@@ -10,8 +10,9 @@
 	require_once("offensive/assets/core.inc");
 	require_once("offensive/assets/comments.inc");
 	
-	// if not logged in, force a switch to ssl.
-	if(!loggedin() && (!isset($_SERVER["HTTPS"]) || $_SERVER["HTTPS"] != "on")) {
+	// force ssl.
+	if(!ssl()) {
+		// TODO: if a token was present in the URI, it should be invalidated.
 		header("Location: https://".$_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"], 301);
 		exit;
 	}
@@ -65,11 +66,9 @@
 	
 	$me = false;
 	// authentication
-	if($func != "login" && !loggedin(false)) {
-		mustLogIn("http");
-	} else if(loggedin()) {
-		// XXX: update ip_history, last_seen
-		$me = new User($_SESSION['userid']);
+	if($func != "login") {
+		mustLogIn(array("prompt" => "http",
+		                "token" => null));
 	}
 	
 /**
@@ -231,7 +230,7 @@
 		handle_errors();
 		session_unset();
 		
-		$loggedin = login($_REQUEST['username'], $_REQUEST['password']);
+		$loggedin = login(array("u/p" => array($_REQUEST['username'], $_REQUEST['password'])));
 		if($loggedin === false) {
 			global $login_message;
 			header("HTTP/1.0 401 Unauthorized");

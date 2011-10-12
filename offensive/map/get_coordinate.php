@@ -12,7 +12,8 @@ if(!isset($link) || !$link) $link = openDbConnection();
 require_once("offensive/assets/functions.inc");
         
 // authentication
-mustLogIn("http");
+mustLogIn(array("prompt" => "http",
+                "token" => null));
 
 $user = (isset($_GET['user']) && is_intger($_GET['user'])) ? $_GET['user'] : "";
 if($user == "") trigger_error("no user argument", E_USER_ERROR);

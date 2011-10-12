@@ -11,7 +11,8 @@ require_once("offensive/assets/argvalidation.inc");
 require_once("offensive/assets/classes.inc");
 require_once("offensive/assets/comments.inc");
 
-mustLogIn("http");
+mustLogIn(array("method" => "http",
+                "token" => null));
 
 $me = new User($_SESSION["userid"]);
 
