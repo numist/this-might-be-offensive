@@ -23,8 +23,14 @@ $upgrading = false;
 
 /*****************************************************************************/
 
-/* all pages require an active session eventually */
+// force ssl.
+if(!ssl()) {
+	// TODO: if a token was present in the URI, it should be invalidated.
+	header("Location: https://".$_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"], 301);
+	exit;
+}
 
+/* all pages require an active session eventually */
 session_start();
 
 /*  _                   _

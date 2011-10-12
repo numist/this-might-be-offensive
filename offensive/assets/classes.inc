@@ -855,10 +855,7 @@ class Comment {
 		           "/http[s]?:\\/\\/([a-zA-z0-9]*\\.)*tmbo\\.org/i",
 		           "/http[s]?:\\/\\/([a-zA-z0-9]*\\.)*thismight\\.be/i",
 		          );
-		// whether the user is browsing http or https should also be respected
-		$r = "http".
-			 (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == "on" ? "s" : "").
-			 "://".$_SERVER['SERVER_NAME'];
+		$r = "https://".$_SERVER['SERVER_NAME'];
 		$comment = preg_replace( $p, $r, $comment );
 
 

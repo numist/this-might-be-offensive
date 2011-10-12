@@ -49,12 +49,9 @@ function mustLogIn($methods=array()) {
     exit;
 	} else {
 		// build the redirect link
-		if(!isset($_SERVER["HTTPS"]) || $_SERVER["HTTPS"] != "on") {
-			$server = "http://".$_SERVER["SERVER_NAME"];
-		} else {
-			$server = "https://".$_SERVER["SERVER_NAME"];
-		}
-		$redirect = (isset($_REQUEST['redirect']) ? $_REQUEST['redirect'] : $server.urlencode($_SERVER['REQUEST_URI']));
+		$redirect = (isset($_REQUEST['redirect']) ?
+		            $_REQUEST['redirect'] :
+		            "https://".$_SERVER["SERVER_NAME"].urlencode($_SERVER['REQUEST_URI']));
 
 		header("Location: https://".$_SERVER["SERVER_NAME"]."/offensive/logn.php?redirect=".$redirect);
 		exit;

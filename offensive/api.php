@@ -9,14 +9,7 @@
 	require_once("offensive/assets/classes.inc");
 	require_once("offensive/assets/core.inc");
 	require_once("offensive/assets/comments.inc");
-	
-	// force ssl.
-	if(!ssl()) {
-		// TODO: if a token was present in the URI, it should be invalidated.
-		header("Location: https://".$_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"], 301);
-		exit;
-	}
-	
+		
 	class Error {
 		private $msg;
 
