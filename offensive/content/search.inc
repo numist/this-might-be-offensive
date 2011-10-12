@@ -144,7 +144,7 @@
 						<?
 							}	
 						?></div>
-				<div class="entry" style="<?= $css ?>">
+				<div class="entry">
 				<?= $comment->HTMLcomment(); ?><br/>
 					 
 	 	 			<div class="timestamp"><?= $result['match'] ?>% <a href="./?c=comments&fileid=<?= $comment->upload()->id() ?>#<?= $comment->id() ?>"><?= $comment->timestamp() ?></a></div>
@@ -171,7 +171,7 @@
 			?>
 			
 			<div class="contentbox">
-				<div class="entry" style="<?= $css ?>">
+				<div class="entry">
 			<table width="100%">
 				<tr>
 					<td width="200px">
