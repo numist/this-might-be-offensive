@@ -216,7 +216,7 @@
 					<td colspan="2">application: <?= (strlen($token->issued_to()) > 64) ? substr($token->issued_to(), 0, 61)."…" : $token->issued_to() ?></td>
 				</tr>
 				<tr>
-					<td colspan="2">token: <?= $token->tokenid() ?><?= $token->readonly() ? " (read only)" : "" ?></td>
+					<td colspan="2">token: <?= $token->tokenid() ?></td>
 				</tr>
 				<tr>
 					<td>issued date: <?= $token->issue_date() ?></td>
