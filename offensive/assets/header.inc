@@ -156,8 +156,6 @@ function tmbo_query($sql, $timeout=2) {
 		return;
 	}
 
-var_dump($sql);
-
 	time_start($time);
 		
 	$result = mysql_query($sql, $link) or 
