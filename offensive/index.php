@@ -56,13 +56,6 @@ $timelimit = 10;
 	if(!isset($link) || !$link) $link = openDbConnection();
 	require_once('offensive/assets/functions.inc');
 
-	// LEGACY: moves from cookie-based landing page to db-based
-	if($me && array_key_exists("thumbnails", $_COOKIE) && 
-	    $_COOKIE["thumbnails"] === "yes") {
-		$me->setPref("index", "thumbs");
-		setcookie( 'thumbnails', "no", time()-3600, "/offensive/" );
-	}
-	
 	// set our target to any of the requested content page...
 	if(isset($_REQUEST['c']) &&
 		// if it exists
