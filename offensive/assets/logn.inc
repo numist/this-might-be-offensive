@@ -261,7 +261,7 @@ function loginWithUserPass($params) {
 		$query = "SELECT userid FROM users WHERE username = '" . sqlEscape($name) . "' AND password = '" . $encrypted_pw . "'";
 		$result = tmbo_query($query);
 		if(mysql_num_rows($result) > 0) {
-			$userid = array_top(mysql_fetch_assoc($result));
+			$userid = reset(mysql_fetch_assoc($result));
 
 			if(logInUser(new User($userid))) {
 				// set rememberme cookie if the user requested it

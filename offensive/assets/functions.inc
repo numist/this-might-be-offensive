@@ -65,15 +65,6 @@ function box($message, $title="hmm:") {
 	<?
 }
 
-function array_top($arr) {
-	assert('is_array($arr)');
-	assert('count($arr) > 0');
-	// use foreach to get the first element of the array regardless of numeric or string index.
-	foreach($arr as $element) {
-		return $element;
-	}
-}
-
 function ssl() {
 	return (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on");
 }
