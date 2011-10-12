@@ -186,7 +186,7 @@
 	}
 
 	function api_getuser() {
-		$userid = check_arg("userid", "integer", $args, false);
+		$userid = check_arg("userid", "integer", null, false);
 		handle_errors();
 
 		if(!$userid && isset($_SESSION) && array_key_exists('userid', $_SESSION)) {
@@ -218,12 +218,13 @@
 	}
 
 	function api_login() {
-		check_arg("username", "string", null);
-		check_arg("password", "string", null);
+		$username = check_arg("username", "string");
+		$password = check_arg("password", "string");
+		$token = check_arg("gettoken", "integer", null, false);
 		handle_errors();
 		session_unset();
 		
-		$loggedin = login(array("u/p" => array($_REQUEST['username'], $_REQUEST['password'])));
+		$loggedin = login(array("u/p" => array($username, $password)));
 		if($loggedin === false) {
 			global $login_message;
 			header("HTTP/1.0 401 Unauthorized");
@@ -235,8 +236,13 @@
 			send(new Error($login_message));
 			exit;
 		}
-		$_REQUEST['userid'] = $_SESSION['userid'];
-		api_getuser();
+
+		if($token) {
+			send(core_createtoken(trim($_SERVER['HTTP_USER_AGENT'])));
+		} else {
+			$_REQUEST['userid'] = $_SESSION['userid'];
+			api_getuser();
+		}
 	}
 
 	function api_logout() {
