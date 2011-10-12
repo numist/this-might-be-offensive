@@ -67,6 +67,7 @@ EOT;
 
 		$result = core_getuploads($args);
 		$count = $page * $numPerPage;
+		$css = "oddfile odd_row";
 		foreach($result as $upload) {
 			$css = strpos($css, "even") !== false ? "oddfile odd_row" : "evenfile even_row";
 

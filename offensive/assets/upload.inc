@@ -759,7 +759,7 @@ function upload_checksize(&$postdata) {
 			<input type=\"submit\" name=\"resample\" value=\"Compress my file.\"/>
 			<input type=\"submit\" name=\"noresample\" value=\"Post it anyway.\"/>
 		</form>";
-	if($postdata['format'] == 'gif') $message .= "<br /><br />(If this is an animated gif, don't click the \"Compress\" button!)";
+	if($postdata['format'] == 'gif') $message .= "<br /><br />(If this image is animated, don't click the \"Compress\" button!)";
 
 	box($message, "whoa, nelly.");
 	$_SESSION['postdata'] = serialize($postdata);
@@ -868,7 +868,9 @@ function upload_checkrotation($postdata) {
 		return false;
 
 	$filename = $tmpdir."/".$postdata['tmpname'];
-	$exif = @exif_read_data($filename);
+	if(function_exists("exif_read_data")) {
+		$exif = @exif_read_data($filename);
+	}
 
 	if(!$exif || !array_key_exists("Orientation", $exif)) {
 		return false;

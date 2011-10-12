@@ -60,9 +60,7 @@
 	function head()
 	{
 ?>
-	<link rel="stylesheet" type="text/css" href="/offensive/css/settings.css"/>
 	<script type="text/javascript" src="/offensive/js/jquery-1.2.6.min.js"></script>
-	<!-- XXX: settings2? -->
 	<script type="text/javascript" src="/offensive/js/settings.js"></script>
 <?php
 	}
