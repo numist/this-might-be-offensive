@@ -42,10 +42,10 @@ mustLogIn();
 					<param name="language" value="english">
 					<param name="pixx:language" value="pixx-english">
 							
-					<param name="nick" value="<?= $_SESSION['username'] ?>">
-					<param name="alternatenick" value="tmb<?= $_SESSION['userid']?>">
-					<param name="userid" value="tmb<?= $_SESSION['userid'] ?>">
-					<param name="name" value="<?= $_SESSION['username'] ?>">
+					<param name="nick" value="<?= me()->username() ?>">
+					<param name="alternatenick" value="tmb<?= me()->id() ?>">
+					<param name="userid" value="tmb<?= me()->id() ?>">
+					<param name="name" value="<?= me()->username() ?>">
 					<param name="host" value="irc.efnet.net">
 					<param name="alternateserver1" value="irc.chowned.org 6667">
 					<param name="alternateserver2" value="irc.choopa.net 6667">

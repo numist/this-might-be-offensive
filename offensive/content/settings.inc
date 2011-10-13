@@ -3,15 +3,14 @@
 	require_once( 'admin/mysqlConnectionInfo.inc' );
 	if(!isset($link) || !$link) $link = openDbConnection();
 	require_once("offensive/assets/classes.inc");
+	require_once("offensive/assets/core.inc");
 
 	require("offensive/data/keynav.inc");
 
 	function start()
 	{
-		global $options, $me;
-		
+		global $options;
 		mustLogIn();
-		$me = new User($_SESSION["userid"]);
 		
 		if(array_key_exists("submit", $_POST)) {
 			// check for post for keys
@@ -37,34 +36,38 @@
 					if($prefname == "noselect") continue;
 					
 					if(array_key_exists($prefname, $choices)) {
-						$me->setPref($prefname, serialize($choices[$prefname]));
+						me()->setPref($prefname, serialize($choices[$prefname]));
 					} else {
-						$me->setPref($prefname, "");
+						me()->setPref($prefname, "");
 					}
 				}
 			} else {
 				foreach($prefnames as $prefname) {
 					if($prefname == "noselect") continue;
 					
-					$me->setPref($prefname, "");
+					me()->setPref($prefname, "");
 				}
 			}
+		}
+		
+		if(array_key_exists("revoke", $_REQUEST)) {
+			core_destroytoken($_REQUEST["revoke"]);
+			header("Location: /offensive/?c=settings");
+			exit;
 		}
 	}
 
 	function head()
 	{
 ?>
-	<link rel="stylesheet" type="text/css" href="/offensive/css/settings.css"/>
 	<script type="text/javascript" src="/offensive/js/jquery-1.2.6.min.js"></script>
-	<!-- XXX: settings2? -->
 	<script type="text/javascript" src="/offensive/js/settings.js"></script>
 <?php
 	}
 
 	function body()
 	{
-		global $me, $options;
+		global $options;
 
 		?><div class="heading">
 				set things up how you like 'em.
@@ -79,7 +82,7 @@
 		<p>use the nsfw and tmbo filters to block images that are not safe for work or potentially offensive.  <br />use the bad filter if you trust the judgement of your fellow maxxers.  10 [this is bad] votes and a ratio of 9 bad for every [this is good] causes the bad filter to activate.</p>
 		<div style="text-align:center">
 			<span><?
-				if($me->getPref("hide_nsfw") == 1) { ?>
+				if(me()->getPref("hide_nsfw") == 1) { ?>
 					<a href="/offensive/setPref.php?p=hide_nsfw&v=">turn nsfw filter off</a>
 				<? } else { ?>
 					<a href="/offensive/setPref.php?p=hide_nsfw&v=1">turn nsfw filter on</a>
@@ -87,7 +90,7 @@
 			</span>
 						
 			<span style="margin-left:48px;"><?
-				if($me->getPref("hide_tmbo") == 1) { ?>
+				if(me()->getPref("hide_tmbo") == 1) { ?>
 					<a href="/offensive/setPref.php?p=hide_tmbo&v=">turn tmbo filter off</a>
 				<? } else { ?>
 					<a href="/offensive/setPref.php?p=hide_tmbo&v=1">turn tmbo filter on</a>
@@ -95,7 +98,7 @@
 			</span>
 			
 			<span style="margin-left:48px;"><?
-				if($me->getPref("hide_bad") == 1) { ?>
+				if(me()->getPref("hide_bad") == 1) { ?>
 					<a href="/offensive/setPref.php?p=hide_bad&v=">turn bad filter off</a>
 				<? } else { ?>
 					<a href="/offensive/setPref.php?p=hide_bad&v=1">turn bad filter on</a>
@@ -140,7 +143,7 @@
 
 					// desc is unused, but required to get the key in a foreach loop.
 					foreach($prefnames as $prefname) {
-						$values = $me->getPref($prefname);
+						$values = me()->getPref($prefname);
 						
 						// possible false values here are false or "", so not checking types.
 						if($values != false) {
@@ -194,6 +197,35 @@
 			</form>
 		</div>
 	</div>
+
+	<div class="heading">tokens:</div>
+	<div class="bluebox">
+		<p>RSS feeds, the web site, and external applications use tokens to log in as you. Here you can see all of your tokens, when they were issued, for whom they were issued, and when they were last used. You can also revoke them here.</p>
+
+			<div align="center" style="padding:1em;">
+			<?
+				$tokens = core_gettokens();
+				foreach($tokens as $token) {
+			?>
+			<table>
+				<tr>
+					<td colspan="2">application: <?= (strlen($token->issued_to()) > 64) ? substr($token->issued_to(), 0, 61)."…" : $token->issued_to() ?></td>
+				</tr>
+				<tr>
+                    <td colspan="2">token: <?= $token->tokenid() ?><?= $token->readonly() ? " (read only)" : "" ?></td>
+				</tr>
+				<tr>
+					<td>issued date: <?= $token->issue_date() ?></td>
+					<td>last used: <?= $token->last_used() ?></td>
+				</tr>
+				<tr>
+					<td colspan="2" style="text-align: center;"><a href="<?= $_SERVER["REQUEST_URI"] ?>&revoke=<?= $token->tokenid() ?>">revoke this token</a></td>
+				</tr>
+			</table>
+			<? } ?>
+			</div>
+	</div>
+
 <?
 	}
 	

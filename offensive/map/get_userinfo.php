@@ -11,7 +11,8 @@ require_once("offensive/assets/functions.inc");
 require_once("offensive/assets/classes.inc");
 
 // authentication
-mustLogIn("http");
+mustLogIn(array("prompt" => "http",
+                "token" => null));
 
 $user = (isset($_GET['user']) && is_intger($_GET['user'])) ? $_GET['user'] : "";
 if($user == "") trigger_error("no user argument", E_USER_ERROR);
@@ -30,6 +31,7 @@ if($avatar == false) {
 }
 
 $referer = $user->referred_by();
+$refer = "";
 
 if($referer) {
 	if($referer->location()) {
@@ -48,6 +50,7 @@ if(count($possearr) == 0) {
 	$posse = "<p style='line-height: 10px; margin: 4px 0px 3px 0px;'><a style='text-decoration: none;' href='/offensive/?c=posse&amp;userid=".$user->id()."'>".$user->username()." has a posse</a>";
 	
 	$posse_markers = 0;
+	$posse_list = "";
 	foreach($possearr as $posser) {
 		if($posser->location()) {
 			$posse_markers++;

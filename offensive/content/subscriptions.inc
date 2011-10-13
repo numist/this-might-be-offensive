@@ -11,10 +11,7 @@
 	}
 
 	function start() {
-		global $me;
 		mustLogIn();
-
-		$me = new User($_SESSION["userid"]);
 	}
 
 	function head() {
@@ -24,7 +21,7 @@ EOT;
 	}
 
 	function body() {
-		$usrid = $_SESSION['userid'];
+		$usrid = me()->id();
 
 		$numPerPage = 100;
 		$page = isset($_REQUEST['p']) && is_intger($_REQUEST['p']) ?

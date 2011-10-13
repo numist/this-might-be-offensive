@@ -12,10 +12,11 @@ if(!isset($link) || !$link) $link = openDbConnection();
 require_once("offensive/assets/functions.inc");
         
 // authentication
-mustLogIn("http");
+mustLogIn(array("prompt" => "http",
+                "token" => null));
 
 // users can only remove their own location.
-$user = $_SESSION['userid'];
+$user = me()->id();
 
 $sql = "DELETE FROM maxxer_locations WHERE userid='$user'";
 $result = tmbo_query( $sql );

@@ -8,18 +8,14 @@
 	require_once("offensive/assets/core.inc");
 
 	function start() {
-		global $me;
 		mustLogIn();
-
-		$me = new User($_SESSION["userid"]);
 	}
 
 	function head() {
-		echo <<<EOT
-		<link id="gallery" rel="alternate" href="/offensive/audio_rss.php" type="application/rss+xml" title="audio stream" />
-		<link rel="alternate" type="application/rss+xml" title="daily archives" href="/offensive/zip_rss.php" />
-		<link href="/styles/grid.css?v=1.03" type="text/css" rel="stylesheet">
-EOT;
+		echo '
+		<link id="gallery" rel="alternate" href="'.Link::rss("audio").'" type="application/rss+xml" title="audio stream" />
+		<link rel="alternate" type="application/rss+xml" title="daily archives" href="'.Link::rss("zip").'" />
+		<link href="/styles/grid.css?v=1.03" type="text/css" rel="stylesheet">';
 	}
 
 	function body() {

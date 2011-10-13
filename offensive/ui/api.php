@@ -11,9 +11,8 @@ require_once("offensive/assets/argvalidation.inc");
 require_once("offensive/assets/classes.inc");
 require_once("offensive/assets/comments.inc");
 
-mustLogIn("http");
-
-$me = new User($_SESSION["userid"]);
+mustLogIn(array("method" => "http",
+                "token" => null));
 
 $userid = $_SESSION['userid'];
 $uri = $_SERVER["REQUEST_URI"];
@@ -34,7 +33,7 @@ call_user_func("api_".$func);
 
 // this gets all the HTML for the quickcomment box.
 function api_getquickcommentbox() {
-	global $userid, $me;
+	global $userid;
 
 	$fileid = check_arg("fileid", "integer", $_REQUEST);
 	handle_errors();
@@ -109,7 +108,7 @@ function api_getquickcommentbox() {
 				continue;
 			$commenter = $comment->commenter();
 			echo '<div class="qc_comment">';
-					if(!$me->squelched($commenter) && strlen($comment->text()) > 0) {
+					if(!me()->squelched($commenter) && strlen($comment->text()) > 0) {
 						echo $comment->HTMLcomment();
 					}
 					else if(strlen($comment->text()) > 0) {

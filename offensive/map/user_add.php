@@ -9,10 +9,11 @@ if(!isset($link) || !$link) $link = openDbConnection();
 require_once("offensive/assets/functions.inc");
         
 // authentication
-mustLogIn("http");
+mustLogIn(array("prompt" => "http",
+                "token" => null));
 
 // users can only change their own location.
-$user = $_SESSION['userid'];
+$user = me()->id();
 
 $lat = (isset($_GET['lat']) && is_numeric($_GET['lat'])) ? $_GET['lat'] : "";
 if($lat == "") trigger_error("no latitude set", E_USER_ERROR);

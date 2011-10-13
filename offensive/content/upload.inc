@@ -9,11 +9,7 @@
 
 	function start() {
 		global $readonly;
-		
-		global $me;
 		mustLogIn();
-		
-		$me = new User($_SESSION["userid"]);
 
 		if($readonly) {
 			header("Location: ./");
@@ -22,12 +18,11 @@
 	}
 	
 	function body() {
-		// TODO: uploadForm should move back out here.
 		return upload();
 	}
 
 	function uploadForm($fileuploaded=false, $avatar=false) {
-		$uploadsRemaining = numUploadsRemaining( $_SESSION['userid'] );
+		$uploadsRemaining = numUploadsRemaining();
 		?>
 			<div class="heading"><?
 				if($fileuploaded && $uploadsRemaining !== 0) {
@@ -44,8 +39,8 @@
 
 				<?php
 
-					if( $uploadsRemaining !== 0 || $_SESSION['status'] == "admin" ) {
-						$remaining = $_SESSION['status'] == 'admin' ? '∞' : $uploadsRemaining;
+					if( $uploadsRemaining !== 0 || me()->status() == "admin" ) {
+						$remaining = me()->status() == 'admin' ? '∞' : $uploadsRemaining;
 
 				?>
 

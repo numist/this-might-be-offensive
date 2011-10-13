@@ -55,6 +55,8 @@ class Redis {
     }
     
     public function set($name, $value, $preserve=false) {
+        global $readonly;
+        if($readonly) return;
         $this->connect();
         $this->write(
             ($preserve ? 'SETNX' : 'SET') .
@@ -76,6 +78,9 @@ class Redis {
     }
     
     public function incr($name, $amount=1) {
+        global $readonly;
+        if($readonly) return;
+
         $this->connect();
         if ($amount == 1)
             $this->write("INCR $name\r\n");
@@ -85,6 +90,9 @@ class Redis {
     }
     
     public function decr($name, $amount=1) {
+        global $readonly;
+        if($readonly) return;
+
         $this->connect();
         if ($amount == 1)
             $this->write("DECR $name\r\n");
@@ -100,6 +108,9 @@ class Redis {
     }
     
     public function delete($name) {
+        global $readonly;
+        if($readonly) return;
+
         $this->connect();
         $this->write("DEL $name\r\n");
         return $this->get_response();
@@ -118,24 +129,36 @@ class Redis {
     }
     
     public function rename($src, $dst) {
+        global $readonly;
+        if($readonly) return;
+
         $this->connect();
         $this->write("RENAME $src $dst\r\n");
         return $this->get_response();
     }
 
     public function renamenx($src, $dst) {
+        global $readonly;
+        if($readonly) return;
+
         $this->connect();
         $this->write("RENAMENX $src $dst\r\n");
         return $this->get_response();
     }
     
     public function expire($name, $time) {
+        global $readonly;
+        if($readonly) return;
+
         $this->connect();
         $this->write("EXPIRE $name $time\r\n");
         return $this->get_response();
     }
     
     public function push($name, $value, $tail=true) {
+        global $readonly;
+        if($readonly) return;
+
         // default is to append the element to the list
         $this->connect();
         $this->write(
@@ -154,6 +177,9 @@ class Redis {
     }
 
     public function ltrim($name, $start, $end) {
+        global $readonly;
+        if($readonly) return;
+
         $this->connect();
         $this->write("LTRIM $name $start $end\r\n");
         return $this->get_response();
@@ -166,6 +192,9 @@ class Redis {
     }
     
     public function pop($name, $tail=true) {
+        global $readonly;
+        if($readonly) return;
+
         $this->connect();
         $this->write(
             ($tail ? 'RPOP' : 'LPOP') .
@@ -195,6 +224,9 @@ class Redis {
     }
 
     public function sort($name, $query=false) {
+        global $readonly;
+        if($readonly) return;
+
         $this->connect();
         $this->write($query == false ? "SORT $name\r\n" : "SORT $name $query\r\n");
         return $this->get_response();
@@ -249,12 +281,18 @@ class Redis {
     }
     
     public function move($name, $db) {
+        global $readonly;
+        if($readonly) return;
+
         $this->connect();
         $this->write("MOVE $name $db\r\n");
         return $this->get_response();
     }
     
     public function save($background=false) {
+        global $readonly;
+        if($readonly) return;
+
         $this->connect();
         $this->write(($background ? "BGSAVE\r\n" : "SAVE\r\n"));
         return $this->get_response();

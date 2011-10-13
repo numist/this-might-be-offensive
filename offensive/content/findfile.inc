@@ -52,8 +52,6 @@
 			echo "<div class=\"piletitle\">No dice, but thanks for playing.</div>";
 		}
 		
-		$me = new User($_SESSION['userid']);
-
 		while( $row = mysql_fetch_assoc( $result ) ) {
 			$style = (isset($style) && $style == "") ? "background:#bbbbee;" : "";
 			$css = (isset($css) && $css == "evenfile") ? "oddfile" : "evenfile";

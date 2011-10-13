@@ -12,7 +12,8 @@ if(!isset($link) || !$link) $link = openDbConnection();
 require_once("offensive/assets/functions.inc");
 
 // authentication
-mustLogIn("http");
+mustLogIn(array("prompt" => "http",
+                "token" => null));
 
 // filter users by these criteria
 $filter = "AND USERS.account_status != 'locked' AND USERS.timestamp > DATE_SUB( NOW(), INTERVAL 12 MONTH )";

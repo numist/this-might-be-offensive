@@ -8,22 +8,16 @@
 	require_once("offensive/assets/core.inc");
 
 	function start() {
-		global $me;
 		mustLogIn();
-
-		$me = new User($_SESSION["userid"]);
 	}
 
 	function head() {
-		echo <<<EOT
-		<link rel="alternate" type="application/rss+xml" title="discussions" href="/offensive/discuss_rss.php" />
-		<link href="/styles/grid.css?v=1.02" type="text/css" rel="stylesheet">
-EOT;
+		echo '
+		<link rel="alternate" type="application/rss+xml" title="discussions" href="/offensive/'.Link::rss("discuss").'" />
+		<link href="/styles/grid.css?v=1.02" type="text/css" rel="stylesheet">';
 	}
 
 	function body() {
-		global $me;
-
 		$page = isset($_REQUEST['p']) && is_intger($_REQUEST['p']) ?
 			    $_REQUEST['p'] : 0;
 		$args = $_REQUEST;
@@ -43,8 +37,8 @@ EOT;
 					</div>
 				</div>
 <?
-		$defaultSort = $me->getPref("sortorder_discussions")
-										? $me->getPref("sortorder_discussions")
+		$defaultSort = me()->getPref("sortorder_discussions")
+										? me()->getPref("sortorder_discussions")
 										: "date_desc";
 		if(strpos($defaultSort, "_") == false) $defaultSort = "date_desc";
 			$args = $_REQUEST;
@@ -65,7 +59,7 @@ EOT;
 
 			// if we made it this far, sort is valid, so we don't have to check it
 			if($args["sort"] != $defaultSort) {
-				$me->setPref("sortorder_discussions", $args["sort"]);
+				me()->setPref("sortorder_discussions", $args["sort"]);
 			}
 ?>
 				<div class="grid" id="discussions">

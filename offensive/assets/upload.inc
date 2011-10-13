@@ -19,14 +19,14 @@ $filetypes = array("jpg", "jpeg", "gif", "png");
  * Result: boolean, is there a file to attempt uploading.
  */
 function uploading_file() {
+	if(!me()) return false;
 	if(array_key_exists("image", $_FILES) &&
 		is_array($_FILES['image']) &&
 		array_key_exists("name", $_FILES['image']) &&
 		$_FILES['image']['name'] != "" &&
 		array_key_exists("size", $_FILES['image']) &&
 		$_FILES['image']['size'] > 0 &&
-		!exceededUploadLimit($_SESSION['userid'])) {
-
+		!exceededUploadLimit()) {
 		return true;
 	}
 	return false;
@@ -39,38 +39,34 @@ function getHash( $filePath ) {
 	return md5( $filedata );
 }
 
-function exceededUploadLimit($uid) {
-	return (numUploadsRemaining( $uid ) === 0 && $_SESSION['status'] != 'admin');
+function exceededUploadLimit() {
+	if(!me()) return true;
+	return (numUploadsRemaining() === 0 && me()->status() != "admin");
 }
 
-function numUploadsRemaining( $uid ) {
-	$limit = numAllowedUploads( $_SESSION['userid'] );
-	$used = numUploadsToday( $_SESSION['userid'] );
+function numUploadsRemaining() {
+	if(!me()) return 0;
+	$limit = numAllowedUploads();
+	$used = numUploadsToday();
 	return ($limit - $used ) > 0 ? ($limit - $used ) : 0;
 }
 
-function numUploadsToday( $uid ) {
-	$sql = "SELECT count( id ) as thecount FROM offensive_uploads WHERE userid = " . $_SESSION['userid'] . " AND timestamp > DATE_SUB( NOW(), INTERVAL 1 DAY ) AND type='image'";
+function numUploadsToday() {
+	if(!me()) return 0;
+	$sql = "SELECT count( id ) as thecount FROM offensive_uploads WHERE userid = ".me()->id()." AND timestamp > DATE_SUB( NOW(), INTERVAL 1 DAY ) AND type='image'";
 	$result = tmbo_query( $sql );
-
 	$row = mysql_fetch_assoc( $result );
-
 	return $row[ 'thecount' ];
-
 }
 
-function numAllowedUploads( $uid ) {
-
-	// Fipi Lele is allowed (effectively) unlimited uploads.
-	if($uid == 143) {
-		return 9999;
-	}
+function numAllowedUploads() {
+	if(!me()) return 0;
 
 	$sql = "SELECT COUNT( vote ) AS thecount, vote
 				FROM offensive_comments, offensive_uploads
 				WHERE vote
 					AND offensive_comments.fileid = offensive_uploads.id
-					AND offensive_uploads.userid = $uid
+					AND offensive_uploads.userid = ".me()->id()."
 					AND offensive_uploads.timestamp > DATE_SUB( NOW(), INTERVAL 6 MONTH )
 				GROUP  BY vote";
 
@@ -197,6 +193,13 @@ function upload() {
 	} else if(!uploading_file() && array_key_exists("submit", $_POST) && array_key_exists("topic", $_POST)) {
 		return upload_topic();
 	} else if(!uploading_file()) {
+		if(array_key_exists("image", $_FILES) &&
+		   is_array($_FILES['image']) &&
+		   array_key_exists("size", $_FILES['image']) &&
+		   $_FILES['image']['size'] == 0) {
+			box("that file is way too big. try something else", "boom.");
+		}
+		
 		uploadForm();
 		return null;
 	} else {
@@ -226,8 +229,8 @@ function upload() {
 			killUpload($postdata);
 			unset($postdata);
 			unset($_SESSION['postdata']);
-			$message = "sorry, filenames can't end in .php";
-			box($message);
+			$message = "filenames can't end in .php";
+			box($message, "nice try.");
 			uploadForm();
 			return;
 		}
@@ -247,7 +250,7 @@ function upload() {
 	box("acceptable file types: ".implode(", ", $filetypes).".", "sorry.");
 
 	mail( "thismightbe@numist.net",
-	      "[" . $_SERVER["REMOTE_ADDR"] . "] - SUSPICIOUS UPLOAD!!! " . $_SESSION['username'] .
+	      "[" . $_SERVER["REMOTE_ADDR"] . "] - SUSPICIOUS UPLOAD!!! ".me()->username().
 	      $postdata['tmpname'], requestDetail(),
 	      "From: offensive@thismight.be (this might be offensive)\r\n" );
 
@@ -596,7 +599,7 @@ function upload_type(&$postdata) {
 					$postdata['avatar'] = true;
 					$info['group'] = "avatar";
 			} else if(array_key_exists('avatar', $_POST)) {
-				box("avatars must be image files", "hard to look at anything else");
+				box("avatars must be image files", "hard to look at anything else.");
 				return "";
 			}
 			$upload_identified_key = $format_name;
@@ -756,9 +759,9 @@ function upload_checksize(&$postdata) {
 			<input type=\"submit\" name=\"resample\" value=\"Compress my file.\"/>
 			<input type=\"submit\" name=\"noresample\" value=\"Post it anyway.\"/>
 		</form>";
-	if($postdata['format'] == 'gif') $message .= "<br /><br />(If this is an animated gif, don't click the \"Compress\" button!)";
+	if($postdata['format'] == 'gif') $message .= "<br /><br />(If this image is animated, don't click the \"Compress\" button!)";
 
-	box($message, "whoa, nelly");
+	box($message, "whoa, nelly.");
 	$_SESSION['postdata'] = serialize($postdata);
 	return true;
 }
@@ -865,7 +868,9 @@ function upload_checkrotation($postdata) {
 		return false;
 
 	$filename = $tmpdir."/".$postdata['tmpname'];
-	$exif = @exif_read_data($filename);
+	if(function_exists("exif_read_data")) {
+		$exif = @exif_read_data($filename);
+	}
 
 	if(!$exif || !array_key_exists("Orientation", $exif)) {
 		return false;
@@ -911,7 +916,7 @@ function upload_largerthan($postdata, $bytes) {
 	if($filesize <= $bytes) return false;
 
 	killUpload($postdata);
-	box("that file is too big to upload, try something else", "WHARRGARBL");
+	box("that file is too big to upload, try something else", "no fishing stories.");
 	uploadForm();
 	return true;
 }
@@ -919,7 +924,6 @@ function upload_largerthan($postdata, $bytes) {
 ###############################################################################
 function upload_insert_file($postdata) {
 	global $tmpdir;
-	global $me;
 
 	// it's possible (it's happened in the past!) for the time in sql to differ from PHP
 	// use the SQL server's time as the trusted source
@@ -1014,7 +1018,7 @@ function upload_insert_file($postdata) {
 	// all set, let's go
 	$sql = "UPDATE offensive_uploads SET status = 'normal' where id = $fileid";
 	tmbo_query($sql);
-	insertChange("upload", $fileid, upload_type($postdata) . ":" . $me->username() . ":" . $postdata['filename']);
+	insertChange("upload", $fileid, upload_type($postdata) . ":" . me()->username() . ":" . $postdata['filename']);
 
 	$sql = "INSERT INTO offensive_subscriptions (userid, fileid )
 	        VALUES ( " . $_SESSION['userid'] . ", $fileid ) ";

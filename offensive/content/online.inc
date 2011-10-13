@@ -7,10 +7,7 @@
 	require_once( 'offensive/assets/tabs.inc' );
 
 	function start() {
-		global $me;
 		mustLogIn();
-		
-		$me = new User($_SESSION["userid"]);
 	}
 	
 
@@ -41,7 +38,7 @@
 	</tr>
 	<?
 		$css = "even";
-		$sql = "SELECT userid, username, timestamp FROM users WHERE timestamp > DATE_SUB( now( ) , INTERVAL $timelimit MINUTE) && userid != ".$_SESSION['userid']." ORDER BY timestamp DESC";
+		$sql = "SELECT userid, username, timestamp FROM users WHERE timestamp > DATE_SUB( now( ) , INTERVAL $timelimit MINUTE) && userid != ".me()->id()." ORDER BY timestamp DESC";
 		$result = tmbo_query( $sql );
 		while(false !== ($row = mysql_fetch_assoc( $result ) )) {
 			$css = $css == "odd" ? "even" : "odd"; ?>

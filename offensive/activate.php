@@ -1,6 +1,4 @@
 <?
-// YYY: awaiting activation doesn't seem to be actually set anywhere in the code
-// XXX: revisit the login process and rewrite
 	set_include_path("..");
 	require_once( 'offensive/assets/header.inc' );
 
@@ -29,7 +27,7 @@
 			$sql = "update users set account_status='normal' where userid=$id AND account_status='awaiting activation' limit 1";
 			tmbo_query( $sql );
 			if( mysql_affected_rows() == 1 ) {
-				$message = "Your account is now active. <a href=\"./\">Click here</a> to return to the list.";
+				$message = "Your account is now active. <a href=\"./\">Click here</a> to log in.";
 			}
 		}		
 	}
