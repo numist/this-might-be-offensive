@@ -20,8 +20,10 @@ If you want to build your own server, it won't take more than an hour or few, an
 * mysql-server
 * apache2
 * apache2-mod-php5
+* php5-mysql
 * imagemagick
 * perl
+* xapian
 
 You'll want to enable mod_rewrite and mod_ssl and configure them as appropriate. You'll also want to install the following perl modules from CPAN:
 
