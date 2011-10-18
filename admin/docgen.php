@@ -78,7 +78,6 @@ foreach($lines as $line) {
 		$words = explode(" ", $nline);
 		switch($words[0]) {
 			case "@method":
-				echo "documenting ".$words[1]."\n";
 				$method = $words[1];
 				assert('!array_key_exists($method, $methods)') or trigger_error("method $method is being defined another time at $linenum", E_USER_WARNING);
 				$methods[$method] = array("params" => array(),
@@ -142,6 +141,7 @@ foreach($lines as $line) {
 ?>
 <html>
 <head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8 "/> 
 	<title>TMBO API Specification</title>
 </head>
 <body>
