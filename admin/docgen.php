@@ -1,5 +1,34 @@
 <?
 
+//$tmboroot = "~/sites/tmbo/";
+$tmboroot = "";
+
+$get_examples = false;
+
+	//$token = "rsk48uhhv328w4gq5jjlvubybsxdycqd";
+	$token = "";
+
+	//$api = "http://dev.thismight.be/offensive/api.php/";
+	$api = "";
+
+/*
+ ******************************************************************************
+ * IGNORE ME
+ ******************************************************************************
+ */
+
+if(!is_dir($tmboroot."offensive")) {
+	trigger_error("tmboroot is not correct", E_USER_ERROR);
+}
+if($get_examples) {
+	if(strlen($token) != 32) {
+		trigger_error("token required to get example output", E_USER_ERROR);
+	}
+	if(!strlen($api)) {
+		trigger_error("api link required to get example output", E_USER_ERROR);
+	}
+}
+
 /*
  ******************************************************************************
  * HTTP codes
@@ -7,7 +36,7 @@
  */
 
 $codes = array(
-	"200" => "<em>OK</em> - Call completed as dialed.",
+	"200" => "<em>OK</em> - Call completed as dialled.",
 	"304" => "<em>Not Modified</em> - If a Conditional GET is used, this indicates that there are no changes to report.",
 	"400" => "<em>Bad Request</em> - The call is erroneous. The body will contain debugging information.",
 	"401" => "<em>Unauthorized</em> - Login failure. Either your credentials weren't valid, or you did not provide any.",
@@ -24,10 +53,10 @@ $codes = array(
  */
 
 $ptypes = array(
-	"string" => "UTF-8 formatted string.",
+	"string" => "UTF-8 string.",
 	"integer" => "Whole number.",
-	"date" => "Any format parseable by <a href=\"http://php.net/strtotime\">strtotime</a> is appropriate.",
-	"limit" => "Format: \"%d,%d\" or \"%d\". Syntax same as <a href=\"http://dev.mysql.com/doc/refman/5.0/en/select.html\">LIMIT in SQL</a>.",
+	"date" => "Any format parseable by <a href=\"http://php.net/strtotime\">strtotime</a> is appropriate. The server time zone is America/Los_Angeles.",
+	"limit" => "Format: \"%d,%d\" or \"%d\". Syntax is the same as <a href=\"http://dev.mysql.com/doc/refman/5.0/en/select.html\">LIMIT in SQL</a>. Default and largest accepted set size is 200.",
 	"float" => "Double precision floating point number."
 );
 
@@ -50,7 +79,7 @@ $rtypes = array(
  ******************************************************************************
  */
 
-$lines = file("/Users/numist/Code/tmbo/offensive/api.php") or die();
+$lines = file($tmboroot."offensive/api.php") or die();
 $in_tag = false;
 $methods = array();
 $method = "";
@@ -138,6 +167,39 @@ foreach($lines as $line) {
 	}
 }
 
+/*
+ ******************************************************************************
+ * Example generation
+ ******************************************************************************
+ */
+if($get_examples) {
+	$docsdir = $tmboroot."offensive/docs";
+	if(!is_dir($docsdir)) {
+		if(!mkdir($docsdir)) {
+			trigger_error("could not create docs directory $docsdir", E_USER_ERROR);
+		}
+	} else {
+		$contents = scandir($docsdir);
+		foreach($contents as $filename) {
+			if(substr($filename, 0, 1) == ".") {
+				continue;
+			}
+			unlink("$docsdir/$filename");
+		}
+	}
+	
+	foreach($methods as $method => $data) {
+		foreach($data["examples"] as $example) {
+			foreach($rtypes as $type => $desc) {
+				$call = $api.$method.".".$type."?".$example."&token=".$token;
+				// XXX: instrument calls for time
+				$ex = file_get_contents($call) or trigger_error("call $call was not valid?", E_USER_ERROR);
+				file_put_contents("$docsdir/$method.$type?$example", $ex) or die("can't write example to file?");
+			}
+		}
+	}
+}
+
 ?>
 <html>
 <head>
@@ -161,18 +223,30 @@ foreach($lines as $line) {
 <!--	<li>rememberme cookie - Setting the rememeberme option to the <a href="#login">login method</a> will cause it to set a rememberme cookie that can be used for long-term authentication.</li> -->
 </ul>
 
+
+<hr/>
+<h3>Parameter Types</h3>
+<p>The API supports <?= count($ptypes) ?> distinct data types for parameters, as described below.</p>
+
+<ul>
+<? foreach($ptypes as $type => $description) { ?>
+	<li><em><?= $type ?></em> - <?= $description ?></li>
+<? } ?>
+</ul>
+
+
 <hr/>
 <h3>Return Types</h3>
 <p>The API supports <?= count($rtypes) ?> formats, which are determined by the server by the filetype extension of the request.</p>
 
 <ul>
 <? foreach($rtypes as $type => $description) { ?>
-	<li><?= $type ?> - <?= $description ?></li>
+	<li><em><?= $type ?></em> - <?= $description ?></li>
 <? } ?>
 </ul>
 
 <hr/>
-<h3>Status Codes and Return Types</h3>
+<h3>Status Codes</h3>
 <p>The following error codes are used by the site as return values:</p>
 <ul>
 <? foreach($codes as $code => $description) { ?>
@@ -183,20 +257,23 @@ foreach($lines as $line) {
 <hr/>
 <h3>Don't be Retarded</h3>
 <p>Like the RSS feeds, requests are limited to a maximum of 200 returned elements.  If you want to download the entire history of the world since the dawn of time for your research project, that's fine but please sleep between requests.</p>
-<p>Because this API is new, you may find some queries take a while to complete.  If you notice calls taking more than two seconds, please email numist@numist.net with the API command you are making, and try to reduce your usage until the problem is addressed.</p>
+
+<p>This API does not support the load of TMBO on its own, so you may find some queries are inefficient and take a while to complete.  If you notice calls taking more than two seconds, please <a href="#Errata">send an email or open a ticket</a> with the method/arguments you're requesting, and try to reduce your usage until the problem is addressed.</p>
 
 <hr/>
 <h3>More</h3>
 <p>The user-agent of the client is used to identify the client.<br />
-If you are developing an application, please send <a href="mailto:tmbo@numist.net">me</a> an email with your application name and a sample user agent.</p>
+If you are developing an application, please <a href="#Errata">send an email or open a ticket</a> with your application name and a sample user agent.</p>
 
 <hr/>
 <h3>Examples</h3>
 <p>Here are some useful examples:</p>
 <ul>
-	<li>Get a front page of data: <code>https://themaxx:psasword@thismight.be/offensive/api.php/getuploads.plist?type=image&amp;limit=100</code></li>
-	<li>Get the hall of fame: <code>https://themaxx:psasword@thismight.be/offensive/api.php/getuploads.plist?type=image&amp;limit=100&amp;sort=votes_desc</code></li>
+	<li>Get a front page of data: <code>https://thismight.be/offensive/api.php/getuploads.plist?type=image&amp;limit=100&amp;token=yourtoken</code></li>
+	<li>Get the hall of fame: <code>https://thismight.be/offensive/api.php/getuploads.plist?type=image&amp;limit=100&amp;sort=votes_desc&amp;token=yourtoken</code></li>
 </ul>
+
+<p>More examples for each method can be found with its documentation.</p>
 
 <hr/>
 <h2>Function Definitions</h2>
@@ -241,10 +318,9 @@ If you are developing an application, please send <a href="mailto:tmbo@numist.ne
 	trigger_error("method $method does not have any examples", E_USER_ERROR);
 }
 foreach($data["examples"] as $example) { ?>
-<p><?= $example ?>: 
+<p><code><?= "$method.xxx?$example" ?></code>: 
 	<? foreach($rtypes as $type => $desc) { ?>
-		<!-- add output autogen -->
-		<?= $type ?>
+		<a href="/offensive/docs/<?= urlencode("/$method.$type?$example"); ?>"><?= $type ?></a>
 	<? } ?>
 </p>
 <? } ?>
@@ -256,7 +332,7 @@ foreach($data["examples"] as $example) { ?>
 		if (!array_key_exists($see, $methods)) {
 			trigger_error("$see is not a valid method, referenced by @see in $method", E_USER_ERROR);
 		} ?>
-		<p><a href="#<?= $see ?>"<?= $see ?></a> - <?= strpos("\n", $methods[$see]["desc"]) === false ?
+		<p><a href="#<?= $see ?>"><?= $see ?></a> - <?= strpos("\n", $methods[$see]["desc"]) === false ?
 		                                               $methods[$see]["desc"] :
 		                                               substr($methods[$see]["desc"], 0, strpos("\n", $methods[$see]["desc"])) ?></p>
 	<? } ?>
@@ -266,8 +342,9 @@ foreach($data["examples"] as $example) { ?>
 
 
 <hr />
+<a name="Errata">
 <h2>Errata</h2>
-<p>If the API lacks notable functionality, or operates in an unexpected manner, please report this behaviour (expected and actual, if applicable) to the <a href="mailto:tmbotech@googlegroups.com">tmbotech</a> mailing list, or open a <a href="https://github.com/numist/this-might-be-offensive/issues">new issue</a>.</p>
+<p>If the API lacks notable functionality, or operates in an unexpected manner, please report this behaviour (expected and actual, if applicable) to the <a href="mailto:tmbotech@googlegroups.com">tmbotech</a> mailing list, open a <a href="https://github.com/numist/this-might-be-offensive/issues">new issue</a>, or send numist an <a href="mailto:tmbo@numist.net">email</a>.</p>
 
 <hr/>
 <h2>Changelog</h2>
@@ -275,6 +352,9 @@ foreach($data["examples"] as $example) { ?>
 	<li>August 11, 2008 - Initial draft.</li>
 	<li>August 14, 2008 - postuploads should take nsfw and tmbo as arguments.</li>
 	<li>August 15, 2008 - searchuploads and searchcomments get more parameters ([limit, type], limit).</li>
+	<li>October 18, 2011 - Documentation is now generated/updated by script. Primary input is the documentation in the API code itself.</li>
+	
+	<li><?= gmdate("F j, Y") ?> - This page was generated.</li>
 </ul>
 </body>
 </html>
