@@ -159,7 +159,7 @@
 	 * @param nsfw integer optional {"0", "1"} Set to 0, suppresses posts that are not safe for work. Set to 1, only returns results that are not safe for work.
 	 * @param tmbo integer optional {"0", "1"} Set to 0, suppresses posts that might be offensive. Set to 1, only returns results that might be offensive.
 	 * @return Array of Upload objects.
-	 * @example type=image&nsfw=0&limit=3,10
+	 * @example type=image&nsfw=0&sort=date_asc&limit=3,10
 	 * @see getupload
 	 */
 	function api_getuploads() {
@@ -220,8 +220,8 @@
 	 * @param limit limit optional Default and maximum is 200.
 	 * @param sort string optional {"date_desc", "date_asc", "uname_asc","uname_desc"} Default:"uname_desc" Sort by username or upload date.
 	 * @return A singleton Upload object if userid is specified, an array of Upload objects otherwise. Returns false if the userid does not exist.
-	 * @example userid=1
-	 * @example limit=1
+	 * @example userid=2054
+	 * @example limit=2&sort=date_asc
 	 * @see getuploads
 	 */
 	function api_getyearbook() {
@@ -234,7 +234,7 @@
 	 *
 	 * @param userid integer optional Get metadata for this user. Defaults to the current user.
 	 * @return If the userid exists, returns a user metadata object. Returns false if the userid does not exist.
-	 * @example
+	 * @example userid=151
 	 */
 	function api_getuser() {
 		$userid = check_arg("userid", "integer", null, false);
@@ -260,8 +260,8 @@
 	 *
 	 * @param userid integer optional Get metadata for this user. Defaults to the current user.
 	 * @return If the userid exists, returns a possibly-empty array of user metadata objects. Returns false if userid does not exist.
-	 * @example userid=1
-	 * @example userid=2
+	 * @example userid=2054
+	 * @example userid=22
 	 */
 	function api_getposse() {
 		$userid = check_arg("userid", "integer", null, false);
@@ -361,7 +361,7 @@
 	 * @param sort string optional {"date_desc", "date_asc"} Default:"date_desc" Sort by comment date.
 	 * @param limit limit optional Default and maximum is 200.
 	 * @return An array of comment objects.
-	 * @example thread=1
+	 * @example thread=112
 	 */
 	function api_getcomments() {
 		send(core_getcomments($_REQUEST));
@@ -424,16 +424,6 @@
 		trigger_error("unimplemented", E_USER_ERROR);
 	}
 
-	/**
-	 * @method searchcomments
-	 *
-	 * Search comments for something. Good luck finding it.
-	 *
-	 * @param q string required Query string
-	 * @param limit limit optional Default and maximum is 200.
-	 * @return Array of Comment objects matching the query string
-	 * @example q=Klingon&limit=5
-	 */
 	function api_searchcomments() {
 		send(core_searchcomments($_REQUEST));
 	}
@@ -492,6 +482,7 @@
 	 * @param limit limit optional Default and maximum is 200.
 	 * @return An array of location data from the database matching the parameters.
 	 * @example limit=5
+	 * @example userid=2054
 	 * @see setlocation
 	 */
 	function api_getlocation() {
@@ -570,7 +561,7 @@
 	 * @param sort string optional {"comment_desc", "comment_asc", "file_asc", "file_desc"} Default:"file_asc" Sort order of results.
 	 * @param limit limit optional Default and maximum is 200.
 	 * @return Array of Comment objects containing the oldest unread comment for each thread with unread comments.
-	 * @example limit=5
+	 * @example limit=3&sort=file_asc
 	 * @see getcomments
 	 */
 	function api_unreadcomments() {
@@ -585,7 +576,7 @@
 	 * @param threadid integer required Thread you're adding/removing from your subscriptions.
 	 * @param subscribe integer required {"1", "0"} 0 -> unsubscribe, 1 -> subscribe.
 	 * @return login
-	 * @example 
+	 * @example threadid=211604&subscribe=1
 	 * @see login
 	 */
 	function api_subscribe() {	
