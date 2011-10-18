@@ -51,8 +51,6 @@
 			trigger_error("args is not an array", E_USER_ERROR);
 		}
 
-		// XXX: need a more fatal way to fail at this level, since we're core.
-		// YYY: API should be soft-fail.
 		$type =   check_arg("type",   "string",  $args, false, $types);
 		$userid = check_arg("userid", "integer", $args, false);
 		$after =  check_arg("after",  "date",    $args, false);
@@ -164,9 +162,9 @@
         if(!array_key_exists('limit', $args)) {
             $limit = "$numPerPage";
         }
-		if($p !== false && $p > 0) {
-			$start = $p * $numPerPage;
-			$limit = "$start, $numPerPage";
+				if($p !== false && $p > 0) {
+					$start = $p * $numPerPage;
+					$limit = "$start, $numPerPage";
         }
 
 		$sql .= " LIMIT $limit";
@@ -217,8 +215,8 @@
 		$userid = check_arg("userid", "integer", $args, false);
 		$limit =  check_arg("limit",  "limit",   $args, false);
 		$sort =   check_arg("sort",   "string",  $args, false, array("date_desc", "date_asc", "uname_asc", "uname_desc"));
-		handle_errors();
 		$p =      check_arg("p", "integer", $args, false);
+		handle_errors();
 		
 		$sql = $uploadsql." AND up.type = 'avatar' 
 		                    AND up.id = (SELECT MAX( up.id) FROM offensive_uploads up 
@@ -324,6 +322,7 @@
 		}
 		
 		if($userfilter !== false) {
+			// XXX: deprecate
 			$sql .= " AND com.userid = $userfilter";
 		}
 		if($after !== false) {
@@ -480,7 +479,7 @@
 					
 		$q = check_arg("q", "string", $method);
 		$limit = check_arg("limit", "limit", $method, false);
-		$type = check_arg("type", "string", $method, false, array("image", "topic", "avatar"));
+		$type = check_arg("type", "string", $method, false, array("image", "topic", "avatar", "audio"));
 		handle_errors();
 		
 		$sql = $uploadsql;
