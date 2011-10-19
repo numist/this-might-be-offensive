@@ -289,8 +289,8 @@
 	 * @param password string required User's password.
 	 * @param gettoken integer optional {"0", "1"} Do you want to generate a new token?
 	 * @return a token object or the metadata for the current user.
-	 * @example username=admin&password=[nsfw]
-	 * @example username=admin&password=[nsfw]&gettoken=1
+	 * @example username=jonxp&password=tester
+	 * @example username=ray&password=tester&gettoken=1
 	 * @see getuser
 	 * @see logout
 	 */
@@ -516,8 +516,10 @@
 		
 		$sql .= " ORDER BY timestamp DESC LIMIT $limit";
 		
-		$rows = get_rows($sql);
+		$result = tmbo_query($sql);
 		
+		$rows = array();
+		while(($rows[] = mysql_fetch_assoc($result)) || array_pop($rows));
 		send($rows);
 	}
 
