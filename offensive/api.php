@@ -198,13 +198,13 @@
 	function api_getupload() {
 		global $uploadsql;
 		
-		$upload = check_arg("fileid", "integer");
+		$arg = check_arg("fileid", "integer");
 		handle_errors();
 		
-		$upload = new Upload($upload);
+		$upload = new Upload($arg);
 		
 		if(!$upload->exists()) {
-			send(new Error("upload $upload does not exist"));
+			send(new Error("upload $arg does not exist"));
 		}
 		
 		send($upload);
