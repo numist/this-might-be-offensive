@@ -99,6 +99,7 @@ If you are developing an application, please <a href="#Errata">send an email or 
 	<li><a href="#setlocation">setlocation</a></li>
 	<li><a href="#unreadcomments">unreadcomments</a></li>
 	<li><a href="#subscribe">subscribe</a></li>
+	<li><a href="#resetsubscription">resetsubscription</a></li>
 </ul>
 
 <hr/>
@@ -284,7 +285,12 @@ Get one or more uploads' metadata, including (if possible) links to the uploaded
 			<a href="/offensive/docs/getposse.xml%3Fuserid%3D22">xml</a>
 	</p>
 
+<h4>See Also:</h4>
 
+			<p><a href="#getuser">getuser</a> - 
+Get a user's metadata.
+</p>
+	
 <hr/>
 <a name="login">
 <h3>login</h3>
@@ -391,7 +397,7 @@ The token is named after the user-agent of the requesting application and can be
 	    <li><b>threadmax</b> (integer) - optional.
 						Get comments from threads before this one, inclusive.</li>
 	    <li><b>thread</b> (integer) - optional.
-						Get comments from this thread. If you are subscribed to this thread, your subscription will be reset.</li>
+						Get comments from this thread.</li>
 	    <li><b>sort</b> (string) - optional.
 							Can be any of {"date_desc","date_asc"}.
 						Default:"date_desc" Sort by comment date.</li>
@@ -437,7 +443,12 @@ The token is named after the user-agent of the requesting application and can be
 			<a href="/offensive/docs/searchuser.xml%3Fq%3Dmax%26limit%3D3">xml</a>
 	</p>
 
+<h4>See Also:</h4>
 
+			<p><a href="#getuser">getuser</a> - 
+Get a user's metadata.
+</p>
+	
 <hr/>
 <a name="searchuploads">
 <h3>searchuploads</h3>
@@ -589,6 +600,14 @@ The format of the data returned from this call is unstable and subject to change
 			<p><a href="#getcomments">getcomments</a> - 
 
 </p>
+			<p><a href="#subscribe">subscribe</a> - 
+
+(Un)Subscribe to new posts in a thread.
+</p>
+			<p><a href="#resetsubscription">resetsubscription</a> - 
+
+Reset your subscription to a thread. New posts made to the thread after this call will cause the subscription to become active again.
+</p>
 	
 <hr/>
 <a name="subscribe">
@@ -606,7 +625,7 @@ The format of the data returned from this call is unstable and subject to change
 
 
 <h4>Returns:</h4>
-<p>login</p>
+<p>unsubscribe always returns true. subscribing returns false if thread does not exist.</p>
 
 <h4>Examples:</h4>
 <p><code>subscribe.xxx?threadid=211604&subscribe=1</code>: 
@@ -618,10 +637,47 @@ The format of the data returned from this call is unstable and subject to change
 
 <h4>See Also:</h4>
 
-			<p><a href="#login">login</a> - 
-Establish a session for future requests and/or generate a token.
+			<p><a href="#resetsubscription">resetsubscription</a> - 
 
-The token is named after the user-agent of the requesting application and can be revoked by the user at any time in /offensive/?c=settings.
+Reset your subscription to a thread. New posts made to the thread after this call will cause the subscription to become active again.
+</p>
+			<p><a href="#unreadcomments">unreadcomments</a> - 
+
+Get a list of unchecked activity on subscribed threads.
+</p>
+	
+<hr/>
+<a name="resetsubscription">
+<h3>resetsubscription</h3>
+<p>Reset your subscription to a thread. New posts made to the thread after this call will cause the subscription to become active again.</p>
+
+<h4>Arguments:</h4>
+<ul>
+	    <li><b>threadid</b> (integer) - required.
+						Reset the subscription to this thread.</li>
+	</ul>
+
+
+<h4>Returns:</h4>
+<p>true if reset, false if no subscription or upload does not exist.</p>
+
+<h4>Examples:</h4>
+<p><code>resetsubscription.xxx?threadid=309779</code>: 
+			<a href="/offensive/docs/resetsubscription.json%3Fthreadid%3D309779">json</a>
+			<a href="/offensive/docs/resetsubscription.plist%3Fthreadid%3D309779">plist</a>
+			<a href="/offensive/docs/resetsubscription.php%3Fthreadid%3D309779">php</a>
+			<a href="/offensive/docs/resetsubscription.xml%3Fthreadid%3D309779">xml</a>
+	</p>
+
+<h4>See Also:</h4>
+
+			<p><a href="#subscribe">subscribe</a> - 
+
+(Un)Subscribe to new posts in a thread.
+</p>
+			<p><a href="#unreadcomments">unreadcomments</a> - 
+
+Get a list of unchecked activity on subscribed threads.
 </p>
 	
 
