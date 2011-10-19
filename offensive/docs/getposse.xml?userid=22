@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<array>
+	<user>
+		
+		<posse type="integer">
+			0
+		</posse>
+		<yearbook type="boolean">
+			false
+		</yearbook>
+		<userid type="integer">
+			2993
+		</userid>
+		<username type="string">
+			oboy
+		</username>
+		<created type="date">
+			2005-08-26 20:45:29
+		</created>
+		<account_status type="string">
+			normal
+		</account_status>
+		<timestamp type="date">
+			2005-08-26 20:52:42
+		</timestamp>
+		<referer_id type="integer">
+			22
+		</referer_id>
+		<referer type="string">
+			eddo
+		</referer>
+
+	</user>
+	<user>
+		
+		<posse type="integer">
+			1
+		</posse>
+		<yearbook type="boolean">
+			true
+		</yearbook>
+		<userid type="integer">
+			3288
+		</userid>
+		<username type="string">
+			dirt
+		</username>
+		<created type="date">
+			2005-11-28 22:52:47
+		</created>
+		<account_status type="string">
+			locked
+		</account_status>
+		<timestamp type="date">
+			2008-01-26 20:29:30
+		</timestamp>
+		<referer_id type="integer">
+			22
+		</referer_id>
+		<referer type="string">
+			eddo
+		</referer>
+
+	</user>
+	<user>
+		
+		<posse type="integer">
+			0
+		</posse>
+		<yearbook type="boolean">
+			true
+		</yearbook>
+		<userid type="integer">
+			3640
+		</userid>
+		<username type="string">
+			therednun
+		</username>
+		<created type="date">
+			2006-05-23 13:31:01
+		</created>
+		<account_status type="string">
+			normal
+		</account_status>
+		<timestamp type="date">
+			2006-05-25 08:11:02
+		</timestamp>
+		<referer_id type="integer">
+			22
+		</referer_id>
+		<referer type="string">
+			eddo
+		</referer>
+
+	</user>
+</array>

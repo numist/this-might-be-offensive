@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+<key>id</key>
+<integer>112</integer>
+<key>userid</key>
+<integer>143</integer>
+<key>filename</key>
+<string>Dancing Queen.jpg</string>
+<key>timestamp</key>
+<date>2004-09-14T00:25:17+00:00</date>
+<key>nsfw</key>
+<false />
+<key>tmbo</key>
+<false />
+<key>type</key>
+<string>image</string>
+<key>username</key>
+<string>Fipi Lele</string>
+<key>subscribed</key>
+<false />
+<key>vote_good</key>
+<integer>17</integer>
+<key>vote_bad</key>
+<integer>1</integer>
+<key>vote_tmbo</key>
+<integer>0</integer>
+<key>vote_repost</key>
+<integer>0</integer>
+<key>comments</key>
+<integer>23</integer>
+<key>filtered</key>
+<false />
+</dict>
+</plist>

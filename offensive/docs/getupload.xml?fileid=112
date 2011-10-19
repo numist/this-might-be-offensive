@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<upload>
+		<id type="integer">
+			112
+		</id>
+		<userid type="integer">
+			143
+		</userid>
+		<filename type="string">
+			Dancing Queen.jpg
+		</filename>
+		<timestamp type="date">
+			2004-09-13 17:25:17
+		</timestamp>
+		<nsfw type="boolean">
+			false
+		</nsfw>
+		<tmbo type="boolean">
+			false
+		</tmbo>
+		<type type="string">
+			image
+		</type>
+		<username type="string">
+			Fipi Lele
+		</username>
+		<subscribed type="boolean">
+			false
+		</subscribed>
+		<vote_good type="integer">
+			17
+		</vote_good>
+		<vote_bad type="integer">
+			1
+		</vote_bad>
+		<vote_tmbo type="integer">
+			0
+		</vote_tmbo>
+		<vote_repost type="integer">
+			0
+		</vote_repost>
+		<comments type="integer">
+			23
+		</comments>
+		<filtered type="boolean">
+			false
+		</filtered>
+</upload>

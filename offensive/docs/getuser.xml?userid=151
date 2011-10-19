@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<user>
+		<posse type="integer">
+			175
+		</posse>
+		<yearbook type="boolean">
+			true
+		</yearbook>
+		<userid type="integer">
+			151
+		</userid>
+		<username type="string">
+			themaxx
+		</username>
+		<created type="date">
+			2004-09-15 17:41:07
+		</created>
+		<account_status type="string">
+			admin
+		</account_status>
+		<timestamp type="date">
+			2011-10-15 20:44:53
+		</timestamp>
+		<ip type="string">
+			192.168.231.1
+		</ip>
+		<email type="string">
+			spam@spammy.com
+		</email>
+</user>

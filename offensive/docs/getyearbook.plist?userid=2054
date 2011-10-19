@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+<key>id</key>
+<integer>251709</integer>
+<key>userid</key>
+<integer>2054</integer>
+<key>filename</key>
+<string>[mp] self-portrait.jpg</string>
+<key>timestamp</key>
+<date>2009-01-09T04:58:46+00:00</date>
+<key>nsfw</key>
+<false />
+<key>tmbo</key>
+<false />
+<key>type</key>
+<string>avatar</string>
+<key>username</key>
+<string>numist</string>
+<key>subscribed</key>
+<false />
+<key>vote_good</key>
+<integer>6</integer>
+<key>vote_bad</key>
+<integer>0</integer>
+<key>vote_tmbo</key>
+<integer>0</integer>
+<key>vote_repost</key>
+<integer>0</integer>
+<key>comments</key>
+<integer>6</integer>
+<key>filtered</key>
+<false />
+</dict>
+</plist>

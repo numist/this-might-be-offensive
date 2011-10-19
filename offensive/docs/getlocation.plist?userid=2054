@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+<dict>
+<key>latitude</key>
+<real>82.8703</real>
+<key>longitude</key>
+<real>-55.7136</real>
+<key>timestamp</key>
+<date>2011-10-15T07:26:16+00:00</date>
+<key>username</key>
+<string>numist</string>
+<key>userid</key>
+<integer>2054</integer>
+</dict>
+</array>
+</plist>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<upload>
+		<id type="integer">
+			251709
+		</id>
+		<userid type="integer">
+			2054
+		</userid>
+		<filename type="string">
+			[mp] self-portrait.jpg
+		</filename>
+		<timestamp type="date">
+			2009-01-08 20:58:46
+		</timestamp>
+		<nsfw type="boolean">
+			false
+		</nsfw>
+		<tmbo type="boolean">
+			false
+		</tmbo>
+		<type type="string">
+			avatar
+		</type>
+		<username type="string">
+			numist
+		</username>
+		<subscribed type="boolean">
+			false
+		</subscribed>
+		<vote_good type="integer">
+			6
+		</vote_good>
+		<vote_bad type="integer">
+			0
+		</vote_bad>
+		<vote_tmbo type="integer">
+			0
+		</vote_tmbo>
+		<vote_repost type="integer">
+			0
+		</vote_repost>
+		<comments type="integer">
+			6
+		</comments>
+		<filtered type="boolean">
+			false
+		</filtered>
+</upload>
