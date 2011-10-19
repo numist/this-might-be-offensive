@@ -262,6 +262,7 @@
 	 * @return If the userid exists, returns a possibly-empty array of user metadata objects. Returns false if userid does not exist.
 	 * @example userid=2054
 	 * @example userid=22
+	 * @see getuser
 	 */
 	function api_getposse() {
 		$userid = check_arg("userid", "integer", null, false);
@@ -360,7 +361,7 @@
 	 * @param id integer optional Get comment with this id.
 	 * @param threadmin integer optional Get comments from threads after this one, inclusive.
 	 * @param threadmax integer optional Get comments from threads before this one, inclusive.
-	 * @param thread integer optional Get comments from this thread. If you are subscribed to this thread, your subscription will be reset.
+	 * @param thread integer optional Get comments from this thread.
 	 * @param sort string optional {"date_desc", "date_asc"} Default:"date_desc" Sort by comment date.
 	 * @param limit limit optional Default and maximum is 200.
 	 * @return An array of comment objects.
@@ -369,7 +370,7 @@
 	function api_getcomments() {
 		send(core_getcomments($_REQUEST));
 	}
-
+	
 	function api_postcomment() {
 		$fileid = check_arg("fileid", "integer", $_POST);
 		$comment = check_arg("comment", "string", $_POST, false);
@@ -440,6 +441,7 @@
 	 * @param limit limit optional Default and maximum is 200.
 	 * @return Array of User objects matching query string.
 	 * @example q=max&limit=3
+	 * @see getuser
 	 */
 	function api_searchuser() {
 		send(core_searchuser($_REQUEST));
@@ -568,6 +570,8 @@
 	 * @return Array of Comment objects containing the oldest unread comment for each thread with unread comments.
 	 * @example limit=3&sort=file_asc
 	 * @see getcomments
+	 * @see subscribe
+	 * @see resetsubscription
 	 */
 	function api_unreadcomments() {
 		send(core_unreadcomments($_REQUEST));
@@ -580,9 +584,10 @@
 	 *
 	 * @param threadid integer required Thread you're adding/removing from your subscriptions.
 	 * @param subscribe integer required {"1", "0"} 0 -> unsubscribe, 1 -> subscribe.
-	 * @return login
+	 * @return unsubscribe always returns true. subscribing returns false if thread does not exist.
 	 * @example threadid=211604&subscribe=1
-	 * @see login
+	 * @see resetsubscription
+	 * @see unreadcomments
 	 */
 	function api_subscribe() {	
 		$threadid = check_arg("threadid", "integer");
@@ -593,6 +598,24 @@
 			send(unsubscribe($threadid));
 		}
 		send(subscribe($threadid));
+	}
+	
+	/**
+	 * @method resetsubscription
+	 *
+	 * Reset your subscription to a thread. New posts made to the thread after this call will cause the subscription to become active again.
+	 *
+	 * @param threadid integer required Reset the subscription to this thread.
+	 * @return true if reset, false if no subscription or upload does not exist.
+	 * @example threadid=309779
+	 * @see subscribe
+	 * @see unreadcomments
+	 */
+	function api_resetsubscription() {
+		$threadid = check_arg("threadid", "integer");
+		handle_errors();
+		
+		send(clearSubscription($threadid, me()->id()));
 	}
 
 ?>

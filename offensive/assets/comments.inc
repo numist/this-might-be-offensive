@@ -75,6 +75,11 @@ function updateSubscriptions( $fileid, $commentid ) {
 function clearSubscription($fileid, $userid) {
 	$sql = "UPDATE offensive_subscriptions SET commentid = NULL WHERE userid=$userid and fileid=$fileid";
 	$result = tmbo_query( $sql );
+	
+	if(mysql_affected_rows() < 1) { 
+		return false;
+	}
+	return true;
 }
 
 function updateCommentCount($fileid, $good, $bad, $repost, $tmbo, $comment) {
@@ -194,10 +199,6 @@ function postComment($fileid, $vote, $repost, $offensive, $comment, $subscribe=n
 	}
 
 	return $commentid;
-}
-
-function searchComments($q, $limit) {
-	// pending classification, search.
 }
 
 ?>

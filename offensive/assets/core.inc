@@ -347,7 +347,6 @@
 			$sql .= " AND com.fileid <= $threadmax";
 		}
 		if($thread !== false) {
-			// XXX: reset subscription?
 			$sql .= " AND com.fileid = $thread";
 		}
 		if($userid !== false) {
