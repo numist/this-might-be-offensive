@@ -478,8 +478,8 @@
 		}
 					
 		$q = check_arg("q", "string", $method);
-		$limit = check_arg("limit", "limit", $method, false);
-		$type = check_arg("type", "string", $method, false, array("image", "topic", "avatar", "audio"));
+		$limit = check_arg("limit", "limit", $args, false);
+		$type = check_arg("type", "string", $args, false, array("image", "topic", "avatar", "audio"));
 		handle_errors();
 		
 		$sql = $uploadsql;
