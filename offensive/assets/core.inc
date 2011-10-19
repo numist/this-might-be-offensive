@@ -453,13 +453,14 @@
 		if(!is_array($args)) {
 			trigger_error("args is not an array", E_USER_ERROR);
 		}
-					
-		$q = check_arg("q", "string", $method);
+
+		$limit = check_arg("limit", "limit", $args, false);
+		$q = check_arg("q", "string", $args);
 		handle_errors();
 		
 		$q = sqlEscape($q);
 		
-		$sql = "SELECT * FROM users WHERE username LIKE '%$q%'";
+		$sql = "SELECT * FROM users WHERE username LIKE '%$q%' LIMIT $limit";
 		
 		$result = tmbo_query($sql);
 		
