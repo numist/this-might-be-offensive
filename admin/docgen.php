@@ -5,7 +5,7 @@ $tmboroot = "";
 
 $get_examples = false;
 
-	//$token = "rsk48uhhv328w4gq5jjlvubybsxdycqd";
+	//$token = "kpnpn4akc6n6jvviw62tpq42qt8q6r6l";
 	$token = "";
 
 	//$api = "http://dev.thismight.be/offensive/api.php/";
@@ -320,7 +320,7 @@ If you are developing an application, please <a href="#Errata">send an email or 
 foreach($data["examples"] as $example) { ?>
 <p><code><?= "$method.xxx?$example" ?></code>: 
 	<? foreach($rtypes as $type => $desc) { ?>
-		<a href="/offensive/docs/<?= urlencode("/$method.$type?$example"); ?>"><?= $type ?></a>
+		<a href="/offensive/docs/<?= urlencode("$method.$type?$example"); ?>"><?= $type ?></a>
 	<? } ?>
 </p>
 <? } ?>
@@ -352,7 +352,7 @@ foreach($data["examples"] as $example) { ?>
 	<li>August 11, 2008 - Initial draft.</li>
 	<li>August 14, 2008 - postuploads should take nsfw and tmbo as arguments.</li>
 	<li>August 15, 2008 - searchuploads and searchcomments get more parameters ([limit, type], limit).</li>
-	<li>October 18, 2011 - Documentation is now generated/updated by script. Primary input is the documentation in the API code itself.</li>
+	<li>October 18, 2011 - Documentation is now generated/updated by script. Primary input is the documentation in the API code itself. See <a href="https://github.com/numist/this-might-be-offensive">github</a> for more detailed change information.</li>
 	
 	<li><?= gmdate("F j, Y") ?> - This page was generated.</li>
 </ul>
