@@ -478,7 +478,7 @@
 			trigger_error("args is not an array", E_USER_ERROR);
 		}
 					
-		$q = check_arg("q", "string", $method);
+		$q = check_arg("q", "string", $args);
 		$limit = check_arg("limit", "limit", $args, false);
 		$type = check_arg("type", "string", $args, false, array("image", "topic", "avatar", "audio"));
 		handle_errors();
@@ -507,8 +507,8 @@
 			trigger_error("args is not an array", E_USER_ERROR);
 		}
 
-		$sort = check_arg("sort", "string", $method, false, array("comment_desc", "comment_asc", "file_asc", "file_desc"));
-		$limit = check_arg("limit", "limit", $method, false);
+		$sort = check_arg("sort", "string", $args, false, array("comment_desc", "comment_asc", "file_asc", "file_desc"));
+		$limit = check_arg("limit", "limit", $args, false);
 		handle_errors();
 
 		if($sort === false) $sort = "file_asc";
