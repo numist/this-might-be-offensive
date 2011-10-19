@@ -316,7 +316,10 @@
 
 		// XXX: do not create a session if this is set!
 		if($token) {
-			send(core_createtoken(trim($_SERVER['HTTP_USER_AGENT'])));
+			$agent = array_key_exists("HTTP_USER_AGENT", $_SERVER) ?
+			         trim($_SERVER['HTTP_USER_AGENT']) :
+			         " (no name)";
+			send(core_createtoken($agent));
 		} else {
 			assert('me()');
 			$_REQUEST['userid'] = me()->id();
