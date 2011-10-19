@@ -166,15 +166,10 @@ function plist_gen_array($val) {
     $ret = "<$type>\n";
     foreach($val as $key => $value) {
         if($type == "dict") {
-            $ret .= "\t<key>".str_replace(array("&", "<", ">"), array("&amp;", "&lt;", "&gt;"), $key)."</key>\n";
+            $ret .= "<key>".str_replace(array("&", "<", ">"), array("&amp;", "&lt;", "&gt;"), $key)."</key>\n";
         }
 
-        // indent each line of the result, for prettiness.
-        $genned = explode("\n", plist_gen_value($value));
-        for($i = 0; $i < count($genned) - 1; $i++) {
-            $genned[$i] = "\t".$genned[$i];
-        }
-        $ret .= implode("\n", $genned);
+				$ret .= plist_gen_value($value);
     }
     $ret .= "</$type>\n";
 

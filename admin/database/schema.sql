@@ -35,23 +35,6 @@ CREATE TABLE `failed_logins` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `hall_of_fame`
---
-
-DROP TABLE IF EXISTS `hall_of_fame`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `hall_of_fame` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `fileid` int(11) NOT NULL DEFAULT '0',
-  `votes` int(11) DEFAULT NULL,
-  `type` enum('hof','today') NOT NULL DEFAULT 'hof',
-  PRIMARY KEY (`id`),
-  KEY `fileid` (`fileid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Table structure for table `ip_history`
 --
 
@@ -234,25 +217,6 @@ CREATE TABLE `offensive_count_cache` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `offensive_messages`
---
-
-DROP TABLE IF EXISTS `offensive_messages`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `offensive_messages` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `to` int(11) NOT NULL DEFAULT '0',
-  `from` int(11) NOT NULL DEFAULT '0',
-  `status` enum('read','unread') NOT NULL DEFAULT 'read',
-  `body` mediumtext NOT NULL,
-  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `to` (`to`,`from`,`status`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Table structure for table `offensive_squelch`
 --
 
@@ -316,37 +280,6 @@ CREATE TABLE `offensive_uploads` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `old_preference_names_values`
---
-
-DROP TABLE IF EXISTS `old_preference_names_values`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `old_preference_names_values` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `value` varchar(255) NOT NULL DEFAULT '',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `old_user_preferences`
---
-
-DROP TABLE IF EXISTS `old_user_preferences`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `old_user_preferences` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `userid` int(11) NOT NULL DEFAULT '0',
-  `nameid` int(11) NOT NULL DEFAULT '0',
-  `valueid` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`),
-  KEY `userid_nameid` (`userid`,`nameid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Table structure for table `referrals`
 --
 
@@ -385,69 +318,6 @@ CREATE TABLE `tokens` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `user_notes`
---
-
-DROP TABLE IF EXISTS `user_notes`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `user_notes` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `userid` int(11) NOT NULL DEFAULT '0',
-  `notes` mediumtext NOT NULL,
-  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `user_preferences`
---
-
-DROP TABLE IF EXISTS `user_preferences`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `user_preferences` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `userid` varchar(50) NOT NULL DEFAULT '',
-  `prefname` varchar(50) NOT NULL DEFAULT '',
-  `value` text NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `userid_id` (`userid`,`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `user_profile_attrs`
---
-
-DROP TABLE IF EXISTS `user_profile_attrs`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `user_profile_attrs` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL DEFAULT '',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `user_profiles`
---
-
-DROP TABLE IF EXISTS `user_profiles`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `user_profiles` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `userid` int(11) NOT NULL DEFAULT '0',
-  `attr_name` varchar(255) NOT NULL DEFAULT '',
-  `attr_value` varchar(255) NOT NULL DEFAULT '',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Table structure for table `users`
 --
 
@@ -473,44 +343,6 @@ CREATE TABLE `users` (
   KEY `account_status` (`account_status`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1 PACK_KEYS=1;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `vote_count_for_export`
---
-
-DROP TABLE IF EXISTS `vote_count_for_export`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `vote_count_for_export` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `fileid` int(11) NOT NULL DEFAULT '0',
-  `vote` varchar(15) NOT NULL DEFAULT '',
-  `count` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`),
-  KEY `fileid` (`fileid`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `vote_stats`
---
-
-DROP TABLE IF EXISTS `vote_stats`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `vote_stats` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `userid` int(11) DEFAULT NULL,
-  `value` int(11) NOT NULL DEFAULT '0',
-  `type` varchar(50) NOT NULL DEFAULT '',
-  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `userid` (`userid`),
-  KEY `userid_to_type` (`userid`,`type`),
-  KEY `type_to_val` (`type`,`value`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

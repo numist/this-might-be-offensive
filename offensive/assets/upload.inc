@@ -211,9 +211,9 @@ function upload() {
 		$postdata['file_extension'] = getFileExtension($_FILES['image']['name']);
 		$postdata['tmpname'] = $postdata['tmpname'].$postdata['file_extension'];
 		$postdata['filename'] = $_FILES['image']['name'];
-		if(array_key_exists('nsfw', $_POST))
+		if(array_key_exists('nsfw', $_POST) || strpos(strtolower($postdata['filename']), "[nsfw]") !== false)
 			$postdata['nsfw'] = $_POST['nsfw'];
-		if(array_key_exists('tmbo', $_POST))
+		if(array_key_exists('tmbo', $_POST) || strpos(strtolower($postdata['filename']), "[tmbo]") !== false)
 			$postdata['tmbo'] = $_POST['tmbo'];
 
 		ensureDirExists($tmpdir);

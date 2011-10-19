@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<array>
+	<user>
+		
+		<posse type="integer">
+			175
+		</posse>
+		<yearbook type="boolean">
+			true
+		</yearbook>
+		<userid type="integer">
+			151
+		</userid>
+		<username type="string">
+			themaxx
+		</username>
+		<created type="date">
+			2004-09-15 17:41:07
+		</created>
+		<account_status type="string">
+			admin
+		</account_status>
+		<timestamp type="date">
+			2011-10-15 20:44:53
+		</timestamp>
+		<ip type="string">
+			192.168.231.1
+		</ip>
+		<email type="string">
+			spam@spammy.com
+		</email>
+
+	</user>
+	<user>
+		
+		<posse type="integer">
+			0
+		</posse>
+		<yearbook type="boolean">
+			false
+		</yearbook>
+		<userid type="integer">
+			196
+		</userid>
+		<username type="string">
+			maxxie
+		</username>
+		<created type="date">
+			2004-09-15 17:41:07
+		</created>
+		<account_status type="string">
+			locked
+		</account_status>
+		<timestamp type="date">
+			2008-09-10 14:17:32
+		</timestamp>
+
+	</user>
+	<user>
+		
+		<posse type="integer">
+			0
+		</posse>
+		<yearbook type="boolean">
+			false
+		</yearbook>
+		<userid type="integer">
+			222
+		</userid>
+		<username type="string">
+			maxwin
+		</username>
+		<created type="date">
+			2004-09-15 17:41:07
+		</created>
+		<account_status type="string">
+			normal
+		</account_status>
+		<timestamp type="date">
+			2005-09-20 23:24:42
+		</timestamp>
+
+	</user>
+</array>
