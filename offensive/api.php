@@ -551,13 +551,85 @@
 		send(true);
 	}
 
-	// XXX: unimplemented (also, topic pickup and audio pickup forthcoming)
-	function api_pickup_image() {
-		trigger_error("unimplemented", E_USER_ERROR);
+	/**
+	 * @method get_preference
+	 *
+	 * Retrieves the given user preference
+	 *
+	 * It may be one of the following:
+	 * •&nbsp;<b>hide_nsfw</b> - indicates the user wants to hide content that is not safe for work
+	 * •&nbsp;<b>hide_tmbo</b> - indicates the user wants to hide content that might be offensive
+	 * •&nbsp;<b>hide_bad</b> - indicates the user wants to hid content that has been deemed by others as "bad"
+	 * •&nbsp;<b>sortorder_discussions</b> - sorting for discussions
+	 * •&nbsp;<b>sortorder_yearbook</b> - sorting for yearbook
+	 * •&nbsp;<b>index</b> - type of frontpage, "thumbs" or blank
+	 * •&nbsp;<b>thumbnails_in_comments</b> - indicates if the user wants to view thumbnails in comments
+	 * •&nbsp;<b>ipickup</b> - pickup id for images
+	 * •&nbsp;<b>tpickup</b> - and pickup id for topics (no web interface implemented)
+	 * •&nbsp;<b>apickup</b> - and pickup id for audio
+	 * •&nbsp;<b>ypickup</b> - and pickup id for yearbook (no web interface implemented)
+	 * •&nbsp;<b>key_good</b> - key for "vote good"
+	 * •&nbsp;<b>key_bad</b> - key for "vote bad"
+	 * •&nbsp;<b>key_next</b> - key for "go to the next post in the stream"
+	 * •&nbsp;<b>key_prev</b> - key for "go to the previous post in the stream"
+	 * •&nbsp;<b>key_index</b> - key for "go to the index"
+	 * •&nbsp;<b>key_comments</b> - key for "go to the comments for this upload"
+	 * •&nbsp;<b>key_quick</b> - key for "open the quick reply window"
+	 * •&nbsp;<b>key_escape</b> - key for "close modal dialogues"
+	 * •&nbsp;<b>key_random</b> - key for "random image jump"
+	 * •&nbsp;<b>key_subscribe</b> - key for "subscription toggle"
+	 * @param key string The preference to retrieve
+	 * @return The value of the preference (may be null)
+	 * @example key=ipickup
+	 * @see set_preference
+	 */
+	function api_get_preference() {
+		require_once('offensive/data/preferences.inc');
+		$pref_key = check_arg('key', 'string', null, true, $prefnames);
+		handle_errors();
+		send(me()->getPref($pref_key));
 	}
-	
-	function  api_pickup_topic() {
-		trigger_error("unimplemented", E_USER_ERROR);
+
+	/**
+	 * @method set_preference
+	 *
+	 * Set the given user preference
+	 *
+	 * It may be one of the following:
+	 * •&nbsp;<b>hide_nsfw</b> - indicates the user wants to hide content that is not safe for work
+	 * •&nbsp;<b>hide_tmbo</b> - indicates the user wants to hide content that might be offensive
+	 * •&nbsp;<b>hide_bad</b> - indicates the user wants to hid content that has been deemed by others as "bad"
+	 * •&nbsp;<b>sortorder_discussions</b> - sorting for discussions
+	 * •&nbsp;<b>sortorder_yearbook</b> - sorting for yearbook
+	 * •&nbsp;<b>index</b> - type of frontpage, "thumbs" or blank
+	 * •&nbsp;<b>thumbnails_in_comments</b> - indicates if the user wants to view thumbnails in comments
+	 * •&nbsp;<b>ipickup</b> - pickup id for images
+	 * •&nbsp;<b>tpickup</b> - and pickup id for topics (no web interface implemented)
+	 * •&nbsp;<b>apickup</b> - and pickup id for audio
+	 * •&nbsp;<b>ypickup</b> - and pickup id for yearbook (no web interface implemented)
+	 * •&nbsp;<b>key_good</b> - key for "vote good"
+	 * •&nbsp;<b>key_bad</b> - key for "vote bad"
+	 * •&nbsp;<b>key_next</b> - key for "go to the next post in the stream"
+	 * •&nbsp;<b>key_prev</b> - key for "go to the previous post in the stream"
+	 * •&nbsp;<b>key_index</b> - key for "go to the index"
+	 * •&nbsp;<b>key_comments</b> - key for "go to the comments for this upload"
+	 * •&nbsp;<b>key_quick</b> - key for "open the quick reply window"
+	 * •&nbsp;<b>key_escape</b> - key for "close modal dialogues"
+	 * •&nbsp;<b>key_random</b> - key for "random image jump"
+	 * •&nbsp;<b>key_subscribe</b> - key for "subscription toggle"
+	 * @param key string The preference to set.
+	 * @param value string The value to set. Leave blank to unset the preference.
+	 * @return true
+	 * @example key=ipickup&value=12345
+	 * @see get_preference
+	 */
+	function api_set_preference() {
+		require_once('offensive/data/preferences.inc');
+		$pref_key = check_arg('key', 'string', null, true, $prefnames);
+		$pref_value = check_arg('value', 'string', null, true);
+		handle_errors();
+		me()->setPref($pref_key, $prev_value);
+		return(true);
 	}
 
 	/**
