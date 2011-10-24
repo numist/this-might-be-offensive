@@ -628,7 +628,7 @@
 		$pref_key = check_arg('key', 'string', null, true, $prefnames);
 		$pref_value = check_arg('value', 'string', null, true);
 		handle_errors();
-		me()->setPref($pref_key, $prev_value);
+		me()->setPref($pref_key, $pref_value);
 		return(true);
 	}
 
