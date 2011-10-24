@@ -97,6 +97,8 @@ If you are developing an application, please <a href="#Errata">send an email or 
 	<li><a href="#searchuploads">searchuploads</a></li>
 	<li><a href="#getlocation">getlocation</a></li>
 	<li><a href="#setlocation">setlocation</a></li>
+	<li><a href="#get_preference">get_preference</a></li>
+	<li><a href="#set_preference">set_preference</a></li>
 	<li><a href="#unreadcomments">unreadcomments</a></li>
 	<li><a href="#subscribe">subscribe</a></li>
 	<li><a href="#resetsubscription">resetsubscription</a></li>
@@ -570,6 +572,110 @@ The format of the data returned from this call is unstable and subject to change
 </p>
 	
 <hr/>
+<a name="get_preference">
+<h3>get_preference</h3>
+<p>Retrieves the given user preference</p>
+
+<h4>Arguments:</h4>
+<ul>
+	    <li><b>key</b> (string) - The.
+						preference to retrieve. It may be one of the following:<br />
+•&nbsp;<b>hide_nsfw</b> - indicates the user wants to hide content that is not safe for work<br />
+•&nbsp;<b>hide_tmbo</b> - indicates the user wants to hide content that might be offensive<br />
+•&nbsp;<b>hide_bad</b> - indicates the user wants to hide content that has been deemed by others as "bad"<br />
+•&nbsp;<b>sortorder_discussions</b> - sorting for discussions<br />
+•&nbsp;<b>sortorder_yearbook</b> - sorting for yearbook<br />
+•&nbsp;<b>index</b> - type of frontpage, "thumbs" or blank<br />
+•&nbsp;<b>thumbnails_in_comments</b> - indicates if the user wants to view thumbnails in comments<br />
+•&nbsp;<b>ipickup</b> - pickup id for images<br />
+•&nbsp;<b>tpickup</b> - pickup id for topics (no web interface implemented)<br />
+•&nbsp;<b>apickup</b> - pickup id for audio<br />
+•&nbsp;<b>ypickup</b> - pickup id for yearbook (no web interface implemented)<br />
+•&nbsp;<b>key_good</b> - key(s) for "vote good"<br />
+•&nbsp;<b>key_bad</b> - key(s) for "vote bad"<br />
+•&nbsp;<b>key_next</b> - key(s) for "go to the next post in the stream"<br />
+•&nbsp;<b>key_prev</b> - key(s) for "go to the previous post in the stream"<br />
+•&nbsp;<b>key_index</b> - key(s) for "go to the index"<br />
+•&nbsp;<b>key_comments</b> - key(s) for "go to the comments for this upload"<br />
+•&nbsp;<b>key_quick</b> - key(s) for "open the quick reply window"<br />
+•&nbsp;<b>key_escape</b> - key(s) for "close modal dialogues"<br />
+•&nbsp;<b>key_random</b> - key(s) for "random image jump"<br />
+•&nbsp;<b>key_subscribe</b> - key(s) for "subscription toggle"</li>
+	</ul>
+
+
+<h4>Returns:</h4>
+<p>The value of the preference (may be null)</p>
+
+<h4>Examples:</h4>
+<p><code>get_preference.xxx?key=ipickup</code>: 
+			<a href="/offensive/docs/get_preference.json%3Fkey%3Dipickup">json</a>
+			<a href="/offensive/docs/get_preference.plist%3Fkey%3Dipickup">plist</a>
+			<a href="/offensive/docs/get_preference.php%3Fkey%3Dipickup">php</a>
+			<a href="/offensive/docs/get_preference.xml%3Fkey%3Dipickup">xml</a>
+	</p>
+
+<h4>See Also:</h4>
+
+			<p><a href="#set_preference">set_preference</a> - 
+
+Set the given user preference
+</p>
+	
+<hr/>
+<a name="set_preference">
+<h3>set_preference</h3>
+<p>Set the given user preference</p>
+
+<h4>Arguments:</h4>
+<ul>
+	    <li><b>key</b> (string) - The.
+						preference to set. It may be one of the following:<br />
+•&nbsp;<b>hide_nsfw</b> - indicates the user wants to hide content that is not safe for work<br />
+•&nbsp;<b>hide_tmbo</b> - indicates the user wants to hide content that might be offensive<br />
+•&nbsp;<b>hide_bad</b> - indicates the user wants to hide content that has been deemed by others as "bad"<br />
+•&nbsp;<b>sortorder_discussions</b> - sorting for discussions<br />
+•&nbsp;<b>sortorder_yearbook</b> - sorting for yearbook<br />
+•&nbsp;<b>index</b> - type of frontpage, "thumbs" or blank<br />
+•&nbsp;<b>thumbnails_in_comments</b> - indicates if the user wants to view thumbnails in comments<br />
+•&nbsp;<b>ipickup</b> - pickup id for images<br />
+•&nbsp;<b>tpickup</b> - pickup id for topics (no web interface implemented)<br />
+•&nbsp;<b>apickup</b> - pickup id for audio<br />
+•&nbsp;<b>ypickup</b> - pickup id for yearbook (no web interface implemented)<br />
+•&nbsp;<b>key_good</b> - key(s) for "vote good"<br />
+•&nbsp;<b>key_bad</b> - key(s) for "vote bad"<br />
+•&nbsp;<b>key_next</b> - key(s) for "go to the next post in the stream"<br />
+•&nbsp;<b>key_prev</b> - key(s) for "go to the previous post in the stream"<br />
+•&nbsp;<b>key_index</b> - key(s) for "go to the index"<br />
+•&nbsp;<b>key_comments</b> - key(s) for "go to the comments for this upload"<br />
+•&nbsp;<b>key_quick</b> - key(s) for "open the quick reply window"<br />
+•&nbsp;<b>key_escape</b> - key(s) for "close modal dialogues"<br />
+•&nbsp;<b>key_random</b> - key(s) for "random image jump"<br />
+•&nbsp;<b>key_subscribe</b> - key(s) for "subscription toggle"</li>
+	    <li><b>value</b> (string) - The.
+						value to set. Leave blank to unset the preference.</li>
+	</ul>
+
+
+<h4>Returns:</h4>
+<p>true</p>
+
+<h4>Examples:</h4>
+<p><code>set_preference.xxx?key=ipickup&value=12345</code>: 
+			<a href="/offensive/docs/set_preference.json%3Fkey%3Dipickup%26value%3D12345">json</a>
+			<a href="/offensive/docs/set_preference.plist%3Fkey%3Dipickup%26value%3D12345">plist</a>
+			<a href="/offensive/docs/set_preference.php%3Fkey%3Dipickup%26value%3D12345">php</a>
+			<a href="/offensive/docs/set_preference.xml%3Fkey%3Dipickup%26value%3D12345">xml</a>
+	</p>
+
+<h4>See Also:</h4>
+
+			<p><a href="#get_preference">get_preference</a> - 
+
+Retrieves the given user preference
+</p>
+	
+<hr/>
 <a name="unreadcomments">
 <h3>unreadcomments</h3>
 <p>Get a list of unchecked activity on subscribed threads.</p>
@@ -695,7 +801,7 @@ Get a list of unchecked activity on subscribed threads.
 	<li>August 15, 2008 - searchuploads and searchcomments get more parameters ([limit, type], limit).</li>
 	<li>October 18, 2011 - Documentation is now generated/updated by script. Primary input is the documentation in the API code itself. See <a href="https://github.com/numist/this-might-be-offensive">github</a> for more detailed change information.</li>
 	
-	<li>October 19, 2011 - This page was generated.</li>
+	<li>October 24, 2011 - This page was generated.</li>
 </ul>
 </body>
 </html>
