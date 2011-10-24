@@ -17,7 +17,9 @@ function tmbo_json_encode($data) {
 		} else {
 			$data = $data->api_data();
 		}
-	}
+  } else {
+    $data = array('response' => $data);
+  }
 	return json_encode($data);
 }
 
