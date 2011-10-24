@@ -31,22 +31,24 @@ function mustLogIn($methods=array()) {
 			$methods = array("u/p" => array($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']));
 			if(login($methods) === true) return;
 
-			header('HTTP/1.0 401 Not Found');
+			header('HTTP/1.0 401 Unauthorized');
     	echo $login_message;
 			exit;
 		}
 
 		// no auth? try again.
 		if($prompt) {
+			header('HTTP/1.0 401 Unauthorized');
 			header('WWW-Authenticate: Basic realm="[this might be offensive]"');
-		}
-    header('HTTP/1.0 401 Unauthorized');
-		if(strlen($login_message) == 0) {
-    	echo 'anon is not welcome here.';
+			if(strlen($login_message) == 0) {
+	    	echo 'anon is not welcome here.';
+			} else {
+				echo $login_message;
+			}
 		} else {
-			echo $login_message;
+			header('HTTP/1.0 403 Forbidden');
+			echo "let it go";
 		}
-    exit;
 	} else {
 		// build the redirect link
 		$redirect = (isset($_REQUEST['redirect']) ?
@@ -54,7 +56,6 @@ function mustLogIn($methods=array()) {
 		            "https://".$_SERVER["SERVER_NAME"].urlencode($_SERVER['REQUEST_URI']));
 
 		header("Location: https://".$_SERVER["SERVER_NAME"]."/offensive/logn.php?redirect=".$redirect);
-		exit;
 	}
 }
 
@@ -196,7 +197,9 @@ function login($methods=array()) {
 	 * been annoying lately.
 	 */
 	if(!canLogIn()) {
+		global $login_message, $prompt;
 		$login_message = "give it a rest.";
+		$prompt = false;
 		return null;
 	}
 	
