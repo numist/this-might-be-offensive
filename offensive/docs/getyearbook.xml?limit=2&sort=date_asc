@@ -3,55 +3,6 @@
 	<upload>
 		
 		<id type="integer">
-			303542
-		</id>
-		<userid type="integer">
-			7441
-		</userid>
-		<filename type="string">
-			avatar 2.jpg
-		</filename>
-		<timestamp type="date">
-			2010-10-18 12:29:30
-		</timestamp>
-		<nsfw type="boolean">
-			false
-		</nsfw>
-		<tmbo type="boolean">
-			false
-		</tmbo>
-		<type type="string">
-			avatar
-		</type>
-		<username type="string">
-			darth_mall
-		</username>
-		<subscribed type="boolean">
-			false
-		</subscribed>
-		<vote_good type="integer">
-			2
-		</vote_good>
-		<vote_bad type="integer">
-			0
-		</vote_bad>
-		<vote_tmbo type="integer">
-			0
-		</vote_tmbo>
-		<vote_repost type="integer">
-			0
-		</vote_repost>
-		<comments type="integer">
-			0
-		</comments>
-		<filtered type="boolean">
-			false
-		</filtered>
-
-	</upload>
-	<upload>
-		
-		<id type="integer">
 			303909
 		</id>
 		<userid type="integer">
@@ -92,6 +43,55 @@
 		</vote_repost>
 		<comments type="integer">
 			3
+		</comments>
+		<filtered type="boolean">
+			false
+		</filtered>
+
+	</upload>
+	<upload>
+		
+		<id type="integer">
+			304034
+		</id>
+		<userid type="integer">
+			5487
+		</userid>
+		<filename type="string">
+			yearbook.jpg
+		</filename>
+		<timestamp type="date">
+			2010-10-27 15:15:18
+		</timestamp>
+		<nsfw type="boolean">
+			false
+		</nsfw>
+		<tmbo type="boolean">
+			false
+		</tmbo>
+		<type type="string">
+			avatar
+		</type>
+		<username type="string">
+			ddizzled
+		</username>
+		<subscribed type="boolean">
+			false
+		</subscribed>
+		<vote_good type="integer">
+			3
+		</vote_good>
+		<vote_bad type="integer">
+			0
+		</vote_bad>
+		<vote_tmbo type="integer">
+			0
+		</vote_tmbo>
+		<vote_repost type="integer">
+			0
+		</vote_repost>
+		<comments type="integer">
+			0
 		</comments>
 		<filtered type="boolean">
 			false
