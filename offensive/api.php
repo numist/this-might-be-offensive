@@ -559,25 +559,25 @@
 	 * @param key string The preference to retrieve. It may be one of the following:
 	 * •&nbsp;<b>hide_nsfw</b> - indicates the user wants to hide content that is not safe for work
 	 * •&nbsp;<b>hide_tmbo</b> - indicates the user wants to hide content that might be offensive
-	 * •&nbsp;<b>hide_bad</b> - indicates the user wants to hid content that has been deemed by others as "bad"
+	 * •&nbsp;<b>hide_bad</b> - indicates the user wants to hide content that has been deemed by others as "bad"
 	 * •&nbsp;<b>sortorder_discussions</b> - sorting for discussions
 	 * •&nbsp;<b>sortorder_yearbook</b> - sorting for yearbook
 	 * •&nbsp;<b>index</b> - type of frontpage, "thumbs" or blank
 	 * •&nbsp;<b>thumbnails_in_comments</b> - indicates if the user wants to view thumbnails in comments
 	 * •&nbsp;<b>ipickup</b> - pickup id for images
-	 * •&nbsp;<b>tpickup</b> - and pickup id for topics (no web interface implemented)
-	 * •&nbsp;<b>apickup</b> - and pickup id for audio
-	 * •&nbsp;<b>ypickup</b> - and pickup id for yearbook (no web interface implemented)
-	 * •&nbsp;<b>key_good</b> - key for "vote good"
-	 * •&nbsp;<b>key_bad</b> - key for "vote bad"
-	 * •&nbsp;<b>key_next</b> - key for "go to the next post in the stream"
-	 * •&nbsp;<b>key_prev</b> - key for "go to the previous post in the stream"
-	 * •&nbsp;<b>key_index</b> - key for "go to the index"
-	 * •&nbsp;<b>key_comments</b> - key for "go to the comments for this upload"
-	 * •&nbsp;<b>key_quick</b> - key for "open the quick reply window"
-	 * •&nbsp;<b>key_escape</b> - key for "close modal dialogues"
-	 * •&nbsp;<b>key_random</b> - key for "random image jump"
-	 * •&nbsp;<b>key_subscribe</b> - key for "subscription toggle"
+	 * •&nbsp;<b>tpickup</b> - pickup id for topics (no web interface implemented)
+	 * •&nbsp;<b>apickup</b> - pickup id for audio
+	 * •&nbsp;<b>ypickup</b> - pickup id for yearbook (no web interface implemented)
+	 * •&nbsp;<b>key_good</b> - key(s) for "vote good"
+	 * •&nbsp;<b>key_bad</b> - key(s) for "vote bad"
+	 * •&nbsp;<b>key_next</b> - key(s) for "go to the next post in the stream"
+	 * •&nbsp;<b>key_prev</b> - key(s) for "go to the previous post in the stream"
+	 * •&nbsp;<b>key_index</b> - key(s) for "go to the index"
+	 * •&nbsp;<b>key_comments</b> - key(s) for "go to the comments for this upload"
+	 * •&nbsp;<b>key_quick</b> - key(s) for "open the quick reply window"
+	 * •&nbsp;<b>key_escape</b> - key(s) for "close modal dialogues"
+	 * •&nbsp;<b>key_random</b> - key(s) for "random image jump"
+	 * •&nbsp;<b>key_subscribe</b> - key(s) for "subscription toggle"
 	 * @return The value of the preference (may be null)
 	 * @example key=ipickup
 	 * @see set_preference
@@ -597,25 +597,25 @@
 	 * @param key string The preference to set. It may be one of the following:
 	 * •&nbsp;<b>hide_nsfw</b> - indicates the user wants to hide content that is not safe for work
 	 * •&nbsp;<b>hide_tmbo</b> - indicates the user wants to hide content that might be offensive
-	 * •&nbsp;<b>hide_bad</b> - indicates the user wants to hid content that has been deemed by others as "bad"
+	 * •&nbsp;<b>hide_bad</b> - indicates the user wants to hide content that has been deemed by others as "bad"
 	 * •&nbsp;<b>sortorder_discussions</b> - sorting for discussions
 	 * •&nbsp;<b>sortorder_yearbook</b> - sorting for yearbook
 	 * •&nbsp;<b>index</b> - type of frontpage, "thumbs" or blank
 	 * •&nbsp;<b>thumbnails_in_comments</b> - indicates if the user wants to view thumbnails in comments
 	 * •&nbsp;<b>ipickup</b> - pickup id for images
-	 * •&nbsp;<b>tpickup</b> - and pickup id for topics (no web interface implemented)
-	 * •&nbsp;<b>apickup</b> - and pickup id for audio
-	 * •&nbsp;<b>ypickup</b> - and pickup id for yearbook (no web interface implemented)
-	 * •&nbsp;<b>key_good</b> - key for "vote good"
-	 * •&nbsp;<b>key_bad</b> - key for "vote bad"
-	 * •&nbsp;<b>key_next</b> - key for "go to the next post in the stream"
-	 * •&nbsp;<b>key_prev</b> - key for "go to the previous post in the stream"
-	 * •&nbsp;<b>key_index</b> - key for "go to the index"
-	 * •&nbsp;<b>key_comments</b> - key for "go to the comments for this upload"
-	 * •&nbsp;<b>key_quick</b> - key for "open the quick reply window"
-	 * •&nbsp;<b>key_escape</b> - key for "close modal dialogues"
-	 * •&nbsp;<b>key_random</b> - key for "random image jump"
-	 * •&nbsp;<b>key_subscribe</b> - key for "subscription toggle"
+	 * •&nbsp;<b>tpickup</b> - pickup id for topics (no web interface implemented)
+	 * •&nbsp;<b>apickup</b> - pickup id for audio
+	 * •&nbsp;<b>ypickup</b> - pickup id for yearbook (no web interface implemented)
+	 * •&nbsp;<b>key_good</b> - key(s) for "vote good"
+	 * •&nbsp;<b>key_bad</b> - key(s) for "vote bad"
+	 * •&nbsp;<b>key_next</b> - key(s) for "go to the next post in the stream"
+	 * •&nbsp;<b>key_prev</b> - key(s) for "go to the previous post in the stream"
+	 * •&nbsp;<b>key_index</b> - key(s) for "go to the index"
+	 * •&nbsp;<b>key_comments</b> - key(s) for "go to the comments for this upload"
+	 * •&nbsp;<b>key_quick</b> - key(s) for "open the quick reply window"
+	 * •&nbsp;<b>key_escape</b> - key(s) for "close modal dialogues"
+	 * •&nbsp;<b>key_random</b> - key(s) for "random image jump"
+	 * •&nbsp;<b>key_subscribe</b> - key(s) for "subscription toggle"
 	 * @param value string The value to set. Leave blank to unset the preference.
 	 * @return true
 	 * @example key=ipickup&value=12345
