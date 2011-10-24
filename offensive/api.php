@@ -556,7 +556,7 @@
 	 *
 	 * Retrieves the given user preference
 	 *
-	 * It may be one of the following:
+	 * @param key string The preference to retrieve. It may be one of the following:
 	 * •&nbsp;<b>hide_nsfw</b> - indicates the user wants to hide content that is not safe for work
 	 * •&nbsp;<b>hide_tmbo</b> - indicates the user wants to hide content that might be offensive
 	 * •&nbsp;<b>hide_bad</b> - indicates the user wants to hid content that has been deemed by others as "bad"
@@ -578,7 +578,6 @@
 	 * •&nbsp;<b>key_escape</b> - key for "close modal dialogues"
 	 * •&nbsp;<b>key_random</b> - key for "random image jump"
 	 * •&nbsp;<b>key_subscribe</b> - key for "subscription toggle"
-	 * @param key string The preference to retrieve
 	 * @return The value of the preference (may be null)
 	 * @example key=ipickup
 	 * @see set_preference
@@ -595,7 +594,7 @@
 	 *
 	 * Set the given user preference
 	 *
-	 * It may be one of the following:
+	 * @param key string The preference to set. It may be one of the following:
 	 * •&nbsp;<b>hide_nsfw</b> - indicates the user wants to hide content that is not safe for work
 	 * •&nbsp;<b>hide_tmbo</b> - indicates the user wants to hide content that might be offensive
 	 * •&nbsp;<b>hide_bad</b> - indicates the user wants to hid content that has been deemed by others as "bad"
@@ -617,7 +616,6 @@
 	 * •&nbsp;<b>key_escape</b> - key for "close modal dialogues"
 	 * •&nbsp;<b>key_random</b> - key for "random image jump"
 	 * •&nbsp;<b>key_subscribe</b> - key for "subscription toggle"
-	 * @param key string The preference to set.
 	 * @param value string The value to set. Leave blank to unset the preference.
 	 * @return true
 	 * @example key=ipickup&value=12345
