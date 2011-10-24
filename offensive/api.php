@@ -629,7 +629,7 @@
 		$pref_value = check_arg('value', 'string', null, true);
 		handle_errors();
 		me()->setPref($pref_key, $pref_value);
-		return(true);
+		send(true);
 	}
 
 	/**
