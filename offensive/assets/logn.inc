@@ -30,24 +30,19 @@ function mustLogIn($methods=array()) {
 		if (isset($_SERVER['PHP_AUTH_USER']) && strlen($_SERVER['PHP_AUTH_USER']) > 0) {
 			$methods = array("u/p" => array($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']));
 			if(login($methods) === true) return;
-
-			header('HTTP/1.0 401 Unauthorized');
-    	echo $login_message;
-			exit;
+			/* this is technically misuse of HTTP code 401 because it does not
+			 * include a WWW-Authenticate header, but it is consistent with the
+			 * HTTP error code expectations in the API.
+			 */
+			require("offensive/401.php");
 		}
 
 		// no auth? try again.
 		if($prompt) {
-			header('HTTP/1.0 401 Unauthorized');
 			header('WWW-Authenticate: Basic realm="[this might be offensive]"');
-			if(strlen($login_message) == 0) {
-	    	echo 'anon is not welcome here.';
-			} else {
-				echo $login_message;
-			}
+			require("offensive/401.php");
 		} else {
-			header('HTTP/1.0 403 Forbidden');
-			echo "let it go";
+			require("offensive/403.php");
 		}
 	} else {
 		// build the redirect link

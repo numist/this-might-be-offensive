@@ -54,7 +54,7 @@
 	if(!is_callable("api_".$func)) {
 		header("HTTP/1.0 404 Not Found");
 		header("Content-type: text/plain");
-		send(new Error("the function you requested ($func) was not found on this server."));
+		echo "the function you requested ($func) was not found on this server.";
 	}
 	
 	// authentication
