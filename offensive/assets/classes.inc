@@ -1515,4 +1515,6 @@ class Token {
 	}
 }
 
+require_once("offensive/assets/core.inc");
+
 ?>

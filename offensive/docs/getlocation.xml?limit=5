@@ -3,13 +3,13 @@
 	<dict>
 		
 	<latitude type="double">
-		-110.412
+		-23.9406
 	</latitude>
 	<longitude type="double">
-		-109.195
+		-54.3241
 	</longitude>
 	<timestamp type="date">
-		2011-10-15 00:26:16
+		2011-10-16 02:18:53
 	</timestamp>
 	<username type="string">
 		matt
@@ -22,13 +22,13 @@
 	<dict>
 		
 	<latitude type="double">
-		-71.1272
+		28.5565
 	</latitude>
 	<longitude type="double">
-		-44.4724
+		-74.6648
 	</longitude>
 	<timestamp type="date">
-		2011-10-15 00:26:16
+		2011-10-16 02:18:53
 	</timestamp>
 	<username type="string">
 		punching_judy
@@ -41,13 +41,13 @@
 	<dict>
 		
 	<latitude type="double">
-		-177.713
+		-6.96133
 	</latitude>
 	<longitude type="double">
-		-42.2189
+		-29.7138
 	</longitude>
 	<timestamp type="date">
-		2011-10-15 00:26:16
+		2011-10-16 02:18:53
 	</timestamp>
 	<username type="string">
 		turska
@@ -60,13 +60,13 @@
 	<dict>
 		
 	<latitude type="double">
-		-36.3963
+		35.7264
 	</latitude>
 	<longitude type="double">
-		138.093
+		-72.5795
 	</longitude>
 	<timestamp type="date">
-		2011-10-15 00:26:16
+		2011-10-16 02:18:53
 	</timestamp>
 	<username type="string">
 		camaleonte
@@ -79,13 +79,13 @@
 	<dict>
 		
 	<latitude type="double">
-		7.88493
+		-23.5473
 	</latitude>
 	<longitude type="double">
-		-56.2608
+		148.414
 	</longitude>
 	<timestamp type="date">
-		2011-10-15 00:26:16
+		2011-10-16 02:18:53
 	</timestamp>
 	<username type="string">
 		Franiblector
