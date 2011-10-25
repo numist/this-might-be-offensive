@@ -201,7 +201,7 @@ function me() {
 	// get the User object for the logged-in user
 	if(is_object($me)) return $me;
 	
-	if(array_key_exists('userid', $_SESSION)) {
+	if(isset($_SESSION) && array_key_exists('userid', $_SESSION)) {
 		trigger_error("was able to get user from session—".
 		              "should have called login() already!",
 		              E_USER_WARNING);
@@ -210,7 +210,10 @@ function me() {
 	}
 	
 	if(!$login_called) {
-		trigger_error("call login() before me()", E_USER_WARNING);
+		$trace = debug_backtrace();
+		$trace = $trace[0];
+		tmbo_error_handler(E_USER_WARNING, "call login() before me()", 
+		                   $trace['file'], $trace['line'], null);
 	}
 	return null;
 }

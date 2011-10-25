@@ -222,7 +222,9 @@ function login($methods=array()) {
  * returns a boolean if success/failure, null if not applicable.
  */
 function loginWithSession() {
-	if(array_key_exists('userid', $_SESSION) && is_intger($_SESSION['userid'])) {
+	if(isset($_SESSION) &&
+	   array_key_exists('userid', $_SESSION) &&
+	   is_intger($_SESSION['userid'])) {
 		$myself = new User($_SESSION["userid"]);
 		return checkUser($myself);
 	}
