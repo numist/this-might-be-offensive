@@ -33,7 +33,7 @@
 		<tr>
 			<td valign="center" height="100%" align="center">
 	
-				<p>whatever you're lookin' for, it ain't here.</p>
+				<p>let it go.</p>
 	
 			</td>
 		</tr>

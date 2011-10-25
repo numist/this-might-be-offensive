@@ -30,23 +30,20 @@ function mustLogIn($methods=array()) {
 		if (isset($_SERVER['PHP_AUTH_USER']) && strlen($_SERVER['PHP_AUTH_USER']) > 0) {
 			$methods = array("u/p" => array($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']));
 			if(login($methods) === true) return;
-
-			header('HTTP/1.0 401 Not Found');
-    	echo $login_message;
-			exit;
+			/* this is technically misuse of HTTP code 401 because it does not
+			 * include a WWW-Authenticate header, but it is consistent with the
+			 * HTTP error code expectations in the API.
+			 */
+			require("offensive/401.php");
 		}
 
 		// no auth? try again.
 		if($prompt) {
 			header('WWW-Authenticate: Basic realm="[this might be offensive]"');
-		}
-    header('HTTP/1.0 401 Unauthorized');
-		if(strlen($login_message) == 0) {
-    	echo 'anon is not welcome here.';
+			require("offensive/401.php");
 		} else {
-			echo $login_message;
+			require("offensive/403.php");
 		}
-    exit;
 	} else {
 		// build the redirect link
 		$redirect = (isset($_REQUEST['redirect']) ?
@@ -54,7 +51,6 @@ function mustLogIn($methods=array()) {
 		            "https://".$_SERVER["SERVER_NAME"].urlencode($_SERVER['REQUEST_URI']));
 
 		header("Location: https://".$_SERVER["SERVER_NAME"]."/offensive/logn.php?redirect=".$redirect);
-		exit;
 	}
 }
 
@@ -196,7 +192,9 @@ function login($methods=array()) {
 	 * been annoying lately.
 	 */
 	if(!canLogIn()) {
+		global $login_message, $prompt;
 		$login_message = "give it a rest.";
+		$prompt = false;
 		return null;
 	}
 	
@@ -224,7 +222,9 @@ function login($methods=array()) {
  * returns a boolean if success/failure, null if not applicable.
  */
 function loginWithSession() {
-	if(array_key_exists('userid', $_SESSION) && is_intger($_SESSION['userid'])) {
+	if(isset($_SESSION) &&
+	   array_key_exists('userid', $_SESSION) &&
+	   is_intger($_SESSION['userid'])) {
 		$myself = new User($_SESSION["userid"]);
 		return checkUser($myself);
 	}

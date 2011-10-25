@@ -19,8 +19,7 @@ foreach($_POST as $k => $v){
 	foreach($badStrings as $v2){
 		if(strpos($v, $v2) !== false){
 			logBadRequest();
-			header("HTTP/1.0 403 Forbidden");
-			exit;
+			require("offensive/403.php");
 		}
 	}
 }  
