@@ -4,3 +4,4 @@ offensive/uploads
 offensive/zips
 .DS_Store
 admin/.config
+*.swp

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+<dict>
+<key>id</key>
+<integer>303909</integer>
+<key>userid</key>
+<integer>208</integer>
+<key>filename</key>
+<string>relan.jpg</string>
+<key>timestamp</key>
+<date>2010-10-25T19:15:41+00:00</date>
+<key>nsfw</key>
+<false />
+<key>tmbo</key>
+<false />
+<key>type</key>
+<string>avatar</string>
+<key>username</key>
+<string>relan</string>
+<key>subscribed</key>
+<false />
+<key>vote_good</key>
+<integer>6</integer>
+<key>vote_bad</key>
+<integer>0</integer>
+<key>vote_tmbo</key>
+<integer>0</integer>
+<key>vote_repost</key>
+<integer>0</integer>
+<key>comments</key>
+<integer>3</integer>
+<key>filtered</key>
+<false />
+</dict>
+<dict>
+<key>id</key>
+<integer>304034</integer>
+<key>userid</key>
+<integer>5487</integer>
+<key>filename</key>
+<string>yearbook.jpg</string>
+<key>timestamp</key>
+<date>2010-10-27T22:15:18+00:00</date>
+<key>nsfw</key>
+<false />
+<key>tmbo</key>
+<false />
+<key>type</key>
+<string>avatar</string>
+<key>username</key>
+<string>ddizzled</string>
+<key>subscribed</key>
+<false />
+<key>vote_good</key>
+<integer>3</integer>
+<key>vote_bad</key>
+<integer>0</integer>
+<key>vote_tmbo</key>
+<integer>0</integer>
+<key>vote_repost</key>
+<integer>0</integer>
+<key>comments</key>
+<integer>0</integer>
+<key>filtered</key>
+<false />
+</dict>
+</array>
+</plist>

@@ -125,7 +125,7 @@ class Upload {
 	}
 	
 	public function exists() {
-		return $this->getUploadRow();
+		return $this->getUploadRow() && $this->status != "pending";
 	}
 	
 	public function expired() {
@@ -151,13 +151,11 @@ class Upload {
 	}
 	
 	public function is_tmbo() {
-		return ($this->getUploadRow("tmbo") == 1 ||
-		        strpos(strtolower($this->filename()), "[tmbo]") !== false);
+		return ($this->getUploadRow("tmbo") == 1);
 	}
 	
 	public function is_nsfw() {
-		return ($this->getUploadRow("nsfw") == 1 ||
-		        strpos(strtolower($this->filename()), "[nsfw]") !== false);
+		return ($this->getUploadRow("nsfw") == 1);
 	}
 	
 	public function type() {
@@ -1516,5 +1514,7 @@ class Token {
 		return $ret;
 	}
 }
+
+require_once("offensive/assets/core.inc");
 
 ?>

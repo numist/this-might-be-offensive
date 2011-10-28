@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+<dict>
+<key>posse</key>
+<integer>175</integer>
+<key>yearbook</key>
+<true />
+<key>userid</key>
+<integer>151</integer>
+<key>username</key>
+<string>themaxx</string>
+<key>created</key>
+<date>2004-09-16T00:41:07+00:00</date>
+<key>account_status</key>
+<string>admin</string>
+<key>timestamp</key>
+<date>2011-10-15T08:19:37+00:00</date>
+<key>ip</key>
+<string>192.168.231.1</string>
+<key>email</key>
+<string>spam@spammy.com</string>
+</dict>
+<dict>
+<key>posse</key>
+<integer>0</integer>
+<key>yearbook</key>
+<false />
+<key>userid</key>
+<integer>196</integer>
+<key>username</key>
+<string>maxxie</string>
+<key>created</key>
+<date>2004-09-16T00:41:07+00:00</date>
+<key>account_status</key>
+<string>locked</string>
+<key>timestamp</key>
+<date>2008-09-10T21:17:32+00:00</date>
+</dict>
+<dict>
+<key>posse</key>
+<integer>0</integer>
+<key>yearbook</key>
+<false />
+<key>userid</key>
+<integer>222</integer>
+<key>username</key>
+<string>maxwin</string>
+<key>created</key>
+<date>2004-09-16T00:41:07+00:00</date>
+<key>account_status</key>
+<string>normal</string>
+<key>timestamp</key>
+<date>2005-09-21T06:24:42+00:00</date>
+</dict>
+</array>
+</plist>

@@ -1,0 +1,493 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<array>
+	<upload>
+		
+		<id type="integer">
+			116
+		</id>
+		<userid type="integer">
+			143
+		</userid>
+		<filename type="string">
+			My New Apartment-1095113811.jpg
+		</filename>
+		<timestamp type="date">
+			2004-09-13 17:25:20
+		</timestamp>
+		<nsfw type="boolean">
+			false
+		</nsfw>
+		<tmbo type="boolean">
+			false
+		</tmbo>
+		<type type="string">
+			image
+		</type>
+		<username type="string">
+			Fipi Lele
+		</username>
+		<subscribed type="boolean">
+			false
+		</subscribed>
+		<vote_good type="integer">
+			3
+		</vote_good>
+		<vote_bad type="integer">
+			0
+		</vote_bad>
+		<vote_tmbo type="integer">
+			0
+		</vote_tmbo>
+		<vote_repost type="integer">
+			0
+		</vote_repost>
+		<comments type="integer">
+			0
+		</comments>
+		<filtered type="boolean">
+			false
+		</filtered>
+
+	</upload>
+	<upload>
+		
+		<id type="integer">
+			117
+		</id>
+		<userid type="integer">
+			143
+		</userid>
+		<filename type="string">
+			donutse.cx.jpg
+		</filename>
+		<timestamp type="date">
+			2004-09-13 17:25:22
+		</timestamp>
+		<nsfw type="boolean">
+			false
+		</nsfw>
+		<tmbo type="boolean">
+			false
+		</tmbo>
+		<type type="string">
+			image
+		</type>
+		<username type="string">
+			Fipi Lele
+		</username>
+		<subscribed type="boolean">
+			false
+		</subscribed>
+		<vote_good type="integer">
+			1
+		</vote_good>
+		<vote_bad type="integer">
+			1
+		</vote_bad>
+		<vote_tmbo type="integer">
+			0
+		</vote_tmbo>
+		<vote_repost type="integer">
+			0
+		</vote_repost>
+		<comments type="integer">
+			0
+		</comments>
+		<filtered type="boolean">
+			false
+		</filtered>
+
+	</upload>
+	<upload>
+		
+		<id type="integer">
+			118
+		</id>
+		<userid type="integer">
+			143
+		</userid>
+		<filename type="string">
+			I heart this job.jpg
+		</filename>
+		<timestamp type="date">
+			2004-09-13 17:25:25
+		</timestamp>
+		<nsfw type="boolean">
+			false
+		</nsfw>
+		<tmbo type="boolean">
+			false
+		</tmbo>
+		<type type="string">
+			image
+		</type>
+		<username type="string">
+			Fipi Lele
+		</username>
+		<subscribed type="boolean">
+			false
+		</subscribed>
+		<vote_good type="integer">
+			2
+		</vote_good>
+		<vote_bad type="integer">
+			0
+		</vote_bad>
+		<vote_tmbo type="integer">
+			0
+		</vote_tmbo>
+		<vote_repost type="integer">
+			0
+		</vote_repost>
+		<comments type="integer">
+			0
+		</comments>
+		<filtered type="boolean">
+			false
+		</filtered>
+
+	</upload>
+	<upload>
+		
+		<id type="integer">
+			119
+		</id>
+		<userid type="integer">
+			143
+		</userid>
+		<filename type="string">
+			tattoos.jpg
+		</filename>
+		<timestamp type="date">
+			2004-09-13 17:25:26
+		</timestamp>
+		<nsfw type="boolean">
+			false
+		</nsfw>
+		<tmbo type="boolean">
+			false
+		</tmbo>
+		<type type="string">
+			image
+		</type>
+		<username type="string">
+			Fipi Lele
+		</username>
+		<subscribed type="boolean">
+			false
+		</subscribed>
+		<vote_good type="integer">
+			7
+		</vote_good>
+		<vote_bad type="integer">
+			0
+		</vote_bad>
+		<vote_tmbo type="integer">
+			0
+		</vote_tmbo>
+		<vote_repost type="integer">
+			0
+		</vote_repost>
+		<comments type="integer">
+			0
+		</comments>
+		<filtered type="boolean">
+			false
+		</filtered>
+
+	</upload>
+	<upload>
+		
+		<id type="integer">
+			120
+		</id>
+		<userid type="integer">
+			143
+		</userid>
+		<filename type="string">
+			donutse.jpg
+		</filename>
+		<timestamp type="date">
+			2004-09-13 17:25:28
+		</timestamp>
+		<nsfw type="boolean">
+			false
+		</nsfw>
+		<tmbo type="boolean">
+			false
+		</tmbo>
+		<type type="string">
+			image
+		</type>
+		<username type="string">
+			Fipi Lele
+		</username>
+		<subscribed type="boolean">
+			false
+		</subscribed>
+		<vote_good type="integer">
+			0
+		</vote_good>
+		<vote_bad type="integer">
+			1
+		</vote_bad>
+		<vote_tmbo type="integer">
+			0
+		</vote_tmbo>
+		<vote_repost type="integer">
+			1
+		</vote_repost>
+		<comments type="integer">
+			1
+		</comments>
+		<filtered type="boolean">
+			false
+		</filtered>
+
+	</upload>
+	<upload>
+		
+		<id type="integer">
+			121
+		</id>
+		<userid type="integer">
+			143
+		</userid>
+		<filename type="string">
+			iVan.gif
+		</filename>
+		<timestamp type="date">
+			2004-09-13 17:25:28
+		</timestamp>
+		<nsfw type="boolean">
+			false
+		</nsfw>
+		<tmbo type="boolean">
+			false
+		</tmbo>
+		<type type="string">
+			image
+		</type>
+		<username type="string">
+			Fipi Lele
+		</username>
+		<subscribed type="boolean">
+			false
+		</subscribed>
+		<vote_good type="integer">
+			1
+		</vote_good>
+		<vote_bad type="integer">
+			0
+		</vote_bad>
+		<vote_tmbo type="integer">
+			0
+		</vote_tmbo>
+		<vote_repost type="integer">
+			0
+		</vote_repost>
+		<comments type="integer">
+			0
+		</comments>
+		<filtered type="boolean">
+			false
+		</filtered>
+
+	</upload>
+	<upload>
+		
+		<id type="integer">
+			122
+		</id>
+		<userid type="integer">
+			143
+		</userid>
+		<filename type="string">
+			[lj]NSFC flaccid cock with bumblebees harvesting skin chode.jpg
+		</filename>
+		<timestamp type="date">
+			2004-09-13 17:25:29
+		</timestamp>
+		<nsfw type="boolean">
+			false
+		</nsfw>
+		<tmbo type="boolean">
+			false
+		</tmbo>
+		<type type="string">
+			image
+		</type>
+		<username type="string">
+			Fipi Lele
+		</username>
+		<subscribed type="boolean">
+			false
+		</subscribed>
+		<vote_good type="integer">
+			2
+		</vote_good>
+		<vote_bad type="integer">
+			1
+		</vote_bad>
+		<vote_tmbo type="integer">
+			2
+		</vote_tmbo>
+		<vote_repost type="integer">
+			1
+		</vote_repost>
+		<comments type="integer">
+			0
+		</comments>
+		<filtered type="boolean">
+			false
+		</filtered>
+
+	</upload>
+	<upload>
+		
+		<id type="integer">
+			123
+		</id>
+		<userid type="integer">
+			143
+		</userid>
+		<filename type="string">
+			bet that shit's good, huh, lemmy, huh huh.jpg
+		</filename>
+		<timestamp type="date">
+			2004-09-13 17:25:30
+		</timestamp>
+		<nsfw type="boolean">
+			false
+		</nsfw>
+		<tmbo type="boolean">
+			false
+		</tmbo>
+		<type type="string">
+			image
+		</type>
+		<username type="string">
+			Fipi Lele
+		</username>
+		<subscribed type="boolean">
+			false
+		</subscribed>
+		<vote_good type="integer">
+			3
+		</vote_good>
+		<vote_bad type="integer">
+			0
+		</vote_bad>
+		<vote_tmbo type="integer">
+			0
+		</vote_tmbo>
+		<vote_repost type="integer">
+			0
+		</vote_repost>
+		<comments type="integer">
+			0
+		</comments>
+		<filtered type="boolean">
+			false
+		</filtered>
+
+	</upload>
+	<upload>
+		
+		<id type="integer">
+			124
+		</id>
+		<userid type="integer">
+			143
+		</userid>
+		<filename type="string">
+			pleasurefoam-promo.jpg
+		</filename>
+		<timestamp type="date">
+			2004-09-13 17:25:32
+		</timestamp>
+		<nsfw type="boolean">
+			false
+		</nsfw>
+		<tmbo type="boolean">
+			false
+		</tmbo>
+		<type type="string">
+			image
+		</type>
+		<username type="string">
+			Fipi Lele
+		</username>
+		<subscribed type="boolean">
+			false
+		</subscribed>
+		<vote_good type="integer">
+			1
+		</vote_good>
+		<vote_bad type="integer">
+			0
+		</vote_bad>
+		<vote_tmbo type="integer">
+			0
+		</vote_tmbo>
+		<vote_repost type="integer">
+			0
+		</vote_repost>
+		<comments type="integer">
+			0
+		</comments>
+		<filtered type="boolean">
+			false
+		</filtered>
+
+	</upload>
+	<upload>
+		
+		<id type="integer">
+			125
+		</id>
+		<userid type="integer">
+			143
+		</userid>
+		<filename type="string">
+			icecreammonster.jpg
+		</filename>
+		<timestamp type="date">
+			2004-09-13 17:25:33
+		</timestamp>
+		<nsfw type="boolean">
+			false
+		</nsfw>
+		<tmbo type="boolean">
+			false
+		</tmbo>
+		<type type="string">
+			image
+		</type>
+		<username type="string">
+			Fipi Lele
+		</username>
+		<subscribed type="boolean">
+			false
+		</subscribed>
+		<vote_good type="integer">
+			0
+		</vote_good>
+		<vote_bad type="integer">
+			0
+		</vote_bad>
+		<vote_tmbo type="integer">
+			0
+		</vote_tmbo>
+		<vote_repost type="integer">
+			0
+		</vote_repost>
+		<comments type="integer">
+			0
+		</comments>
+		<filtered type="boolean">
+			false
+		</filtered>
+
+	</upload>
+</array>

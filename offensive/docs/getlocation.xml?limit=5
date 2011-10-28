@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<array>
+	<dict>
+		
+	<latitude type="double">
+		-23.9406
+	</latitude>
+	<longitude type="double">
+		-54.3241
+	</longitude>
+	<timestamp type="date">
+		2011-10-16 02:18:53
+	</timestamp>
+	<username type="string">
+		matt
+	</username>
+	<userid type="integer">
+		31
+	</userid>
+
+	</dict>
+	<dict>
+		
+	<latitude type="double">
+		28.5565
+	</latitude>
+	<longitude type="double">
+		-74.6648
+	</longitude>
+	<timestamp type="date">
+		2011-10-16 02:18:53
+	</timestamp>
+	<username type="string">
+		punching_judy
+	</username>
+	<userid type="integer">
+		421
+	</userid>
+
+	</dict>
+	<dict>
+		
+	<latitude type="double">
+		-6.96133
+	</latitude>
+	<longitude type="double">
+		-29.7138
+	</longitude>
+	<timestamp type="date">
+		2011-10-16 02:18:53
+	</timestamp>
+	<username type="string">
+		turska
+	</username>
+	<userid type="integer">
+		2157
+	</userid>
+
+	</dict>
+	<dict>
+		
+	<latitude type="double">
+		35.7264
+	</latitude>
+	<longitude type="double">
+		-72.5795
+	</longitude>
+	<timestamp type="date">
+		2011-10-16 02:18:53
+	</timestamp>
+	<username type="string">
+		camaleonte
+	</username>
+	<userid type="integer">
+		1616
+	</userid>
+
+	</dict>
+	<dict>
+		
+	<latitude type="double">
+		-23.5473
+	</latitude>
+	<longitude type="double">
+		148.414
+	</longitude>
+	<timestamp type="date">
+		2011-10-16 02:18:53
+	</timestamp>
+	<username type="string">
+		Franiblector
+	</username>
+	<userid type="integer">
+		1042
+	</userid>
+
+	</dict>
+</array>

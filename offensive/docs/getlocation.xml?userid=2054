@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<array>
+	<dict>
+		
+	<latitude type="double">
+		4.33391
+	</latitude>
+	<longitude type="double">
+		-114.051
+	</longitude>
+	<timestamp type="date">
+		2011-10-16 02:18:53
+	</timestamp>
+	<username type="string">
+		numist
+	</username>
+	<userid type="integer">
+		2054
+	</userid>
+
+	</dict>
+</array>

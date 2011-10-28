@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<array>
+	<upload>
+		
+		<id type="integer">
+			308841
+		</id>
+		<userid type="integer">
+			2411
+		</userid>
+		<filename type="string">
+			from my weekend 2.jpg
+		</filename>
+		<timestamp type="date">
+			2011-01-17 09:48:15
+		</timestamp>
+		<nsfw type="boolean">
+			false
+		</nsfw>
+		<tmbo type="boolean">
+			false
+		</tmbo>
+		<type type="string">
+			image
+		</type>
+		<username type="string">
+			Kristian
+		</username>
+		<subscribed type="boolean">
+			false
+		</subscribed>
+		<vote_good type="integer">
+			44
+		</vote_good>
+		<vote_bad type="integer">
+			0
+		</vote_bad>
+		<vote_tmbo type="integer">
+			0
+		</vote_tmbo>
+		<vote_repost type="integer">
+			0
+		</vote_repost>
+		<comments type="integer">
+			1
+		</comments>
+		<filtered type="boolean">
+			false
+		</filtered>
+
+	</upload>
+	<upload>
+		
+		<id type="integer">
+			308840
+		</id>
+		<userid type="integer">
+			2411
+		</userid>
+		<filename type="string">
+			[mp] from my weekend 1.jpg
+		</filename>
+		<timestamp type="date">
+			2011-01-17 09:48:07
+		</timestamp>
+		<nsfw type="boolean">
+			false
+		</nsfw>
+		<tmbo type="boolean">
+			false
+		</tmbo>
+		<type type="string">
+			image
+		</type>
+		<username type="string">
+			Kristian
+		</username>
+		<subscribed type="boolean">
+			false
+		</subscribed>
+		<vote_good type="integer">
+			71
+		</vote_good>
+		<vote_bad type="integer">
+			0
+		</vote_bad>
+		<vote_tmbo type="integer">
+			0
+		</vote_tmbo>
+		<vote_repost type="integer">
+			0
+		</vote_repost>
+		<comments type="integer">
+			3
+		</comments>
+		<filtered type="boolean">
+			false
+		</filtered>
+
+	</upload>
+	<upload>
+		
+		<id type="integer">
+			308681
+		</id>
+		<userid type="integer">
+			135
+		</userid>
+		<filename type="string">
+			Best weekend of the year.jpeg
+		</filename>
+		<timestamp type="date">
+			2011-01-14 08:28:48
+		</timestamp>
+		<nsfw type="boolean">
+			false
+		</nsfw>
+		<tmbo type="boolean">
+			false
+		</tmbo>
+		<type type="string">
+			image
+		</type>
+		<username type="string">
+			Blackstar
+		</username>
+		<subscribed type="boolean">
+			false
+		</subscribed>
+		<vote_good type="integer">
+			31
+		</vote_good>
+		<vote_bad type="integer">
+			2
+		</vote_bad>
+		<vote_tmbo type="integer">
+			0
+		</vote_tmbo>
+		<vote_repost type="integer">
+			0
+		</vote_repost>
+		<comments type="integer">
+			32
+		</comments>
+		<filtered type="boolean">
+			false
+		</filtered>
+
+	</upload>
+	<upload>
+		
+		<id type="integer">
+			308462
+		</id>
+		<userid type="integer">
+			2745
+		</userid>
+		<filename type="string">
+			[mp][my weekend][scrollercaust]Breakfast At Elli's.jpg
+		</filename>
+		<timestamp type="date">
+			2011-01-11 05:12:38
+		</timestamp>
+		<nsfw type="boolean">
+			false
+		</nsfw>
+		<tmbo type="boolean">
+			false
+		</tmbo>
+		<type type="string">
+			image
+		</type>
+		<username type="string">
+			RHiRHi
+		</username>
+		<subscribed type="boolean">
+			false
+		</subscribed>
+		<vote_good type="integer">
+			144
+		</vote_good>
+		<vote_bad type="integer">
+			0
+		</vote_bad>
+		<vote_tmbo type="integer">
+			0
+		</vote_tmbo>
+		<vote_repost type="integer">
+			0
+		</vote_repost>
+		<comments type="integer">
+			27
+		</comments>
+		<filtered type="boolean">
+			false
+		</filtered>
+
+	</upload>
+	<upload>
+		
+		<id type="integer">
+			308298
+		</id>
+		<userid type="integer">
+			2763
+		</userid>
+		<filename type="string">
+			living for the weekend.jpg
+		</filename>
+		<timestamp type="date">
+			2011-01-08 08:11:05
+		</timestamp>
+		<nsfw type="boolean">
+			true
+		</nsfw>
+		<tmbo type="boolean">
+			false
+		</tmbo>
+		<type type="string">
+			image
+		</type>
+		<username type="string">
+			latecomer
+		</username>
+		<subscribed type="boolean">
+			false
+		</subscribed>
+		<vote_good type="integer">
+			145
+		</vote_good>
+		<vote_bad type="integer">
+			1
+		</vote_bad>
+		<vote_tmbo type="integer">
+			0
+		</vote_tmbo>
+		<vote_repost type="integer">
+			0
+		</vote_repost>
+		<comments type="integer">
+			15
+		</comments>
+		<filtered type="boolean">
+			false
+		</filtered>
+
+	</upload>
+</array>

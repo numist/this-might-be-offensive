@@ -6,35 +6,37 @@
 	if(!isset($link) || !$link) $link = openDbConnection();
 	require_once("offensive/assets/functions.inc");
 	require_once("offensive/assets/classes.inc");
-	
 	require_once("offensive/assets/argvalidation.inc");
 	
-	// standardized sql query for getting uploads from the db. see: api_getupload(s)?
-	$subscribed = array_key_exists('userid', $_SESSION)
-	              ? "("."SELECT COUNT(*) FROM offensive_subscriptions 
-	                     WHERE userid = {$_SESSION['userid']} AND fileid = up.id".")"
-	              : "NULL";
+	function uploadsql() {
+		$subscribed = me()
+		              ? "("."SELECT COUNT(*) FROM offensive_subscriptions 
+		                     WHERE fileid = up.id AND userid = ".me()->id().")"
+		              : "NULL";
+		
+		return "SELECT up.*,
+		               $subscribed as subscribed,
+			             ca.good as goods,
+			             ca.bad as bads,
+			             ca.tmbo as tmbos,
+			             ca.repost as tiars,
+			             ca.comments,
+			             ca.timestamp as last_active,
+			             u.username as user_username,
+			             u.account_status as user_account_status
+		        FROM offensive_uploads up, offensive_count_cache ca, users u
+		        WHERE ca.threadid = up.id AND up.userid = u.userid AND up.status = 'normal'";
+	}
 	
-	$uploadsql = "SELECT up.*,
-	                     $subscribed as subscribed,
-		                 ca.good as goods,
-		                 ca.bad as bads,
-		                 ca.tmbo as tmbos,
-		                 ca.repost as tiars,
-		                 ca.comments,
-		                 ca.timestamp as last_active,
-		                 u.username as user_username,
-		                 u.account_status as user_account_status
-	FROM offensive_uploads up, offensive_count_cache ca, users u
-	WHERE ca.threadid = up.id AND up.userid = u.userid AND up.status = 'normal'";
-	
-	$commentsql = "SELECT com.*,
-	                     u.username as user_username, u.account_status as user_account_status, u.userid as user_userid,
-	              		 up.userid as upload_userid, up.id as upload_id, up.filename as upload_filename,
-	                     up.timestamp as upload_timestamp, up.nsfw as upload_nsfw, up.tmbo as upload_tmbo,
-	                     up.type as upload_type, up.status as upload_status
-	               FROM offensive_comments com, users u, offensive_uploads up
-	               WHERE com.userid = u.userid AND up.id = com.fileid";
+	function commentsql() {
+	 	return "SELECT com.*,
+	                 u.username as user_username, u.account_status as user_account_status, u.userid as user_userid,
+	                 up.userid as upload_userid, up.id as upload_id, up.filename as upload_filename,
+	                 up.timestamp as upload_timestamp, up.nsfw as upload_nsfw, up.tmbo as upload_tmbo,
+	                 up.type as upload_type, up.status as upload_status
+	          FROM offensive_comments com, users u, offensive_uploads up
+	          WHERE com.userid = u.userid AND up.id = com.fileid";
+	}
 	
 	require_once("offensive/assets/comments.inc");
 
@@ -45,14 +47,12 @@
 	$types = array("image", "topic", "avatar", "audio");
 
 	function core_getuploads($args) {
-		global $uploadsql, $types;
+		global $types;
 		
 		if(!is_array($args)) {
 			trigger_error("args is not an array", E_USER_ERROR);
 		}
 
-		// XXX: need a more fatal way to fail at this level, since we're core.
-		// YYY: API should be soft-fail.
 		$type =   check_arg("type",   "string",  $args, false, $types);
 		$userid = check_arg("userid", "integer", $args, false);
 		$after =  check_arg("after",  "date",    $args, false);
@@ -69,7 +69,7 @@
 		// sort order needs to always be set, even if only to default.
 		if($sort === false) $sort = "date_desc";
 		
-		$sql = $uploadsql;
+		$sql = uploadsql();
 		
 		if($type !== false) {
 			$sql .= " AND up.type = '$type'";
@@ -164,9 +164,9 @@
         if(!array_key_exists('limit', $args)) {
             $limit = "$numPerPage";
         }
-		if($p !== false && $p > 0) {
-			$start = $p * $numPerPage;
-			$limit = "$start, $numPerPage";
+				if($p !== false && $p > 0) {
+					$start = $p * $numPerPage;
+					$limit = "$start, $numPerPage";
         }
 
 		$sql .= " LIMIT $limit";
@@ -183,14 +183,13 @@
 	}
 	
 	function core_getupload($id) {
-		global $uploadsql;
 		$args = array("id" => $id);
 		$id =   check_arg("id", "integer", $args);
 		handle_errors();
 		
 		$upload = new Upload($id);
 		
-		$sql = $uploadsql." AND up.id = $id";
+		$sql = uploadsql()." AND up.id = $id";
 		
 		$result = tmbo_query($sql);
 		
@@ -208,8 +207,6 @@
 	}
 
 	function core_getyearbook($args) {
-		global $uploadsql;
-		
 		if(!is_array($args)) {
 			trigger_error("args is not an array", E_USER_ERROR);
 		}
@@ -217,12 +214,12 @@
 		$userid = check_arg("userid", "integer", $args, false);
 		$limit =  check_arg("limit",  "limit",   $args, false);
 		$sort =   check_arg("sort",   "string",  $args, false, array("date_desc", "date_asc", "uname_asc", "uname_desc"));
-		handle_errors();
 		$p =      check_arg("p", "integer", $args, false);
+		handle_errors();
 		
-		$sql = $uploadsql." AND up.type = 'avatar' 
-		                    AND up.id = (SELECT MAX( up.id) FROM offensive_uploads up 
-		                                 WHERE type='avatar' AND userid=u.userid)";
+		$sql = uploadsql()." AND up.type = 'avatar' 
+		                     AND up.id = (SELECT MAX( up.id) FROM offensive_uploads up 
+		                                  WHERE type='avatar' AND userid=u.userid)";
 		
 		if($userid !== false) {
 			$sql .= " AND u.userid = $userid";
@@ -281,8 +278,6 @@
 	}
 
 	function core_getcomments($args) {
-		global $commentsql;
-		
 		if(!is_array($args)) {
 			trigger_error("args is not an array", E_USER_ERROR);
 		}
@@ -302,7 +297,7 @@
 		$userid = check_arg("userid", "integer", $args, false);
 		handle_errors();
 		
-		$sql = $commentsql;
+		$sql = commentsql();
 		
 		if(strpos($votefilter, "+") !== false) {
 			$sql .= " AND com.vote = 'this is good'";
@@ -324,6 +319,7 @@
 		}
 		
 		if($userfilter !== false) {
+			// XXX: deprecate
 			$sql .= " AND com.userid = $userfilter";
 		}
 		if($after !== false) {
@@ -348,7 +344,6 @@
 			$sql .= " AND com.fileid <= $threadmax";
 		}
 		if($thread !== false) {
-			// XXX: reset subscription?
 			$sql .= " AND com.fileid = $thread";
 		}
 		if($userid !== false) {
@@ -383,8 +378,6 @@
 	}
 	
 	function core_getcomment($id) {
-		global $commentsql;
-
 		if(!is_array($id)) {
 			$args = array("id" => $id);
 			$id = array(check_arg("id", "integer", $args));
@@ -398,7 +391,7 @@
 		}
 		handle_errors();
 
-		$sql = $commentsql;
+		$sql = commentsql();
 
 		if(count($id) == 1) {
 			$sql .= " AND com.id = ".$id[0];
@@ -437,8 +430,6 @@
 
 	// XXX: unimplemented (broken)
 	function core_searchcomments($args) {
-		global $commentsql;
-		
 		if(!is_array($args)) {
 			trigger_error("args is not an array", E_USER_ERROR);
 		}
@@ -454,13 +445,14 @@
 		if(!is_array($args)) {
 			trigger_error("args is not an array", E_USER_ERROR);
 		}
-					
-		$q = check_arg("q", "string", $method);
+
+		$limit = check_arg("limit", "limit", $args, false);
+		$q = check_arg("q", "string", $args);
 		handle_errors();
 		
 		$q = sqlEscape($q);
 		
-		$sql = "SELECT * FROM users WHERE username LIKE '%$q%'";
+		$sql = "SELECT * FROM users WHERE username LIKE '%$q%' LIMIT $limit";
 		
 		$result = tmbo_query($sql);
 		
@@ -472,18 +464,16 @@
 	}
 
 	function core_searchuploads($args) {
-		global $uploadsql;
-		
 		if(!is_array($args)) {
 			trigger_error("args is not an array", E_USER_ERROR);
 		}
 					
-		$q = check_arg("q", "string", $method);
-		$limit = check_arg("limit", "limit", $method, false);
-		$type = check_arg("type", "string", $method, false, array("image", "topic", "avatar"));
+		$q = check_arg("q", "string", $args);
+		$limit = check_arg("limit", "limit", $args, false);
+		$type = check_arg("type", "string", $args, false, array("image", "topic", "avatar", "audio"));
 		handle_errors();
 		
-		$sql = $uploadsql;
+		$sql = uploadsql();
 		if($type !== false) {
 			$sql .= " AND up.type = '$type'";
 		}
@@ -501,33 +491,23 @@
 	}
 
 	function core_unreadcomments($args) {
-		global $commentsql;
-
 		if(!is_array($args)) {
 			trigger_error("args is not an array", E_USER_ERROR);
 		}
 
-		$sort = check_arg("sort", "string", $method, false, array("comment_desc", "comment_asc", "file_asc", "file_desc"));
-		$limit = check_arg("limit", "limit", $method, false);
+		$sort = check_arg("sort", "string", $args, false, array("comment_desc", "comment_asc", "file_asc", "file_desc"));
+		$limit = check_arg("limit", "limit", $args, false);
 		handle_errors();
 
 		if($sort === false) $sort = "file_asc";
 
-		$sql = $commentsql;
+		$sql = commentsql();
 
 		if(!me()) {
 			trigger_error("must be logged in to use this function", E_USER_ERROR);
 		}
 		$userid = me()->id();
 
-		/*	$commentsql = "SELECT com.*,
-		             u.username as user_username, u.account_status as user_account_status, u.userid as user_userid,
-					 up.userid as upload_userid, up.id as upload_id, up.filename as upload_filename,
-		             up.timestamp as upload_timestamp, up.nsfw as upload_nsfw, up.tmbo as upload_tmbo,
-		             up.type as upload_type, up.status as upload_status
-		       FROM offensive_comments com, users u, offensive_uploads up
-		       WHERE com.userid = u.userid AND up.id = com.fileid";
-		*/
 		$sql = str_replace("FROM offensive_comments com", 
 		                   "FROM offensive_subscriptions sub, offensive_comments com", $sql);
 		$sql .= " AND sub.userid = $userid AND up.id = sub.fileid AND sub.commentid IS NOT NULL ORDER BY ";

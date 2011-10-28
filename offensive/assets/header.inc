@@ -23,6 +23,13 @@ $upgrading = false;
 
 /*****************************************************************************/
 
+// force not www.
+if(substr($_SERVER["SERVER_NAME"], 0, 4) == "www.") {
+	// TODO: if a token was present in the URI, it should be invalidated.
+	header("Location: https://".substr($_SERVER["SERVER_NAME"], 4).$_SERVER["REQUEST_URI"], 301);
+	exit;
+}
+
 // force ssl.
 if(!ssl()) {
 	// TODO: if a token was present in the URI, it should be invalidated.
@@ -194,7 +201,7 @@ function me() {
 	// get the User object for the logged-in user
 	if(is_object($me)) return $me;
 	
-	if(array_key_exists('userid', $_SESSION)) {
+	if(isset($_SESSION) && array_key_exists('userid', $_SESSION)) {
 		trigger_error("was able to get user from session—".
 		              "should have called login() already!",
 		              E_USER_WARNING);
@@ -203,7 +210,10 @@ function me() {
 	}
 	
 	if(!$login_called) {
-		trigger_error("call login() before me()", E_USER_WARNING);
+		$trace = debug_backtrace();
+		$trace = $trace[0];
+		tmbo_error_handler(E_USER_WARNING, "call login() before me()", 
+		                   $trace['file'], $trace['line'], null);
 	}
 	return null;
 }
