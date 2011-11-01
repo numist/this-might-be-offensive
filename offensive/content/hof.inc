@@ -69,6 +69,11 @@ EOT;
 		$count = $page * $numPerPage;
 		$css = "oddfile odd_row";
 		foreach($result as $upload) {
+			// cellophane doesn't want her images in the hof;
+			// this is a quick hack to omit them.
+			if( $upload->uploader()->id() == 1138 ) {
+				continue;
+			}
 			$css = strpos($css, "even") !== false ? "oddfile odd_row" : "evenfile even_row";
 
 			if( $upload->uploader()->id() == me()->id()) {
