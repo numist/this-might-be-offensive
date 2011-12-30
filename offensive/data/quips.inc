@@ -6,7 +6,8 @@
 		"welcome back. we missed you. oh, and don't use apostrophes for plurals. ever.",
 		"you're cooler than the other side of my pillow.",
 		"consciousness doesn't really exist. it's just another one of our ideas.",
-		"what did you bring the book i didn't want to be read out of up for?"
+		"what did you bring the book i didn't want to be read out of up for?",
+		"Each day's a gift!"
 		);
 	$quip = $quips[rand(0, count($quips) - 1)];
 
