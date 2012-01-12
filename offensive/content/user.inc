@@ -310,7 +310,7 @@ function handleSetStatusSubmission() {
 	if( is_intger($usrid ) && $status !== "" ) {
 		$isEmailValid = preg_match( '/[a-zA-Z0-9-_\.]+\@[a-zA-Z0-9-_\.]+\.[a-zA-Z0-9-_\.]+/', $email ) > 0;
 		$emailClause = $isEmailValid ? ", email = '$email' " : "";
-		$sql = "update users set account_status ='$status' $emailClause where userid = $usrid limit 1";
+		$sql = "UPDATE users SET timestamp = timestamp, account_status ='$status' $emailClause WHERE userid = $usrid limit 1";
 		$result = tmbo_query( $sql );
 
 		if($changed) {
