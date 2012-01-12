@@ -18,7 +18,7 @@
 
             $encrypted_pw = sha1( $pw );
 
-			$sql = "update users set password='$encrypted_pw' WHERE userid = $uid LIMIT 1";
+			$sql = "UPDATE users SET timestamp = timestamp, password='$encrypted_pw' WHERE userid = $uid LIMIT 1";
 			
 			tmbo_query( $sql );
 			header( "Location: ./logn.php" );

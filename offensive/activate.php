@@ -24,7 +24,7 @@
 		$rehash = tmbohash( $id + 0, $email . $salt );
 		
 		if( $rehash == $_REQUEST[ $hash_param_key ] ) {
-			$sql = "update users set account_status='normal' where userid=$id AND account_status='awaiting activation' limit 1";
+			$sql = "UPDATE users SET timestamp = timestamp, account_status='normal' WHERE userid=$id AND account_status='awaiting activation' limit 1";
 			tmbo_query( $sql );
 			if( mysql_affected_rows() == 1 ) {
 				$message = "Your account is now active. <a href=\"./\">Click here</a> to log in.";

@@ -31,7 +31,7 @@ if(!isset($link) || !$link) $link = openDbConnection();
 				$result = tmbo_query( $query );
 				if( mysql_num_rows( $result ) == 1 ) {
 					$encrypted_pw = sha1( $new );
-					$sql = "UPDATE users SET password='$encrypted_pw' WHERE userid=$uid LIMIT 1";
+					$sql = "UPDATE users SET timestamp = timestamp, password='$encrypted_pw' WHERE userid=$uid LIMIT 1";
 					$result = tmbo_query( $sql );
 					?>done.<br/><br/><?
 				}

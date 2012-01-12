@@ -273,11 +273,7 @@
 			$userid = me()->id();
 		}
 		
-		$user = new User($userid);
-		
-		$posse = $user->posse();
-		
-		send($posse);
+		send(id(new User($userid))->posse());
 	}
 
 	/**
