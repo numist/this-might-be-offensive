@@ -73,4 +73,8 @@ function ssl() {
 	return (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on");
 }
 
+function id($id) {
+	return $id;
+}
+
 ?>

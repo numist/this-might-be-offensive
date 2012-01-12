@@ -176,9 +176,7 @@ LIMIT $page_limit_clause, 15";
 $result = tmbo_query($sql);
 while( $image = mysql_fetch_assoc( $result ) ) 
 {
-	$upload = new Upload($image);
-	
-	$filepath = $upload->file();
+	$filepath = id(new Upload($image))->file();
 ?>
 
 
