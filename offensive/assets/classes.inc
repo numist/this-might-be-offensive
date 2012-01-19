@@ -307,9 +307,15 @@ class Upload {
 	 */
 	public function next() {
 		if(!array_key_exists("next", $this->data)) {
+			$blocksql = "";
+			if(me()) {
+				$blocksql = "AND userid NOT IN (SELECT squelched FROM offensive_squelch WHERE userid = ".me()->id().")
+                       AND userid NOT IN (SELECT userid FROM offensive_squelch WHERE squelched = ".me()->id().")";
+			}
 			
-			$sql = "SELECT * FROM offensive_uploads WHERE id > ".$this->id()." AND type='".$this->type()."' AND status='normal'
-					ORDER BY id ASC LIMIT 1";	
+			$sql = "SELECT * FROM offensive_uploads WHERE id > {$this->id()} AND type='{$this->type()}' AND status='normal'
+			        $blocksql
+              ORDER BY id ASC LIMIT 1";	
 			$result = tmbo_query($sql);
 			if(mysql_num_rows($result) == 0) {
 				$this->data["next"] = false;
@@ -323,15 +329,17 @@ class Upload {
 	
 	public function next_filtered() {
 		if(!me()) return $this->next();
+		$me = me();
 		
 		if(!array_key_exists("next_filtered", $this->data)) {			
 			$tmbo_sql = me()->getPref("hide_tmbo") ? " AND NOT tmbo " : "";
 			$nsfw_sql = me()->getPref("hide_nsfw") ? " AND NOT nsfw " : "";
-        
+
 			$sql = "SELECT * FROM offensive_uploads WHERE id > {$this->id()} AND type='{$this->type()}' AND status='normal'
 					$tmbo_sql
 					$nsfw_sql
-					AND userid NOT IN (SELECT squelched FROM offensive_squelch WHERE userid = ".me()->id()." )
+					AND userid NOT IN (SELECT squelched FROM offensive_squelch WHERE userid = {$me->id()})
+					AND userid NOT IN (SELECT userid FROM offensive_squelch WHERE squelched = {$me->id()})
 					ORDER BY id ASC LIMIT 1";
 			$result = tmbo_query($sql);
 			if(mysql_num_rows($result) == 0) {
@@ -808,7 +816,7 @@ class Comment {
 		 * +-----------+
 		 * 3 rows in set (12.21 sec)
 		 *
-		 * thus this code is more clever than it really should need to.
+		 * thus this code is more clever than it really should need to be.
 		 */
 		
 		return (1 == $this->getCommentRow("offensive") ? true : false);
@@ -827,8 +835,9 @@ class Comment {
 		 *  +--------+
 		 *  3 rows in set (14.39 sec)
 		 *
-		 * thus this code is more clever than it really should need to.
+		 * thus this code is more clever than it really should need to be.
 		 */
+		
 		return (1 == $this->getCommentRow("repost") ? true : false);
 	}
 	
