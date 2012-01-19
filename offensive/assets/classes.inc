@@ -125,7 +125,7 @@ class Upload {
 	}
 	
 	public function exists() {
-		return $this->getUploadRow() && $this->status != "pending";
+		return $this->getUploadRow() && $this->status() != "pending";
 	}
 	
 	public function expired() {
@@ -1262,12 +1262,12 @@ class User {
 	 * preferences
 	 */
 	public function getPref($name) {
-		global $redislink;
-		return $redislink->get($this->id().':'.$name);
+		global $redis;
+		return $redis->get($this->id().':'.$name);
 	}
 	
 	public function setPref($name, $value) {
-		global $redislink;
+		global $redis;
 		require("offensive/data/preferences.inc");
 		if(!in_array($name, $prefnames))
 			trigger_error("$name is not a valid preference name!", E_USER_ERROR);
@@ -1275,9 +1275,9 @@ class User {
 			trigger_error("user(".$this->id().") does not exist", E_USER_ERROR);
 		
 		if(strlen($value) > 0) {
-			$redislink->set($this->id().':'.$name, $value);
+			$redis->set($this->id().':'.$name, $value);
 		} else {
-			$redislink->delete($this->id().':'.$name);
+			$redis->del($this->id().':'.$name);
 		}
 	}
 
