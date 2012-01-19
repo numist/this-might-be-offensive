@@ -335,11 +335,18 @@ $timelimit = 10;
 		site development by
 		<a href="/contact/" class="textlinks" onmouseover='window.status="[ connect ]"; return true' onmouseout='window.status=""'>ray hatfield</a>,
 		<a href="mailto:thismightbe@numist.net">scott perry</a>,
-		and others.</div>
-	<div class="textlinks">tmbo runs on
+		and <a href="https://github.com/numist/this-might-be-offensive/contributors">others</a>.</div>
+	<div class="textlinks" style="margin: 1em;">Ingredients:
+		<a href="http://php.net/" title="to talk to the computer">PHP</a>,
+		<a href="http://www.mysql.com/" title="for things of importance">MySQL</a>,
+		<a href="http://redis.io/" title="for things that need to be fast">Redis</a>,
+		<a href="https://github.com/nrk/predis" title="to get to things">Predis</a>,
+		<a href="http://jquery.com/" title="for fancy dynamic things">jQuery</a>,
+		<a href="http://flash-mp3-player.net/players/maxi/" title="for making music">MP3 Player</a>,
 		<a href="http://www.imagemagick.org" title="for messing with images">ImageMagick</a>,
 		<a href="http://xapian.org" title="for comment search">Xapian</a>,
-		and unicorn farts.
+		natural flavor.<br />
+		Not a significant source of calcium, iron, dietary fiber, vitamin D, and sanity.
 	</div>
 	<?
 	
