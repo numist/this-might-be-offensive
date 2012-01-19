@@ -167,10 +167,10 @@
 	}
 	
 	function api_getchanges() {
-		global $redislink;
+		global $redis;
 		$since = check_arg("since", "integer");
 		handle_errors();
-		$changes = $redislink->lrange("changelog", 0, 100);
+		$changes = $redis->lrange("changelog", 0, 100);
 		$ret_changes = array();
 		foreach ($changes as $change) {
 			$entry = explode(":", $change, 3);
