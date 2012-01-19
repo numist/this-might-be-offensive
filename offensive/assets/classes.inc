@@ -387,15 +387,15 @@ class Upload {
 	 * filtering code
 	 */
 	public function filtered() {
-		return $this->squelched() ||
+		return $this->blocked() ||
 		       $this->filtered_nsfw() ||
 		       $this->filtered_tmbo() ||
 		       $this->filtered_bad();
 	}
 	
-	public function squelched() {
+	public function blocked() {
 		return (me() != false
-			? me()->squelched($this->uploader())
+			? me()->blocked($this->uploader())
 			: false);
 	}
 	

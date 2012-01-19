@@ -199,11 +199,12 @@
     	
 				<?php
     	
-					if(!me()->squelched($commenter) && strlen($comment->text()) > 0) {
+					if(!me()->blocked($commenter) && strlen($comment->text()) > 0) {
 						echo $comment->HTMLcomment();
 					}
 					else if(strlen($comment->text()) > 0) {
-						echo "<div class='squelched'>[ squelched ]</div>";
+						$context = me()->squelched($commenter) ? "squelched" : "blocked";
+						echo "<div class='squelched'>[ $context ]</div>";
 					}
 		?>
 				<br />

@@ -108,7 +108,7 @@ function api_getquickcommentbox() {
 				continue;
 			$commenter = $comment->commenter();
 			echo '<div class="qc_comment">';
-					if(!me()->squelched($commenter) && strlen($comment->text()) > 0) {
+					if(!me()->blocked($commenter) && strlen($comment->text()) > 0) {
 						echo $comment->HTMLcomment();
 					}
 					else if(strlen($comment->text()) > 0) {
