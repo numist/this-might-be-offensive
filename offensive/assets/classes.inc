@@ -125,7 +125,7 @@ class Upload {
 	}
 	
 	public function exists() {
-		return $this->getUploadRow() && $this->status != "pending";
+		return $this->getUploadRow() && $this->status() != "pending";
 	}
 	
 	public function expired() {
