@@ -174,7 +174,7 @@
 		$ret_changes = array();
 		foreach ($changes as $change) {
 			$entry = explode(":", $change, 3);
-			if ($since < $entry[1]) {
+			if(count($entry) == 3 && $since < $entry[1]) {
 				$ret_changes[$entry[1]] = $entry[2];
 			} else {
 				break;
