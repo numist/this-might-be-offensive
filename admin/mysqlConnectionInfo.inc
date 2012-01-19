@@ -7,14 +7,16 @@ if(!($config = parse_ini_file("admin/.config"))) {
 	exit;
 }
 
-require("redis.php");
-// Set $link null
+require_once("offensive/assets/Predis/Autoloader.php");
+Predis\Autoloader::register();
+
+// initialize database links
 $link = null;
-$redislink = null;
+$redis = null;
 
 // Generic database connection function
 function openDbConnection() {
-		global $config, $link, $redislink;
+		global $config, $link, $redis;
 
 		// If there isn't $link currently, then open up the connection, if it fails then forward the user
 		// to the out of order URL.
@@ -30,9 +32,8 @@ function openDbConnection() {
 		}
 		
 		// Overloading this into the db connect since the combination is our "database"
-		if(!$redislink) {
-			$redislink = new Redis();
-			$redislink->connect();
+		if(!$redis) {
+			$redis = new Predis\Client();
 		}
 		return $link;		
 }
