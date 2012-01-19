@@ -556,19 +556,6 @@
 			<span style="color:#999999">
 				uploaded by <?= $upload->uploader()->htmlUsername() ?> @ <?= $upload->timestamp() ?>
 			</span>
-
-			<!--
-				squelch block
-			-->
-			<span style="margin-left:48px">
-				<?
-				if(me()->squelched($upload->uploader()->id())) {
-					?><a id="unsquelchLink" style="color:#999999; text-decoration:underline" href="/offensive/setPref.php?unsq=<?= $upload->uploader()->id() ?>">unsquelch <?= $upload->uploader()->username() ?></a><?
-				} else {
-					?><a id="squelchLink" style="color:#999999; text-decoration:underline" href="/offensive/setPref.php?sq=<?= $upload->uploader()->id() ?>">squelch <?= $upload->uploader()->username() ?></a><?
-				}
-				?>
-			</span>
 			<br/><br/>
 			
 			<!--
