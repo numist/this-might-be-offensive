@@ -1172,17 +1172,38 @@ class User {
 			trigger_error("target must be a userid or User object", E_USER_ERROR);
 		}
 		
-		if(!array_key_exists("squelched", $this->data)) {
+		if(!array_key_exists("squelched", $this->data)
+		|| !array_key_exists("squelched_by", $this->data)) {
+			
+			// data consistency
+			assert('!array_key_exists("squelched", $this->data)');
+			assert('!array_key_exists("squelched_by", $this->data)');
 			$this->data["squelched"] = array();
-			$sql = "SELECT squelched FROM offensive_squelch WHERE userid=".$this->id();
+			$this->data["squelched_by"] = array();
+
+			$sql = "SELECT userid,squelched FROM offensive_squelch WHERE userid=".$this->id()." OR squelched=".$this->id();
 			$result = tmbo_query($sql);
 
 			while($row = mysql_fetch_array($result)) {
-				$this->data["squelched"][] = $row["squelched"];
+				if($row["userid"] == $this->id()) {
+					$this->data["squelched"][] = $row["squelched"];
+				} else {
+					$this->data["squelched_by"][] = $row["userid"];
+				}
 			}
 		}
 		
 		return in_array($target, $this->data["squelched"]);
+	}
+	
+	public function blocked($target) {
+		if(is_object($target)) {
+			$target = $target->id();
+		} else if(!is_intger($target)) {
+			trigger_error("target must be a userid or User object", E_USER_ERROR);
+		}
+		
+		return $this->squelched($target) || in_array($target, $this->data["squelched_by"]);
 	}
 
 	// squelch a user
