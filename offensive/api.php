@@ -306,7 +306,7 @@
 			exit;
 		} else if($loggedin === null) {
 			global $login_message;
-			header("HTTP/1.0 403 Forbidden");
+			header("HTTP/1.0 503 Forbidden");
 			send(new Error($login_message));
 			exit;
 		}

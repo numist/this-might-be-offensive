@@ -221,4 +221,6 @@ function me() {
 // logn.inc is needed for all authentication
 require_once("offensive/assets/logn.inc");
 
+define("TMBO", true);
+
 ?>

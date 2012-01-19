@@ -40,10 +40,11 @@ $codes = array(
 	"304" => "<em>Not Modified</em> - If a Conditional GET is used, this indicates that there are no changes to report.",
 	"400" => "<em>Bad Request</em> - The call is erroneous. The body will contain debugging information.",
 	"401" => "<em>Unauthorized</em> - Login failure. Either your credentials weren't valid, or you did not provide any.",
-	"403" => "<em>Forbidden</em> - Refusal. You have attempted to log in too many times in a rolling 30 minute period and you are blocked from any more attempts. Wait and try again later.",
+	"403" => "<em>Forbidden</em> - This content is not available to you.",
 	"404" => "<em>Not Found</em> - The function being requested does not exist.",
 	"500" => "<em>Internal Server Error</em> - kaboom. Please report if reproducible.",
-	"502" => "<em>Bad Gateway</em> - TMBO is down for maintenance. Please wait a few minutes and try your call again."
+	"502" => "<em>Bad Gateway</em> - TMBO is down for maintenance. Please wait a few minutes and try your call again.",
+	"503" => "<em>Service Unavailable</em> - Refusal. You have attempted to log in too many times in a rolling 30 minute period and you are blocked from any more attempts. Wait and try again later."
 );
 
 /*
