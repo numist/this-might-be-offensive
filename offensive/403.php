@@ -1,6 +1,10 @@
 <?
 	header('HTTP/1.0 403 Forbidden');
 	header('Content-type: text/html');
+	
+	if(!defined("TMBO")) {
+		set_include_path("..");
+	}
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
         "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
@@ -33,13 +37,36 @@
 		<tr>
 			<td valign="center" height="100%" align="center">
 	
-				<p>let it go.</p>
+				<p>no can do.</p>
+				
+				<? if(isset($upload) && is_object($upload) && me()) { ?><p><?
+
+					$index="";
+					switch($upload->type()) {
+						case "avatar":
+							$index = "yearbook";
+							break;
+						case "audio":
+							$index = "audio";
+							break;
+						default:
+							$index = me()->getPref("index");
+							if($index == "") {
+								$index = "main";
+							}
+							break;
+					}
+				?>
+					
+				<a id="index" href="/offensive/?c=<?= $index ?>">up</a>
+					
+				</p><? } ?>
 	
 			</td>
 		</tr>
 	</table>
 	
-<? include '../includes/footer.txt' ?>
+<? include 'includes/footer.txt' ?>
 
 </body>
 </html>
