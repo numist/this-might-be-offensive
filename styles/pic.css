@@ -97,3 +97,25 @@ body {
 audio {
 	width: 500px;
 }
+
+.bluebox,.entry {
+	background: #ccccff;
+	padding: 10px;
+	font-family: verdana;
+	font-size: 10px;
+}
+
+.entry {
+	padding: 10px;
+	font-size: 11px;
+	line-height:21px;
+}
+
+.squelched, a.squelched {
+	color:#9999cc;
+	font-size:10px;
+}
+
+.entry .squelched {
+	text-align:center;
+}

@@ -98,6 +98,7 @@ function api_getquickcommentbox() {
 	
 
 	if( $comments_exist ) {
+		$i = 0;
 		$comments_heading = "the dorks who came before you said: ";
 		if($fileid != "211604") {
 			echo "<b>$comments_heading</b>";
@@ -107,17 +108,12 @@ function api_getquickcommentbox() {
 			if($comment->text() == '')
 				continue;
 			$commenter = $comment->commenter();
-			echo '<div class="qc_comment">';
-					if(!me()->blocked($commenter) && strlen($comment->text()) > 0) {
-						echo $comment->HTMLcomment();
-					}
-					else if(strlen($comment->text()) > 0) {
-						echo "<div class='squelched'>[ squelched ]</div>";
-					}
+			echo '<div class="entry u'.$commenter->id().'" style="'.($i++ % 2 ? "background:#bbbbee;" : "background:#ccccff").'">';
+			echo $comment->HTMLcomment();
 ?>
 			<br />
 			<div class="timestamp"><?= $comment->timestamp() ?></div>
-			&raquo; <a href="/offensive/?c=user&userid=<?= $commenter->id() ?>"><?= $commenter->username() ?></a>
+			&raquo; <?= $commenter->htmlUsername() ?>
 <?php
 			if($comment->vote() != '') {
 				echo '<span class="vote">[ ' . $comment->vote() .' ]</span>';

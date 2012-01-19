@@ -837,12 +837,21 @@ class Comment {
 	}
 	
 	public function text() {
-		return $this->getCommentRow("comment");
+		$comment = $this->getCommentRow("comment");
+		if($this->blocked() && strlen($comment) > 0) {
+			$comment = "yes, there's a comment. no, you can't see it.";
+		}
+		return $comment;
 	}
 	
 	public function HTMLcomment() {
 		$comment = $this->text();
 		if($comment == "") return "";
+		
+		if($this->blocked()) {
+			$context = me()->squelched($this->commenter()) ? "squelched" : "blocked";
+			return "<div class='squelched'>[ $context ]</div>";
+		}
 
 		$comment = htmlEscape($comment);
 
@@ -928,6 +937,10 @@ class Comment {
 		}
 		
 		return $this->data["commenter"];
+	}
+	
+	public function blocked() {
+		return me()->blocked($this->commenter());
 	}
 
 	public function api_data() {

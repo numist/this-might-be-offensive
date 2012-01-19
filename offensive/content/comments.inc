@@ -196,17 +196,7 @@
 		?>
 		<a name="<?= $comment->id() ?>"></a>
 		<div class="entry u<?= $commenter->id() ?>" style="<?= nextStyle($commentnum++)?>">
-    	
-				<?php
-    	
-					if(!me()->blocked($commenter) && strlen($comment->text()) > 0) {
-						echo $comment->HTMLcomment();
-					}
-					else if(strlen($comment->text()) > 0) {
-						$context = me()->squelched($commenter) ? "squelched" : "blocked";
-						echo "<div class='squelched'>[ $context ]</div>";
-					}
-		?>
+				<?= $comment->HTMLcomment(); ?>
 				<br />
 				<div class="timestamp"><a href="#<?= $comment->id() ?>"><?= $comment->timestamp() ?></a></div>
 				
