@@ -1187,8 +1187,16 @@ class User {
 
 	// squelch a user
 	public function squelch($target) {
-		// populate our local squelch cache
-		$this->squelched(0);
+		// sanity check
+		if(me()->id() != $this->id() && me()->status() != "admin") {
+			trigger_error(me()->username()." can not squelch on ".$this->username()."'s behalf!", E_USER_ERROR);
+		}
+		
+		// is this redundant?
+		if($this->squelched($target)) {
+			return;
+		}
+		
 		// make sure user exists and all that
 		if(is_object($target)) {
 			$target = $target->id();
@@ -1203,17 +1211,21 @@ class User {
 		
 		$sql = "INSERT INTO offensive_squelch(userid, squelched) VALUES ( ".$this->id().", $target )";
 		tmbo_query( $sql );
-		
-		foreach($this->data["squelched"] as $squelchee) {
-			if($squelchee == $target) return;
-		}
 		$this->data["squelched"][] = $target;
 	}
 	
 	// unsquelch a user
 	public function unsquelch($target) {
-		// populate our local squelch cache
-		$this->squelched(0);
+		// sanity check
+		if(me()->id() != $this->id() && me()->status() != "admin") {
+			trigger_error(me()->username()." can not squelch on ".$this->username()."'s behalf!", E_USER_ERROR);
+		}
+		
+		// is this redundant?
+		if(!$this->squelched($target)) {
+			return;
+		}
+		
 		// make sure user exists and all that
 		if(is_object($target)) {
 			$target = $target->id();
@@ -1228,10 +1240,7 @@ class User {
 		
 		$sql = "DELETE FROM offensive_squelch WHERE userid=".$this->id()." AND squelched=$target";
 		tmbo_query($sql);
-		
-		foreach($this->data["squelched"] as $key => $squelchee) {
-			if($squelchee == $target) unset($this->data["squelched"][$key]);
-		}
+		unset($this->data["squelched"][$target]);
 	}
 	
 	/*
