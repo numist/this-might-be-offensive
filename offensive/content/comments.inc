@@ -27,13 +27,7 @@
 			exit;
 		}
 		
-		$upload = new Upload($_REQUEST['fileid']);
-
-		if(!$upload->exists()) {
-			require("offensive/404.php");
-			exit;
-		}
-
+		$upload = core_getupload($_REQUEST['fileid']);
 		$uploader = $upload->uploader();
 
 		clearSubscription($upload->id(), me()->id());
