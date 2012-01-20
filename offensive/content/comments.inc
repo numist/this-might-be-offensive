@@ -189,7 +189,13 @@
 			$commenter = $comment->commenter();
 		?>
 		<a name="<?= $comment->id() ?>"></a>
-		<div class="entry u<?= $commenter->id() ?>" style="<?= nextStyle($commentnum++)?>">
+		<div class="entry u<?= $commenter->id() ?><?
+			if($comment->vote() == "this is good") echo " tig";
+			if($comment->vote() == "this is bad") echo " tib";
+			if($comment->tiar()) echo " tiar";
+			if($comment->tmbo()) echo " tmbo";
+			if(strlen($comment->text())) echo " comment";
+		?>" style="<?= nextStyle($commentnum++)?>">
 				<?= $comment->HTMLcomment(); ?>
 				<br />
 				<div class="timestamp"><a href="#<?= $comment->id() ?>"><?= $comment->timestamp() ?></a></div>
