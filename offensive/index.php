@@ -5,6 +5,8 @@ $userlimit = 20;
 // how long before a user is considered not online anymore
 $timelimit = 10;
 
+//$downtime = 1327204800; // Sat Jan 21 22:00:00 CST 2012
+//$downtime_link = "https://thismight.be/offensive/?c=comments&fileid=327976";
 /*****************************************************************************/
 
 	$defaultpath = ini_get('include_path');
@@ -310,6 +312,27 @@ $timelimit = 10;
 		</div> <!-- end left column -->
 		
 		<div id="rightcol">
+		
+		<?
+		if(isset($downtime)) {
+		  $left = $downtime - time();
+		  if($left >= 0 && $left < 14400) { // 4h
+		    $message = "tmbo is going ";
+		    if(isset($downtime_link)) $message .= "<a href=\"$downtime_link\">";
+		    $message .= "down for maintenance";
+		    if(isset($downtime_link)) $message .= "</a>";
+		    
+		    if($left > 7200) { // 2h
+		      $message .= " in ".(int)($left / 3600)." hours";
+		    } else if($left > 120) { // 2m
+		      $message .= " in ".(int)($left / 60)." minutes";
+		    } else {
+		      $message .= " SOON";
+		    }
+		    box($message, "maintenance time!");
+	    }
+		} ?>
+		
 			<div class="contentbox">
 				<div class="blackbar"></div>
 
