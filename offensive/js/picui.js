@@ -59,8 +59,6 @@ function do_vote(o) {
 	}
 }
 
-// here laid handle_keypress and handle_qc_keypress
-
 form_text = "";
 function handle_quickcomment()
 {

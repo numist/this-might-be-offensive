@@ -14,20 +14,16 @@
 		
 		if(array_key_exists("submit", $_POST)) {
 			// check for post for keys
-			$n = 0;
 			$choices = array();
-			
-			while(array_key_exists("key$n", $_POST) && array_key_exists("keycode$n", $_POST)) {
+			for($n = 0; array_key_exists("key$n", $_POST) && array_key_exists("keycode$n", $_POST); $n++) {
 				// filter out invalid options
 				if($_POST["key$n"] == "noselect" || !array_key_exists($_POST["key$n"], $key_options)) {
-					$n++;
 					continue;
 				}
 				
 				if(!array_key_exists($_POST["key$n"], $choices))
 					$choices[$_POST["key$n"]] = array();
 				$choices[$_POST["key$n"]][] = $_POST["keycode$n"];
-				$n++;
 			}
 		
 			$prefnames = array_keys($key_options);
@@ -61,13 +57,13 @@
 	{
 ?>
 	<script type="text/javascript" src="/offensive/js/jquery-1.2.6.min.js"></script>
-	<script type="text/javascript" src="/offensive/js/settings.js"></script>
+	<script type="text/javascript" src="/offensive/js/settings.php"></script>
 <?php
 	}
 
 	function body()
 	{
-		global $key_options;
+		global $key_options, $key_defaults;
 
 		?><div class="heading">
 				set things up how you like 'em.
@@ -155,32 +151,11 @@
 						}
 					}
 					if(!$custom) {
-						emitRow("key_next", 37);		// ←
-						emitRow("key_next", 178);       // Wii ←
-						
-						emitRow("key_prev", 39);		// →
-						emitRow("key_prev", 177);       // Wii →
-						
-						emitRow("key_comments", 40);		// ↓
-						emitRow("key_comments", 176);    // Wii ↓
-						
-						emitRow("key_index", 38);		// ↑
-						emitRow("key_index", 175);      // Wii ↑
-						
-						emitRow("key_good", 61);		// +
-						emitRow("key_good", 107);       // + (numpad)
-						emitRow("key_good", 187);       // =
-						emitRow("key_good", 174);       // Wii +
-						
-						emitRow("key_bad", 109);		// - (numpad)
-						emitRow("key_bad", 189);        // -
-						emitRow("key_bad", 170);        // Wii -
-						
-						emitRow("key_quick", 81);		// q
-						
-						emitRow("key_escape", 27);		// Esc
-						
-						emitRow("key_random", 191);		// ?
+						foreach($key_defaults as $type => $codes) {
+							foreach($codes as $code) {
+								emitRow($type, $code);
+							}
+						}
 					}
 					?>
 					<!-- end of data from database -->
@@ -242,7 +217,7 @@
 					} ?>
 				</select>
 			</td>
-			<td><input size='8' class="keycode" min="1" id="" name="" value="<?= $keycode ?>" /></td>
+			<td><input size='16' class="keycode" id="" name="" value="<?= $keycode ?>" /></td>
 			<td><span class="key_notification"></span></td>
 			<td><input type="hidden" class="registered_key" value="<?= $keycode ?>" /></td>
 		</tr>

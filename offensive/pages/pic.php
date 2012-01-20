@@ -146,239 +146,130 @@
 				top.location.href = window.location.href;
 			}
 
+      <? require("offensive/data/keynav.inc"); ?>
+      function composite_keycode(e)
+      {
+        var keycode = (e.which == null) ? e.keyCode : e.which;
+				if(e.shiftKey) {
+    		  keycode |= <?= KEY_SHIFT ?>;
+    		}
+    		if(e.altKey) {
+    		  keycode |= <?= KEY_ALT ?>;
+    		}
+    		if(e.ctrlKey) {
+    		  keycode |= <?= KEY_CTRL ?>;
+    		}
+    		if(e.metaKey) {
+    		  keycode |= <?= KEY_META ?>;
+    		}
+    		// TODO: remove key-agnosticism
+    		keycode |= <?= KEY_META_AWARE ?>;
+    		
+    		return keycode;
+      }
+
 			// handle a keybased event. this code was incorporated from offensive.js, which has now been deprecated
 			function handle_keypress(o,e)
 			{
-				var id;
+			  // potential actions
+			  function nav_to_id(id) {
+          if(document.getElementById(id)) {
+  					document.location.href = document.getElementById( id ).href;
+  				}
+        }
+        
+      	function key_next() { nav_to_id("next"); };
+      	function key_prev() { nav_to_id("previous"); };
+      	function key_comments() { nav_to_id("comments"); };
+      	function key_index() { nav_to_id("index"); };
+      	function key_subscribe() { handle_subscribe(sub,e,$("#good").attr("name")); };
+      	function key_quick() { $("#dialog").jqmShow(); };
+        function key_random() { document.location.href = "/offensive/pages/pic.php?id=<?= $upload->id() ?>&random"; };
+        function key_good() {
+					id = $("#good");
+					if(id.parent().hasClass('on')) {
+						do_vote(id);
+					}
+      	};
+      	function key_bad() {
+					id = $("#bad");
+					if(id.parent().hasClass('on')) {
+						do_vote(id);
+					}
+      	};
+      	
 				if(e == null)  return true;
+        var keycode = composite_keycode(e);
 
-				var keycode = (e.which == null) ? e.keyCode : e.which;
-				switch( keycode ) {
-					<?
-					require("offensive/data/keynav.inc");
-					// get the user's keyboard navigation preferences
-					$prefs = array();
-					foreach($key_options as $option => $foo) {
-						if($option == "noselect") continue;
-						$val = me()->getPref($option);
-						if($val) {
-							$prefs[$option] = unserialize($val);
-						}
+        <?// get the user's keyboard navigation preferences
+				$prefs = array();
+				foreach($key_options as $option => $foo) {
+					if($option == "noselect") continue;
+					$val = me()->getPref($option);
+					if($val) {
+						$prefs[$option] = unserialize($val);
 					}
-
-					if(count($prefs) == 0) {
-						// use the default keybindings, the user has set nothing special.
-						?>
-						case 61:  // +
-						case 107: // + (numpad)
-						case 187: // =
-						case 174: // Wii +
-							e.preventDefault();
-							id = $("#good");
-							if(id.parent().hasClass('on')) {
-								do_vote(id);
-							}
-							return;
-							break;
-
-						case 109: // - (numpad)
-						case 189: // -
-						case 170: // Wii -
-							e.preventDefault();
-							id = $("#bad");
-							if(id.parent().hasClass('on')) {
-								do_vote(id);
-							}
-							return;
-							break;
-
-						case 81:  // q
-							e.preventDefault();
-							$("#dialog").jqmShow();
-							return;
-							break;
-
-						case 191: // ?
-							e.preventDefault();
-							document.location.href = "/offensive/pages/pic.php?id=<?= $upload->id() ?>&random";
-							return;
-							break;
-
-					// following not ajaxified
-						case 39:  // →
-						case 177: // Wii Right
-							e.preventDefault();
-							id = "previous";
-							break;
-
-						case 37:  // ←
-						case 178: // Wii Left
-							e.preventDefault();
-							id = "next";
-							break;
-
-						case 38:  // ↑
-						case 175: // Wii Up
-							e.preventDefault();
-							id = "index";
-							break;
-
-						case 40:  // ↓
-						case 176: // Wii Down
-							e.preventDefault();
-							id = "comments";
-							break;
-						<?
-						$escape = array("27");
-					} else {
-						if(array_key_exists("key_good", $prefs)) {
-							foreach($prefs["key_good"] as $code) {
-								echo "case $code:\n";
-							}
-							?>
-							e.preventDefault();
-							id = $("#good");
-							if(id.parent().hasClass('on')) {
-								do_vote(id);
-							}
-							return;
-							break;
-							<?
-						}
-
-						if(array_key_exists("key_bad", $prefs)) {
-							foreach($prefs["key_bad"] as $code) {
-								echo "case $code:\n";
-							}
-							?>
-							e.preventDefault();
-							id = $("#bad");
-							if(id.parent().hasClass('on')) {
-								do_vote(id);
-							}
-							return;
-							break;
-							<?
-						}
-
-						if(array_key_exists("key_quick", $prefs)) {
-							foreach($prefs["key_quick"] as $code) {
-								echo "case $code:\n";
-							}
-							?>
-							e.preventDefault();
-							$("#dialog").jqmShow();
-							return;
-							break;
-							<?
-						}
-
-						if(array_key_exists("key_random", $prefs)) {
-							foreach($prefs["key_random"] as $code) {
-								echo "case $code:\n";
-							}
-							?>
-							e.preventDefault();
-							document.location.href = "/offensive/pages/pic.php?id=<?= $upload->id() ?>&random";
-							return;
-							break;
-							<?
-						}
-
-						if(array_key_exists("key_prev", $prefs)) {
-							foreach($prefs["key_prev"] as $code) {
-								echo "case $code:\n";
-							}
-							?>
-							e.preventDefault();
-							id = "previous";
-							break;
-							<?
-						}
-
-						if(array_key_exists("key_next", $prefs)) {
-							foreach($prefs["key_next"] as $code) {
-								echo "case $code:\n";
-							}
-							?>
-							e.preventDefault();
-							id = "next";
-							break;
-							<?
-						}
-
-						if(array_key_exists("key_index", $prefs)) {
-							foreach($prefs["key_index"] as $code) {
-								echo "case $code:\n";
-							}
-							?>
-							e.preventDefault();
-							id = "index";
-							break;
-							<?
-						}
-
-						if(array_key_exists("key_comments", $prefs)) {
-							foreach($prefs["key_comments"] as $code) {
-								echo "case $code:\n";
-							}
-							?>
-							e.preventDefault();
-							id = "comments";
-							break;
-							<?
-						}
-
-						if(array_key_exists("key_subscribe", $prefs)) {
-							foreach($prefs["key_subscribe"] as $code) {
-								echo "case $code:\n";
-							}
-							?>
-							sub=$('.subscribe_toggle:visible');
-							handle_subscribe(sub,e,$("#good").attr("name"));
-							return;
-							break;
-							<?
-						}
-
-						if(array_key_exists("key_escape", $prefs)) {
-							$escape = $prefs["key_escape"];
-						} else {
-							$escape = array();
-						}
-					}
-					?>
 				}
-				if( id && document.getElementById( id ) ) {
-					document.location.href = document.getElementById( id ).href;
-					return false;
-				}
-				return true;
+				if(count($prefs) == 0) {
+				  $prefs = $key_defaults;
+			  }
+        
+        foreach($prefs as $action => $codes) {
+          foreach($codes as $code) {
+            // TODO: remove key-agnosticism
+            if($code <= KEY_CODE_MASK) {
+              // code is modifier-agnostic ?>
+            if(<?= $code ?> == (keycode & <?= KEY_CODE_MASK ?>)) {
+            <? } else {
+              // code is modifier-strict ?>
+            if(<?= $code ?> == keycode) {
+            <? } ?>
+              
+              e.preventDefault();
+              <?= $action ?>();
+              return;
+            }
+        
+        <?}
+        }?>
+
+				return;
 			}
 
 			// handle a keybased event. this code was incorporated from offensive.js, which has now been deprecated
 			function handle_qc_keypress(o,e)
 			{
-				if(e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return true;
+			  // potential actions
+			  function escape() {
+			    e.preventDefault();
+					$("#dialog").jqmHide();
+					return;
+			  }
 
 				var id;
 				if(e == null)  {
 					return true;
 				}
 
-				var keycode = (e.which == null) ? e.keyCode : e.which;
-				switch( keycode ) {
-					<?
-					foreach($escape as $keycode) {
-						echo "case $keycode:\n";
-					}
-					if(count($escape) > 0) { ?>
-						e.preventDefault();
-						$("#dialog").jqmHide();
-						return;
-						break;
-					<? } ?>
-				}
+				var keycode = composite_keycode(e);
+
+				<?
+				if(array_key_exists("key_escape", $prefs)) {
+				  foreach($prefs["key_escape"] as $code) {
+				    // TODO: remove key-agnosticism
+            if($code <= KEY_CODE_MASK) {
+              // code is modifier-agnostic ?>
+            if(<?= $code ?> == (keycode & <?= KEY_CODE_MASK ?>)) {
+            <? } else {
+              // code is modifier-strict ?>
+            if(<?= $code ?> == keycode) {
+            <? } ?>
+
+              escape();
+              return;
+            }
+				<?}
+			  }?>
 				return true;
 			}
 
