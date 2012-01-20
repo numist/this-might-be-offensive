@@ -48,15 +48,18 @@ function currentChange() {
 	return $redis->get("changelog:counter");
 }
 
-// XXX: fix: missing blackbar
 function box($message, $title="hmm:") {
 	?>
+	<div class="contentbox">
+		<div class="blackbar"></div>
 		<div class="heading"><?= $title ?></div>
 		<div class="bluebox">
 			<div style="text-align:center">
 				<?= $message ?>
 			</div>
 		</div>
+		<div class="blackbar"></div>
+	</div>
 	<?
 }
 
