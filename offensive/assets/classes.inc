@@ -1219,10 +1219,12 @@ class User {
 	}
 	
 	public function blocked($target) {
+		if($this->status() == "admin") {
+			return $this->squelched($target);
+		}
+
 		if(is_object($target)) {
 			$target = $target->id();
-		} else if(!is_intger($target)) {
-			trigger_error("target must be a userid or User object", E_USER_ERROR);
 		}
 		
 		return $this->squelched($target) || in_array($target, $this->data["squelched_by"]);
