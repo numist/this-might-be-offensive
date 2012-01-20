@@ -155,7 +155,7 @@
 						<?
 							if($avatar) {
 // XXX: avatar history
-								if($avatar->file()) {
+								if($avatar->file() && !$avatar->blocked()) {
 								?>
 									<div class="piletitle" style="margin-bottom:12px;">
 										<a href="pages/pic.php?id=<?= $avatar->id() ?>"><?= $name ?> is gorgeous.</a>
@@ -196,64 +196,10 @@
 						?>
 
 						<table width="100%" border="0" cellpadding="0" cellspacing="0">
-
-<tr>
-								<td>
 									<? 
-										recentComments( $usrid );
+										recentComments($usrid);
+										contributions($usrid)
 									?>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<div class="piletitle"><a href="/offensive/?c=thumbs&userid=<?= $usrid?>"><?= $name ?>'s contributions to society:</a><!-- +<?php echo isset($good_votes) ? $good_votes : 0; ?> -<?php echo isset($bad_votes) ? $bad_votes : 0; ?> (<a href="./?c=uservotedetail&userid=<?= $usrid ?>">click for details</a>)--></div>
-								</td>
-							</tr>
-						
-							<tr>
-								<td valign="top">
-<div style="padding:8px;">								
-<table style="width:100%">
-									
-<?php
-		$sql = "SELECT up.*, counts.good as goods, counts.bad as bads, counts.tmbo as tmbos, counts.comments
-				FROM offensive_uploads up
-				LEFT JOIN offensive_count_cache counts ON up.id = counts.threadid
-			WHERE up.userid = $usrid AND status != 'pending'
-			ORDER BY up.timestamp DESC 
-			LIMIT 300
-";
-
-	$result = tmbo_query( $sql );
-
-	$class = 'evenfile';
-
-	while( $row = mysql_fetch_assoc( $result ) ) {
-		$css = isset($css) && strpos($css, "even") !== false ? "oddfile odd_row" : "evenfile even_row";
-		$upload = new Upload($row);
-		?>
-			<tr class="<?= $css ?>">
-				<td style="width:100%"><div style="overflow:hidden;white-space:nowrap;width:285px;"><a class="<?= $css ?>" href="<?
-				if($upload->type() != "topic") 
-					echo "pages/pic.php?id=".$upload->id();
-				else
-					echo "/offensive/?c=comments&fileid=".$upload->id();
-				?>"><?= $upload->htmlFilename(true) ?></div></td>
-				<td class="<?php echo $css?>" style="text-align:right;white-space:nowrap;width:100%"><a href="./?c=comments&fileid=<?php echo $upload->id() ?>" class="<?php echo $css?>"><?=
-					$upload->commentLabel(!($upload->type() == 'topic'));
-				?></a></td>
-				<td style="text-align:right;white-space:nowrap;width:100%" class="<?php echo $css?>"><?php echo $upload->timestamp() ?></td>
-			</tr>
-		<?
-		
-	}
-
-?>
-</table>
-</div>
-
-								</td>
-							</tr>
 						</table>
 					</div>
 <?
@@ -261,37 +207,37 @@
 
 
 function recentComments( $uid ) {
-	$sql="SELECT up.*, offensive_comments.id as commentid
-			FROM offensive_uploads up, offensive_comments
-			WHERE offensive_comments.userid = $uid
-			AND up.id = offensive_comments.fileid
-			AND comment <> \"\"
-			ORDER  BY offensive_comments.timestamp DESC 
-			LIMIT 100";
-	$result = tmbo_query( $sql );
+	if(me()->blocked($uid)) {
+		return;
+	}
 	
-?>
+?><tr><td>
 	<div class="piletitle">the smartypants' most recent remarks:</div>
 	<div style="padding:8px;"><table width="535px">
-
 <?
 
+	$comments = core_getcomments(array("limit" => 100, "userid" => $uid, "votefilter" => "c"));
 	$seen = array();
 	$count = 0;
-	while( false !== ($row = mysql_fetch_assoc( $result )) && $count < 15) {
-		$upload = new Upload($row);
+	foreach($comments as $comment) {
+		$upload = $comment->upload();
 		
-		if(array_key_exists($upload->filename(), $seen)) continue;
-		$seen[$upload->filename()] = true;
+		// avoid duplicates
+		if(array_key_exists($comment->upload()->id(), $seen) && $seen[$comment->upload()->id()] == true) {
+			continue;
+		}
+		$seen[$comment->upload()->id()] = true;
 		$count++;
 		
 		$css = isset($css) && strpos($css, "even") !== false ? "oddfile odd_row" : "evenfile even_row";
-?>
-		<tr class="<?= $css ?>"><td><div style="white-space:nowrap; width:535px; overflow:hidden;"><a class="<?= $css ?>" href="?c=comments&fileid=<?= $upload->id() ?>#<?= $row['commentid'] ?>"><?= $upload->htmlFilename() ?></a></div></td></tr>
-<?
+		?><tr class="<?= $css ?>"><td><div style="white-space:nowrap; width:535px; overflow:hidden;"><a class="<?= $css ?>" href="?c=comments&fileid=<?= $upload->id() ?>#<?= $comment->id() ?>"><?= $upload->htmlFilename() ?></a></div></td></tr><?
+
+		if($count >= 15) {
+			break;
+		}
 	}
 ?>
-	</table></div>
+	</table></div></td></tr>
 <?
 
 }
@@ -326,7 +272,6 @@ function handleSetStatusSubmission() {
 }
 
 function setStatusForm( $id, $status, $email ) {
-
 	$sql = "SHOW COLUMNS FROM users LIKE 'account_status'";
 	$result = tmbo_query( $sql );
 	$row = mysql_fetch_row($result);
@@ -355,8 +300,11 @@ function setStatusForm( $id, $status, $email ) {
 
 }
 
-
 function votingRecord( $id, $name ) {
+	if(me()->blocked($id)) {
+		return;
+	}
+	
 	$sql = "SELECT COUNT(*) FROM offensive_comments WHERE userid = $id";
 	$result = tmbo_query( $sql );
 	$comments = mysql_fetch_row($result);
@@ -381,6 +329,48 @@ function votingRecord( $id, $name ) {
 ?> (<a href="./?c=votedetail&userid=<?= $id ?>">click for details</a>)</div>
 <?
 
+}
+
+function contributions($usrid) {
+	global $them;
+	if(me()->blocked($them)) {
+		return;
+	}
+	
+	?><tr><td>
+	<div class="piletitle">
+		<a href="/offensive/?c=thumbs&userid=<?= $usrid?>"><?= $them->username() ?>'<?= substr($them->username(), -1) == "s" ? "" : "s" ?> contributions to society:</a>
+		<!-- +<?php echo isset($good_votes) ? $good_votes : 0; ?> -<?php echo isset($bad_votes) ? $bad_votes : 0; ?> (<a href="./?c=uservotedetail&userid=<?= $usrid ?>">click for details</a>)--></div>
+		</td></tr>
+		<tr><td valign="top">
+			<div style="padding:8px;">								
+				<table style="width:100%">
+
+<?
+	$uploads = core_getuploads(array("userid" => $usrid));
+	$class = 'evenfile';
+	foreach($uploads as $upload) {
+		$css = isset($css) && strpos($css, "even") !== false ? "oddfile odd_row" : "evenfile even_row";
+		?>
+			<tr class="<?= $css ?>">
+				<td style="width:100%"><div style="overflow:hidden;white-space:nowrap;width:285px;"><a class="<?= $css ?>" href="<?
+				if($upload->type() != "topic") 
+					echo "pages/pic.php?id=".$upload->id();
+				else
+					echo "/offensive/?c=comments&fileid=".$upload->id();
+				?>"><?= $upload->htmlFilename(true) ?></div></td>
+				<td class="<?php echo $css?>" style="text-align:right;white-space:nowrap;width:100%">
+					<a href="./?c=comments&fileid=<?php echo $upload->id() ?>" class="<?php echo $css?>"><?=$upload->commentLabel(!($upload->type() == 'topic'));?></a>
+				</td>
+				<td style="text-align:right;white-space:nowrap;width:100%" class="<?php echo $css?>"><?php echo $upload->timestamp() ?></td>
+			</tr>
+		<?
+	}
+?>
+
+				</table>
+			</div>
+		</td></tr><?
 }
 
 ?>
