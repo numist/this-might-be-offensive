@@ -158,7 +158,7 @@
 					require("offensive/data/keynav.inc");
 					// get the user's keyboard navigation preferences
 					$prefs = array();
-					foreach($options as $option => $foo) {
+					foreach($key_options as $option => $foo) {
 						if($option == "noselect") continue;
 						$val = me()->getPref($option);
 						if($val) {

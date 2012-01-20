@@ -1,6 +1,6 @@
 <?
 
-$options = array(
+$key_options = array(
 	"noselect" => "Select key function...",
 	"key_next" => "newer",
 	"key_prev" => "older",
