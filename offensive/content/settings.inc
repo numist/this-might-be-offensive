@@ -9,7 +9,7 @@
 
 	function start()
 	{
-		global $options;
+		global $key_options;
 		mustLogIn();
 		
 		if(array_key_exists("submit", $_POST)) {
@@ -19,7 +19,7 @@
 			
 			while(array_key_exists("key$n", $_POST) && array_key_exists("keycode$n", $_POST)) {
 				// filter out invalid options
-				if($_POST["key$n"] == "noselect" || !array_key_exists($_POST["key$n"], $options)) {
+				if($_POST["key$n"] == "noselect" || !array_key_exists($_POST["key$n"], $key_options)) {
 					$n++;
 					continue;
 				}
@@ -30,7 +30,7 @@
 				$n++;
 			}
 		
-			$prefnames = array_keys($options);
+			$prefnames = array_keys($key_options);
 			if(count($choices) > 0) {
 				foreach($prefnames as $prefname) {
 					if($prefname == "noselect") continue;
@@ -67,7 +67,7 @@
 
 	function body()
 	{
-		global $options;
+		global $key_options;
 
 		?><div class="heading">
 				set things up how you like 'em.
@@ -117,7 +117,7 @@
 				</td>
 				<td class='keytype'>
 					<select>
-						<?foreach($options as $name => $desc) {
+						<?foreach($key_options as $name => $desc) {
 							?><option value="<?= $name ?>"><?= $desc ?></option><?
 						}?>
 					</select>
@@ -139,7 +139,7 @@
 					// has the user customized their key layout?
 					$custom = false;
 
-                	$prefnames = array_keys($options);
+                	$prefnames = array_keys($key_options);
 
 					// desc is unused, but required to get the key in a foreach loop.
 					foreach($prefnames as $prefname) {
@@ -192,7 +192,7 @@
 						</a>
 					</div>
 					<input id="keynav_submit" type="submit" value="Save" name="submit">
-					<p>to reset to default, delete all rows and set the last one to "<?= $options["noselect"] ?>".</p>
+					<p>to reset to default, delete all rows and set the last one to "<?= $key_options["noselect"] ?>".</p>
 				</center>
 			</form>
 		</div>
@@ -230,14 +230,14 @@
 	}
 	
 	function emitRow($prefname, $keycode) {
-		global $options;?>
+		global $key_options;?>
 		<tr>
 			<td class="key_delete">
 				<a href="#"><span>delete</span></a>
 			</td>
 			<td class="keytype">
 				<select>
-					<? foreach($options as $name => $desc) {
+					<? foreach($key_options as $name => $desc) {
 						?><option value="<?= $name ?>"<?= $name == $prefname ? " selected" : "" ?>><?= $desc ?></option><?
 					} ?>
 				</select>
