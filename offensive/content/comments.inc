@@ -27,13 +27,7 @@
 			exit;
 		}
 		
-		$upload = new Upload($_REQUEST['fileid']);
-
-		if(!$upload->exists()) {
-			require("offensive/404.php");
-			exit;
-		}
-
+		$upload = core_getupload($_REQUEST['fileid']);
 		$uploader = $upload->uploader();
 
 		clearSubscription($upload->id(), me()->id());
@@ -196,16 +190,7 @@
 		?>
 		<a name="<?= $comment->id() ?>"></a>
 		<div class="entry u<?= $commenter->id() ?>" style="<?= nextStyle($commentnum++)?>">
-    	
-				<?php
-    	
-					if(!me()->squelched($commenter) && strlen($comment->text()) > 0) {
-						echo $comment->HTMLcomment();
-					}
-					else if(strlen($comment->text()) > 0) {
-						echo "<div class='squelched'>[ squelched ]</div>";
-					}
-		?>
+				<?= $comment->HTMLcomment(); ?>
 				<br />
 				<div class="timestamp"><a href="#<?= $comment->id() ?>"><?= $comment->timestamp() ?></a></div>
 				

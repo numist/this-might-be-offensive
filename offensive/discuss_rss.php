@@ -47,8 +47,8 @@ conditionalGet($lastBuildTime);
 			<title><![CDATA[<?= $upload->filename() ?> (started by <?= $upload->uploader()->username() ?>)]]></title>
 			<link>http://<?= $_SERVER['SERVER_NAME'] ?>/offensive/?c=comments&fileid=<?= $upload->id() ?></link>
 			<description><![CDATA[<?
-				if(count($upload->getComments()) > 0) {
-					$comments = $upload->getComments();
+				$comments = $upload->getComments();
+				if(count($comments) > 0) {
 					echo $comments[0]->HTMLcomment();
 				} else {
 					echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(whaddya want, they didn't say anything)";

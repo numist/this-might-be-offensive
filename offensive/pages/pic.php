@@ -445,14 +445,14 @@
 
 				if($upload->next_filtered()) {
 					$style = ($upload->next_filtered()->is_nsfw() || $upload->next_filtered()->is_tmbo() ? 'style="font-style:italic; color: #990000"' : "") ?>
-					<a id="next" <?= $style ?> href="<?= $_SERVER['PHP_SELF'] ?>?id=<?= $upload->next_filtered()->id() ?>" title="<?= str_replace('"', '\\"', $upload->next_filtered()->filename()) ?>">newer</a>
+					<a id="next" <?= $style ?> href="<?= Link::upload($upload->next_filtered()) ?>" title="<?= str_replace('"', '\\"', $upload->next_filtered()->filename()) ?>">newer</a>
 				<? } else { ?>
 					<a href="/offensive/?c=<?= $index ?>" id="next" style="visibility:hidden">newer</a>
 				<? } ?>
 				. <a id="index" href="/offensive/?c=<?= $index ?>">index</a> .
 				<? if($upload->prev_filtered()) {
 					$style = ($upload->prev_filtered()->is_nsfw() || $upload->prev_filtered()->is_tmbo() ? 'style="font-style:italic; color: #990000"' : "") ?>
-					<a id="previous" <?= $style ?> href="<?= $_SERVER['PHP_SELF'] ?>?id=<?= $upload->prev_filtered()->id() ?>" title="<?= str_replace('"', '\\"', $upload->prev_filtered()->filename()) ?>">older</a>
+					<a id="previous" <?= $style ?> href="<?= Link::upload($upload->prev_filtered()) ?>" title="<?= str_replace('"', '\\"', $upload->prev_filtered()->filename()) ?>">older</a>
 				<? } else { ?>
 					<a id="previous" href="/offensive/?c=<?= $index ?>" style="visibility:hidden">older</a>
 				<? } ?>
@@ -555,19 +555,6 @@
 			-->
 			<span style="color:#999999">
 				uploaded by <?= $upload->uploader()->htmlUsername() ?> @ <?= $upload->timestamp() ?>
-			</span>
-
-			<!--
-				squelch block
-			-->
-			<span style="margin-left:48px">
-				<?
-				if(me()->squelched($upload->uploader()->id())) {
-					?><a id="unsquelchLink" style="color:#999999; text-decoration:underline" href="/offensive/setPref.php?unsq=<?= $upload->uploader()->id() ?>">unsquelch <?= $upload->uploader()->username() ?></a><?
-				} else {
-					?><a id="squelchLink" style="color:#999999; text-decoration:underline" href="/offensive/setPref.php?sq=<?= $upload->uploader()->id() ?>">squelch <?= $upload->uploader()->username() ?></a><?
-				}
-				?>
 			</span>
 			<br/><br/>
 			
@@ -681,8 +668,9 @@
 
 				if( $upload->filtered() ) {
 					?><div style="padding:128px;">[ <a id="imageLink" href="<?= $upload->URL() ?>" target="_blank">filtered</a>:<?
-						if($upload->squelched()) {
-							echo " squelched <!-- ".$upload->uploader()->id()
+						if($upload->blocked()) {
+							$context = me()->squelched($upload->uploader()) ? "squelched" : "blocked";
+							echo " $context <!-- ".$upload->uploader()->id()
 							     ." - ".$upload->uploader()->username()." -->";
 						}
 						if($upload->filtered_nsfw()) {

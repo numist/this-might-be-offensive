@@ -96,9 +96,6 @@ TMBO has a few functions that make the codebase cleaner, more secure, and more p
 -------------------------------------------------------------------------------
 Due to a high requirement that the site be portable, some special functions have been created to handle various idiosyncrasies that vary by environment.  These functions can be found in /offensive/assets/functions.inc.
 
-linkUrls($input)
-This function replaces occurrences of links to themaxx.com in the input text with a link to the current server.  In the future it will do this for links to thismight.be and tmbo.org as well.
-
 sqlEscape($string)
 This function returns a properly escaped string, when given input from a user.  Please note that if magic_quotes is enabled, this function will take into account that the string has been (potentially incorrectly) escaped already and will take steps to correct it, so please use mysql_real_escape_string() for strings that are not affected by magic_quotes.
 

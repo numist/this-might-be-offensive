@@ -1,10 +1,5 @@
 <?
 
-// XXX: this public function may be up for deprecation
-function linkUrls( $input ) {
-	trigger_error("deprecated: use Comment::HTMLcomment() from now on.", E_USER_ERROR);
-}
-
 function sqlEscape($string) {
 	if(ini_get("magic_quotes_gpc")) {
 		$string = str_replace( "\\'", "'", $string );
