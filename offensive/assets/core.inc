@@ -647,4 +647,56 @@
 		tmbo_query($sql);
 	}
 
+	function core_getlocation($args) {
+		if(!is_array($args)) {
+			trigger_error("args is not an array", E_USER_ERROR);
+		}
+		if(!me()) array();
+		
+		$userid =  check_arg("userid",  "integer", $args, false);
+		$minlat =  check_arg("minlat",  "float",   $args, false);
+		$maxlat =  check_arg("maxlat",  "float",   $args, false);
+		$minlong = check_arg("minlong", "float",   $args, false);
+		$maxlong = check_arg("maxlong", "float",   $args, false);
+		$limit =   check_arg("limit",   "limit",   $args, false);
+		handle_errors();
+		
+		$sql = "SELECT loc.x as latitude, loc.y as longitude,
+		               loc.timestamp, u.username, loc.userid
+		        FROM maxxer_locations loc, users u 
+				    WHERE u.userid = loc.userid
+				    AND loc.mapversion = 'google'
+	          AND u.account_status != 'locked'
+	          AND u.timestamp > DATE_SUB( NOW(), INTERVAL 12 MONTH )";
+
+		if($userid) {
+			$sql .= " AND loc.userid = $userid";
+		}
+		if($minlat) {
+			$sql .= " AND loc.x >= $minlat";
+		}
+		if($maxlat) {
+			$sql .= " AND loc.x <= $maxlat";
+		}
+		if($minlong) {
+			$sql .= " AND loc.y >= $minlong";
+		}
+		if($maxlong) {
+			$sql .= " AND loc.y <= $maxlong";
+		}
+		
+		$sql .= " ORDER BY timestamp DESC LIMIT $limit";
+		
+		$result = tmbo_query($sql);
+		
+		$rows = array();
+		while($row = mysql_fetch_assoc($result)) {
+			if(!me()->blocked($row["userid"])) {
+				$rows[] = $row;
+			}
+		}
+		
+		return $rows;
+	}
+
 ?>

@@ -1144,22 +1144,15 @@ class User {
 	 */
 	
 	public function location() {
-		if(!me() || me()->blocked($this)) return false;
-
 		if(!array_key_exists("location", $this->data)) {
-			$sql = "SELECT map.x AS latitude, map.y AS longitude, map.timestamp 
-			        FROM maxxer_locations map, users u
-			        WHERE u.userid = map.userid
-			          AND map.mapversion = 'google'
-			          AND u.account_status != 'locked'
-			          AND u.timestamp > DATE_SUB( NOW(), INTERVAL 12 MONTH )
-			          AND u.userid = ".$this->data["userid"];
-			$result = tmbo_query($sql);
+			$locs = core_getlocation(array("userid" => $this->id()));
 			
-			if(mysql_num_rows($result) !== 1)
+			if(count($locs) !== 1)
 				$this->data["location"] = false;
 			else
-				$this->data["location"] = mysql_fetch_assoc($result);
+				$this->data["location"] = array("latitude" => $locs[0]["latitude"],
+				                                "longitude" => $locs[0]["longitude"],
+				                                "timestamp" => $locs[0]["timestamp"]);
 		}
 		
 		return $this->data["location"];
