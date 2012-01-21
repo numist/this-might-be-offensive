@@ -22,7 +22,6 @@
 	}
 
 	$upload = core_getupload($id);
-
 	if(!$upload->exists()) {
 		header( "Location: /offensive/" );
 		exit;
@@ -133,19 +132,11 @@
 		<? } ?> -->
 
 		<script type="text/javascript" src="/offensive/js/jquery-1.2.6.min.js"></script>
-		<!-- XXX: a lot of this picui stuff is going to have to move into this header so it can be customized -->
-		<script type="text/javascript" src="/offensive/js/picui.js"></script>
+		<script type="text/javascript" src="/offensive/js/picui.js?v=1"></script>
 		<script type="text/javascript" src="/offensive/js/subscriptions.js"></script>
 		<script type="text/javascript" src="/offensive/js/jqModal.js"></script>
 		<script type="text/javascript" src="/offensive/js/jqDnR.js"></script>
 		<script type="text/javascript">
-			self.file_id = "";
-
-			// prevent sites from hosting this page in a frame;
-			if( window != top ) {
-				top.location.href = window.location.href;
-			}
-
       <? require("offensive/data/keynav.inc"); ?>
       function composite_keycode(e)
       {
@@ -174,29 +165,19 @@
 			  // potential actions
 			  function nav_to_id(id) {
           if(document.getElementById(id)) {
-  					document.location.href = document.getElementById( id ).href;
+  					document.location.href = document.getElementById(id).href;
   				}
         }
         
-      	function key_next() { nav_to_id("next"); };
-      	function key_prev() { nav_to_id("previous"); };
+      	function key_next()     { nav_to_id("next"); };
+      	function key_prev()     { nav_to_id("previous"); };
       	function key_comments() { nav_to_id("comments"); };
-      	function key_index() { nav_to_id("index"); };
-      	function key_subscribe() { handle_subscribe($('.subscribe_toggle:visible'),e,$("#good").attr("name")); };
+      	function key_index()    { nav_to_id("index"); };
+        function key_good() { do_vote($("#good")); };
+      	function key_bad()  { do_vote($("#bad")); };
       	function key_quick() { $("#dialog").jqmShow(); };
+      	function key_subscribe() { handle_subscribe($('.subscribe_toggle:visible'),e,$("#good").attr("name")); };
         function key_random() { document.location.href = "/offensive/pages/pic.php?id=<?= $upload->id() ?>&random"; };
-        function key_good() {
-					id = $("#good");
-					if(id.parent().hasClass('on')) {
-						do_vote(id);
-					}
-      	};
-      	function key_bad() {
-					id = $("#bad");
-					if(id.parent().hasClass('on')) {
-						do_vote(id);
-					}
-      	};
       	
 				if(e == null)  return true;
         var keycode = composite_keycode(e);
@@ -313,7 +294,7 @@
 
 		<div id="content">
 			<div id="heading" style="white-space:nowrap;">
-				&nbsp;&nbsp;
+				&nbsp;&nbsp;<span id="navigation_controls">
 				<?
 				/*
 				 * navigation buttons, prev index next are dependant on type
@@ -347,25 +328,28 @@
 				<? } else { ?>
 					<a id="previous" href="/offensive/?c=<?= $index ?>" style="visibility:hidden">older</a>
 				<? } ?>
+				</span>
 
 				<!--
 					comment block
 				-->
-				<a style="margin-left:48px;"
-				   id="comments"
-				   href="/offensive/?c=comments&fileid=<?= $upload->id() ?>">comments</a>
-				(<span id="count_comment"><?= $upload->comments() ?></span>c
-				+<span id="count_good"><?= $upload->goods() ?></span>
-				-<span id="count_bad"><?= $upload->bads() ?></span><?
-				if($upload->tmbos() > 0) { ?>
-					<span style=\"color:#990000\">x<?= $upload->tmbos() ?></span>
-				<? } ?>)
-				&nbsp;(<a id="quickcomment" class="jqModal" href="#">quick</a>)
+				<span id="voting_stats">
+					<a style="margin-left:48px;"
+					   id="comments"
+					   href="/offensive/?c=comments&fileid=<?= $upload->id() ?>">comments</a>
+					(<span id="count_comment"><?= $upload->comments() ?></span>c
+					+<span id="count_good"><?= $upload->goods() ?></span>
+					-<span id="count_bad"><?= $upload->bads() ?></span><?
+					if($upload->tmbos() > 0) { ?>
+						<span style=\"color:#990000\">x<?= $upload->tmbos() ?></span>
+					<? } ?>)
+					<span id="quicklink">&nbsp;(<a id="quickcomment" class="jqModal" href="#">quick</a>)</span>
+				</span>
 
 				<!--
 					voting block
 				-->
-				<span style="margin-left:40px;">
+				<span id="voting_controls" style="margin-left:40px;">
 					<?
 					if(canVote($upload->id()) && $upload->file()) {
 						$good_href = "href=\"/offensive/?c=comments&submit=submit&fileid=$id&vote=this%20is%20good&redirect=true\"";
@@ -386,7 +370,7 @@
 				<!--
 					subscribe block
 				-->
-				<span style="margin-left:48px;">
+				<span id="subscribe" style="margin-left:48px;">
 					<?
 					if($upload->subscribed()) { ?>
 						<a class="subscribe_toggle" id="unsubscribeLink" href="/offensive/subscribe.php?un=1&fileid=<?= $id ?>" title="take this file off my 'unread comments' watch list.">unsubscribe</a>
@@ -398,21 +382,23 @@
 				<!--
 				    filter block
 				-->
-				<span style="margin-left:48px;">filters:</span>
-				<span style="margin-left:5px;"><?
-				        if(me()->getPref("hide_nsfw") == 1) { ?>
-				                <a href="/offensive/setPref.php?p=hide_nsfw&v=">nsfw(on)</a>
-				        <? } else { ?>
-				                <a href="/offensive/setPref.php?p=hide_nsfw&v=1">nsfw(off)</a>
-				        <? } ?>
-				</span>
-
-				<span style="margin-left:5px;"><?
-				        if(me()->getPref("hide_tmbo") == 1) { ?>
-				                        <a href="/offensive/setPref.php?p=hide_tmbo&v=">tmbo(on)</a>
-				        <? } else { ?>
-				                        <a href="/offensive/setPref.php?p=hide_tmbo&v=1">tmbo(off)</a>
-				        <? } ?>
+				<span id="filter_controls">
+					<span style="margin-left:48px;">filters:</span>
+					<span style="margin-left:5px;"><?
+					        if(me()->getPref("hide_nsfw") == 1) { ?>
+					                <a href="/offensive/setPref.php?p=hide_nsfw&v=">nsfw(on)</a>
+					        <? } else { ?>
+					                <a href="/offensive/setPref.php?p=hide_nsfw&v=1">nsfw(off)</a>
+					        <? } ?>
+					</span>
+        	
+					<span style="margin-left:5px;"><?
+					        if(me()->getPref("hide_tmbo") == 1) { ?>
+					                        <a href="/offensive/setPref.php?p=hide_tmbo&v=">tmbo(on)</a>
+					        <? } else { ?>
+					                        <a href="/offensive/setPref.php?p=hide_tmbo&v=1">tmbo(off)</a>
+					        <? } ?>
+					</span>
 				</span>
 			</div>
 
@@ -555,8 +541,7 @@
 				} else { ?>
 					<div style="padding:128px;">[ got nothin' for ya ]</div><?
 				}
-			} else {
-
+			} else if($upload->type() == "image") {
 				if( $upload->filtered() ) {
 					?><div style="padding:128px;">[ <a id="imageLink" href="<?= $upload->URL() ?>" target="_blank">filtered</a>:<?
 						if($upload->blocked()) {
@@ -591,6 +576,9 @@
 		<?
 		if(me()->status() == "admin") {
 			?>
+			<!--
+			page stats block
+			-->
 			<br />
 		
 			<center><div style="color:#ccc;"><?= number_format(time_end($ptime), 3)."s php, ".number_format($querytime, 3)."s sql, ".count($queries)." queries\n\n <!--\n\n";
