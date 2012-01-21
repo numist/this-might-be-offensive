@@ -1145,9 +1145,13 @@ class User {
 	
 	public function location() {
 		if(!array_key_exists("location", $this->data)) {
-		
-			$sql = "SELECT x AS latitude, y AS longitude, timestamp 
-			        FROM maxxer_locations WHERE mapversion = 'google' AND userid = ".$this->data["userid"];
+			$sql = "SELECT map.x AS latitude, map.y AS longitude, map.timestamp 
+			        FROM maxxer_locations map, users u
+			        WHERE u.userid = map.userid
+			          AND map.mapversion = 'google'
+			          AND u.account_status != 'locked'
+			          AND u.timestamp > DATE_SUB( NOW(), INTERVAL 12 MONTH )
+			          AND u.userid = ".$this->data["userid"];
 			$result = tmbo_query($sql);
 			
 			if(mysql_num_rows($result) !== 1)
