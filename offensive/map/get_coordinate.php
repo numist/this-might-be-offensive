@@ -21,7 +21,7 @@ if($user == "") trigger_error("no user argument", E_USER_ERROR);
 $sql = "SELECT userid,x,y FROM maxxer_locations WHERE mapversion='google' AND userid='$user'";
 
 $result = mysql_query($sql);
-if(!$result) {
+if(!$result || me()->blocked($user)) {
 	exit;
 }
 header("Content-type: text/xml");

@@ -1144,6 +1144,8 @@ class User {
 	 */
 	
 	public function location() {
+		if(!me() || me()->blocked($this)) return false;
+
 		if(!array_key_exists("location", $this->data)) {
 			$sql = "SELECT map.x AS latitude, map.y AS longitude, map.timestamp 
 			        FROM maxxer_locations map, users u
