@@ -182,7 +182,7 @@
       	function key_prev() { nav_to_id("previous"); };
       	function key_comments() { nav_to_id("comments"); };
       	function key_index() { nav_to_id("index"); };
-      	function key_subscribe() { handle_subscribe(sub,e,$("#good").attr("name")); };
+      	function key_subscribe() { handle_subscribe($('.subscribe_toggle:visible'),e,$("#good").attr("name")); };
       	function key_quick() { $("#dialog").jqmShow(); };
         function key_random() { document.location.href = "/offensive/pages/pic.php?id=<?= $upload->id() ?>&random"; };
         function key_good() {
