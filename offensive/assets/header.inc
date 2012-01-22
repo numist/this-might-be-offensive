@@ -79,7 +79,8 @@ function tmbo_error_handler($errno, $errstr, $errfile, $errline, $errcontext) {
                 E_USER_WARNING       => 'User Warning',
                 E_USER_NOTICE        => 'User Notice',
                 E_STRICT             => 'Runtime Notice',
-                E_RECOVERABLE_ERROR  => 'Catchable Fatal Error'
+                E_RECOVERABLE_ERROR  => 'Catchable Fatal Error',
+				        E_DEPRECATED         => 'Deprecated'
                 );
         $critical = E_ERROR | E_WARNING | E_PARSE | E_CORE_ERROR | E_CORE_WARNING | 
                     E_COMPILE_ERROR | E_COMPILE_WARNING | E_USER_ERROR | E_USER_WARNING;
