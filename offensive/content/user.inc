@@ -316,7 +316,6 @@ function handleSetStatusSubmission() {
 		if($changed) {
 			$emails = array();
 			$admins = core_getadmins();
-			var_dump($admins);
 			foreach($admins as $admin) {
 				$emails[] = $admin->email();
 			}

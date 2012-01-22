@@ -70,6 +70,7 @@
 		$autoplay = !$upload->filtered();
 		me()->setPref($prefname, $upload->id());
 	}
+	
 	if(array_key_exists('loop', $_REQUEST)) {
 		$autoplay = true;
 	}
@@ -127,9 +128,9 @@
 		<META NAME="ROBOTS" CONTENT="NOARCHIVE" />
 		<title>[<?= $upload->type() ?>] : <?= $upload->filename() ?> </title>
 		<link rel="stylesheet" type="text/css" href="/styles/pic.css"/>
-		<? if($upload->next_filtered()) { ?>
+		<!-- <? if($upload->next_filtered()) { ?>
 			<link rel="prefetch" href="<?= $_SERVER['PHP_SELF'] ?>?id=<?= $upload->next_filtered()->id() ?>"/>
-		<? } ?>
+		<? } ?> -->
 
 		<script type="text/javascript" src="/offensive/js/jquery-1.2.6.min.js"></script>
 		<!-- XXX: a lot of this picui stuff is going to have to move into this header so it can be customized -->
