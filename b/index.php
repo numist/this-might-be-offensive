@@ -14,7 +14,7 @@ $p = array_key_exists("p", $_REQUEST) ? $_REQUEST['p'] : 0 ;
 
 function poast($comment, $image, $upload) {
 	$comment = new Comment($comment['commentid']);
-	if(!me()->squelched($comment->commenter()->id())) {
+	if(!me()->blocked($comment->commenter()->id())) {
 		$com = $comment->HTMLcomment();
 		$com = explode("\n", $com);
 		if(count($com) <= 10) { 
@@ -24,11 +24,11 @@ function poast($comment, $image, $upload) {
 			for($i = 0; $i < 10; $i++) {
 				echo $com[$i] . "<br />";
 			}?>
-				<span class="abbr">Comment too long. Click <a href="/offensive/?c=comments&fileid=<?= $upload->id() ?>#<?= $comment->id() ?>">here</a> to view the full text.</span>
+				<blockquote>
+					<span class="abbr">Comment too long. Click <a href="/offensive/?c=comments&fileid=<?= $upload->id() ?>#<?= $comment->id() ?>">here</a> to view the full text.</span>
+				</blockquote>
 			<?
 		}
-	} else {
-		echo "<span class='abbr'>[ squelched ]</span>";
 	}
 }
 
@@ -239,9 +239,7 @@ echo $info[0]."x".$info[1];
 	++$fetch;
 	if($comment['userid'] == $upload->uploader()->id()) {
 		$op = 1;
-		echo "<blockquote>";
 		poast($comment, $image, $upload);
-		echo "</blockquote>";
 	}
 	 
 
@@ -279,10 +277,7 @@ echo $info[0]."x".$info[1];
 			<span id="norep<?= $comment['commentid'] ?>">
 				<a href="/offensive/?c=comments&fileid=<?= $upload->id() ?>#<?= $comment['commentid'] ?>" class="quotejs">No.<?= $comment['commentid'] ?></a>
 			</span>
-			<blockquote><?
-				poast($comment, $image, $upload);
-			?>
-			</blockquote>
+			<? poast($comment, $image, $upload); ?>
 		</td>
 	</tr>
 </table>

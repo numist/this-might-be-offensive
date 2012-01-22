@@ -1,10 +1,5 @@
 <?
 
-// XXX: this public function may be up for deprecation
-function linkUrls( $input ) {
-	trigger_error("deprecated: use Comment::HTMLcomment() from now on.", E_USER_ERROR);
-}
-
 function sqlEscape($string) {
 	if(ini_get("magic_quotes_gpc")) {
 		$string = str_replace( "\\'", "'", $string );
@@ -53,15 +48,18 @@ function currentChange() {
 	return $redis->get("changelog:counter");
 }
 
-// XXX: fix: missing blackbar
 function box($message, $title="hmm:") {
 	?>
+	<div class="contentbox">
+		<div class="blackbar"></div>
 		<div class="heading"><?= $title ?></div>
 		<div class="bluebox">
 			<div style="text-align:center">
 				<?= $message ?>
 			</div>
 		</div>
+		<div class="blackbar"></div>
+	</div>
 	<?
 }
 

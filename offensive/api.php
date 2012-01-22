@@ -306,7 +306,7 @@
 			exit;
 		} else if($loggedin === null) {
 			global $login_message;
-			header("HTTP/1.0 403 Forbidden");
+			header("HTTP/1.0 503 Forbidden");
 			send(new Error($login_message));
 			exit;
 		}
@@ -487,41 +487,7 @@
 	 * @see setlocation
 	 */
 	function api_getlocation() {
-		$userid =  check_arg("userid",  "integer", null, false);
-		$minlat =  check_arg("minlat",  "float",   null, false);
-		$maxlat =  check_arg("maxlat",  "float",   null, false);
-		$minlong = check_arg("minlong", "float",   null, false);
-		$maxlong = check_arg("maxlong", "float",   null, false);
-		$limit =   check_arg("limit",   "limit",   null, false);
-		handle_errors();
-		
-		$sql = "SELECT loc.x as latitude, loc.y as longitude, loc.timestamp, u.username, loc.userid
-		        FROM maxxer_locations loc, users u 
-				WHERE u.userid = loc.userid";
-
-		if($userid) {
-			$sql .= " AND loc.userid = $userid";
-		}
-		if($minlat) {
-			$sql .= " AND loc.x >= $minlat";
-		}
-		if($maxlat) {
-			$sql .= " AND loc.x <= $maxlat";
-		}
-		if($minlong) {
-			$sql .= " AND loc.y >= $minlong";
-		}
-		if($maxlong) {
-			$sql .= " AND loc.y <= $maxlong";
-		}
-		
-		$sql .= " ORDER BY timestamp DESC LIMIT $limit";
-		
-		$result = tmbo_query($sql);
-		
-		$rows = array();
-		while(($rows[] = mysql_fetch_assoc($result)) || array_pop($rows));
-		send($rows);
+		send(core_getlocation($_REQUEST));
 	}
 
 	/**

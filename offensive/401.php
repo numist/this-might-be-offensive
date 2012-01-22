@@ -1,6 +1,10 @@
 <?
-	header('HTTP/1.0 403 Forbidden');
+	header('HTTP/1.0 401 Unauthorized');
 	header('Content-type: text/html');
+	
+	if(!defined("TMBO")) {
+		set_include_path("..");
+	}
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
         "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
@@ -33,13 +37,13 @@
 		<tr>
 			<td valign="center" height="100%" align="center">
 	
-				<p><?= strlen($login_message) ? $login_message : "no free admission." ?></p>
+				<p><?= isset($login_message) && strlen($login_message) ? $login_message : "no free admission." ?></p>
 	
 			</td>
 		</tr>
 	</table>
 	
-<? include '../includes/footer.txt' ?>
+<? include 'includes/footer.txt' ?>
 
 </body>
 </html>

@@ -174,7 +174,10 @@
 		$result = tmbo_query($sql);
 		$ret = array();
 		while($row = mysql_fetch_assoc($result)) {
-			$ret[] = new Upload($row);
+			$upload = new Upload($row);
+			if(!$upload->blocked()) {
+				$ret[] = $upload;
+			}
 		}
 		
 		unset($result, $sql);
@@ -190,20 +193,24 @@
 		$upload = new Upload($id);
 		
 		$sql = uploadsql()." AND up.id = $id";
-		
 		$result = tmbo_query($sql);
-		
 		if(mysql_num_rows($result) == 0) {
 			if(!$upload->exists()) {
-				trigger_error("upload nonexist", E_USER_ERROR);
+				require("offensive/404.php");
+			} else {
+				updateCommentCount($id, 0, 0, 0, 0, 0);
 			}
-			
-			updateCommentCount($id, 0, 0, 0, 0, 0);
-			
-			return new Upload($id);
+		} else {
+			assert('mysql_num_rows($result) == 1');
+			$upload = new Upload(mysql_fetch_assoc($result));
 		}
 		
-		return new Upload(mysql_fetch_assoc($result));
+		
+		if($upload->blocked()) {
+			require("offensive/403.php");
+		}
+		
+		return $upload;
 	}
 
 	function core_getyearbook($args) {
@@ -222,12 +229,15 @@
 		                                  WHERE type='avatar' AND userid=u.userid)";
 		
 		if($userid !== false) {
+			if(me()->blocked($userid)) {
+				require("offensive/403.php");
+			}
+			
 			$sql .= " AND u.userid = $userid";
-			
 			$result = tmbo_query($sql);
-			
-			if(mysql_num_rows($result) == 0)
-				return null;
+			if(mysql_num_rows($result) == 0) {
+				require("offensive/404.php");
+			}
 			
 			return new Upload(mysql_fetch_assoc($result));
 		}
@@ -271,7 +281,10 @@
 			return $ret;
 		
 		while($row = mysql_fetch_assoc($result)) {
-			$ret[] = new Upload($row);
+			$upload = new Upload($row);
+			if(!$upload->blocked()) {
+				$ret[] = $upload;
+			}
 		}
 		
 		return $ret;
@@ -378,16 +391,14 @@
 	}
 	
 	function core_getcomment($id) {
+		$singleton = false;
 		if(!is_array($id)) {
-			$args = array("id" => $id);
-			$id = array(check_arg("id", "integer", $args));
-		} else {
-			$targs = array();
-			foreach($id as $key => $arg) {
-				$targs[] = check_arg($key, "integer", $id);
-			}
-			$id = $targs;
-			unset($targs);
+			$singleton = true;
+			$id = array("id" => $id);
+		}
+		
+		foreach($id as $key => $arg) {
+			check_arg($key, "integer", $id);
 		}
 		handle_errors();
 
@@ -404,14 +415,19 @@
 		}
 
 		$result = tmbo_query($sql);
+		if(mysql_num_rows($result) == 0 && $singleton) {
+			require("offensive/404.php");
+		}
 
 		$ret = array();
-
 		while($row = mysql_fetch_assoc($result)) {
 			$ret[] = new Comment($row);
 		}
+		if($singleton) {
+			assert('count($ret) == 1');
+		}
 
-		return count($ret) == 1 ? $ret[0] : $ret;
+		return $singleton ? array_pop($ret) : $ret;
 	}
 	
 	// XXX: unimplemented
@@ -484,7 +500,10 @@
 		$ret = array();
 		
 		while($row = mysql_fetch_assoc($result)) {
-			$ret[] = new Upload($row);
+			$upload = new Upload($row);
+			if(!$upload->blocked()) {
+				$ret[] = $upload;
+			}
 		}
 		
 		return $ret;
@@ -626,6 +645,58 @@
 		
 		$sql = "DELETE FROM tokens WHERE tokenid = \"".$token->id()."\"";
 		tmbo_query($sql);
+	}
+
+	function core_getlocation($args) {
+		if(!is_array($args)) {
+			trigger_error("args is not an array", E_USER_ERROR);
+		}
+		if(!me()) array();
+		
+		$userid =  check_arg("userid",  "integer", $args, false);
+		$minlat =  check_arg("minlat",  "float",   $args, false);
+		$maxlat =  check_arg("maxlat",  "float",   $args, false);
+		$minlong = check_arg("minlong", "float",   $args, false);
+		$maxlong = check_arg("maxlong", "float",   $args, false);
+		$limit =   check_arg("limit",   "limit",   $args, false);
+		handle_errors();
+		
+		$sql = "SELECT loc.x as latitude, loc.y as longitude,
+		               loc.timestamp, u.username, loc.userid
+		        FROM maxxer_locations loc, users u 
+				    WHERE u.userid = loc.userid
+				    AND loc.mapversion = 'google'
+	          AND u.account_status != 'locked'
+	          AND u.timestamp > DATE_SUB( NOW(), INTERVAL 12 MONTH )";
+
+		if($userid) {
+			$sql .= " AND loc.userid = $userid";
+		}
+		if($minlat) {
+			$sql .= " AND loc.x >= $minlat";
+		}
+		if($maxlat) {
+			$sql .= " AND loc.x <= $maxlat";
+		}
+		if($minlong) {
+			$sql .= " AND loc.y >= $minlong";
+		}
+		if($maxlong) {
+			$sql .= " AND loc.y <= $maxlong";
+		}
+		
+		$sql .= " ORDER BY timestamp DESC LIMIT $limit";
+		
+		$result = tmbo_query($sql);
+		
+		$rows = array();
+		while($row = mysql_fetch_assoc($result)) {
+			if(!me()->blocked($row["userid"])) {
+				$rows[] = $row;
+			}
+		}
+		
+		return $rows;
 	}
 
 ?>

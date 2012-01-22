@@ -42,7 +42,7 @@ function mustLogIn($methods=array()) {
 			header('WWW-Authenticate: Basic realm="[this might be offensive]"');
 			require("offensive/401.php");
 		} else {
-			require("offensive/403.php");
+			require("offensive/503.php");
 		}
 	} else {
 		// build the redirect link

@@ -10,6 +10,8 @@ require_once( "offensive/assets/activationFunctions.inc" );
 require_once( 'admin/mysqlConnectionInfo.inc' );
 if(!isset($link) || !$link) $link = openDbConnection();
 require_once("offensive/assets/functions.inc");
+require_once("offensive/assets/classes.inc");
+require_once("offensive/assets/core.inc");
         
 // authentication
 mustLogIn(array("prompt" => "http",
@@ -18,20 +20,20 @@ mustLogIn(array("prompt" => "http",
 $user = (isset($_GET['user']) && is_intger($_GET['user'])) ? $_GET['user'] : "";
 if($user == "") trigger_error("no user argument", E_USER_ERROR);
 
-$sql = "SELECT userid,x,y FROM maxxer_locations WHERE mapversion='google' AND userid='$user'";
+$locations = core_getlocation(array("userid" => $user));
 
-$result = mysql_query($sql);
-if(!$result) {
+if(count($locations) == 0) {
 	exit;
 }
+
 header("Content-type: text/xml");
 echo '<markers>';
-while ($row = @mysql_fetch_assoc($result)){
+foreach ($locations as $location){
 	// ADD TO XML DOCUMENT NODE
 	echo '<marker ';
-	echo 'userid="' . $row['userid'] . '" ';
-	echo 'lat="' . $row['x'] . '" ';
-	echo 'lon="' . $row['y'] . '" ';
+	echo 'userid="' . $location['userid'] . '" ';
+	echo 'lat="' . $row['latitude'] . '" ';
+	echo 'lon="' . $row['longitude'] . '" ';
 	echo '/>';
 }
 echo '</markers>';

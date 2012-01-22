@@ -24,10 +24,12 @@ if($avatar == false) {
 	// show a default image if there is no thumbnail
 	$thumb = "<img src='/tmbologo.gif' width='50' height='33' />";
 } else {
-	$info = getimagesize($avatar->thumb());
+	if(strlen($avatar->thumb())) {
+		$info = getimagesize($avatar->thumb());
+	}
 	
 	// XXX: this could do with some filtering.
-	$thumb = "<a href='/offensive/pages/pic.php?id=".$avatar->id()."' target='_blank'><img src='" . $avatar->thumbURL() . "' ".$info[3]." border='0' /></a>";
+	$thumb = "<a href='/offensive/pages/pic.php?id=".$avatar->id()."' target='_blank'><img src='" . $avatar->thumbURL() . "' ".(is_array($info) ? $info[3] : "")." border='0' /></a>";
 }
 
 $referer = $user->referred_by();
