@@ -27,6 +27,8 @@ EOT;
 
 	function body() {
 ?>
+<div class="contentbox">
+	<div class="blackbar"></div>
 	<div class="heading">the beautiful people.</div>
 <?
 		tabs();
@@ -34,6 +36,8 @@ EOT;
 		<div class="bluebox">
 			<? yearbook(); ?>
 		</div>
+		<div class="blackbar"></div>
+	</div>
 <?
 	}
 

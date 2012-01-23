@@ -43,6 +43,8 @@
 
 	function body() {
 ?>
+<div class="contentbox">
+	<div class="blackbar"></div>
 		<div class="heading">we need to talk.</div>
 
 <?
@@ -69,7 +71,8 @@
 			</form>
 			
 		</div>
-
+		<div class="blackbar"></div>
+	</div>
 <?
 	}
 ?>

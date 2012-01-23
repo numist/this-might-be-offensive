@@ -25,6 +25,8 @@
 		$args["p"] = $page;
 
 ?>
+<div class="contentbox">
+	<div class="blackbar"></div>
 	<div class="heading">we need to talk.</div>
 <?
 		tabs();
@@ -113,6 +115,9 @@
 				</div>
 			</div>
 		</div>
+		<div class="blackbar"></div>
+	</div>
+
 <?
 	}
 ?>

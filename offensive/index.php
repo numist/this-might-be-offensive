@@ -331,18 +331,12 @@ $timelimit = 10;
 		    box($message, "maintenance time!");
 	    }
 		} ?>
-		
-			<div class="contentbox">
-				<div class="blackbar"></div>
 
 					<?
 						if( function_exists( 'body' ) ) {
 							body();
 						}
 					?>
-
-				<div class="blackbar"></div>
-			</div>
 		</div>
 
 	</div>

@@ -26,43 +26,45 @@
 		$result = tmbo_query( $sql );
 		
 		?>
-		
-<div class="heading">where'd all those votes go? <!-- who do you love? --></div>
-<? tabs(); ?>
-<div class="bluebox">
-<table border="0" width="100%">
-
-	<?
-		$good = 0;
-		$bad = 0;
-		$username = "";
-		while( $row = mysql_fetch_assoc( $result ) ) {
-			if( $row['username'] != $username && $username != "" ) {
-				emitRow( $username, $good, $bad );
-				$good = 0;
-				$bad = 0;
-			}
-			
-			$username = $row['username'];
-			
-			switch( $row['vote'] ) {
-				case 'this is good':
-					$good = $row['thecount'];
-				break;
-				
-				case 'this is bad':
-					$bad = $row['thecount'];	
-				break;
-			}
-
-		}
-	?>
+<div class="contentbox">
+	<div class="blackbar"></div>
+	<div class="heading">where'd all those votes go? <!-- who do you love? --></div>
+	<? tabs(); ?>
+	<div class="bluebox">
+	<table border="0" width="100%">
 	
-</table>
-</div>
-		
 		<?
+			$good = 0;
+			$bad = 0;
+			$username = "";
+			while( $row = mysql_fetch_assoc( $result ) ) {
+				if( $row['username'] != $username && $username != "" ) {
+					emitRow( $username, $good, $bad );
+					$good = 0;
+					$bad = 0;
+				}
+				
+				$username = $row['username'];
+				
+				switch( $row['vote'] ) {
+					case 'this is good':
+						$good = $row['thecount'];
+					break;
+					
+					case 'this is bad':
+						$bad = $row['thecount'];	
+					break;
+				}
+	
+			}
+		?>
+		
+	</table>
+	</div>
+	<div class="blackbar"></div>
+</div>
 
+		<?
 	}
 
 	function emitRow( $name, $good, $bad ) {

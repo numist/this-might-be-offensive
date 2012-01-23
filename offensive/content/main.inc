@@ -43,6 +43,8 @@
 		}
 
 ?>
+<div class="contentbox">
+<div class="blackbar"></div>
 <div class="heading">
 
 	<?
@@ -98,6 +100,9 @@
 		</div>
 	</div>
 </div>
+<div class="blackbar"></div>
+</div>
+
 <script>
 	var update_index = <?= $revision ?>;
 </script>

@@ -46,20 +46,22 @@
 			trigger_error("topics do not have thumbnails", E_USER_ERROR);
 		}
 ?>
-<div class="heading">
-
-    <?
-		require("offensive/data/quips.inc");
-		echo $quip;
-
-		// employee of the month insertion
-		$employee = get_include_path()."/offensive/employeeOfTheMonth.txt";
-		if(file_exists($employee) && time() - filemtime($employee) < 172800) {
-		    require("offensive/employeeOfTheMonth.txt");
-		}
-	?>
-
-</div>
+<div class="contentbox">
+	<div class="blackbar"></div>
+	<div class="heading">
+	
+	    <?
+			require("offensive/data/quips.inc");
+			echo $quip;
+	
+			// employee of the month insertion
+			$employee = get_include_path()."/offensive/employeeOfTheMonth.txt";
+			if(file_exists($employee) && time() - filemtime($employee) < 172800) {
+			    require("offensive/employeeOfTheMonth.txt");
+			}
+		?>
+	
+	</div>
 
 <?
 	global $activeTab;
@@ -67,41 +69,43 @@
 	tabs();
 ?>
 
-<div class="bluebox">
-	<div id="grid-container">
-		<div id="commands">
-			<div class="floatleft"><? include( 'offensive/assets/pickupLink.inc' ) ?></div>
-			<div class="floatright"><a href="./?c=main<?= query_string("c", "&") ?>">text view</a></div>
-		</div>
-		<div class="grid_thumbs" id="thumbnails">
-			<ul>
-			<?php
-				$result = core_getuploads($args);
-				$output = 0;
-
-				foreach( $result as $upload ) {?>
-				<li fileid="<?= $upload->id() ?>">
-				  <div class="thumbcontainer">
-					<div><a href="pages/pic.php?id=<?= $upload->id() ?>"
-						<?php if($upload->filtered()) { ?>
-							onMouseOver='changesrc("th<?= $upload->id()?>","<?= $upload->thumbURL() ?>")'
-							onMouseOut='changesrc("th<?= $upload->id() ?>","/offensive/graphics/th-filtered.gif")'
-						<? } ?>
-					><img name="th<?= $upload->id()?>"
-								src="<?= $upload->filtered() ? "/offensive/graphics/th-filtered.gif" : $upload->thumbURL() ?>"
-								title="uploaded by <?= $upload->uploader()->username(); ?>"
-						>
-					</a></div>
-					<div class="score"><a href="./?c=comments&amp;fileid=<?= $upload->id() ?>"><?= $upload->commentLabel(); ?></a></div>
-			    </div>
-			  </li>
-		<?php } ?>
-			</ul>
-		</div>
-		<div id="bottom">
-			<p><a href="">load more…</a></p>
+	<div class="bluebox">
+		<div id="grid-container">
+			<div id="commands">
+				<div class="floatleft"><? include( 'offensive/assets/pickupLink.inc' ) ?></div>
+				<div class="floatright"><a href="./?c=main<?= query_string("c", "&") ?>">text view</a></div>
+			</div>
+			<div class="grid_thumbs" id="thumbnails">
+				<ul>
+				<?php
+					$result = core_getuploads($args);
+					$output = 0;
+	
+					foreach( $result as $upload ) {?>
+					<li fileid="<?= $upload->id() ?>">
+					  <div class="thumbcontainer">
+						<div><a href="pages/pic.php?id=<?= $upload->id() ?>"
+							<?php if($upload->filtered()) { ?>
+								onMouseOver='changesrc("th<?= $upload->id()?>","<?= $upload->thumbURL() ?>")'
+								onMouseOut='changesrc("th<?= $upload->id() ?>","/offensive/graphics/th-filtered.gif")'
+							<? } ?>
+						><img name="th<?= $upload->id()?>"
+									src="<?= $upload->filtered() ? "/offensive/graphics/th-filtered.gif" : $upload->thumbURL() ?>"
+									title="uploaded by <?= $upload->uploader()->username(); ?>"
+							>
+						</a></div>
+						<div class="score"><a href="./?c=comments&amp;fileid=<?= $upload->id() ?>"><?= $upload->commentLabel(); ?></a></div>
+				    </div>
+				  </li>
+			<?php } ?>
+				</ul>
+			</div>
+			<div id="bottom">
+				<p><a href="">load more…</a></p>
+			</div>
 		</div>
 	</div>
+	<div class="blackbar"></div>
 </div>
 <?
 }

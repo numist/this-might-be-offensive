@@ -206,7 +206,8 @@
 
 	function body() {
 ?>
-
+<div class="contentbox">
+	<div class="blackbar"></div>
 	<div class="heading">both hands and a flashlight.</div>
 	<? tabs(); ?>
 	<div class="bluebox">
@@ -244,11 +245,9 @@
 		
 		
 ?>
-
 	</div>
-
+	<div class="blackbar"></div>
+</div>	
 <?
-		
 	}
-
 ?>

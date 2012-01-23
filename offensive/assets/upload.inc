@@ -789,7 +789,10 @@ function upload_checkrepost(&$postdata) {
 
 	$filePath=dirname(realpath($_SERVER['SCRIPT_FILENAME']));
 
-	?><div class="heading">poster child:</div>
+	?>
+<div class="contentbox">
+	<div class="blackbar"></div>
+	<div class="heading">poster child:</div>
 	<div class="bluebox">
 	<div style="text-align:center">
 	Your file appears to be a repost of:
@@ -827,6 +830,9 @@ function upload_checkrepost(&$postdata) {
 	</form>
 	</div>
 	</div>
+	<div class="blackbar"></div>
+</div>
+
 	<?
 	$_SESSION['postdata'] = serialize($postdata);
 	return true;

@@ -63,16 +63,17 @@
 
 	function body()
 	{
-		global $key_options, $key_defaults;
+		global $key_options, $key_defaults; ?>
 
-		?><div class="heading">
-				set things up how you like 'em.
-		</div><?
-		
+<div class="contentbox">
+	<div class="blackbar"></div>
+	<div class="heading">
+			set things up how you like 'em.
+	</div>
+	<?
 		global $activeTab;
 		tabs();
-?>
-
+	?>
 	<div class="heading">browsing filters:</div>
 	<div class="bluebox">
 		<p>use the nsfw and tmbo filters to block images that are not safe for work or potentially offensive.  <br />use the bad filter if you trust the judgement of your fellow maxxers.  10 [this is bad] votes and a ratio of 9 bad for every [this is good] causes the bad filter to activate.</p>
@@ -200,7 +201,8 @@
 			<? } ?>
 			</div>
 	</div>
-
+	<div class="blackbar"></div>
+</div>
 <?
 	}
 	

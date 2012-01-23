@@ -98,7 +98,8 @@
 
 ?>
 		
-
+				<div class="contentbox">
+					<div class="blackbar"></div>
 					<div class="heading">
 						<? echo $accountMessage ?><br/>
 						<span style="color:#666699">
@@ -202,9 +203,10 @@
 									?>
 						</table>
 					</div>
+					<div class="blackbar"></div>
+				</div>
 <?
 }
-
 
 function recentComments( $uid ) {
 	if(me()->blocked($uid)) {

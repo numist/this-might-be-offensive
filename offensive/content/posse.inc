@@ -13,7 +13,8 @@
 		$them = new User($usrid);
 
 ?>
-
+<div class="contentbox">
+	<div class="blackbar"></div>
 					<div class="heading">
 						<span style="color:#666699">
 							<?= $them->htmlUsername() ?> has a posse.
@@ -34,20 +35,18 @@
 							<?= $them->htmlUsername() ?> has a posse.
 						</div>
 						<ol>
-	<?
+<?
 			
 			$posse = $them->posse();
 			foreach($posse as $accomplice) {
 				?><li><?= $accomplice->htmlUsername() ?> (<?= $accomplice->status() ?>)</li>
 <?
 			}
-	?>											
+?>											
 					</ol>
 					</div>
-		
-
-
-
+					<div class="blackbar"></div>
+				</div>
 <?
 }
 ?>

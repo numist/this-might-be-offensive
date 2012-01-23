@@ -16,6 +16,8 @@
 
 	function body() {
 ?>
+<div class="contentbox">
+	<div class="blackbar"></div>
 	<div class="heading">spy stuff.</div>
 <?
 		tabs();
@@ -23,6 +25,9 @@
 		<div class="bluebox">
 			<? iphistory( sqlEscape( $_REQUEST['uid'] ) ); ?>
 		</div>
+		<div class="blackbar"></div>
+	</div>
+		
 <?
 	}
 

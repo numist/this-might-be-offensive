@@ -38,7 +38,8 @@
 		
 		
 ?>
-
+<div class="contentbox">
+	<div class="blackbar"></div>
 	<div class="heading">search results</div>
 	<div class="bluebox">
 	
@@ -116,7 +117,8 @@
 
 
 	</div>
-
+	<div class="blackbar"></div>
+</div>
 <?
 		
 	}

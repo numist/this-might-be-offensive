@@ -38,8 +38,8 @@ EOT;
 
 		$result = tmbo_query( $sql );
 ?>
-
-
+	<div class="contentbox">
+		<div class="blackbar"></div>
 		<div class="heading">
 			subscriptions.
 		</div>
@@ -84,6 +84,8 @@ EOT;
 				</div>
 			</div>
 		</div>
+		<div class="blackbar"></div>
+	</div>
 	<?
 	}
 ?>

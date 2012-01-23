@@ -12,7 +12,9 @@ if(!isset($link) || !$link) $link = openDbConnection();
 	}
 
 	function body() {
-?>	
+?>
+<div class="contentbox">
+	<div class="blackbar"></div>
 	<div class="heading">ooo! top secret codeword spy stuff!</div>
 	<div class="bluebox">
 <?
@@ -52,6 +54,8 @@ if(!isset($link) || !$link) $link = openDbConnection();
 			<input type="submit" value="make it so"/>
 		</form>
 	</div>
+	<div class="blackbar"></div>
+</div>
 <?
 	}
 
