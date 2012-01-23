@@ -936,7 +936,7 @@ function upload_insert_file($postdata) {
 	$year = date( "Y", $timestamp );
 	$month = date( "m", $timestamp );
 	$day = date( "d", $timestamp );
-	$path = get_include_path()."/offensive/uploads/$year/$month/$day/".upload_type($postdata)."/";
+	$path = get_include_path()."/offensive/uploads/$year/$month/$day/".upload_type($postdata);
 
 	$nsfw = array_key_exists('nsfw', $postdata) ? 1 : 0;
 	$tmbo = array_key_exists('tmbo', $postdata) ? 1 : 0;
@@ -961,8 +961,8 @@ function upload_insert_file($postdata) {
 		ensureDirExists("$path/thumbs");
 
 		// generate the thumbnail
-		$cmd = "convert -define jpeg:size=800x800 $tmpdir/".$postdata['tmpname']."[0] -thumbnail 133x100^ -gravity center -extent 133x100 $tmpdir/th".$postdata['tmpname'];
-		
+		// XXX: this is what's failing
+		$cmd = "/usr/bin/convert -define jpeg:size=800x800 $tmpdir/".$postdata['tmpname']."[0] -thumbnail 133x100^ -gravity center -extent 133x100 $tmpdir/th".$postdata['tmpname'];
 		$err = shell_exec($cmd);
 		if(strlen($err) > 0) trigger_error("ImageMagick failed: $err", E_USER_ERROR);
 
