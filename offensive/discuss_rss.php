@@ -29,7 +29,7 @@ conditionalGet($lastBuildTime);
 <rss version="2.0">
 	<channel>
 		<title>[ this might be offensive ] : discussions</title>
-		<link>http://<?= $_SERVER['SERVER_NAME'] ?>/offensive/</link>
+		<link>https://<?= $_SERVER['SERVER_NAME'] ?>/offensive/</link>
 		<description>[ this might be offensive ]</description>
 		<lastBuildDate><?= gmdate('r', $lastBuildTime); ?></lastBuildDate>
 <?
@@ -45,7 +45,7 @@ conditionalGet($lastBuildTime);
 
 		<item>
 			<title><![CDATA[<?= $upload->filename() ?> (started by <?= $upload->uploader()->username() ?>)]]></title>
-			<link>http://<?= $_SERVER['SERVER_NAME'] ?>/offensive/?c=comments&fileid=<?= $upload->id() ?></link>
+			<link>https://<?= $_SERVER['SERVER_NAME'] ?>/offensive/?c=comments&fileid=<?= $upload->id() ?></link>
 			<description><![CDATA[<?
 				$comments = $upload->getComments();
 				if(count($comments) > 0) {
@@ -55,7 +55,7 @@ conditionalGet($lastBuildTime);
 				}
 			?>]]></description>
 			<pubDate><?= date( "r", strtotime( $upload->timestamp() ) ) ?></pubDate>			
-			<comments><![CDATA[http://<?= $_SERVER['SERVER_NAME'] ?>/offensive/page.php?c=comments&fileid=<?= $upload->id() ?>]]></comments>
+			<comments><![CDATA[https://<?= $_SERVER['SERVER_NAME'] ?>/offensive/page.php?c=comments&fileid=<?= $upload->id() ?>]]></comments>
 		</item>
 <?
 	}
