@@ -46,12 +46,11 @@ function lazyload_top() {
             $score.html(create_score_text(comments, good, bad, offensive));
           } 
         }
-      } else if (command == "upload" && upload_id > $('#grid-container ul li:first').attr('fileid')) {
+      } else if (command == "upload" && upload_id > $('#grid-container ul li[fileid]').first().attr('fileid')) {
         $.getJSON('/offensive/api.php/getupload.json', {'fileid' : upload_id}, function(data) {
           var html = html_upload(data);
           if(html.length > 0) {
-            $('#grid-container ul').prepend(html);
-  				  $("#grid-container ul li:first").fadeIn("slow");
+            $(html).insertBefore($('#grid-container ul li[fileid]').first()).fadeIn("slow");
 				  }
         });
       }

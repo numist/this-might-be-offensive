@@ -15,9 +15,19 @@
 	}
 
 	function head() {
-		echo <<<EOT
+		?>
 		<link href="/styles/grid.css?v=1.02" type="text/css" rel="stylesheet">
-EOT;
+		<script type="text/javascript" src="/offensive/js/jquery-1.7.1.min.js"></script>
+		<!-- lazyload_bottom -->
+		<script type="text/javascript">
+			function prep_item(item, neighbor) {
+				var color_class = (neighbor.find('.odd_row').length > 0) ? "even_row" : "odd_row";
+				$(item).find('div.col').removeClass("odd_row even_row").addClass(color_class);
+				return item;
+			}
+		</script>
+		<script type="text/javascript" src="/offensive/js/lazyload_bottom.js?v=0.0.1"></script>
+		<?
 	}
 
 	function body() {

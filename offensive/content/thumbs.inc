@@ -57,7 +57,9 @@
 				              +'</a>'
 				            +'</div>'
 				            +'<div class="score">'
-				              +create_score(upload)
+											+'<a href="./?c=comments&fileid='+upload.id+'">'
+				              	+create_score(upload)
+											+'</a>'
 				            +'</div>'
 				          +'</div>'
 				        +'</li>';
@@ -67,8 +69,10 @@
 			</script>
     	<script type="text/javascript" src="/offensive/js/lazyload_changes.js?v=0.0.5"></script>';
 			<?
-		}
-	}
+		}?>
+		<!-- lazyload_bottom -->
+		<script type="text/javascript" src="/offensive/js/lazyload_bottom.js?v=0.0.2"></script>
+<?}
 
 	function body() {
 		$numPerPage = 100;
@@ -134,7 +138,7 @@
 									title="uploaded by <?= $upload->uploader()->username(); ?>"
 							>
 						</a></div>
-						<div class="score"><a href="./?c=comments&amp;fileid=<?= $upload->id() ?>"><?= $upload->commentLabel(); ?></a></div>
+						<div><span class="score"><a href="./?c=comments&fileid=<?= $upload->id() ?>"><?= $upload->commentLabel(); ?></a></span></div>
 				    </div>
 				  </li>
 			<?php } ?>

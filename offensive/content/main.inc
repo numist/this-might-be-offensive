@@ -50,18 +50,30 @@
 				            +'</a>'
 				          +'</div>'
 				          +'<div class="col col2 '+color_class+'">'
-				            +'<span class="score">'
-				              +create_score(upload)
-				            +'</span>'
+			            	+'<span class="score">'
+										  +'<a href="./?c=comments&fileid='+upload.id+'">'
+				              	+create_score(upload)
+											+'</a>'
+			            	+'</span>'
 				          +'</div>'
 				        +'</li>';
 				  
 			    return html;
 				}
 			</script>
+    	<script type="text/javascript" src="/offensive/js/lazyload_changes.js?v=0.0.5"></script>
 			<?
-		}
-	}
+		}?>
+		<!-- lazyload_bottom -->
+		<script type="text/javascript">
+			function prep_item(item, neighbor) {
+				var color_class = (neighbor.find('.odd_row').length > 0) ? "even_row" : "odd_row";
+				$(item).find('div.col').removeClass("odd_row even_row").addClass(color_class);
+				return item;
+			}
+		</script>
+		<script type="text/javascript" src="/offensive/js/lazyload_bottom.js?v=0.0.2"></script>
+<?}
 
 	function body() {
 		$numPerPage = 100;

@@ -660,7 +660,8 @@ class Upload {
 				"vote_tmbo" => $this->tmbos(),
 				"vote_repost" => $this->tiars(),
 				"comments" => $this->comments(),
-				"filtered" => $this->filtered()
+				"filtered" => $this->filtered(),
+				"last_active" => $this->last_active()
 			);
 		if($this->type() != "topic" && $this->file() != '') {
 			$ret["link_file"] = $this->URL();
