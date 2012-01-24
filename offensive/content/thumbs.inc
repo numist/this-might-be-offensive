@@ -26,7 +26,7 @@
 		<link rel="alternate" type="application/rss+xml" title="daily archives" href="<?= Link::rss("zip") ?>" />
 		<link href="/styles/grid.css?v=1.01" type="text/css" rel="stylesheet">
 		<script type="text/javascript" src="/offensive/js/tmbolib.js?v=0.1"></script>
-		<script type="text/javascript" src="/offensive/js/jquery-1.3.2.min.js"></script>
+		<script type="text/javascript" src="/offensive/js/jquery-1.7.1.min.js"></script>
 		<? if(count($_GET) == 1 && array_key_exists("c", $_GET)) { ?>
 			<!-- lazyload_changes are only used if on a base page (?c=main not ?c=main&foo=bar) -->
 			<script type="text/javascript">
