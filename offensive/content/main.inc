@@ -35,9 +35,18 @@
 				  color_class = (color_class == "odd_row") ? "even_row" : "odd_row";
 				  html = '<li style="display: none;" fileid="'+upload.id+'">'
 				          +'<div class="col col1 '+color_class+'">'
-				            +'<a href="pages/pic.php?id='+upload.id+'" title="uploaded by '+upload.username.htmlescape()+'">'
-											// XXX: [nsfw] & [tmbo] tags, if appropriate
-				              +upload.filename.htmlescape()
+				            +'<a href="pages/pic.php?id='+upload.id+'" title="uploaded by '+upload.username.htmlescape()+'">';
+					if(upload.nsfw || upload.tmbo) {
+						html     +='<span class="tags">';
+						if(upload.nsfw) {
+							html     +='[nsfw]';
+						}
+						if(upload.tmbo) {
+							html     +='[tmbo]';
+						}
+						html     +='</span> ';
+					}
+				  html        +=upload.filename.htmlescape()
 				            +'</a>'
 				          +'</div>'
 				          +'<div class="col col2 '+color_class+'">'
