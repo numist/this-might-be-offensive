@@ -30,7 +30,7 @@
 		$hash = tmbohash( $id, $email . $salt );
 		$message = "  Thanks for registering at [ this might be offensive ].
   Please visit this link to activate your account:
-  http://thismight.be/offensive/activate.php?$hash_param_key=$hash
+  https://thismight.be/offensive/activate.php?$hash_param_key=$hash
   
   Do not respond to this email. If you need to contact us,
   please visit http://thismight.be/contact/

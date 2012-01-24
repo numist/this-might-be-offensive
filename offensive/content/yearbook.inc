@@ -27,6 +27,8 @@ EOT;
 
 	function body() {
 ?>
+<div class="contentbox">
+	<div class="blackbar"></div>
 	<div class="heading">the beautiful people.</div>
 <?
 		tabs();
@@ -34,6 +36,8 @@ EOT;
 		<div class="bluebox">
 			<? yearbook(); ?>
 		</div>
+		<div class="blackbar"></div>
+	</div>
 <?
 	}
 
@@ -87,7 +91,7 @@ EOT;
 		// output loop
 		foreach($result as $upload) {
 			?>
-					<li>
+					<li fileid="<?= $upload->id() ?>">
 						<div class="thumbcontainer">
 							<div><a href="pages/pic.php?id=<?= $upload->id() ?>"
 								<? if($upload->filtered()) { ?>

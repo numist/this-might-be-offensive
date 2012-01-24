@@ -143,43 +143,47 @@
 	function body() {
 		global $message;
 ?>
-		<div class="heading">sign me up.</div>
-		<div class="bluebox">
+<div class="contentbox">
+	<div class="blackbar"></div>
+	<div class="heading">sign me up.</div>
+	<div class="bluebox">
 
-			<? 
-			if(isset($message) && $message != null) {
-				echo $message->message; 
-			}?>
+		<? 
+		if(isset($message) && $message != null) {
+			echo $message->message; 
+		}?>
 
-			<form action="<?= $_SERVER['PHP_SELF'] ?>" method="post">
-				<input type="hidden" name="c" value="register" />
+		<form action="<?= $_SERVER['PHP_SELF'] ?>" method="post">
+			<input type="hidden" name="c" value="register" />
 
-				<div class="entry odd_row">
-					desired username:<br/>
-					<input type="text" name="username" size="50" value="<?= array_key_exists("username", $_REQUEST) ? $_REQUEST['username'] : ""; ?>" />
-				</div>
-				
-				<div class="entry even_row">
-					password:<br/>
-					<input type="password" name="password" size="50" />
-				</div>
-				<div class="entry odd_row">
-					repeat password:<br/>
-					<input type="password" name="password2" size="50" />
-				</div>
-				<div class="entry even_row">
-					email: (activation instructions will be sent to this address. you will <b>not</b> be spammed.)<br/>
-					<input type="text" name="email" size="50" value="<?= array_key_exists("email", $_REQUEST) ? $_REQUEST['email'] : ""; ?>"/>
-				</div>
-				<div class="entry odd_row">
-					invitation code:<br/>
-					<input type="text" name="referral_code" size="50" value="<?= array_key_exists("referral_code", $_REQUEST) ? $_REQUEST['referral_code'] : ""; ?>"/>
-				</div>
-				<div class="entry even_row">
-					<input type="submit" value="go!">
-				</div>
-			</form>
-		</div>
+			<div class="entry odd_row">
+				desired username:<br/>
+				<input type="text" name="username" size="50" value="<?= array_key_exists("username", $_REQUEST) ? $_REQUEST['username'] : ""; ?>" />
+			</div>
+			
+			<div class="entry even_row">
+				password:<br/>
+				<input type="password" name="password" size="50" />
+			</div>
+			<div class="entry odd_row">
+				repeat password:<br/>
+				<input type="password" name="password2" size="50" />
+			</div>
+			<div class="entry even_row">
+				email: (activation instructions will be sent to this address. you will <b>not</b> be spammed.)<br/>
+				<input type="text" name="email" size="50" value="<?= array_key_exists("email", $_REQUEST) ? $_REQUEST['email'] : ""; ?>"/>
+			</div>
+			<div class="entry odd_row">
+				invitation code:<br/>
+				<input type="text" name="referral_code" size="50" value="<?= array_key_exists("referral_code", $_REQUEST) ? $_REQUEST['referral_code'] : ""; ?>"/>
+			</div>
+			<div class="entry even_row">
+				<input type="submit" value="go!">
+			</div>
+		</form>
+	</div>
+	<div class="blackbar"></div>
+</div>
 <?
 	}
 ?>

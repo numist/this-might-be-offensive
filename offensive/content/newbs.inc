@@ -11,13 +11,18 @@
 
 	function body() {
 ?>
-	<div class="heading">newbies.</div>
+<div class="contentbox">
+	<div class="blackbar"></div>
+	<div class="heading">fresh meat.</div>
 <?
 		tabs();
 ?>
 		<div class="bluebox">
 			<? newbs(); ?>
 		</div>
+		<div class="blackbar"></div>
+	</div>
+		
 <?
 	}
 

@@ -38,8 +38,8 @@ EOT;
 
 		$result = tmbo_query( $sql );
 ?>
-
-
+	<div class="contentbox">
+		<div class="blackbar"></div>
 		<div class="heading">
 			subscriptions.
 		</div>
@@ -59,7 +59,7 @@ EOT;
 			$row['filename'] = htmlEscape($row['filename']);
 			$css = (isset($css) && $css == "odd_row") ? "even_row" : "odd_row";
 			?>
-						<li class="grid_row">
+						<li class="grid_row" fileid="<?= $row['fileid'] ?>">
 							<div class="col col1 <?= $css ?>">
 								<a href="./?c=comments&fileid=<?= $row['fileid'] ?>"><?= $row['filename'] ?></a>
 							</div>
@@ -84,6 +84,8 @@ EOT;
 				</div>
 			</div>
 		</div>
+		<div class="blackbar"></div>
+	</div>
 	<?
 	}
 ?>

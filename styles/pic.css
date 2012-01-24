@@ -107,8 +107,8 @@ audio {
 
 .entry {
 	padding: 10px;
-	font-size: 11px;
-	line-height:21px;
+	font-size: 10px;
+	line-height:15px;
 }
 
 .squelched, a.squelched {

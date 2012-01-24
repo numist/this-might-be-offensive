@@ -33,58 +33,61 @@
 		}
 
 ?>
-<div class="heading">
+<div class="contentbox">
+	<div class="blackbar"></div>
+	<div class="heading">
+		oh lookie here...
+	</div>
+	
+	<?
+		global $activeTab;
+		$activeTab = "audio";
+		tabs();
+	?>
 
-	oh lookie here...
-
-</div>
-
-<?
-	global $activeTab;
-	$activeTab = "audio";
-	tabs();
-?>
-
-<div class="bluebox">
-	<div id="grid-container">
-		<div id="commands">
-			<div class="floatleft">
-				<? require( 'offensive/assets/pickupLink.inc' ) ?>
+	<div class="bluebox">
+		<div id="grid-container">
+			<div id="commands">
+				<div class="floatleft">
+					<? require( 'offensive/assets/pickupLink.inc' ) ?>
+				</div>
 			</div>
-		</div>
-		<div class="grid" id="audio">
-			<ul>
-<?
-			$result = core_getuploads($args);
-			foreach( $result as $upload ) {
-				$css = (isset($css) && $css == "odd_row") ? "even_row" : "odd_row";
-?>
-				<li>
-					<div class="col col1 <?= $css ?>">
-						<a href="pages/pic.php?id=<?= $upload->id() ?>" class="<?= $css ?>" title="uploaded by <?= htmlEscape($upload->uploader()->username()) ?>"><?= $upload->htmlFilename() ?></a>
-						<? if(!file_exists($upload->file())) { echo "(expired)"; } ?>
-					</div>
-					<div class="col col2 <?= $css ?>">
-						<a href="./?c=comments&fileid=<?= $upload->id() ?>" class="<?= $css ?>"><nobr><?= $upload->commentLabel(); ?></nobr></a>
-					</div>
-				</li>
-			<? } ?>
-			</ul>
-			<div id="navigation">
-			<? if( $page > 0 ) { ?>
-				<p id="prevpage">
-					<a href="./?<?= query_string("p") ?>&p=<?= $page - 1 ?>">&laquo; previous page</a>
-				</p>
-			<? } ?>
-			<? if(count($result) == $numPerPage) { ?>
-				<p id="nextpage">
-					<a href="./?<?= query_string("p") ?>&p=<?= $page + 1 ?>">next page</a> &raquo;
-				</p>
-			<? } ?>
+			<div class="grid" id="audio">
+				<ul>
+	<?
+				$result = core_getuploads($args);
+				foreach( $result as $upload ) {
+					$css = (isset($css) && $css == "odd_row") ? "even_row" : "odd_row";
+	?>
+					<li>
+						<div class="col col1 <?= $css ?>">
+							<a href="pages/pic.php?id=<?= $upload->id() ?>" class="<?= $css ?>" title="uploaded by <?= htmlEscape($upload->uploader()->username()) ?>"><?= $upload->htmlFilename() ?></a>
+							<? if(!file_exists($upload->file())) { echo "(expired)"; } ?>
+						</div>
+						<div class="col col2 <?= $css ?>">
+							<a href="./?c=comments&fileid=<?= $upload->id() ?>" class="<?= $css ?>"><nobr><?= $upload->commentLabel(); ?></nobr></a>
+						</div>
+					</li>
+				<? } ?>
+				</ul>
+				<div id="navigation">
+				<? if( $page > 0 ) { ?>
+					<p id="prevpage">
+						<a href="./?<?= query_string("p") ?>&p=<?= $page - 1 ?>">&laquo; previous page</a>
+					</p>
+				<? } ?>
+				<? if(count($result) == $numPerPage) { ?>
+					<p id="nextpage">
+						<a href="./?<?= query_string("p") ?>&p=<?= $page + 1 ?>">next page</a> &raquo;
+					</p>
+				<? } ?>
+				</div>
 			</div>
 		</div>
 	</div>
+	<div class="blackbar"></div>
 </div>
+
 
 <?
 }

@@ -143,7 +143,8 @@
 		$href = "/offensive/pages/pic.php?id=".$upload->id();
 ?>	
 
-
+<div class="contentbox">
+	<div class="blackbar"></div>
 		<div class="heading"><?
     // changeblog special header
 	if($upload->id() == "211604") {
@@ -366,6 +367,9 @@
 				
 				</form>
 			</div>
+			<div class="blackbar"></div>
+		</div>
+			
 
 <?
     }

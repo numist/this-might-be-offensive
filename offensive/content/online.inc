@@ -20,7 +20,8 @@
 		list($nonline) = mysql_fetch_array($result);
 
 ?>
-
+<div class="contentbox">
+	<div class="blackbar"></div>
 	<div class="heading"><?= $nonline ?> folks online in the last <?= $timelimit ?> minutes.</div>
 	<? tabs(); ?>
 	<div class="bluebox">
@@ -61,9 +62,8 @@
 	</table>
 
 	</div>
-
-<?
-		
+	<div class="blackbar"></div>
+</div>
+<?		
 	}
-
 ?>

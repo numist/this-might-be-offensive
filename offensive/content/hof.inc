@@ -22,7 +22,8 @@ EOT;
 
 		$view = isset( $_REQUEST['t'] ) ? sqlEscape( $_REQUEST['t'] ) : 'hof';	
 ?>
-
+<div class="contentbox">
+	<div class="blackbar"></div>
 		<div class="heading">hall of fame: the coolest files of all time (according to you sick puppies).</div>
 		<? tabs(); ?>
 
@@ -84,7 +85,7 @@ EOT;
 			if($view=="hof") $timeSince = weeksSince($upload->timestamp());
 			$cssw = $view == 'hof' ? "$css weeks_$timeSince" : $css;
 ?>
-						<li>
+						<li fileid="<?= $upload->id() ?>">
 							<div class="col col1 <?= $cssw ?>">
 								<? echo ++$count ?>.
 							</div>
@@ -111,6 +112,8 @@ EOT;
 				</div>
 			</div>
 	</div>
+	<div class="blackbar"></div>
+</div>
 <?
 	}
 

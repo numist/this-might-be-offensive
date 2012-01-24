@@ -24,6 +24,8 @@
 	function uploadForm($fileuploaded=false, $avatar=false) {
 		$uploadsRemaining = numUploadsRemaining();
 		?>
+		<div class="contentbox">
+			<div class="blackbar"></div>
 			<div class="heading"><?
 				if($fileuploaded && $uploadsRemaining !== 0) {
 					echo "thank you, sir, may i have another?";
@@ -85,19 +87,16 @@
 
 					</form>
 
-				<?php } else { ?>
+				<? } else { ?>
 
 						<p>Save some for later, man.</p>
 						<p><a href="./">index</a></p>
 
-				<?php } ?>
+				<? } ?>
 			</div>		
-
 		</div>
-
-		<?
-
+		<div class="blackbar"></div>
+	</div>
+	<?
 	}
-
-
 ?>

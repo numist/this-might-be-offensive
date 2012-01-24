@@ -8,7 +8,7 @@ $get_examples = false;
 	//$token = "kpnpn4akc6n6jvviw62tpq42qt8q6r6l";
 	$token = "";
 
-	//$api = "http://dev.thismight.be/offensive/api.php/";
+	//$api = "https://dev.thismight.be/offensive/api.php/";
 	$api = "";
 
 /*
