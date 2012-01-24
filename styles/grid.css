@@ -139,5 +139,5 @@
 #audio .col2 { width: 115px; text-align: right;}
 
 /* subscriptions */
-#subscriptions .col1 {width: 450px; text-align: left; padding: 10px 2px 10px 10px !important;}
-#subscriptions .col2 {width:  80px; text-align: center; padding: 10px 2px 10px 2px !important;}
+#subscriptions .col1 {width: 450px; text-align: left; padding: 2px 2px 2px 10px !important;}
+#subscriptions .col2 {width:  80px; text-align: center; padding: 2px 2px 2px 2px !important;}

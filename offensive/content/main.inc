@@ -19,16 +19,61 @@
 	}
 
 	function head() {
-		echo '
-		<link id="gallery" rel="alternate" href="'.Link::rss("pic").'&gallery=true" type="application/rss+xml" title="PicLens feed" />
-		<link rel="alternate" type="application/rss+xml" title="image stream" href="'.Link::rss("pic").'" />
-		<link rel="alternate" type="application/rss+xml" title="daily archives" href="'.Link::rss("zip").'" />
+		?>
+		<link id="gallery" rel="alternate" href="<?= Link::rss("pic") ?>&gallery=true" type="application/rss+xml" title="PicLens feed" />
+		<link rel="alternate" type="application/rss+xml" title="image stream" href="<?= Link::rss("pic") ?>" />
+		<link rel="alternate" type="application/rss+xml" title="daily archives" href="<?= Link::rss("zip") ?>" />
 		<link href="/styles/grid.css" type="text/css" rel="stylesheet" />
 		<script type="text/javascript" src="/offensive/js/tmbolib.js?v=0.1"></script>
-		<script type="text/javascript" src="/offensive/js/jquery-1.3.2.min.js"></script>
-		<script type="text/javascript" src="/offensive/js/inview.js?v=1.12"></script>
-    <script type="text/javascript" src="/offensive/js/lazyload_new.js?v=0.98"></script>';
-	}
+		<script type="text/javascript" src="/offensive/js/jquery-1.7.1.min.js"></script>
+		<? if(count($_GET) == 1 && array_key_exists("c", $_GET)) { ?>
+			<!-- lazyload_changes are only used if on a base page (?c=main not ?c=main&foo=bar) -->
+			<script type="text/javascript">
+				function html_upload(upload) {
+					if(upload.type != "image") return "";
+    	
+				  var color_class = ($('li[fileid]').first().find('.odd_row').length > 0) ? "even_row" : "odd_row";
+				  html = '<li style="display: none;" fileid="'+upload.id+'">'
+				          +'<div class="col col1 '+color_class+'">'
+				            +'<a href="pages/pic.php?id='+upload.id+'" title="uploaded by '+upload.username.htmlescape()+'">';
+					if(upload.nsfw || upload.tmbo) {
+						html     +='<span class="tags">';
+						if(upload.nsfw) {
+							html     +='[nsfw]';
+						}
+						if(upload.tmbo) {
+							html     +='[tmbo]';
+						}
+						html     +='</span> ';
+					}
+				  html        +=upload.filename.htmlescape()
+				            +'</a>'
+				          +'</div>'
+				          +'<div class="col col2 '+color_class+'">'
+			            	+'<span class="score">'
+										  +'<a href="./?c=comments&fileid='+upload.id+'">'
+				              	+create_score(upload)
+											+'</a>'
+			            	+'</span>'
+				          +'</div>'
+				        +'</li>';
+				  
+			    return html;
+				}
+			</script>
+    	<script type="text/javascript" src="/offensive/js/lazyload_changes.js?v=0.0.5"></script>
+			<?
+		}?>
+		<!-- lazyload_bottom -->
+		<script type="text/javascript">
+			function prep_item(item, neighbor) {
+				var color_class = (neighbor.find('.odd_row').length > 0) ? "even_row" : "odd_row";
+				$(item).find('div.col').removeClass("odd_row even_row").addClass(color_class);
+				return item;
+			}
+		</script>
+		<script type="text/javascript" src="/offensive/js/lazyload_bottom.js?v=0.0.2"></script>
+<?}
 
 	function body() {
 		$numPerPage = 100;
@@ -96,7 +141,16 @@
 			</ul>
 		</div>
 		<div id="bottom">
-			<p><a href="">load more…</a></p>
+			<?
+				// next page!
+				$args = $_GET;
+				if(array_key_exists("p", $args)) {
+					$args["p"]++;
+				} else {
+					$args["p"] = 1;
+				}
+			?>
+			<p id="morelink"><a href="<?= $_SERVER['PHP_SELF'] ?>?<?= http_build_query($args) ?>">more…</a></p>
 		</div>
 	</div>
 </div>

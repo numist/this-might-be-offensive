@@ -341,7 +341,8 @@ function contributions($usrid) {
 	
 	?><tr><td>
 	<div class="piletitle">
-		<a href="/offensive/?c=thumbs&userid=<?= $usrid?>"><?= $them->username() ?>'<?= substr($them->username(), -1) == "s" ? "" : "s" ?> contributions to society:</a>
+		<a href="/offensive/?c=<?= (me()->getPref("index") == "thumbs") ? 
+		      "thumbs" : "main" ?>&userid=<?= $usrid?>"><?= $them->username() ?>'<?= substr($them->username(), -1) == "s" ? "" : "s" ?> contributions to society:</a>
 		<!-- +<?php echo isset($good_votes) ? $good_votes : 0; ?> -<?php echo isset($bad_votes) ? $bad_votes : 0; ?> (<a href="./?c=uservotedetail&userid=<?= $usrid ?>">click for details</a>)--></div>
 		</td></tr>
 		<tr><td valign="top">

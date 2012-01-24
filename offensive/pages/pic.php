@@ -131,7 +131,7 @@
 			<link rel="prefetch" href="<?= $_SERVER['PHP_SELF'] ?>?id=<?= $upload->next_filtered()->id() ?>"/>
 		<? } ?> -->
 
-		<script type="text/javascript" src="/offensive/js/jquery-1.2.6.min.js"></script>
+		<script type="text/javascript" src="/offensive/js/jquery-1.7.1.min.js"></script>
 		<script type="text/javascript" src="/offensive/js/picui.js?v=1"></script>
 		<script type="text/javascript" src="/offensive/js/subscriptions.js"></script>
 		<script type="text/javascript" src="/offensive/js/jqModal.js"></script>
@@ -541,7 +541,7 @@
 				} else { ?>
 					<div style="padding:128px;">[ got nothin' for ya ]</div><?
 				}
-			} else if($upload->type() == "image") {
+			} else if($upload->type() == "image" || $upload->type() == "avatar") {
 				if( $upload->filtered() ) {
 					?><div style="padding:128px;">[ <a id="imageLink" href="<?= $upload->URL() ?>" target="_blank">filtered</a>:<?
 						if($upload->blocked()) {
