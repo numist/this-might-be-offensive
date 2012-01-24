@@ -16,7 +16,7 @@
 
 	function head() {
 		echo <<<EOT
-		<link href="/styles/grid.css?v=1.02" type="text/css" rel="stylesheet">
+		<link href="/styles/grid.css?v=1.0.3" type="text/css" rel="stylesheet">
 EOT;
 	}
 
