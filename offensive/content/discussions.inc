@@ -87,7 +87,7 @@
 						foreach( $result as $upload ) {
 							$css = (isset($css) && $css == "even_row") ? "odd_row" : "even_row";
 ?>
-						<li>
+						<li fileid="<?= $upload->id() ?>">
 							<div class="col col1 <?= $css ?>">
 								<a href="./?c=comments&fileid=<?= $upload->id() ?>"><?= $upload->htmlFilename() ?></a>
 							</div>

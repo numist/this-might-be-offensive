@@ -91,7 +91,7 @@ EOT;
 		// output loop
 		foreach($result as $upload) {
 			?>
-					<li>
+					<li fileid="<?= $upload->id() ?>">
 						<div class="thumbcontainer">
 							<div><a href="pages/pic.php?id=<?= $upload->id() ?>"
 								<? if($upload->filtered()) { ?>

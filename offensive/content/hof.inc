@@ -85,7 +85,7 @@ EOT;
 			if($view=="hof") $timeSince = weeksSince($upload->timestamp());
 			$cssw = $view == 'hof' ? "$css weeks_$timeSince" : $css;
 ?>
-						<li>
+						<li fileid="<?= $upload->id() ?>">
 							<div class="col col1 <?= $cssw ?>">
 								<? echo ++$count ?>.
 							</div>
