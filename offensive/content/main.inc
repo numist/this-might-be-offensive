@@ -32,7 +32,7 @@
 				function html_upload(upload) {
 					if(upload.type != "image") return "";
     	
-				  color_class = (color_class == "odd_row") ? "even_row" : "odd_row";
+				  var color_class = ($('li[fileid]').first().find('.odd_row').length > 0) ? "even_row" : "odd_row";
 				  html = '<li style="display: none;" fileid="'+upload.id+'">'
 				          +'<div class="col col1 '+color_class+'">'
 				            +'<a href="pages/pic.php?id='+upload.id+'" title="uploaded by '+upload.username.htmlescape()+'">';
@@ -59,7 +59,6 @@
 			    return html;
 				}
 			</script>
-    	<script type="text/javascript" src="/offensive/js/lazyload_changes.js?v=0.0.4"></script>';
 			<?
 		}
 	}

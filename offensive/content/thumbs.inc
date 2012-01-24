@@ -65,7 +65,7 @@
 					return html;
 				}
 			</script>
-    	<script type="text/javascript" src="/offensive/js/lazyload_changes.js?v=0.0.4"></script>';
+    	<script type="text/javascript" src="/offensive/js/lazyload_changes.js?v=0.0.5"></script>';
 			<?
 		}
 	}

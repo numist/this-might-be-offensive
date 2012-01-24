@@ -10,10 +10,7 @@ $(document).ready(function() {
 });
 
 function lazyload_top() {
-  var latest_upload = $('#grid-container ul li:first');
-  var latest_id = parseInt($(latest_upload).attr('fileid'));
   var last_on_page = parseInt($('#grid-container ul li:last').attr('fileid'))-1;
-  color_class = ($(latest_upload).find('.col1').hasClass('odd_row')) ? "odd_row" : "even_row";
 
   $.getJSON('/offensive/api.php/getchanges.json', {
     'since': update_index
@@ -49,7 +46,7 @@ function lazyload_top() {
             $score.html(create_score_text(comments, good, bad, offensive));
           } 
         }
-      } else if (command == "upload") {
+      } else if (command == "upload" && upload_id > $('#grid-container ul li:first').attr('fileid')) {
         $.getJSON('/offensive/api.php/getupload.json', {'fileid' : upload_id}, function(data) {
           var html = html_upload(data);
           if(html.length > 0) {
