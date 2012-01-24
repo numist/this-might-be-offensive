@@ -100,18 +100,9 @@
 						</li>
 						<? } ?>
 					</ul>
-					<div id="navigation">
-					<? if( $page > 0 ) { ?>
-						<p id="prevpage">
-							<a href="./?<?= query_string("p") ?>&p=<?= $page - 1 ?>">&laquo; previous page</a>
-						</p>
-					<? } ?>
-					<? if(count($result) == $numPerPage) { ?>
-						<p id="nextpage">
-							<a href="./?<?= query_string("p") ?>&p=<?= $page + 1 ?>">next page</a> &raquo;
-						</p>
-						<? } ?>
-					</div>
+				</div>
+				<div id="bottom">
+					<p><a href="">load more…</a></p>
 				</div>
 			</div>
 		</div>

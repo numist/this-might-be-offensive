@@ -110,6 +110,9 @@ EOT;
 						?>
 					</ul>
 				</div>
+				<div id="bottom">
+					<p><a href="">load more…</a></p>
+				</div>
 			</div>
 	</div>
 	<div class="blackbar"></div>

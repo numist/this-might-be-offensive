@@ -201,13 +201,7 @@
 		$arg = check_arg("fileid", "integer");
 		handle_errors();
 		
-		$upload = new Upload($arg);
-		
-		if(!$upload->exists()) {
-			send(new Error("upload $arg does not exist"));
-		}
-		
-		send($upload);
+		send(core_getupload($arg));
 	}
 
 	/**

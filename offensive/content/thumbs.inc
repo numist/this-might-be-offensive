@@ -20,15 +20,54 @@
 	}
 
 	function head() {
-		echo '
-		<link id="gallery" rel="alternate" href="'.Link::rss("pic").'&gallery=true" type="application/rss+xml" title="PicLens feed" />
-		<link rel="alternate" type="application/rss+xml" title="image stream" href="'.Link::rss("pic").'" />
-		<link rel="alternate" type="application/rss+xml" title="daily archives" href="'.Link::rss("zip").'" />
+		?>
+		<link id="gallery" rel="alternate" href="<?= Link::rss("pic") ?>&gallery=true" type="application/rss+xml" title="PicLens feed" />
+		<link rel="alternate" type="application/rss+xml" title="image stream" href="<?= Link::rss("pic") ?>" />
+		<link rel="alternate" type="application/rss+xml" title="daily archives" href="<?= Link::rss("zip") ?>" />
 		<link href="/styles/grid.css?v=1.01" type="text/css" rel="stylesheet">
 		<script type="text/javascript" src="/offensive/js/tmbolib.js?v=0.1"></script>
 		<script type="text/javascript" src="/offensive/js/jquery-1.3.2.min.js"></script>
-		<script type="text/javascript" src="/offensive/js/inview.js?v=1.12"></script>
-    <script type="text/javascript" src="/offensive/js/lazyload.js?v=0.93"></script>';
+		<? if(count($_GET) == 1 && array_key_exists("c", $_GET)) { ?>
+			<!-- lazyload_changes are only used if on a base page (?c=main not ?c=main&foo=bar) -->
+			<script type="text/javascript">
+				function html_upload(upload) {
+					if(upload.type != "image") return "";
+    	
+				  // we cant find a thumbnail for this image.
+				  if(typeof(upload.link_thumb) == "undefined") {
+						upload.link_thumb = "/offensive/graphics/previewNotAvailable.gif";
+					}
+    		
+				  // image is filtered
+				  if(upload.filtered == true) {
+				    orig_src = upload.link_thumb;
+				    upload.link_thumb = "/offensive/graphics/th-filtered.gif";
+				    mouseout = "onmouseout='changesrc(\"th"+upload.id+"\",\"/offensive/graphics/th-filtered.gif\")' onmouseover='changesrc(\"th"+upload.id+"\",\""+orig_src+"\")'";
+				  } else {
+				    mouseout = "";
+				  }
+    		
+				  html = '<li style="display: none;" fileid="'+upload.id+'">'
+				          +'<div class="thumbcontainer">'
+				            +'<div>'
+				              +'<a '+mouseout+' href="pages/pic.php?id='+upload.id+'">'
+				                +'<img title="uploaded by '+upload.username+'" '
+				                     +'src="'+upload.link_thumb+'" '
+				                     +'name="th'+upload.id+'"/>'
+				              +'</a>'
+				            +'</div>'
+				            +'<div class="score">'
+				              +create_score(upload)
+				            +'</div>'
+				          +'</div>'
+				        +'</li>';
+    	
+					return html;
+				}
+			</script>
+    	<script type="text/javascript" src="/offensive/js/lazyload_changes.js?v=0.0.4"></script>';
+			<?
+		}
 	}
 
 	function body() {
@@ -79,6 +118,7 @@
 				<ul>
 				<?php
 					$result = core_getuploads($args);
+					$revision = currentChange();
 					$output = 0;
 	
 					foreach( $result as $upload ) {?>
@@ -107,6 +147,9 @@
 	</div>
 	<div class="blackbar"></div>
 </div>
+<script>
+	var update_index = <?= $revision ?>;
+</script>
 <?
 }
 ?>

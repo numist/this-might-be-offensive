@@ -19,15 +19,40 @@
 	}
 
 	function head() {
-		echo '
-		<link id="gallery" rel="alternate" href="'.Link::rss("pic").'&gallery=true" type="application/rss+xml" title="PicLens feed" />
-		<link rel="alternate" type="application/rss+xml" title="image stream" href="'.Link::rss("pic").'" />
-		<link rel="alternate" type="application/rss+xml" title="daily archives" href="'.Link::rss("zip").'" />
+		?>
+		<link id="gallery" rel="alternate" href="<?= Link::rss("pic") ?>&gallery=true" type="application/rss+xml" title="PicLens feed" />
+		<link rel="alternate" type="application/rss+xml" title="image stream" href="<?= Link::rss("pic") ?>" />
+		<link rel="alternate" type="application/rss+xml" title="daily archives" href="<?= Link::rss("zip") ?>" />
 		<link href="/styles/grid.css" type="text/css" rel="stylesheet" />
 		<script type="text/javascript" src="/offensive/js/tmbolib.js?v=0.1"></script>
 		<script type="text/javascript" src="/offensive/js/jquery-1.3.2.min.js"></script>
-		<script type="text/javascript" src="/offensive/js/inview.js?v=1.12"></script>
-    <script type="text/javascript" src="/offensive/js/lazyload_new.js?v=0.98"></script>';
+		<? if(count($_GET) == 1 && array_key_exists("c", $_GET)) { ?>
+			<!-- lazyload_changes are only used if on a base page (?c=main not ?c=main&foo=bar) -->
+			<script type="text/javascript">
+				function html_upload(upload) {
+					if(upload.type != "image") return "";
+    	
+				  color_class = (color_class == "odd_row") ? "even_row" : "odd_row";
+				  html = '<li style="display: none;" fileid="'+upload.id+'">'
+				          +'<div class="col col1 '+color_class+'">'
+				            +'<a href="pages/pic.php?id='+upload.id+'" title="uploaded by '+upload.username.htmlescape()+'">'
+											// XXX: [nsfw] & [tmbo] tags, if appropriate
+				              +upload.filename.htmlescape()
+				            +'</a>'
+				          +'</div>'
+				          +'<div class="col col2 '+color_class+'">'
+				            +'<span class="score">'
+				              +create_score(upload)
+				            +'</span>'
+				          +'</div>'
+				        +'</li>';
+				  
+			    return html;
+				}
+			</script>
+    	<script type="text/javascript" src="/offensive/js/lazyload_changes.js?v=0.0.4"></script>';
+			<?
+		}
 	}
 
 	function body() {
