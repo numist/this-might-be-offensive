@@ -164,7 +164,7 @@
         if(!array_key_exists('limit', $args)) {
             $limit = "$numPerPage";
         }
-				if($p !== false && $p > 0) {
+				if($p !== false) {
 					$start = $p * $numPerPage;
 					$limit = "$start, $numPerPage";
         }

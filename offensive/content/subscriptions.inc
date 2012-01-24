@@ -15,9 +15,19 @@
 	}
 
 	function head() {
-		echo <<<EOT
-		<link href="/styles/grid.css?v=1.0.3" type="text/css" rel="stylesheet">
-EOT;
+		?>
+		<link href="/styles/grid.css?v=1.03" type="text/css" rel="stylesheet">
+		<script type="text/javascript" src="/offensive/js/jquery-1.7.1.min.js"></script>
+		<!-- lazyload_bottom -->
+		<script type="text/javascript">
+			function prep_item(item, neighbor) {
+				var color_class = (neighbor.find('.odd_row').length > 0) ? "even_row" : "odd_row";
+				$(item).find('div.col').removeClass("odd_row even_row").addClass(color_class);
+				return item;
+			}
+		</script>
+		<script type="text/javascript" src="/offensive/js/lazyload_bottom.js?v=0.0.1"></script>
+		<?
 	}
 
 	function body() {
@@ -69,18 +79,18 @@ EOT;
 						</li>
 			<? } ?>
 					</ul>
-					<div id="navigation">
-					<? if( $page > 0 ) { ?>
-						<p id="prevpage">
-							<a href="./?<?= query_string("p") ?>&p=<?= $page - 1 ?>">&laquo; previous page</a>
-						</p>
-					<? } ?>
-					<? if(mysql_num_rows($result) == $numPerPage) { ?>
-						<p id="nextpage">
-							<a href="./?<?= query_string("p") ?>&p=<?= $page + 1 ?>">next page</a> &raquo;
-						</p>
-						<? } ?>
-					</div>
+				</div>
+				<div id="bottom">
+					<?
+						// next page!
+						$args = $_GET;
+						if(array_key_exists("p", $args)) {
+							$args["p"]++;
+						} else {
+							$args["p"] = 1;
+						}
+					?>
+					<p id="morelink"><a href="<?= $_SERVER['PHP_SELF'] ?>?<?= http_build_query($args) ?>">more…</a></p>
 				</div>
 			</div>
 		</div>
