@@ -111,7 +111,16 @@ EOT;
 					</ul>
 				</div>
 				<div id="bottom">
-					<p><a href="">load more…</a></p>
+					<?
+						// next page!
+						$args = $_GET;
+						if(array_key_exists("p", $args)) {
+							$args["p"]++;
+						} else {
+							$args["p"] = 1;
+						}
+					?>
+					<p id="morelink"><a href="<?= $_SERVER['PHP_SELF'] ?>?<?= http_build_query($args) ?>">more…</a></p>
 				</div>
 			</div>
 	</div>
