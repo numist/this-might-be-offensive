@@ -541,7 +541,7 @@
 				} else { ?>
 					<div style="padding:128px;">[ got nothin' for ya ]</div><?
 				}
-			} else if($upload->type() == "image") {
+			} else if($upload->type() == "image" || $upload->type() == "avatar") {
 				if( $upload->filtered() ) {
 					?><div style="padding:128px;">[ <a id="imageLink" href="<?= $upload->URL() ?>" target="_blank">filtered</a>:<?
 						if($upload->blocked()) {
