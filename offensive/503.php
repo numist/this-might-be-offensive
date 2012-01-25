@@ -1,5 +1,5 @@
 <?
-	header('HTTP/1.0 403 Forbidden');
+	header('HTTP/1.0 503 Service Unavailable');
 	header('Content-type: text/html');
 	
 	if(!defined("TMBO")) {
