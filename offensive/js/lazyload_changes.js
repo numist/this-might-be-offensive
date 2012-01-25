@@ -1,7 +1,5 @@
 var lazy_interval_top;
 var lazy_timeout = 15000;	// how often to check for new data
-var lazy_limit = 40;		// how many thumbs to fetch on the bottom of the page
-var update_thumbs = 200;	// how many thumbs to update if comment/vote counts change
 
 $(document).ready(function() {
   if (update_index != undefined) {
@@ -60,46 +58,35 @@ function lazyload_top() {
           } 
         }
       } else if (command == "upload" && upload_id > $('#grid-container ul li[fileid]').first().attr('fileid')) {
-        $.getJSON('/offensive/api.php/getupload.json', {'fileid' : upload_id}, function(data) {
-          var html = html_upload(data);
-          if(html.length > 0) {
-            $(html).insertBefore($('#grid-container ul li[fileid]').first()).fadeIn("slow");
-				  }
+        var api = "/offensive/ui/api.php/";
+        switch(getURLParam("c")) {
+          case "main":
+            api += "getfileli.php?type=image";
+            break;
+          case "audio":
+            api += "getfileli.php?type=audio";
+            break;
+          case "topic":
+            api += "gettopicli.php?type=topic";
+            break;
+          case "thumbs":
+            api += "getthumbli.php?type=image";
+            break;
+          default:
+            return;
+        }
+        $.ajax({
+          type: 'GET',
+          url: api+"&fileid="+upload_id,
+          dataType: "html",
+          success: function(data) {
+            if($(data).filter('li[fileid="'+upload_id+'"]').length == 1) {
+              $(data).filter('li[fileid="'+upload_id+'"]').insertBefore($('#grid-container ul li[fileid]').first()).fadeIn("slow");
+            }
+          }
         });
       }
     });
     lazy_interval_top = setInterval(lazyload_top,lazy_timeout);
   });
-}
-
-function uploadobject(id, username, filename, comments, good, bad) {
-  this.id = id;
-  this.username = username;
-  this.filename = filename;
-  this.vote_good = good ? good : 0;
-  this.vote_bad = bad ? bad : 0;
-  this.comments = comments ? comments : 0;
-}
-
-function create_score(upload) {
-  html = '<a href="./?c=comments&fileid='+upload.id+'">'+ create_score_text(upload.comments, upload.vote_good, upload.vote_bad)+'</a>';
-  return(html);
-}
-
-function create_score_text(comments, good, bad, offensive) {
-  // adjust
-  if (comments == 0) {
-	comments = "no comments";
-  }
-  else if (comments == 1) {
-    comments = "1 comment";
-  } else {
-    comments = comments+" comments";
-  }
-  if (offensive > 0) {
-    offensive = " x" + offensive;
-  } else {
-    offensive = "";
-  }
-  return comments + " (+" + good + " -" + bad + offensive + ")";
 }

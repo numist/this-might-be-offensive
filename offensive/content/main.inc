@@ -28,42 +28,8 @@
 		<script type="text/javascript" src="/offensive/js/jquery-1.7.1.min.js"></script>
 		<? if(count($_GET) == 1 && array_key_exists("c", $_GET)) { ?>
 			<!-- lazyload_changes are only used if on a base page (?c=main not ?c=main&foo=bar) -->
-			<script type="text/javascript">
-				function html_upload(upload) {
-					if(upload.type != "image") return "";
-    	
-				  var color_class = ($('li[fileid]').first().find('.odd_row').length > 0) ? "even_row" : "odd_row";
-				  html = '<li style="display: none;" fileid="'+upload.id+'">'
-				          +'<div class="col col1 '+color_class+'">'
-				            +'<a href="pages/pic.php?id='+upload.id+'" title="uploaded by '+upload.username.htmlescape()+'">';
-					if(upload.nsfw || upload.tmbo) {
-						html     +='<span class="tags">';
-						if(upload.nsfw) {
-							html     +='[nsfw]';
-						}
-						if(upload.tmbo) {
-							html     +='[tmbo]';
-						}
-						html     +='</span> ';
-					}
-				  html        +=upload.filename.htmlescape()
-				            +'</a>'
-				          +'</div>'
-				          +'<div class="col col2 '+color_class+'">'
-			            	+'<span class="score">'
-										  +'<a href="./?c=comments&fileid='+upload.id+'">'
-				              	+create_score(upload)
-											+'</a>'
-			            	+'</span>'
-				          +'</div>'
-				        +'</li>';
-				  
-			    return html;
-				}
-			</script>
-    	<script type="text/javascript" src="/offensive/js/lazyload_changes.js?v=0.0.7"></script>
-			<?
-		}?>
+    	<script type="text/javascript" src="/offensive/js/lazyload_changes.js?v=0.0.9"></script>
+		<? } ?>
 		<!-- lazyload_bottom -->
 		<script type="text/javascript">
 			function prep_item(item, neighbor) {
@@ -125,17 +91,7 @@
 				$output = 0;
 				foreach( $result as $upload ) {
 					$css = (isset($css) && $css == "odd_row") ? "even_row" : "odd_row";
-					$filename = $upload->htmlFilename();
-			?>
-				<li fileid="<?= $upload->id() ?>">
-					<div class="col col1 <?= $css ?>">
-						<a href="pages/pic.php?id=<?= $upload->id() ?>" title="uploaded by <?= htmlEscape($upload->uploader()->username()) ?>"><?= $upload->htmlFilename() ?></a>
-					</div>
-					<div class="col col2 <?= $css ?>">
-						<span class="score"><a href="./?c=comments&fileid=<?= $upload->id() ?>"><?= $upload->commentLabel(); ?></a></span>
-					</div>
-				</li>
-			<?
+					require("offensive/templates/listitem_file.inc");
 				}
 			?>
 			</ul>
