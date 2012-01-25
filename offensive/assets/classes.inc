@@ -614,10 +614,15 @@ class Upload {
 	public function commentLabel($showvotes=true) {
 		$comments = $this->comments();
 
-		$retval = ($comments == 0 ? "no" : $comments)." comment".($comments == 1 ? "" :"s");
+		$retval = '<span class="comments">'.$comments."</span> "
+		         .'<span class="commentlabel">comment'.($comments == 1 ? "" :"s")."</span>";
 		if(!$showvotes) return $retval;
-		$retval .= " (+".$this->goods()." -".$this->bads()
-		        . ($this->tmbos() > 0 ? " x".$this->tmbos() : "").")";
+
+		$retval .= ' ('
+		          .'+<span class="goods">'.$this->goods().'</span>'
+		          .' -<span class="bads">'.$this->bads().'</span>'
+		          .($this->tmbos() > 0 ? ' x<span class="tmbos">'.$this->tmbos().'</span>' : "")
+		          .")";
 		return $retval;
 	}
 

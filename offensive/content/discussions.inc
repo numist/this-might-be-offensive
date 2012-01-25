@@ -30,17 +30,17 @@
 						      	+'<a href="./?c=comments&fileid='+upload.id+'">'+upload.filename.htmlescape()+'</a>'
 						      +'</div>'
 						      +'<div class="col col2 '+color_class+'">'
-						      	+'<a href="./?c=comments&fileid='+upload.id+'">'
-								  		+'(';
-					if(upload.comments == 0) {
-						html        +='no comments';
-					} else  if(upload.comments == 1) {
-						html        +='1 comment';
+										+'<span class="score">'
+						      		+'<a href="./?c=comments&fileid='+upload.id+'">'
+								  			+'(';
+					if(upload.comments == 1) {
+						html        	+='<span class="comments">1</span> <span class="commentlabel">comment</span>';
 					} else {
-						html				+=upload.comments+" comments";
+						html        	+='<span class="comments">'+upload.comments+'</span> <span class="commentlabel">comments</span>';
 					}
-					html				+=')'
-										+'</a>'
+					html					+=')'
+											+'</a>'
+										+'</span>'
 						      +'</div>'
 						      +'<div class="col col3 '+color_class+'">'
 						      		+upload.last_active
@@ -50,7 +50,7 @@
 			    return html;
 				}
 			</script>
-    	<script type="text/javascript" src="/offensive/js/lazyload_changes.js?v=0.0.6"></script>
+    	<script type="text/javascript" src="/offensive/js/lazyload_changes.js?v=0.0.9"></script>
 			<?
 		}?>
 		<!-- lazyload_bottom -->
@@ -138,7 +138,9 @@
 								<a href="./?c=comments&fileid=<?= $upload->id() ?>"><?= $upload->htmlFilename() ?></a>
 							</div>
 							<div class="col col2 <?= $css ?>">
-								<a href="./?c=comments&fileid=<?= $upload->id() ?>">(<?=$upload->commentLabel(false);?>)</a>
+								<span class="score">
+									<a href="./?c=comments&fileid=<?= $upload->id() ?>">(<?=$upload->commentLabel(false);?>)</a>
+								</span>
 							</div>
 							<div class="col col3 <?= $css ?>">
 									<?= $upload->last_active() ?>

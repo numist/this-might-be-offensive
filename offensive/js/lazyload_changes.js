@@ -30,20 +30,33 @@ function lazyload_top() {
         // make sure this element is visible on this page
         if(upload_id > last_on_page) {
           // find the element on the page
-          var $score = $("li[fileid='"+upload_id+"'] .score a");
+          var score = $("li[fileid='"+upload_id+"'] .score a");
           // if the element already exists, replace the score field
           // checking to see if something changed is not any faster. just replace.
-          if($score.length) {
-            var score_parts = $score.html().match(/^([\w]+) comment(?:s)? \(\+(\d+) -(\d+)(?: x(\d+))?\)/);
-            var comments = parseInt(score_parts[1] == "no" ? "0" : score_parts[1]);
-            var good = parseInt(score_parts[2]);
-            var bad = parseInt(score_parts[3]);
-            var offensive = score_parts[4] == undefined ? 0 : parseInt(score_parts[4]);
-            comments += parseInt(command_args[4]);
-            good += parseInt(command_args[0]);
-            bad += parseInt(command_args[1]);
-            offensive += parseInt(command_args[3]);
-            $score.html(create_score_text(comments, good, bad, offensive));
+          if(score.length) {
+            // create a space for new tmbo votes
+            if(score.find('.tmbos').text() == "" && parseInt(command_args[3]) > 0) {
+              score.find('.bads').after(' x<span class="tmbos">0</span>');
+            }
+
+            if(score.find('.goods').text() != "") {
+              score.find('.goods').text(parseInt(command_args[0]) + parseInt(score.find('.goods').text()));
+            }
+            if(score.find('.bads').text() != "") {
+              score.find('.bads').text(parseInt(command_args[1]) + parseInt(score.find('.bads').text()));
+            }
+            if(score.find('.tmbos').text() != "") {
+              score.find('.tmbos').text(parseInt(command_args[3]) + parseInt(score.find('.tmbos').text()));
+            }
+            if(score.find('.comments').text() != "") {
+              var comments = parseInt(score.find('.comments').text());
+              if(comments == 0) {
+                score.find('.commentlabel').text("comment");
+              } else if (comments == 1) {
+                score.find('.commentlabel').text("comments");
+              }
+              score.find('.comments').text(parseInt(command_args[4]) + comments);
+            }
           } 
         }
       } else if (command == "upload" && upload_id > $('#grid-container ul li[fileid]').first().attr('fileid')) {
