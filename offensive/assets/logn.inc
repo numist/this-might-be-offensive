@@ -52,6 +52,7 @@ function mustLogIn($methods=array()) {
 
 		header("Location: https://".$_SERVER["SERVER_NAME"]."/offensive/logn.php?redirect=".$redirect);
 	}
+	exit;
 }
 
 /*

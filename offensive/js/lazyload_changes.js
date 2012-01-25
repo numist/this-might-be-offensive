@@ -52,7 +52,7 @@ function lazyload_top() {
           case "audio":
             api += "getfileli.php?type=audio";
             break;
-          case "topic":
+          case "discussions":
             api += "gettopicli.php?type=topic";
             break;
           case "thumbs":
