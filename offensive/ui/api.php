@@ -14,7 +14,6 @@ require_once("offensive/assets/comments.inc");
 mustLogIn(array("method" => "http",
                 "token" => null));
 
-$userid = $_SESSION['userid'];
 $uri = $_SERVER["REQUEST_URI"];
 
 $broken = explode("/", $uri);
@@ -33,8 +32,6 @@ call_user_func("api_".$func);
 
 // this gets all the HTML for the quickcomment box.
 function api_getquickcommentbox() {
-	global $userid;
-
 	$fileid = check_arg("fileid", "integer", $_REQUEST);
 	handle_errors();
 
@@ -42,7 +39,6 @@ function api_getquickcommentbox() {
 	$sql = "SELECT users.username, users.userid, users.account_status, offensive_uploads.filename, nsfw, tmbo, offensive_uploads.timestamp as upload_timestamp, offensive_uploads.type FROM users, offensive_uploads WHERE users.userid = offensive_uploads.userid AND offensive_uploads.id = $fileid";
 	$result = tmbo_query( $sql );
 	$row = mysql_fetch_assoc( $result );
-	$my_posting = ($userid == $row['userid']) ? 1 : 0;
 	$upload = new Upload($fileid);
 
 	// start building the HTML that will be inserted into the quick comment box directly
