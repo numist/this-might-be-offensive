@@ -116,7 +116,7 @@ function api_getquickcommentbox() {
 			&raquo; <?= $commenter->htmlUsername() ?>
 <?php
 			if($comment->vote() != '') {
-				echo '<span class="vote">[ ' . $comment->vote() .' ]</span>';
+				echo '<span class="vote"> [ ' . $comment->vote() .' ]</span>';
 			}
 			if($comment->tmbo()) {
 				echo '<span class="vote"> [ this might be offensive ]</span>';
