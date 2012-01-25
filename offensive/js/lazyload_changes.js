@@ -8,8 +8,6 @@ $(document).ready(function() {
 });
 
 function lazyload_top() {
-  var last_on_page = parseInt($('#grid-container ul li:last').attr('fileid'))-1;
-
   $.getJSON('/offensive/api.php/getchanges.json', {
     'since': update_index
   }, function(data) {
@@ -23,39 +21,27 @@ function lazyload_top() {
       var upload_id = entry[2];
 
       if (command == "comment") {
-        var command_args = entry[3].split(":");
+        // find the element on the page
+        var score = $("li[fileid='"+upload_id+"'] .score a");
+        if(score.length) {
+          var command_args = entry[3].split(":");
+          
+          // create a space for new tmbo votes, if needed
+          if(score.find('.tmbos').text() == "" && parseInt(command_args[3]) > 0) {
+            score.find('.bads').after('&nbsp;x<span class="tmbos">0</span>');
+          }
         
-        // make sure this element is visible on this page
-        if(upload_id > last_on_page) {
-          // find the element on the page
-          var score = $("li[fileid='"+upload_id+"'] .score a");
-          // if the element already exists, replace the score field
-          // checking to see if something changed is not any faster. just replace.
-          if(score.length) {
-            // create a space for new tmbo votes
-            if(score.find('.tmbos').text() == "" && parseInt(command_args[3]) > 0) {
-              score.find('.bads').after('&nbsp;x<span class="tmbos">0</span>');
-            }
+          score.find('.goods').text(parseInt(command_args[0]) + parseInt(score.find('.goods').text()));
+          score.find('.bads').text(parseInt(command_args[1]) + parseInt(score.find('.bads').text()));
+          score.find('.tmbos').text(parseInt(command_args[3]) + parseInt(score.find('.tmbos').text()));
 
-            if(score.find('.goods').text() != "") {
-              score.find('.goods').text(parseInt(command_args[0]) + parseInt(score.find('.goods').text()));
-            }
-            if(score.find('.bads').text() != "") {
-              score.find('.bads').text(parseInt(command_args[1]) + parseInt(score.find('.bads').text()));
-            }
-            if(score.find('.tmbos').text() != "") {
-              score.find('.tmbos').text(parseInt(command_args[3]) + parseInt(score.find('.tmbos').text()));
-            }
-            if(score.find('.comments').text() != "") {
-              var comments = parseInt(score.find('.comments').text());
-              if(comments == 0) {
-                score.find('.commentlabel').text("comment");
-              } else if (comments == 1) {
-                score.find('.commentlabel').text("comments");
-              }
-              score.find('.comments').text(parseInt(command_args[4]) + comments);
-            }
-          } 
+          var comments = parseInt(score.find('.comments').text());
+          if(comments == 0) {
+            score.find('.commentlabel').text("comment");
+          } else if (comments == 1) {
+            score.find('.commentlabel').text("comments");
+          }
+          score.find('.comments').text(parseInt(command_args[4]) + comments);
         }
       } else if (command == "upload" && upload_id > $('#grid-container ul li[fileid]').first().attr('fileid')) {
         var api = "/offensive/ui/api.php/";
