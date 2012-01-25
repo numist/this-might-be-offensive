@@ -24,7 +24,7 @@
 		<link href="/styles/grid.css?v=1.02" type="text/css" rel="stylesheet">
 		<script type="text/javascript" src="/offensive/js/jquery-1.7.1.min.js"></script>
 		<!-- lazyload_bottom -->
-		<script type="text/javascript" src="/offensive/js/lazyload_bottom.js?v=0.0.2"></script>
+		<script type="text/javascript" src="/offensive/js/lazyload_bottom.js?v=0.0.4"></script>
 		<?
 	}
 

@@ -7,10 +7,8 @@
   * http://benalman.com/about/license/
   */
  (function($){var a={},c="doTimeout",d=Array.prototype.slice;$[c]=function(){return b.apply(window,[0].concat(d.call(arguments)))};$.fn[c]=function(){var f=d.call(arguments),e=b.apply(this,[c+f[0]].concat(f));return typeof f[0]==="number"||typeof f[1]==="number"?this:e};function b(l){var m=this,h,k={},g=l?$.fn:$,n=arguments,i=4,f=n[1],j=n[2],p=n[3];if(typeof f!=="string"){i--;f=l=0;j=n[1];p=n[2]}if(l){h=m.eq(0);h.data(l,k=h.data(l)||{})}else{if(f){k=a[f]||(a[f]={})}}k.id&&clearTimeout(k.id);delete k.id;function e(){if(l){h.removeData(l)}else{if(f){delete a[f]}}}function o(){k.id=setTimeout(function(){k.fn()},j)}if(p){k.fn=function(q){if(typeof p==="string"){p=g[p]}p.apply(m,d.call(n,i))===true&&!q?o():e()};o()}else{if(k.fn){j===undefined?e():k.fn(j===false);return true}else{e()}}}})(jQuery);
-/*****************************************************************************/
-
-/*
- * Original file: https://github.com/numist/jslib/blob/master/infScr-1.0.2.js
+/*****************************************************************************
+ * Original file: infScr.js at https://github.com/numist/jslib/
  * Released under the MIT License; see link above.
  */
 
@@ -30,7 +28,6 @@ var infScrLoadingFeedback = 'loading…';
   // first page in range of pages shown, set once.
   var infScrUrlBasePage = null;
   
-  var moreNode = false;
   var hasMore = true;
   
   // worker function
@@ -41,14 +38,20 @@ var infScrLoadingFeedback = 'loading…';
      * • viewport is less than one $(window).height() from bottom of document.
      *   see: http://www.tbray.org/ongoing/When/201x/2011/11/26/Misscrolling
      */
+    
+    var moreNode = $('p#morelink').last();
+    if(moreNode.length == 0) {
+      return;
+    }
+     
     if(infScrState == infScrStates.idle
-    && $(document).height() < $(document).scrollTop() + (2 * $(window).height()))
+    && ($(document).height() < $(document).scrollTop() + (2 * $(window).height())
+       || moreNode.offset().top < $(window).scrollTop() + $(window).height()))
     {
       // block potentially concurrent requests
       infScrState = infScrStates.loading;
   
-      // get next page's loading node and URL
-      if(!moreNode) moreNode = $('p#morelink').last();
+      // get next page's URL
       var moreURL = moreNode.find('a').last().attr("href");
   
       // make request if node was found, not hidden, and updatepath is supported
@@ -84,6 +87,7 @@ var infScrLoadingFeedback = 'loading…';
               // update moreNode with url from data
               moreNode.find('a').last().attr("href", $(data).find('p#morelink').last().find('a').last().attr("href"));
             } else if($(data).find('#grid-container ul').length > 0) {
+              // make sure the error exists before assuming no elements—this could be an error page
               hasMore = false;
             }
           },
@@ -93,6 +97,8 @@ var infScrLoadingFeedback = 'loading…';
 
             if(hasMore) {
               moreNode.show();
+            } else {
+              moreNode.remove();
             }
   
             infScrState = infScrStates.idle;

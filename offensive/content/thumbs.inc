@@ -31,7 +31,7 @@
 			<!-- lazyload_changes are only used if on a base page (?c=main not ?c=main&foo=bar) -->
     	<script type="text/javascript" src="/offensive/js/lazyload_changes.js?v=0.0.11"></script>
 		<? } ?>
-		<script type="text/javascript" src="/offensive/js/lazyload_bottom.js?v=0.0.2"></script>
+		<script type="text/javascript" src="/offensive/js/lazyload_bottom.js?v=0.0.4"></script>
 <?}
 
 	function body() {
