@@ -14,12 +14,11 @@ if (typeof String.prototype.startsWith != 'function') {
 }
 
 function getURLParam(param) {
-  var strReturn = "";
   var href = window.location.href;
   if(href.indexOf("?") > -1) {
-    var query = href.substr(href.indexOf("?")).toLowerCase().split("&");
+    var query = href.substr(href.indexOf("?") + 1).toLowerCase().split("&");
     for(var i = 0; i < query.length; i++ ){
-      if(query[i].startsWith(param.toLowerCase() + "=") > -1) {
+      if(query[i].startsWith(param.toLowerCase() + "=")) {
         return unescape(query[i].split("=")[1]);
       } else if(query[i] == param.toLowerCase()) {
         return true;
