@@ -132,10 +132,10 @@
 		<? } ?> -->
 
 		<script type="text/javascript" src="/offensive/js/jquery-1.7.1.min.js"></script>
-		<script type="text/javascript" src="/offensive/js/picui.js?v=1"></script>
+		<script type="text/javascript" src="/offensive/js/picui.js?v=0.0.3"></script>
 		<script type="text/javascript" src="/offensive/js/subscriptions.js"></script>
 		<script type="text/javascript" src="/offensive/js/jqModal.js"></script>
-		<script type="text/javascript" src="/offensive/js/jqDnR.js"></script>
+		<script type="text/javascript" src="/offensive/js/jqDnR.js?v=0.0.1"></script>
 		<script type="text/javascript">
       <? require("offensive/data/keynav.inc"); ?>
       function composite_keycode(e)
