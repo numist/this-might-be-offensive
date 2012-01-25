@@ -137,7 +137,7 @@ function get_comments(hash) {
 
 				// hide the dialog box
 				$("#dialog").jqmHide();
-				vote = $("#dialog input[@type=radio][@checked]").val();
+				vote = $('#dialog input[name=vote]:checked').val();
 				comment = $("#qc_comment").val();
 				tmbo = $("#tmbo").attr("checked") ? "1" : "0";
 				repost = $("#repost").attr("checked") ? "1" : "0";

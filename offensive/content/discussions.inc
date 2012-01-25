@@ -13,46 +13,14 @@
 
 	function head() {
 		?>
-		<link rel="alternate" type="application/rss+xml" title="discussions" href="/offensive/'.Link::rss("discuss").'" />
+		<link rel="alternate" type="application/rss+xml" title="discussions" href="<?= Link::rss("discuss") ?>" />
 		<link href="/styles/grid.css?v=1.02" type="text/css" rel="stylesheet">
 		<script type="text/javascript" src="/offensive/js/tmbolib.js?v=0.1"></script>
 		<script type="text/javascript" src="/offensive/js/jquery-1.7.1.min.js"></script>
-		<? if(count($_GET) == 1 && array_key_exists("c", $_GET) && defaultSort() == "date_desc") { ?>
+		<? if(count($_GET) == 1 && array_key_exists("c", $_GET)) { ?>
 			<!-- lazyload_changes are only used if on a base page (?c=main not ?c=main&foo=bar) -->
-			<script type="text/javascript">
-				function html_upload(upload) {
-					if(upload.type != "topic") return "";
-
-				  var color_class = ($('li[fileid]').first().find('.odd_row').length > 0) ? "even_row" : "odd_row";
-				
-					html = '<li fileid="'+upload.id+'">'
-						      +'<div class="col col1 '+color_class+'">'
-						      	+'<a href="./?c=comments&fileid='+upload.id+'">'+upload.filename.htmlescape()+'</a>'
-						      +'</div>'
-						      +'<div class="col col2 '+color_class+'">'
-						      	+'<a href="./?c=comments&fileid='+upload.id+'">'
-								  		+'(';
-					if(upload.comments == 0) {
-						html        +='no comments';
-					} else  if(upload.comments == 1) {
-						html        +='1 comment';
-					} else {
-						html				+=upload.comments+" comments";
-					}
-					html				+=')'
-										+'</a>'
-						      +'</div>'
-						      +'<div class="col col3 '+color_class+'">'
-						      		+upload.last_active
-						      +'</div>'
-						    +'</li>';
-				  
-			    return html;
-				}
-			</script>
-    	<script type="text/javascript" src="/offensive/js/lazyload_changes.js?v=0.0.6"></script>
-			<?
-		}?>
+    	<script type="text/javascript" src="/offensive/js/lazyload_changes.js?v=0.0.9"></script>
+		<? } ?>
 		<!-- lazyload_bottom -->
 		<script type="text/javascript">
 			function prep_item(item, neighbor) {
@@ -61,7 +29,7 @@
 				return item;
 			}
 		</script>
-		<script type="text/javascript" src="/offensive/js/lazyload_bottom.js?v=0.0.1"></script>
+		<script type="text/javascript" src="/offensive/js/lazyload_bottom.js?v=0.0.2"></script>
 		<?
 	}
 
@@ -132,19 +100,8 @@
 <?
 						foreach( $result as $upload ) {
 							$css = (isset($css) && $css == "even_row") ? "odd_row" : "even_row";
-?>
-						<li fileid="<?= $upload->id() ?>">
-							<div class="col col1 <?= $css ?>">
-								<a href="./?c=comments&fileid=<?= $upload->id() ?>"><?= $upload->htmlFilename() ?></a>
-							</div>
-							<div class="col col2 <?= $css ?>">
-								<a href="./?c=comments&fileid=<?= $upload->id() ?>">(<?=$upload->commentLabel(false);?>)</a>
-							</div>
-							<div class="col col3 <?= $css ?>">
-									<?= $upload->last_active() ?>
-							</div>
-						</li>
-						<? } ?>
+							require("offensive/templates/listitem_topic.inc");
+ 						} ?>
 					</ul>
 				</div>
 				<div id="bottom">

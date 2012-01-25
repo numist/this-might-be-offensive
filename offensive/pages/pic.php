@@ -126,16 +126,16 @@
 		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 		<META NAME="ROBOTS" CONTENT="NOARCHIVE" />
 		<title>[<?= $upload->type() ?>] : <?= $upload->filename() ?> </title>
-		<link rel="stylesheet" type="text/css" href="/styles/pic.css"/>
+		<link rel="stylesheet" type="text/css" href="/styles/pic.css?v=0.0.1"/>
 		<!-- <? if($upload->next_filtered()) { ?>
 			<link rel="prefetch" href="<?= $_SERVER['PHP_SELF'] ?>?id=<?= $upload->next_filtered()->id() ?>"/>
 		<? } ?> -->
 
 		<script type="text/javascript" src="/offensive/js/jquery-1.7.1.min.js"></script>
-		<script type="text/javascript" src="/offensive/js/picui.js?v=1"></script>
+		<script type="text/javascript" src="/offensive/js/picui.js?v=0.0.3"></script>
 		<script type="text/javascript" src="/offensive/js/subscriptions.js"></script>
 		<script type="text/javascript" src="/offensive/js/jqModal.js"></script>
-		<script type="text/javascript" src="/offensive/js/jqDnR.js"></script>
+		<script type="text/javascript" src="/offensive/js/jqDnR.js?v=0.0.1"></script>
 		<script type="text/javascript">
       <? require("offensive/data/keynav.inc"); ?>
       function composite_keycode(e)

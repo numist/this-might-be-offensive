@@ -1,5 +1,5 @@
 <?
-	header('HTTP/1.0 503 Service Unavailable');
+	header('HTTP/1.0 500 Internal Server Error');
 	header('Content-type: text/html');
 	
 	if(!defined("TMBO")) {

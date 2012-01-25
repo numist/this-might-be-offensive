@@ -129,4 +129,38 @@ function api_getquickcommentbox() {
 		echo "</div>";
 	}
 }
+
+// dynamic page templating functions
+function getlicheck() {
+	$fileid = check_arg("fileid", "integer", $_REQUEST);
+	handle_errors();
+	
+	$upload = core_getupload($fileid);
+	
+	if(array_key_exists("type", $_REQUEST)) {
+		if($upload->type() != $_REQUEST["type"]) {
+			exit;
+		}
+	}
+	return $upload;
+}
+
+function api_getfileli() {
+	$upload = getlicheck();
+	require("offensive/templates/listitem_file.inc");
+	exit;
+}
+
+function api_getthumbli() {
+	$upload = getlicheck();
+	require("offensive/templates/thumbitem_file.inc");
+	exit;
+}
+
+function api_gettopicli() {
+	$upload = getlicheck();
+	require("offensive/templates/listitem_topic.inc");
+	exit;
+}
+
 ?>

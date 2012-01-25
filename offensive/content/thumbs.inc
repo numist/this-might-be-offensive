@@ -29,47 +29,8 @@
 		<script type="text/javascript" src="/offensive/js/jquery-1.7.1.min.js"></script>
 		<? if(count($_GET) == 1 && array_key_exists("c", $_GET)) { ?>
 			<!-- lazyload_changes are only used if on a base page (?c=main not ?c=main&foo=bar) -->
-			<script type="text/javascript">
-				function html_upload(upload) {
-					if(upload.type != "image") return "";
-    	
-				  // we cant find a thumbnail for this image.
-				  if(typeof(upload.link_thumb) == "undefined") {
-						upload.link_thumb = "/offensive/graphics/previewNotAvailable.gif";
-					}
-    		
-				  // image is filtered
-				  if(upload.filtered == true) {
-				    orig_src = upload.link_thumb;
-				    upload.link_thumb = "/offensive/graphics/th-filtered.gif";
-				    mouseout = "onmouseout='changesrc(\"th"+upload.id+"\",\"/offensive/graphics/th-filtered.gif\")' onmouseover='changesrc(\"th"+upload.id+"\",\""+orig_src+"\")'";
-				  } else {
-				    mouseout = "";
-				  }
-    		
-				  html = '<li style="display: none;" fileid="'+upload.id+'">'
-				          +'<div class="thumbcontainer">'
-				            +'<div>'
-				              +'<a '+mouseout+' href="pages/pic.php?id='+upload.id+'">'
-				                +'<img title="uploaded by '+upload.username+'" '
-				                     +'src="'+upload.link_thumb+'" '
-				                     +'name="th'+upload.id+'"/>'
-				              +'</a>'
-				            +'</div>'
-				            +'<div class="score">'
-											+'<a href="./?c=comments&fileid='+upload.id+'">'
-				              	+create_score(upload)
-											+'</a>'
-				            +'</div>'
-				          +'</div>'
-				        +'</li>';
-    	
-					return html;
-				}
-			</script>
-    	<script type="text/javascript" src="/offensive/js/lazyload_changes.js?v=0.0.5"></script>';
-			<?
-		}?>
+    	<script type="text/javascript" src="/offensive/js/lazyload_changes.js?v=0.0.9"></script>
+		<? } ?>
 		<!-- lazyload_bottom -->
 		<script type="text/javascript" src="/offensive/js/lazyload_bottom.js?v=0.0.2"></script>
 <?}
@@ -125,23 +86,9 @@
 					$revision = currentChange();
 					$output = 0;
 	
-					foreach( $result as $upload ) {?>
-					<li fileid="<?= $upload->id() ?>">
-					  <div class="thumbcontainer">
-						<div><a href="pages/pic.php?id=<?= $upload->id() ?>"
-							<?php if($upload->filtered()) { ?>
-								onMouseOver='changesrc("th<?= $upload->id()?>","<?= $upload->thumbURL() ?>")'
-								onMouseOut='changesrc("th<?= $upload->id() ?>","/offensive/graphics/th-filtered.gif")'
-							<? } ?>
-						><img name="th<?= $upload->id()?>"
-									src="<?= $upload->filtered() ? "/offensive/graphics/th-filtered.gif" : $upload->thumbURL() ?>"
-									title="uploaded by <?= $upload->uploader()->username(); ?>"
-							>
-						</a></div>
-						<div><span class="score"><a href="./?c=comments&fileid=<?= $upload->id() ?>"><?= $upload->commentLabel(); ?></a></span></div>
-				    </div>
-				  </li>
-			<?php } ?>
+					foreach( $result as $upload ) {
+						require("offensive/templates/thumbitem_file.inc");
+					} ?>
 				</ul>
 			</div>
 			<div id="bottom">
