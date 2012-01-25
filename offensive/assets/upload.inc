@@ -577,6 +577,7 @@ function upload_type(&$postdata) {
 		$dataoffset = 0;
 		$byteword = substr($header, 6, 4);
 		$bytewordlen = strlen($byteword);
+		$intvalue = 0;
 		for ($i = 0; $i < $bytewordlen; $i++) {
 				$intvalue = $intvalue | (ord($byteword{$i}) & 0x7F) << (($bytewordlen - 1 - $i) * 7);
 		}
