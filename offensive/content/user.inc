@@ -363,9 +363,9 @@ function contributions($usrid) {
 					echo "/offensive/?c=comments&fileid=".$upload->id();
 				?>"><?= $upload->htmlFilename(true) ?></div></td>
 				<td class="<?php echo $css?>" style="text-align:right;white-space:nowrap;width:100%">
-					<a href="./?c=comments&fileid=<?php echo $upload->id() ?>" class="<?php echo $css?>"><?=$upload->commentLabel(!($upload->type() == 'topic'));?></a>
+					<a href="./?c=comments&fileid=<?php echo $upload->id() ?>" class="<?= $css?>"><?=$upload->commentLabel(!($upload->type() == 'topic'));?></a>
 				</td>
-				<td style="text-align:right;white-space:nowrap;width:100%" class="<?php echo $css?>"><?php echo $upload->timestamp() ?></td>
+				<td style="text-align:right;white-space:nowrap;width:100%" class="<?= $css?>"><?php echo $upload->timestamp() ?></td>
 			</tr>
 		<?
 	}
