@@ -74,7 +74,7 @@ var infScrLoadingFeedback = 'loading…';
               $.each(filteredData, function(i, item) {
                 if($('li[fileid="'+$(item).attr("fileid")+'"]').length == 0) {
                   if(typeof prep_item == "function") {
-                    // if needed, prep the item (for css etc)
+                    // if needed, prep the item (for css)
                     item = prep_item(item, $('li[fileid]').last());
                   }
                   $('#grid-container ul').append(item);

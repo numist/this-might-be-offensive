@@ -66,8 +66,13 @@ function lazyload_top() {
           url: api+"&fileid="+upload_id,
           dataType: "html",
           success: function(data) {
-            if($(data).filter('li[fileid="'+upload_id+'"]').length == 1) {
-              $(data).filter('li[fileid="'+upload_id+'"]').insertBefore($('#grid-container ul li[fileid]').first()).fadeIn("slow");
+            var item = $(data).filter('li[fileid="'+upload_id+'"]');
+            if(item.length == 1) {
+              if(typeof prep_item == "function") {
+                // if needed, prep the item (for css)
+                item = prep_item(item, $('li[fileid]').first());
+              }
+              item.insertBefore($('#grid-container ul li[fileid]').first()).fadeIn("slow");
             }
           }
         });
