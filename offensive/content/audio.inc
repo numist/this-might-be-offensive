@@ -102,7 +102,7 @@
 					<? require( 'offensive/assets/pickupLink.inc' ) ?>
 				</div>
 			</div>
-			<div class="grid" id="audio">
+			<div class="grid" id="main">
 				<ul>
 	<?
 				$result = core_getuploads($args);
