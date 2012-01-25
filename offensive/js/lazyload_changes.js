@@ -34,7 +34,7 @@ function lazyload_top() {
           if(score.length) {
             // create a space for new tmbo votes
             if(score.find('.tmbos').text() == "" && parseInt(command_args[3]) > 0) {
-              score.find('.bads').after(' x<span class="tmbos">0</span>');
+              score.find('.bads').after('&nbsp;x<span class="tmbos">0</span>');
             }
 
             if(score.find('.goods').text() != "") {
