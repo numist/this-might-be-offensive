@@ -27,7 +27,7 @@
 		<link href="/styles/grid.css" type="text/css" rel="stylesheet" />
 		<script type="text/javascript" src="/offensive/js/tmbolib.js?v=0.0.3"></script>
 		<script type="text/javascript" src="/offensive/js/jquery-1.7.1.min.js"></script>
-		<script type="text/javascript" src="/offensive/js/pickuplink_visibility.js?v=0.0.1"></script>
+		<script type="text/javascript" src="/offensive/js/pickuplink_visibility.js?v=0.0.2"></script>
 		<? if(count($_GET) == 1 && array_key_exists("c", $_GET)) { ?>
 			<!-- lazyload_changes are only used if on a base page (?c=main not ?c=main&foo=bar) -->
     	<script type="text/javascript" src="/offensive/js/lazyload_changes.js?v=0.0.12"></script>
@@ -39,7 +39,7 @@
 				return item;
 			}
 		</script>
-		<script type="text/javascript" src="/offensive/js/lazyload_bottom.js?v=0.0.4"></script>
+		<script type="text/javascript" src="/offensive/js/lazyload_bottom.js?v=0.0.5"></script>
 <?}
 
 	function body() {
@@ -89,16 +89,9 @@
 			<?php
 				$result = core_getuploads($args);
 				$revision = currentChange();
-
-				$pickuplinks = get_pickuplinks();
-				$first = array_key_exists("p", $args) && $args["p"] > 0 ? false : true;
 				foreach( $result as $upload ) {
 					$css = (isset($css) && strpos($css, "odd_row") !== false) ? "even_row" : "odd_row";
-					if(!$first && in_array($upload->id(), $pickuplinks)) {
-						$css .= " hilight_row";
-					}
 					require("offensive/templates/listitem_file.inc");
-					$first = false;
 				}
 			?>
 			</ul>

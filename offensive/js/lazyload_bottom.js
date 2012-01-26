@@ -86,6 +86,10 @@ var infScrLoadingFeedback = 'loading…';
               
               // update moreNode with url from data
               moreNode.find('a').last().attr("href", $(data).find('p#morelink').last().find('a').last().attr("href"));
+              
+              if(typeof pickuplink_set_visibility == "function") {
+                pickuplink_set_visibility();
+              }
             } else if($(data).find('#grid-container ul').length > 0) {
               // make sure the error exists before assuming no elements—this could be an error page
               hasMore = false;
