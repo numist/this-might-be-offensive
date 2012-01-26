@@ -6,6 +6,7 @@
 	require_once( 'offensive/assets/tabs.inc' );
 	require_once("offensive/assets/classes.inc");
 	require_once("offensive/assets/core.inc");
+	require_once('offensive/assets/pickupLink.inc');
 
 	function start() {
 		mustLogIn();
@@ -97,22 +98,12 @@
 							</div>
 						</li>
 <?
-						// get db pickuplink
-						$dbpickup = me()->getPref("tpickup");
-						
-						// get cookie pickuplink
-						$cookiename = me()->id()."lasttopic";
-						if(array_key_exists($cookiename, $_COOKIE) && is_intger($_COOKIE[$cookiename])) {
-							$cookiepickup = $_COOKIE[$cookiename];
-						} else {
-							$cookiepickup = 0;
-						}
-						
+						$pickuplinks = get_pickuplinks();
 						$first = true;
 						foreach( $result as $upload ) {
 							$css = (isset($css) && strpos($css, "even_row") !== false) ? "odd_row" : "even_row";
 							if(!$first && $args["sort"] == "date_desc"
-							&& ($upload->id() == $dbpickup || $upload->id() == $cookiepickup)) {
+							&& in_array($upload->id(), $pickuplinks)) {
 								$css .= " hilight_row";
 							}
 							require("offensive/templates/listitem_topic.inc");

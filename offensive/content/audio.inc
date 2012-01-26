@@ -6,7 +6,8 @@
 	require_once( 'offensive/assets/tabs.inc' );
 	require_once("offensive/assets/classes.inc");
 	require_once("offensive/assets/core.inc");
-
+	require_once('offensive/assets/pickupLink.inc');
+	
 	function start() {
 		mustLogIn();
 	}
@@ -65,7 +66,7 @@
 		<div id="grid-container">
 			<div id="commands">
 				<div class="floatleft">
-					<? require( 'offensive/assets/pickupLink.inc' ) ?>
+					<? print_pickuplink(); ?>
 				</div>
 				<div class="floatright">&nbsp;</div>
 			</div>

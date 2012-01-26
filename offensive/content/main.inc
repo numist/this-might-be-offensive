@@ -6,6 +6,7 @@
 	require_once( 'offensive/assets/tabs.inc' );
 	require_once("offensive/assets/classes.inc");
 	require_once("offensive/assets/core.inc");
+	require_once('offensive/assets/pickupLink.inc');
 
 	function start() {
 		mustLogIn();
@@ -80,7 +81,7 @@
 <div class="bluebox">
 	<div id="grid-container">
 		<div id="commands">
-			<div class="floatleft"><? include( 'offensive/assets/pickupLink.inc' ) ?></div>
+			<div class="floatleft"><? print_pickuplink(); ?></div>
 			<div class="floatright"><a href="./?c=thumbs<?= query_string("c p", "&") ?>">thumbnail view</a></div>
 		</div>
 		<div class="grid" id="main">

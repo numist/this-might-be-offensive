@@ -6,6 +6,7 @@
 	require_once("offensive/assets/tabs.inc");
 	require_once("offensive/assets/comments.inc");
 	require_once("offensive/assets/classes.inc");
+	require_once('offensive/assets/pickupLink.inc');
 
 	function additionalCssFor($vote) {
 		if(strpos($vote, 'bad') > 0) return " bad";
@@ -34,18 +35,7 @@
 
 		// update pickuplink for discussions
 		if($upload->type() == "topic") {
-			// update the pickup cookie
-		 	$cookiename = me()->id()."lasttopic";
-		 	if(!array_key_exists($cookiename, $_COOKIE) ||
-		     !is_intger($_COOKIE[$cookiename]) ||
-		     $_COOKIE[$cookiename] < $upload->id()) {
-		 		setcookie( $cookiename, $upload->id(), time() + 3600*24*365*10, "/offensive/"); 
-			}
-			
-			// update the pickup db entry
-			if(me()->getPref("tpickup") == false || me()->getPref("tpickup") < $upload->id()) {
-				me()->setPref("tpickup", $upload->id());
-			}
+			update_pickuplinks($upload, $upload->type());
 		}
 
 	
