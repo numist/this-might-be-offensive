@@ -73,6 +73,9 @@ function lazyload_top() {
                 item = prep_item(item, $('li[fileid]').first());
               }
               item.insertBefore($('#grid-container ul li[fileid]').first()).fadeIn("slow");
+              if(typeof pickuplink_set_visibility == "function") {
+                pickuplink_set_visibility();
+              }
             }
           }
         });
