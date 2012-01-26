@@ -75,9 +75,16 @@
 	<?
 				$result = core_getuploads($args);
 				$revision = currentChange();
+				
+				$pickuplinks = get_pickuplinks();
+				$first = array_key_exists("p", $args) && $args["p"] > 0 ? false : true;
 				foreach( $result as $upload ) {
-					$css = (isset($css) && $css == "odd_row") ? "even_row" : "odd_row";
+					$css = (isset($css) && strpos($css, "odd_row") !== false) ? "even_row" : "odd_row";
+					if(!$first && in_array($upload->id(), $pickuplinks)) {
+						$css .= " hilight_row";
+					}
 					require("offensive/templates/listitem_file.inc");
+					$first = false;
 	 			} ?>
 				</ul>
 			</div>
