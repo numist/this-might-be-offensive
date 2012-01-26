@@ -1322,7 +1322,13 @@ class User {
 	 */
 	public function getPref($name) {
 		global $redis;
-		return $redis->get($this->id().':'.$name);
+		$value = $redis->get($this->id().':'.$name);
+		
+		if($name == "sortorder_discussions" && $value == "") {
+			return "date_desc";
+		}
+		
+		return $value;
 	}
 	
 	public function setPref($name, $value) {
