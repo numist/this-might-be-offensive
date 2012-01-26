@@ -57,7 +57,7 @@
 
 			$args = $_REQUEST;
 			if(!array_key_exists("sort", $args)) {
-				$args["sort"] = defaultSort();
+				$args["sort"] = me()->getPref("sortorder_discussions");
 			}
 
 			$numPerPage = 100;
@@ -73,7 +73,7 @@
 			$revision = currentChange();
 
 			// if we made it this far, sort is valid, so we don't have to check it
-			if($args["sort"] != defaultSort()) {
+			if($args["sort"] != me()->getPref("sortorder_discussions")) {
 				me()->setPref("sortorder_discussions", $args["sort"]);
 			}
 ?>
@@ -97,10 +97,28 @@
 							</div>
 						</li>
 <?
+						// get db pickuplink
+						$dbpickup = me()->getPref("tpickup");
+						
+						// get cookie pickuplink
+						$cookiename = me()->id()."lasttopic";
+						if(array_key_exists($cookiename, $_COOKIE) && is_intger($_COOKIE[$cookiename])) {
+							$cookiepickup = $_COOKIE[$cookiename];
+						} else {
+							$cookiepickup = 0;
+						}
+						
+						$first = true;
 						foreach( $result as $upload ) {
-							$css = (isset($css) && $css == "even_row") ? "odd_row" : "even_row";
+							$css = (isset($css) && strpos($css, "even_row") !== false) ? "odd_row" : "even_row";
+							if(!$first && $args["sort"] == "date_desc"
+							&& ($upload->id() == $dbpickup || $upload->id() == $cookiepickup)) {
+								$css .= " hilight_row";
+							}
 							require("offensive/templates/listitem_topic.inc");
- 						} ?>
+							
+							$first = false;
+						} ?>
 					</ul>
 				</div>
 				<div id="bottom">
