@@ -1322,6 +1322,11 @@ class User {
 	 */
 	public function getPref($name) {
 		global $redis;
+		
+		require("offensive/data/preferences.inc");
+		if(!in_array($name, $prefnames))
+			trigger_error("$name is not a valid preference name!", E_USER_ERROR);
+		
 		$value = $redis->get($this->id().':'.$name);
 		
 		if($name == "sortorder_discussions" && $value == "") {
