@@ -1322,7 +1322,18 @@ class User {
 	 */
 	public function getPref($name) {
 		global $redis;
-		return $redis->get($this->id().':'.$name);
+		
+		require("offensive/data/preferences.inc");
+		if(!in_array($name, $prefnames))
+			trigger_error("$name is not a valid preference name!", E_USER_ERROR);
+		
+		$value = $redis->get($this->id().':'.$name);
+		
+		if($name == "sortorder_discussions" && $value == "") {
+			return "date_desc";
+		}
+		
+		return $value;
 	}
 	
 	public function setPref($name, $value) {

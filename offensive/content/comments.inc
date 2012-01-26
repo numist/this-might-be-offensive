@@ -6,6 +6,7 @@
 	require_once("offensive/assets/tabs.inc");
 	require_once("offensive/assets/comments.inc");
 	require_once("offensive/assets/classes.inc");
+	require_once('offensive/assets/pickupLink.inc');
 
 	function additionalCssFor($vote) {
 		if(strpos($vote, 'bad') > 0) return " bad";
@@ -33,39 +34,28 @@
 		clearSubscription($upload->id(), me()->id());
 
 		// update pickuplink for discussions
-	    if($upload->type() == "topic") {
-	    	// update the pickup cookie
-        	$cookiename = me()->id()."lasttopic";
-        	if(!array_key_exists($cookiename, $_COOKIE) ||
-        	   !is_intger($_COOKIE[$cookiename]) ||
-        	   $_COOKIE[$cookiename] < $upload->id()) {
-        		setcookie( $cookiename, $upload->id(), time() + 3600*24*365*10, "/offensive/"); 
-			}
-
-			// update the pickup db entry
-			if(me()->getPref("tpickup") == false || me()->getPref("tpickup") < $upload->id()) {
-				me()->setPref("tpickup", $upload->id());
-			}
-        }
+		if($upload->type() == "topic") {
+			update_pickuplinks($upload, $upload->type());
+		}
 
 	
-	    // check to see if someone's posting.  
-	    /* check if someone is being hoodwinked into voting by link.
-	     * NB: only works if the client is reporting REFERERS. 
-	     */
-	    if($upload->type() != 'topic' &&
-		   array_key_exists("submit", $_REQUEST) && array_key_exists("HTTP_REFERER", $_SERVER) &&
-	       $_SERVER['HTTP_REFERER'] !== "" && strpos($_SERVER['HTTP_REFERER'], $_SERVER['SERVER_NAME']) === false) {
-			echo "you've been had.";
-			trigger_error("off-site tried to vote on non-topic upload, referer: ".$_SERVER['HTTP_REFERER'], E_USER_WARNING);
-			return;
-	    }
-	    
-	    // quietly snub them if they are not an admin and they are trying to post to the changeblog
-	    if(array_key_exists("submit", $_REQUEST) && $upload->id() == "211604" && me()->status() != "admin") {
-	        return;
-	    }
-	    
+	  // check to see if someone's posting.  
+	  /* check if someone is being hoodwinked into voting by link.
+	   * NB: only works if the client is reporting REFERERS. 
+	   */
+	  if($upload->type() != 'topic' &&
+		 array_key_exists("submit", $_REQUEST) && array_key_exists("HTTP_REFERER", $_SERVER) &&
+	     $_SERVER['HTTP_REFERER'] !== "" && strpos($_SERVER['HTTP_REFERER'], $_SERVER['SERVER_NAME']) === false) {
+		echo "you've been had.";
+		trigger_error("off-site tried to vote on non-topic upload, referer: ".$_SERVER['HTTP_REFERER'], E_USER_WARNING);
+		return;
+	  }
+	  
+	  // quietly snub them if they are not an admin and they are trying to post to the changeblog
+	  if(array_key_exists("submit", $_REQUEST) && $upload->id() == "211604" && me()->status() != "admin") {
+	      return;
+	  }
+	  
 		if( array_key_exists("submit", $_POST)) {
 			$fileid		 = array_key_exists("fileid", $_POST) ?
 							$_POST['fileid'] : '';

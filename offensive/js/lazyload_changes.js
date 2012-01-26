@@ -35,13 +35,13 @@ function lazyload_top() {
           score.find('.bads').text(parseInt(command_args[1]) + parseInt(score.find('.bads').text()));
           score.find('.tmbos').text(parseInt(command_args[3]) + parseInt(score.find('.tmbos').text()));
 
-          var comments = parseInt(score.find('.comments').text());
-          if(comments == 0) {
+          var comments = parseInt(score.find('.comments').text()) + parseInt(command_args[4]);
+          if(comments == 1) {
             score.find('.commentlabel').text("comment");
-          } else if (comments == 1) {
+          } else if (comments >= 2) {
             score.find('.commentlabel').text("comments");
           }
-          score.find('.comments').text(parseInt(command_args[4]) + comments);
+          score.find('.comments').text(comments);
         }
       } else if (command == "upload" && upload_id > $('#grid-container ul li[fileid]').first().attr('fileid')) {
         var api = "/offensive/ui/api.php/";
@@ -73,6 +73,9 @@ function lazyload_top() {
                 item = prep_item(item, $('li[fileid]').first());
               }
               item.insertBefore($('#grid-container ul li[fileid]').first()).fadeIn("slow");
+              if(typeof pickuplink_set_visibility == "function") {
+                pickuplink_set_visibility();
+              }
             }
           }
         });

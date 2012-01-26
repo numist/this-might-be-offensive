@@ -6,7 +6,8 @@
 	require_once( 'offensive/assets/tabs.inc' );
 	require_once("offensive/assets/classes.inc");
 	require_once("offensive/assets/core.inc");
-
+	require_once('offensive/assets/pickupLink.inc');
+	
 	function start() {
 		mustLogIn();
 	}
@@ -18,9 +19,10 @@
 		<link href="/styles/grid.css?v=1.03" type="text/css" rel="stylesheet">
 		<script type="text/javascript" src="/offensive/js/tmbolib.js?v=0.0.3"></script>
 		<script type="text/javascript" src="/offensive/js/jquery-1.7.1.min.js"></script>
+		<script type="text/javascript" src="/offensive/js/pickuplink_visibility.js?v=0.0.1"></script>
 		<? if(count($_GET) == 1 && array_key_exists("c", $_GET)) { ?>
 			<!-- lazyload_changes are only used if on a base page (?c=main not ?c=main&foo=bar) -->
-    	<script type="text/javascript" src="/offensive/js/lazyload_changes.js?v=0.0.11"></script>
+    	<script type="text/javascript" src="/offensive/js/lazyload_changes.js?v=0.0.12"></script>
 		<? } ?>
 		<script type="text/javascript">
 			function prep_item(item, neighbor) {
@@ -29,7 +31,7 @@
 				return item;
 			}
 		</script>
-		<script type="text/javascript" src="/offensive/js/lazyload_bottom.js?v=0.0.2"></script>
+		<script type="text/javascript" src="/offensive/js/lazyload_bottom.js?v=0.0.4"></script>
 		<?
 	}
 
@@ -64,8 +66,9 @@
 		<div id="grid-container">
 			<div id="commands">
 				<div class="floatleft">
-					<? require( 'offensive/assets/pickupLink.inc' ) ?>
+					<? print_pickuplink(); ?>
 				</div>
+				<div class="floatright">&nbsp;</div>
 			</div>
 			<div class="grid" id="main">
 				<ul>

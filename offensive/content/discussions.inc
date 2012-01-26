@@ -6,6 +6,7 @@
 	require_once( 'offensive/assets/tabs.inc' );
 	require_once("offensive/assets/classes.inc");
 	require_once("offensive/assets/core.inc");
+	require_once('offensive/assets/pickupLink.inc');
 
 	function start() {
 		mustLogIn();
@@ -28,7 +29,7 @@
 				return item;
 			}
 		</script>
-		<script type="text/javascript" src="/offensive/js/lazyload_bottom.js?v=0.0.2"></script>
+		<script type="text/javascript" src="/offensive/js/lazyload_bottom.js?v=0.0.4"></script>
 		<?
 	}
 
@@ -57,7 +58,7 @@
 
 			$args = $_REQUEST;
 			if(!array_key_exists("sort", $args)) {
-				$args["sort"] = defaultSort();
+				$args["sort"] = me()->getPref("sortorder_discussions");
 			}
 
 			$numPerPage = 100;
@@ -73,7 +74,7 @@
 			$revision = currentChange();
 
 			// if we made it this far, sort is valid, so we don't have to check it
-			if($args["sort"] != defaultSort()) {
+			if($args["sort"] != me()->getPref("sortorder_discussions")) {
 				me()->setPref("sortorder_discussions", $args["sort"]);
 			}
 ?>
@@ -97,10 +98,18 @@
 							</div>
 						</li>
 <?
+						$pickuplinks = get_pickuplinks();
+						$first = true;
 						foreach( $result as $upload ) {
-							$css = (isset($css) && $css == "even_row") ? "odd_row" : "even_row";
+							$css = (isset($css) && strpos($css, "even_row") !== false) ? "odd_row" : "even_row";
+							if(!$first && $args["sort"] == "date_desc"
+							&& in_array($upload->id(), $pickuplinks)) {
+								$css .= " hilight_row";
+							}
 							require("offensive/templates/listitem_topic.inc");
- 						} ?>
+							
+							$first = false;
+						} ?>
 					</ul>
 				</div>
 				<div id="bottom">

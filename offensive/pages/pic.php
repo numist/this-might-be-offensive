@@ -7,6 +7,7 @@
 	require_once("offensive/assets/classes.inc");
 	require_once("offensive/assets/core.inc");
 	require_once("offensive/assets/comments.inc");
+	require_once('offensive/assets/pickupLink.inc');
 
 	mustLogIn();
 	time_start($ptime);
@@ -39,71 +40,20 @@
 
 	###########################################################################
 	// update pickuplinks
-	switch($upload->type()) {
-		case "image":
-			$cookiename = me()->id()."lastpic";
-			$prefname = "ipickup";
-			break;
-		case "audio":
-			$cookiename = me()->id()."lasttrack";
-			$prefname = "apickup";
-			break;
-		case "avatar":
-			$cookiename = me()->id()."lastavatar";
-			$prefname = "ypickup";
-	}
-
-	// update the pickup cookie
-	if(!array_key_exists($cookiename, $_COOKIE) ||
-	   !is_intger($_COOKIE[$cookiename]) ||
-	   $_COOKIE[$cookiename] < $upload->id()) {
-		setcookie( $cookiename, $upload->id(), time() + 3600*24*365*10, "/offensive/");
-	}
-
 	global $autoplay;
-	$autoplay = false;
+	$autoplay = update_pickuplinks($upload, $upload->type());
 
-	// update the pickup db entry
-	if(me()->getPref($prefname) == false || me()->getPref($prefname) < $upload->id()) {
-		// if this account has not been this far forward in the stream before, autoplay.
-		$autoplay = !$upload->filtered();
-		me()->setPref($prefname, $upload->id());
-	}
-	
 	if(array_key_exists('loop', $_REQUEST)) {
 		$autoplay = true;
 	}
 
 	###########################################################################
 	function get_random_id($upload) {
-		switch($upload->type()) {
-			case "image":
-				$cookiename = me()->id()."lastpic";
-				break;
-			case "audio":
-				$cookiename = me()->id()."lasttrack";
-				break;
-			case "avatar":
-				$cookiename = me()->id()."lastavatar";
-				break;
-		}
+		$pickuplinks = get_pickuplinks($upload->type());
 
-		if(array_key_exists($cookiename, $_COOKIE)) {
-			$cookiepic = $_COOKIE[$cookiename];
-		} else {
-			// this should never happen, since in normal browsing you have to hit
-			// pic.php at least once with an id argument in order to use random.
-			$cookiepic = 0;
-		}
-
-		/*
-		 * since pic.php sets the ipickup db preference and the pickupid in the cookie
-		 * at the beginning of execution if they are invalid, it's safe to skip
-		 * existence and type checks at this point.
-		 */
 		$filter = me()->getPref("hide_nsfw") ? " AND nsfw = 0" : "";
 		$filter .= me()->getPref("hide_tmbo") ? " AND tmbo = 0" : "";
-		$sql = "SELECT id FROM offensive_uploads WHERE type='".$upload->type()."' AND status='normal' AND id < ".min(me()->getPref('ipickup'), $cookiepic).$filter." ORDER BY RAND() LIMIT 1";
+		$sql = "SELECT id FROM offensive_uploads WHERE type='".$upload->type()."' AND status='normal' AND id < ".min($pickuplinks).$filter." ORDER BY RAND() LIMIT 1";
 		$res = tmbo_query($sql);
 		$row = mysql_fetch_assoc( $res );
 		return($row['id']);

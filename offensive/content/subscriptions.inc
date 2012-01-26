@@ -26,7 +26,7 @@
 				return item;
 			}
 		</script>
-		<script type="text/javascript" src="/offensive/js/lazyload_bottom.js?v=0.0.1"></script>
+		<script type="text/javascript" src="/offensive/js/lazyload_bottom.js?v=0.0.4"></script>
 		<?
 	}
 

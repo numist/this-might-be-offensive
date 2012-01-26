@@ -33,7 +33,7 @@
 .header .col {
   text-align: center !important;
   font-weight: bold;
-  background: #bbbbee;
+  background: #aad;
 }
 
 .col {
@@ -113,7 +113,9 @@
   text-align: center;
 }
 
-
+.hilight_row {
+  background: #aad;
+}
 
 /* page specific column widths */
 
