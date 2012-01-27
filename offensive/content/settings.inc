@@ -136,10 +136,9 @@
 					// has the user customized their key layout?
 					$custom = false;
 
-                	$prefnames = array_keys($key_options);
-
-					// desc is unused, but required to get the key in a foreach loop.
+					$prefnames = array_keys($key_options);
 					foreach($prefnames as $prefname) {
+						if($prefname == "noselect") continue;
 						$values = me()->getPref($prefname);
 						
 						// possible false values here are false or "", so not checking types.
