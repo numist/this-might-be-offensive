@@ -19,7 +19,11 @@ $fixing = false;
  * at the top of all index pages notifying admins that the site is being
  * worked on.
  */
-$upgrading = false;
+if(isset($downtime) && time() > $downtime) {
+        $upgrading = true;
+} else {
+        $upgrading = false;
+}
 
 /*****************************************************************************/
 
@@ -221,5 +225,7 @@ function me() {
 
 // logn.inc is needed for all authentication
 require_once("offensive/assets/logn.inc");
+
+define("TMBO", true);
 
 ?>

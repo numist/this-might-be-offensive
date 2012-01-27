@@ -33,7 +33,7 @@
 .header .col {
   text-align: center !important;
   font-weight: bold;
-  background: #bbbbee;
+  background: #aad;
 }
 
 .col {
@@ -113,11 +113,13 @@
   text-align: center;
 }
 
-
+.hilight_row {
+  background: #aad;
+}
 
 /* page specific column widths */
 
-/* main.inc */
+/* main.inc and audio.inc */
 #main .col1 { width: 395px; text-align: left;}
 #main .col2 { width: 150px; text-align: right;}
 
@@ -134,10 +136,6 @@
 #hof .col5 { width: 35px; text-align: left;}
 #hof .col6 { width: 35px; text-align: right;}
 
-/* audio */
-#audio .col1 { width: 430px; text-align: left;}
-#audio .col2 { width: 115px; text-align: right;}
-
 /* subscriptions */
-#subscriptions .col1 {width: 450px; text-align: left; padding: 10px 2px 10px 10px !important;}
-#subscriptions .col2 {width:  80px; text-align: center; padding: 10px 2px 10px 2px !important;}
+#subscriptions .col1 {width: 450px; text-align: left; padding: 2px 2px 2px 10px !important;}
+#subscriptions .col2 {width:  80px; text-align: center; padding: 2px 2px 2px 2px !important;}

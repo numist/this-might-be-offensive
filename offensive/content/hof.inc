@@ -14,15 +14,26 @@
 	}
 
 	function head() {
-		echo <<<EOT
+		?>
 		<link href="/styles/grid.css?v=1.01" type="text/css" rel="stylesheet">
-EOT;
+		<script type="text/javascript" src="/offensive/js/jquery-1.7.1.min.js"></script>
+		<!-- lazyload_bottom -->
+		<script type="text/javascript">
+			function prep_item(item, neighbor) {
+				var color_class = (neighbor.find('.odd_row').length > 0) ? "even_row" : "odd_row";
+				$(item).find('div.col').removeClass("odd_row even_row").addClass(color_class);
+				return item;
+			}
+		</script>
+		<script type="text/javascript" src="/offensive/js/lazyload_bottom.js?v=0.0.5"></script>
+		<?
 	}
 	function body() {
 
 		$view = isset( $_REQUEST['t'] ) ? sqlEscape( $_REQUEST['t'] ) : 'hof';	
 ?>
-
+<div class="contentbox">
+	<div class="blackbar"></div>
 		<div class="heading">hall of fame: the coolest files of all time (according to you sick puppies).</div>
 		<? tabs(); ?>
 
@@ -72,19 +83,20 @@ EOT;
 			// cellophane doesn't want her images in the hof;
 			// this is a quick hack to omit them.
 			if( $upload->uploader()->id() == 1138 ) {
+				++$count;
 				continue;
 			}
-			$css = strpos($css, "even") !== false ? "oddfile odd_row" : "evenfile even_row";
+			$css = strpos($css, "even") !== false ? "odd_row" : "even_row";
 
 			if( $upload->uploader()->id() == me()->id()) {
-				$css = "my_hof ".(strpos($css, "even") !== false ? "even_row" : "odd_row");
+				$css = "my_hof ".$css;
 			}
 
 			if($view=="today") $timeSince=hoursSince($upload->timestamp());
 			if($view=="hof") $timeSince = weeksSince($upload->timestamp());
 			$cssw = $view == 'hof' ? "$css weeks_$timeSince" : $css;
 ?>
-						<li>
+						<li fileid="<?= $upload->id() ?>">
 							<div class="col col1 <?= $cssw ?>">
 								<? echo ++$count ?>.
 							</div>
@@ -109,8 +121,22 @@ EOT;
 						?>
 					</ul>
 				</div>
+				<div id="bottom">
+					<?
+						// next page!
+						$args = $_GET;
+						if(array_key_exists("p", $args)) {
+							$args["p"]++;
+						} else {
+							$args["p"] = 1;
+						}
+					?>
+					<p id="morelink"><a href="<?= $_SERVER['PHP_SELF'] ?>?<?= http_build_query($args) ?>">more…</a></p>
+				</div>
 			</div>
 	</div>
+	<div class="blackbar"></div>
+</div>
 <?
 	}
 

@@ -16,7 +16,7 @@ mustLogIn(array("prompt" => "http",
                 "token" => null));
 
 // filter users by these criteria
-$filter = "AND USERS.account_status != 'locked' AND USERS.timestamp > DATE_SUB( NOW(), INTERVAL 12 MONTH )";
+$filter = "AND u.account_status != 'locked' AND u.timestamp > DATE_SUB( NOW(), INTERVAL 12 MONTH )";
 
 // this array determines how much of an area is mapped to a certain
 // lat/lon at each zoom level. This is not an exact science, but may require
@@ -57,11 +57,11 @@ for($i = $max_marker_level; $i >= 0; $i--) {
                 'lat'   =>  $marker['lat'],
                 'lon'   =>  $marker['lon'],
                 'level' =>  $i,				// level of this cluster
-		'num_users' => $marker['num_users'],	// number of markers
-		'swx' => $marker['swx'],
-		'swy' => $marker['swy'],		
-		'nex' => $marker['nex'],
-		'ney' => $marker['ney']	
+								'num_users' => $marker['num_users'],	// number of markers
+								'swx' => $marker['swx'],
+								'swy' => $marker['swy'],		
+								'nex' => $marker['nex'],
+								'ney' => $marker['ney']	
             ); 
             array_push($clusters,$cluster);
         }
@@ -117,7 +117,11 @@ function sql_get_markers($max_marker_level) {
 	global $filter;
 	$markers = array();
 
-	$query = "select MAP.userid,USERS.username,MAP.x,MAP.y from maxxer_locations MAP, users USERS where MAP.mapversion = 'google' AND MAP.userid = USERS.userid $filter order by USERS.username";
+	$query = "SELECT map.userid, u.username,
+	                 map.x, map.y
+	          FROM maxxer_locations map, users u
+						WHERE map.mapversion = 'google' AND map.userid = u.userid $filter
+						ORDER BY u.username";
 
 	$result = mysql_query($query);
 	if (!$result) {
@@ -125,8 +129,10 @@ function sql_get_markers($max_marker_level) {
 	}
 
 	while ($row = @mysql_fetch_assoc($result)) {
+	  if(!me()->blocked($row["userid"])) {
 	    $row['min_zoom'] = $max_marker_level+1;
 	    array_push($markers, $row);
+    }
 	}
 	return($markers);
 }
@@ -135,7 +141,15 @@ function sql_get_markers($max_marker_level) {
 function sql_get_markers_at_zoom($level) {
 	global $filter;
 
-	$sql = "select MAP.userid,USERS.username,MIN(MAP.x) as swx, MIN(MAP.y) as swy, MAX(MAP.x) as nex, MAX(MAP.y) as ney,AVG(MAP.x) as lat,AVG(MAP.y) AS lon,count(*) as num_users, FLOOR(MAP.x/$level)*$level as fuzzy_lat, FLOOR(MAP.y/$level)*$level as fuzzy_lon  from maxxer_locations MAP, users USERS where MAP.mapversion = 'google' AND MAP.userid = USERS.userid $filter GROUP BY fuzzy_lat, fuzzy_lon order by num_users DESC";
+	$sql = "SELECT map.userid, u.username,
+	               MIN(map.x) as swx, MIN(map.y) as swy,
+	               MAX(map.x) as nex, MAX(map.y) as ney,
+	               AVG(map.x) as lat, AVG(map.y) AS lon,
+	               count(*) as num_users,
+	               FLOOR(map.x/$level)*$level as fuzzy_lat, FLOOR(map.y/$level)*$level as fuzzy_lon
+	        FROM maxxer_locations map, users u
+	        WHERE map.mapversion = 'google' AND map.userid = u.userid $filter
+	        GROUP BY fuzzy_lat, fuzzy_lon ORDER BY num_users DESC";
 
 	$markers = array();
 	$result = mysql_query($sql);
@@ -143,7 +157,9 @@ function sql_get_markers_at_zoom($level) {
 	    die('Invalid query: ' . mysql_error());
 	}
 	while ($row = @mysql_fetch_array($result)) {
+		if(!me()->blocked($row["userid"])) {
 	    array_push($markers,$row);
+		}
 	}
 	return($markers);
 }

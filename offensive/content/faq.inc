@@ -8,6 +8,8 @@ function start() {
 
 function body() {
 ?>
+<div class="contentbox">
+	<div class="blackbar"></div>
 	<div class="heading">
 		rules and stuff:
 	</div>
@@ -57,6 +59,8 @@ function body() {
 	<div class="bluebox">
 		<p>It's the number of good votes received on files uploaded in the past 30 days.</p>
 	</div>
+	<div class="blackbar"></div>
+</div>
 
 <?
 }

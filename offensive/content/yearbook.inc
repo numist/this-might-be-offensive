@@ -6,6 +6,7 @@
 	require_once( 'offensive/assets/tabs.inc' );
 	require_once( 'offensive/assets/classes.inc' );
 	require_once( 'offensive/assets/core.inc' );
+	require_once('offensive/assets/pickupLink.inc');
 
 	function start() {
 		mustLogIn();
@@ -20,13 +21,19 @@
 	}
 
 	function head() {
-		echo <<<EOT
+		?>
 		<link href="/styles/grid.css?v=1.02" type="text/css" rel="stylesheet">
-EOT;
+		<script type="text/javascript" src="/offensive/js/jquery-1.7.1.min.js"></script>
+		<script type="text/javascript" src="/offensive/js/pickuplink_visibility.js?v=0.0.2"></script>
+		<!-- lazyload_bottom -->
+		<script type="text/javascript" src="/offensive/js/lazyload_bottom.js?v=0.0.5"></script>
+		<?
 	}
 
 	function body() {
 ?>
+<div class="contentbox">
+	<div class="blackbar"></div>
 	<div class="heading">the beautiful people.</div>
 <?
 		tabs();
@@ -34,6 +41,8 @@ EOT;
 		<div class="bluebox">
 			<? yearbook(); ?>
 		</div>
+		<div class="blackbar"></div>
+	</div>
 <?
 	}
 
@@ -71,7 +80,8 @@ EOT;
 ?>
 		<div id="grid-container">
 			<div id="commands">
-				<div class="floatleft">
+				<div class="floatleft"><? print_pickuplink() ?></div>
+				<div class="floatright">
 					<? if($args["sort"] !== 'uname_asc') { ?>
 					<a href="./?c=yearbook&sort=uname_asc">sort by username</a>
 					<? } ?>
@@ -87,7 +97,7 @@ EOT;
 		// output loop
 		foreach($result as $upload) {
 			?>
-					<li>
+					<li fileid="<?= $upload->id() ?>">
 						<div class="thumbcontainer">
 							<div><a href="pages/pic.php?id=<?= $upload->id() ?>"
 								<? if($upload->filtered()) { ?>
@@ -108,18 +118,18 @@ EOT;
 					</li>
 				<?php } ?>
 				</ul>
-				<div id="navigation">
-					<? if( $page > 0 ) { ?>
-					<p id="prevpage">
-						<a href="./?<?= query_string("p") ?>&p=<?= $page - 1 ?>">&laquo; previous page</a>
-					</p>
-					<? } ?>
-					<? if(count($result) == $numPerPage) { ?>
-					<p id="nextpage">
-						<a href="./?<?= query_string("p") ?>&p=<?= $page + 1 ?>">next page</a> &raquo;
-					</p>
-					<? } ?>
-				</div>
+			</div>
+			<div id="bottom">
+				<?
+					// next page!
+					$args = $_GET;
+					if(array_key_exists("p", $args)) {
+						$args["p"]++;
+					} else {
+						$args["p"] = 1;
+					}
+				?>
+				<p id="morelink"><a href="<?= $_SERVER['PHP_SELF'] ?>?<?= http_build_query($args) ?>">more…</a></p>
 			</div>
 		</div>
 <?

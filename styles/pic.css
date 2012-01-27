@@ -25,7 +25,7 @@ body {
     top: 50px;
     left: 0px;
     margin-left: 250px;
-    width: 600px;
+    width: 500px;
     background: #ccccff none repeat scroll 0 0;
     color: #000033;
     border: 2px solid black;
@@ -65,7 +65,8 @@ body {
 
 #qc_comments {
 	text-align: left;
-	margin: 25px 45px 25px 45px;
+	/* margin: 25px 45px 25px 45px; */
+	margin: 10px;
 }
 
 #qc_commentrows {
@@ -96,4 +97,26 @@ body {
 
 audio {
 	width: 500px;
+}
+
+.bluebox,.entry {
+	background: #ccccff;
+	padding: 10px;
+	font-family: verdana;
+	font-size: 10px;
+}
+
+.entry {
+	padding: 10px;
+	font-size: 10px;
+	line-height:15px;
+}
+
+.squelched, a.squelched {
+	color:#9999cc;
+	font-size:10px;
+}
+
+.entry .squelched {
+	text-align:center;
 }

@@ -12,7 +12,8 @@ Order Allow,Deny
 Allow from All
 # primedius.com
 Deny from 69.64.147.243	216.227.149.245 81.158.135.58 65.34.123.103 151.203.66.152 68.69.84.151 70.49.11.117 193.166.235.103 69.243.18.143 84.130.100.148 67.184.216.236
-ErrorDocument 403 /fuckoff.php
+
+ErrorDocument 403 /offensive/403.php
 
 RewriteEngine on 
 RewriteCond %{HTTP_REFERER} !^$ 

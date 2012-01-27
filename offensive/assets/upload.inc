@@ -577,6 +577,7 @@ function upload_type(&$postdata) {
 		$dataoffset = 0;
 		$byteword = substr($header, 6, 4);
 		$bytewordlen = strlen($byteword);
+		$intvalue = 0;
 		for ($i = 0; $i < $bytewordlen; $i++) {
 				$intvalue = $intvalue | (ord($byteword{$i}) & 0x7F) << (($bytewordlen - 1 - $i) * 7);
 		}
@@ -789,7 +790,10 @@ function upload_checkrepost(&$postdata) {
 
 	$filePath=dirname(realpath($_SERVER['SCRIPT_FILENAME']));
 
-	?><div class="heading">poster child:</div>
+	?>
+<div class="contentbox">
+	<div class="blackbar"></div>
+	<div class="heading">poster child:</div>
 	<div class="bluebox">
 	<div style="text-align:center">
 	Your file appears to be a repost of:
@@ -827,6 +831,9 @@ function upload_checkrepost(&$postdata) {
 	</form>
 	</div>
 	</div>
+	<div class="blackbar"></div>
+</div>
+
 	<?
 	$_SESSION['postdata'] = serialize($postdata);
 	return true;
@@ -936,7 +943,7 @@ function upload_insert_file($postdata) {
 	$year = date( "Y", $timestamp );
 	$month = date( "m", $timestamp );
 	$day = date( "d", $timestamp );
-	$path = get_include_path()."/offensive/uploads/$year/$month/$day/".upload_type($postdata)."/";
+	$path = get_include_path()."/offensive/uploads/$year/$month/$day/".upload_type($postdata);
 
 	$nsfw = array_key_exists('nsfw', $postdata) ? 1 : 0;
 	$tmbo = array_key_exists('tmbo', $postdata) ? 1 : 0;
@@ -961,8 +968,8 @@ function upload_insert_file($postdata) {
 		ensureDirExists("$path/thumbs");
 
 		// generate the thumbnail
-		$cmd = "convert -define jpeg:size=800x800 $tmpdir/".$postdata['tmpname']."[0] -thumbnail 133x100^ -gravity center -extent 133x100 $tmpdir/th".$postdata['tmpname'];
-		
+		// XXX: this is what's failing
+		$cmd = "/usr/bin/convert -define jpeg:size=800x800 $tmpdir/".$postdata['tmpname']."[0] -thumbnail 133x100^ -gravity center -extent 133x100 $tmpdir/th".$postdata['tmpname'];
 		$err = shell_exec($cmd);
 		if(strlen($err) > 0) trigger_error("ImageMagick failed: $err", E_USER_ERROR);
 

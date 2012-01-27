@@ -1,6 +1,3 @@
-// this file contains all javascript necessary for the UI
-// by Cor Bosman (cor@in.ter.net)
-
 // on page load, call this function
 $(document).ready(function() {
 
@@ -32,17 +29,24 @@ $(document).ready(function() {
 	handle_quickcomment();
 });
 
+// prevent sites from hosting this page in a frame;
+if( window != top ) {
+	top.location.href = window.location.href;
+}
+
 // handle a vote that was clicked on
 function handle_vote(o,e)
 {
 	e.preventDefault();		// prevent the link to continue
-	if(o.parent().hasClass('on')) {
-		do_vote(o);
-	}
+	do_vote(o);
 }
 
 // perform a vote. The object here is the div that belongs to this vote link
 function do_vote(o) {
+  if(!o.parent().hasClass('on')) {
+    return;
+  }
+  
 	// make sure we can't vote again
 	$("#votelinks a").unbind();			// remove click event
 
@@ -58,8 +62,6 @@ function do_vote(o) {
 		increase_count("#count_bad");
 	}
 }
-
-// here laid handle_keypress and handle_qc_keypress
 
 form_text = "";
 function handle_quickcomment()
@@ -135,7 +137,7 @@ function get_comments(hash) {
 
 				// hide the dialog box
 				$("#dialog").jqmHide();
-				vote = $("#dialog input[@type=radio][@checked]").val();
+				vote = $('#dialog input[name=vote]:checked').val();
 				comment = $("#qc_comment").val();
 				tmbo = $("#tmbo").attr("checked") ? "1" : "0";
 				repost = $("#repost").attr("checked") ? "1" : "0";

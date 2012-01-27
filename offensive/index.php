@@ -5,6 +5,8 @@ $userlimit = 20;
 // how long before a user is considered not online anymore
 $timelimit = 10;
 
+//$downtime = 1327204800; // Sat Jan 21 22:00:00 CST 2012
+//$downtime_link = "https://thismight.be/offensive/?c=comments&fileid=327976";
 /*****************************************************************************/
 
 	$defaultpath = ini_get('include_path');
@@ -309,17 +311,32 @@ $timelimit = 10;
 		</div> <!-- end left column -->
 		
 		<div id="rightcol">
-			<div class="contentbox">
-				<div class="blackbar"></div>
+		
+		<?
+		if(isset($downtime)) {
+		  $left = $downtime - time();
+		  if($left >= 0 && $left < 14400) { // 4h
+		    $message = "tmbo is going ";
+		    if(isset($downtime_link)) $message .= "<a href=\"$downtime_link\">";
+		    $message .= "down for maintenance";
+		    if(isset($downtime_link)) $message .= "</a>";
+		    
+		    if($left > 7200) { // 2h
+		      $message .= " in ".(int)($left / 3600)." hours";
+		    } else if($left > 120) { // 2m
+		      $message .= " in ".(int)($left / 60)." minutes";
+		    } else {
+		      $message .= " SOON";
+		    }
+		    box($message, "maintenance time!");
+	    }
+		} ?>
 
 					<?
 						if( function_exists( 'body' ) ) {
 							body();
 						}
 					?>
-
-				<div class="blackbar"></div>
-			</div>
 		</div>
 
 	</div>
@@ -334,11 +351,18 @@ $timelimit = 10;
 		site development by
 		<a href="/contact/" class="textlinks" onmouseover='window.status="[ connect ]"; return true' onmouseout='window.status=""'>ray hatfield</a>,
 		<a href="mailto:thismightbe@numist.net">scott perry</a>,
-		and others.</div>
-	<div class="textlinks">tmbo runs on
+		and <a href="https://github.com/numist/this-might-be-offensive/contributors">others</a>.</div>
+	<div class="textlinks" style="margin: 1em;">Ingredients:
+		<a href="http://php.net/" title="to talk to the computer">PHP</a>,
+		<a href="http://www.mysql.com/" title="for things of importance">MySQL</a>,
+		<a href="http://redis.io/" title="for things that need to be fast">Redis</a>,
+		<a href="https://github.com/nrk/predis" title="to get to things">Predis</a>,
+		<a href="http://jquery.com/" title="for fancy dynamic things">jQuery</a>,
+		<a href="http://flash-mp3-player.net/players/maxi/" title="for making music">MP3 Player</a>,
 		<a href="http://www.imagemagick.org" title="for messing with images">ImageMagick</a>,
 		<a href="http://xapian.org" title="for comment search">Xapian</a>,
-		and unicorn farts.
+		natural flavor.<br />
+		Not a significant source of calcium, iron, dietary fiber, vitamin D, and sanity.
 	</div>
 	<?
 	

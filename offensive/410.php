@@ -1,6 +1,10 @@
 <?
-	header('HTTP/1.0 403 Forbidden');
+	header('HTTP/1.0 410 Gone');
 	header('Content-type: text/html');
+	
+	if(!defined("TMBO")) {
+		set_include_path("..");
+	}
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
         "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
@@ -39,7 +43,7 @@
 		</tr>
 	</table>
 	
-<? include '../includes/footer.txt' ?>
+<? include 'includes/footer.txt' ?>
 
 </body>
 </html>

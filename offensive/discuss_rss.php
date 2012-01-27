@@ -29,7 +29,7 @@ conditionalGet($lastBuildTime);
 <rss version="2.0">
 	<channel>
 		<title>[ this might be offensive ] : discussions</title>
-		<link>http://<?= $_SERVER['SERVER_NAME'] ?>/offensive/</link>
+		<link>https://<?= $_SERVER['SERVER_NAME'] ?>/offensive/</link>
 		<description>[ this might be offensive ]</description>
 		<lastBuildDate><?= gmdate('r', $lastBuildTime); ?></lastBuildDate>
 <?
@@ -45,17 +45,17 @@ conditionalGet($lastBuildTime);
 
 		<item>
 			<title><![CDATA[<?= $upload->filename() ?> (started by <?= $upload->uploader()->username() ?>)]]></title>
-			<link>http://<?= $_SERVER['SERVER_NAME'] ?>/offensive/?c=comments&fileid=<?= $upload->id() ?></link>
+			<link>https://<?= $_SERVER['SERVER_NAME'] ?>/offensive/?c=comments&fileid=<?= $upload->id() ?></link>
 			<description><![CDATA[<?
-				if(count($upload->getComments()) > 0) {
-					$comments = $upload->getComments();
+				$comments = $upload->getComments();
+				if(count($comments) > 0) {
 					echo $comments[0]->HTMLcomment();
 				} else {
 					echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(whaddya want, they didn't say anything)";
 				}
 			?>]]></description>
 			<pubDate><?= date( "r", strtotime( $upload->timestamp() ) ) ?></pubDate>			
-			<comments><![CDATA[http://<?= $_SERVER['SERVER_NAME'] ?>/offensive/page.php?c=comments&fileid=<?= $upload->id() ?>]]></comments>
+			<comments><![CDATA[https://<?= $_SERVER['SERVER_NAME'] ?>/offensive/page.php?c=comments&fileid=<?= $upload->id() ?>]]></comments>
 		</item>
 <?
 	}

@@ -14,7 +14,6 @@ require_once("offensive/assets/comments.inc");
 mustLogIn(array("method" => "http",
                 "token" => null));
 
-$userid = $_SESSION['userid'];
 $uri = $_SERVER["REQUEST_URI"];
 
 $broken = explode("/", $uri);
@@ -33,8 +32,6 @@ call_user_func("api_".$func);
 
 // this gets all the HTML for the quickcomment box.
 function api_getquickcommentbox() {
-	global $userid;
-
 	$fileid = check_arg("fileid", "integer", $_REQUEST);
 	handle_errors();
 
@@ -42,7 +39,6 @@ function api_getquickcommentbox() {
 	$sql = "SELECT users.username, users.userid, users.account_status, offensive_uploads.filename, nsfw, tmbo, offensive_uploads.timestamp as upload_timestamp, offensive_uploads.type FROM users, offensive_uploads WHERE users.userid = offensive_uploads.userid AND offensive_uploads.id = $fileid";
 	$result = tmbo_query( $sql );
 	$row = mysql_fetch_assoc( $result );
-	$my_posting = ($userid == $row['userid']) ? 1 : 0;
 	$upload = new Upload($fileid);
 
 	// start building the HTML that will be inserted into the quick comment box directly
@@ -98,6 +94,7 @@ function api_getquickcommentbox() {
 	
 
 	if( $comments_exist ) {
+		$i = 0;
 		$comments_heading = "the dorks who came before you said: ";
 		if($fileid != "211604") {
 			echo "<b>$comments_heading</b>";
@@ -107,20 +104,15 @@ function api_getquickcommentbox() {
 			if($comment->text() == '')
 				continue;
 			$commenter = $comment->commenter();
-			echo '<div class="qc_comment">';
-					if(!me()->squelched($commenter) && strlen($comment->text()) > 0) {
-						echo $comment->HTMLcomment();
-					}
-					else if(strlen($comment->text()) > 0) {
-						echo "<div class='squelched'>[ squelched ]</div>";
-					}
+			echo '<div class="entry u'.$commenter->id().'" style="'.($i++ % 2 ? "background:#bbbbee;" : "background:#ccccff").'">';
+			echo $comment->HTMLcomment();
 ?>
 			<br />
 			<div class="timestamp"><?= $comment->timestamp() ?></div>
-			&raquo; <a href="/offensive/?c=user&userid=<?= $commenter->id() ?>"><?= $commenter->username() ?></a>
+			&raquo; <?= $commenter->htmlUsername() ?>
 <?php
 			if($comment->vote() != '') {
-				echo '<span class="vote">[ ' . $comment->vote() .' ]</span>';
+				echo '<span class="vote"> [ ' . $comment->vote() .' ]</span>';
 			}
 			if($comment->tmbo()) {
 				echo '<span class="vote"> [ this might be offensive ]</span>';
@@ -133,4 +125,38 @@ function api_getquickcommentbox() {
 		echo "</div>";
 	}
 }
+
+// dynamic page templating functions
+function getlicheck() {
+	$fileid = check_arg("fileid", "integer", $_REQUEST);
+	handle_errors();
+	
+	$upload = core_getupload($fileid);
+	
+	if(array_key_exists("type", $_REQUEST)) {
+		if($upload->type() != $_REQUEST["type"]) {
+			exit;
+		}
+	}
+	return $upload;
+}
+
+function api_getfileli() {
+	$upload = getlicheck();
+	require("offensive/templates/listitem_file.inc");
+	exit;
+}
+
+function api_getthumbli() {
+	$upload = getlicheck();
+	require("offensive/templates/thumbitem_file.inc");
+	exit;
+}
+
+function api_gettopicli() {
+	$upload = getlicheck();
+	require("offensive/templates/listitem_topic.inc");
+	exit;
+}
+
 ?>

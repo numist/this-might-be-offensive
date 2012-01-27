@@ -6,6 +6,7 @@
 	require_once( 'offensive/assets/tabs.inc' );
 	require_once("offensive/assets/classes.inc");
 	require_once("offensive/assets/core.inc");
+	require_once('offensive/assets/pickupLink.inc');
 
 	function start() {
 		mustLogIn();
@@ -19,16 +20,27 @@
 	}
 
 	function head() {
-		echo '
-		<link id="gallery" rel="alternate" href="'.Link::rss("pic").'&gallery=true" type="application/rss+xml" title="PicLens feed" />
-		<link rel="alternate" type="application/rss+xml" title="image stream" href="'.Link::rss("pic").'" />
-		<link rel="alternate" type="application/rss+xml" title="daily archives" href="'.Link::rss("zip").'" />
+		?>
+		<link id="gallery" rel="alternate" href="<?= Link::rss("pic") ?>&gallery=true" type="application/rss+xml" title="PicLens feed" />
+		<link rel="alternate" type="application/rss+xml" title="image stream" href="<?= Link::rss("pic") ?>" />
+		<link rel="alternate" type="application/rss+xml" title="daily archives" href="<?= Link::rss("zip") ?>" />
 		<link href="/styles/grid.css" type="text/css" rel="stylesheet" />
-		<script type="text/javascript" src="/offensive/js/tmbolib.js?v=0.1"></script>
-		<script type="text/javascript" src="/offensive/js/jquery-1.3.2.min.js"></script>
-		<script type="text/javascript" src="/offensive/js/inview.js?v=1.12"></script>
-    <script type="text/javascript" src="/offensive/js/lazyload_new.js?v=0.98"></script>';
-	}
+		<script type="text/javascript" src="/offensive/js/tmbolib.js?v=0.0.3"></script>
+		<script type="text/javascript" src="/offensive/js/jquery-1.7.1.min.js"></script>
+		<script type="text/javascript" src="/offensive/js/pickuplink_visibility.js?v=0.0.2"></script>
+		<? if(count($_GET) == 1 && array_key_exists("c", $_GET)) { ?>
+			<!-- lazyload_changes are only used if on a base page (?c=main not ?c=main&foo=bar) -->
+    	<script type="text/javascript" src="/offensive/js/lazyload_changes.js?v=0.0.12"></script>
+		<? } ?>
+		<script type="text/javascript">
+			function prep_item(item, neighbor) {
+				var color_class = (neighbor.find('.odd_row').length > 0) ? "even_row" : "odd_row";
+				$(item).find('div.col').removeClass("odd_row even_row").addClass(color_class);
+				return item;
+			}
+		</script>
+		<script type="text/javascript" src="/offensive/js/lazyload_bottom.js?v=0.0.5"></script>
+<?}
 
 	function body() {
 		$numPerPage = 100;
@@ -43,6 +55,8 @@
 		}
 
 ?>
+<div class="contentbox">
+<div class="blackbar"></div>
 <div class="heading">
 
 	<?
@@ -67,7 +81,7 @@
 <div class="bluebox">
 	<div id="grid-container">
 		<div id="commands">
-			<div class="floatleft"><? include( 'offensive/assets/pickupLink.inc' ) ?></div>
+			<div class="floatleft"><? print_pickuplink(); ?></div>
 			<div class="floatright"><a href="./?c=thumbs<?= query_string("c p", "&") ?>">thumbnail view</a></div>
 		</div>
 		<div class="grid" id="main">
@@ -75,29 +89,30 @@
 			<?php
 				$result = core_getuploads($args);
 				$revision = currentChange();
-				$output = 0;
 				foreach( $result as $upload ) {
-					$css = (isset($css) && $css == "odd_row") ? "even_row" : "odd_row";
-					$filename = $upload->htmlFilename();
-			?>
-				<li fileid="<?= $upload->id() ?>">
-					<div class="col col1 <?= $css ?>">
-						<a href="pages/pic.php?id=<?= $upload->id() ?>" title="uploaded by <?= htmlEscape($upload->uploader()->username()) ?>"><?= $upload->htmlFilename() ?></a>
-					</div>
-					<div class="col col2 <?= $css ?>">
-						<span class="score"><a href="./?c=comments&fileid=<?= $upload->id() ?>"><?= $upload->commentLabel(); ?></a></span>
-					</div>
-				</li>
-			<?
+					$css = (isset($css) && strpos($css, "odd_row") !== false) ? "even_row" : "odd_row";
+					require("offensive/templates/listitem_file.inc");
 				}
 			?>
 			</ul>
 		</div>
 		<div id="bottom">
-			<p><a href="">load more…</a></p>
+			<?
+				// next page!
+				$args = $_GET;
+				if(array_key_exists("p", $args)) {
+					$args["p"]++;
+				} else {
+					$args["p"] = 1;
+				}
+			?>
+			<p id="morelink"><a href="<?= $_SERVER['PHP_SELF'] ?>?<?= http_build_query($args) ?>">more…</a></p>
 		</div>
 	</div>
 </div>
+<div class="blackbar"></div>
+</div>
+
 <script>
 	var update_index = <?= $revision ?>;
 </script>

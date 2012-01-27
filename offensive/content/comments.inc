@@ -6,6 +6,7 @@
 	require_once("offensive/assets/tabs.inc");
 	require_once("offensive/assets/comments.inc");
 	require_once("offensive/assets/classes.inc");
+	require_once('offensive/assets/pickupLink.inc');
 
 	function additionalCssFor($vote) {
 		if(strpos($vote, 'bad') > 0) return " bad";
@@ -27,51 +28,34 @@
 			exit;
 		}
 		
-		$upload = new Upload($_REQUEST['fileid']);
-
-		if(!$upload->exists()) {
-			require("offensive/404.php");
-			exit;
-		}
-
+		$upload = core_getupload($_REQUEST['fileid']);
 		$uploader = $upload->uploader();
 
 		clearSubscription($upload->id(), me()->id());
 
 		// update pickuplink for discussions
-	    if($upload->type() == "topic") {
-	    	// update the pickup cookie
-        	$cookiename = me()->id()."lasttopic";
-        	if(!array_key_exists($cookiename, $_COOKIE) ||
-        	   !is_intger($_COOKIE[$cookiename]) ||
-        	   $_COOKIE[$cookiename] < $upload->id()) {
-        		setcookie( $cookiename, $upload->id(), time() + 3600*24*365*10, "/offensive/"); 
-			}
-
-			// update the pickup db entry
-			if(me()->getPref("tpickup") == false || me()->getPref("tpickup") < $upload->id()) {
-				me()->setPref("tpickup", $upload->id());
-			}
-        }
+		if($upload->type() == "topic") {
+			update_pickuplinks($upload, $upload->type());
+		}
 
 	
-	    // check to see if someone's posting.  
-	    /* check if someone is being hoodwinked into voting by link.
-	     * NB: only works if the client is reporting REFERERS. 
-	     */
-	    if($upload->type() != 'topic' &&
-		   array_key_exists("submit", $_REQUEST) && array_key_exists("HTTP_REFERER", $_SERVER) &&
-	       $_SERVER['HTTP_REFERER'] !== "" && strpos($_SERVER['HTTP_REFERER'], $_SERVER['SERVER_NAME']) === false) {
-			echo "you've been had.";
-			trigger_error("off-site tried to vote on non-topic upload, referer: ".$_SERVER['HTTP_REFERER'], E_USER_WARNING);
-			return;
-	    }
-	    
-	    // quietly snub them if they are not an admin and they are trying to post to the changeblog
-	    if(array_key_exists("submit", $_REQUEST) && $upload->id() == "211604" && me()->status() != "admin") {
-	        return;
-	    }
-	    
+	  // check to see if someone's posting.  
+	  /* check if someone is being hoodwinked into voting by link.
+	   * NB: only works if the client is reporting REFERERS. 
+	   */
+	  if($upload->type() != 'topic' &&
+		 array_key_exists("submit", $_REQUEST) && array_key_exists("HTTP_REFERER", $_SERVER) &&
+	     $_SERVER['HTTP_REFERER'] !== "" && strpos($_SERVER['HTTP_REFERER'], $_SERVER['SERVER_NAME']) === false) {
+		echo "you've been had.";
+		trigger_error("off-site tried to vote on non-topic upload, referer: ".$_SERVER['HTTP_REFERER'], E_USER_WARNING);
+		return;
+	  }
+	  
+	  // quietly snub them if they are not an admin and they are trying to post to the changeblog
+	  if(array_key_exists("submit", $_REQUEST) && $upload->id() == "211604" && me()->status() != "admin") {
+	      return;
+	  }
+	  
 		if( array_key_exists("submit", $_POST)) {
 			$fileid		 = array_key_exists("fileid", $_POST) ?
 							$_POST['fileid'] : '';
@@ -106,8 +90,7 @@
 
 	function head() {
 ?>
-	<script type="text/javascript" src="/offensive/js/jquery-1.2.6.min.js"></script>
-
+	<script type="text/javascript" src="/offensive/js/jquery-1.7.1.min.js"></script>
 	<script type="text/javascript" src="/offensive/js/subscriptions.js"></script>
 
 	<script type="text/javascript">
@@ -149,7 +132,8 @@
 		$href = "/offensive/pages/pic.php?id=".$upload->id();
 ?>	
 
-
+<div class="contentbox">
+	<div class="blackbar"></div>
 		<div class="heading"><?
     // changeblog special header
 	if($upload->id() == "211604") {
@@ -195,17 +179,14 @@
 			$commenter = $comment->commenter();
 		?>
 		<a name="<?= $comment->id() ?>"></a>
-		<div class="entry u<?= $commenter->id() ?>" style="<?= nextStyle($commentnum++)?>">
-    	
-				<?php
-    	
-					if(!me()->squelched($commenter) && strlen($comment->text()) > 0) {
-						echo $comment->HTMLcomment();
-					}
-					else if(strlen($comment->text()) > 0) {
-						echo "<div class='squelched'>[ squelched ]</div>";
-					}
-		?>
+		<div class="entry u<?= $commenter->id() ?><?
+			if($comment->vote() == "this is good") echo " tig";
+			if($comment->vote() == "this is bad") echo " tib";
+			if($comment->tiar()) echo " tiar";
+			if($comment->tmbo()) echo " tmbo";
+			if(strlen($comment->text())) echo " comment";
+		?>" style="<?= nextStyle($commentnum++)?>">
+				<?= $comment->HTMLcomment(); ?>
 				<br />
 				<div class="timestamp"><a href="#<?= $comment->id() ?>"><?= $comment->timestamp() ?></a></div>
 				
@@ -375,6 +356,9 @@
 				
 				</form>
 			</div>
+			<div class="blackbar"></div>
+		</div>
+			
 
 <?
     }

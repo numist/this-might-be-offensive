@@ -1,3 +1,7 @@
+<?
+  set_include_path("../..");
+  require("offensive/data/keynav.inc");
+?>
 var template;
 var old_key;
 $(document).ready(function() {
@@ -106,6 +110,22 @@ function record_key(o,e) {
 		   keycode == 91 || keycode == 92 || keycode == 93) {
 			return;
 		}
+		
+		if(i.shiftKey) {
+		  keycode |= <?= KEY_SHIFT ?>;
+		}
+		if(i.altKey) {
+		  keycode |= <?= KEY_ALT ?>;
+		}
+		if(i.ctrlKey) {
+		  keycode |= <?= KEY_CTRL ?>;
+		}
+		if(i.metaKey) {
+		  keycode |= <?= KEY_META ?>;
+		}
+		// TODO: remove key-agnosticism
+		keycode |= <?= KEY_META_AWARE ?>;
+		
 		keyval = key_value(keycode);
 		o.blur();
 		o.parent().parent().find('.key_notification').html('');
@@ -118,53 +138,69 @@ function record_key(o,e) {
 
 // return human readable key values
 function key_value(keycode) {
+  // meta keys
+  var meta = "";
+  if(keycode <= 255) {
+    // TODO: remove key-agnosticism
+    meta += "(agnostic) ";
+  } else if(keycode & <?= KEY_SHIFT ?>) {
+    meta += "(shift) ";
+  } else if(keycode & <?= KEY_ALT ?>) {
+    meta += "(alt) ";
+  } else if(keycode & <?= KEY_CTRL ?>) {
+    meta += "(ctrl) ";
+  } else if(keycode & <?= KEY_META ?>) {
+    meta += "(meta) ";
+  }
+  keycode &= <?= KEY_CODE_MASK ?>;
+  
 	// digits
 	if(keycode >= 48 && keycode <= 57) {
-		return keycode-48+" (key)";
+		return meta+(keycode-48)+" (key)";
 	}
 	
 	// numpad digits
 	if(keycode >= 96 && keycode <= 105) {
-		return keycode-96+" (num)";
+		return meta+(keycode-96)+" (num)";
 	}
 
 	if(keycode >= 65 && keycode <= 90) {
-		return String.fromCharCode(keycode).toLowerCase();
+		return meta+String.fromCharCode(keycode).toLowerCase();
 	}
 	switch(keycode) {
-		case 27:	return "Esc";
-		case 37:	return "←";
-		case 38:	return "↑";
-		case 39:	return "→";
-		case 40:	return "↓";
-		case 61:  return "+";
-		case 106: return "* (num)";
-		case 107: return "+ (num)";
-		case 109: return "- (num)";
-		case 110: return ". (num)";
-		case 111: return "/ (num)";
-		case 112:	return "F1";
-		case 113:	return "F2";
-		case 114:	return "F3";
-		case 115:	return "F4";
-		case 116:	return "F5";
-		case 117:	return "F6";
-		case 118:	return "F7";
-		case 119:	return "F8";
-		case 120:	return "F9";
-		case 121:	return "F10";
-		case 122:	return "F11";
-		case 123:	return "F12";
-		case 170: return "- (Wii)";
-		case 174: return "+ (Wii)";
-		case 175: return "↑ (Wii)";
-		case 176: return "↓ (Wii)";
-		case 177: return "→ (Wii)";
-		case 178: return "← (Wii)";
-		case 187: return "=";
-		case 189: return "-";
+		case 27:	return meta+"Esc";
+		case 37:	return meta+"←";
+		case 38:	return meta+"↑";
+		case 39:	return meta+"→";
+		case 40:	return meta+"↓";
+		case 61:  return meta+"+";
+		case 106: return meta+"* (num)";
+		case 107: return meta+"+ (num)";
+		case 109: return meta+"- (num)";
+		case 110: return meta+". (num)";
+		case 111: return meta+"/ (num)";
+		case 112:	return meta+"F1";
+		case 113:	return meta+"F2";
+		case 114:	return meta+"F3";
+		case 115:	return meta+"F4";
+		case 116:	return meta+"F5";
+		case 117:	return meta+"F6";
+		case 118:	return meta+"F7";
+		case 119:	return meta+"F8";
+		case 120:	return meta+"F9";
+		case 121:	return meta+"F10";
+		case 122:	return meta+"F11";
+		case 123:	return meta+"F12";
+		case 170: return meta+"- (Wii)";
+		case 174: return meta+"+ (Wii)";
+		case 175: return meta+"↑ (Wii)";
+		case 176: return meta+"↓ (Wii)";
+		case 177: return meta+"→ (Wii)";
+		case 178: return meta+"← (Wii)";
+		case 187: return meta+"=";
+		case 189: return meta+"-";
 
-		default:	return keycode;
+		default:	return meta+keycode;
 	}
 }
 

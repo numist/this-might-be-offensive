@@ -34,6 +34,8 @@
 	
 		$sql = "INSERT INTO offensive_count_cache(threadid, good, bad, tmbo, comments, repost) VALUES($threadid, 0, 0, 0, 0, 0)";
 		tmbo_query($sql);
+		
+		insertChange("upload", $threadid, "topic" . ":" . me()->username() . ":" . $topic);
 
 		return $threadid;
 
@@ -43,6 +45,8 @@
 
 	function body() {
 ?>
+<div class="contentbox">
+	<div class="blackbar"></div>
 		<div class="heading">we need to talk.</div>
 
 <?
@@ -69,7 +73,8 @@
 			</form>
 			
 		</div>
-
+		<div class="blackbar"></div>
+	</div>
 <?
 	}
 ?>

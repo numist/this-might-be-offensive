@@ -307,9 +307,15 @@ class Upload {
 	 */
 	public function next() {
 		if(!array_key_exists("next", $this->data)) {
+			$blocksql = "";
+			if(me()) {
+				$blocksql = "AND userid NOT IN (SELECT squelched FROM offensive_squelch WHERE userid = ".me()->id().")
+                       AND userid NOT IN (SELECT userid FROM offensive_squelch WHERE squelched = ".me()->id().")";
+			}
 			
-			$sql = "SELECT * FROM offensive_uploads WHERE id > ".$this->id()." AND type='".$this->type()."' AND status='normal'
-					ORDER BY id ASC LIMIT 1";	
+			$sql = "SELECT * FROM offensive_uploads WHERE id > {$this->id()} AND type='{$this->type()}' AND status='normal'
+			        $blocksql
+              ORDER BY id ASC LIMIT 1";	
 			$result = tmbo_query($sql);
 			if(mysql_num_rows($result) == 0) {
 				$this->data["next"] = false;
@@ -323,15 +329,17 @@ class Upload {
 	
 	public function next_filtered() {
 		if(!me()) return $this->next();
+		$me = me();
 		
 		if(!array_key_exists("next_filtered", $this->data)) {			
 			$tmbo_sql = me()->getPref("hide_tmbo") ? " AND NOT tmbo " : "";
 			$nsfw_sql = me()->getPref("hide_nsfw") ? " AND NOT nsfw " : "";
-        
+
 			$sql = "SELECT * FROM offensive_uploads WHERE id > {$this->id()} AND type='{$this->type()}' AND status='normal'
 					$tmbo_sql
 					$nsfw_sql
-					AND userid NOT IN (SELECT squelched FROM offensive_squelch WHERE userid = ".me()->id()." )
+					AND userid NOT IN (SELECT squelched FROM offensive_squelch WHERE userid = {$me->id()})
+					AND userid NOT IN (SELECT userid FROM offensive_squelch WHERE squelched = {$me->id()})
 					ORDER BY id ASC LIMIT 1";
 			$result = tmbo_query($sql);
 			if(mysql_num_rows($result) == 0) {
@@ -387,15 +395,15 @@ class Upload {
 	 * filtering code
 	 */
 	public function filtered() {
-		return $this->squelched() ||
+		return $this->blocked() ||
 		       $this->filtered_nsfw() ||
 		       $this->filtered_tmbo() ||
 		       $this->filtered_bad();
 	}
 	
-	public function squelched() {
+	public function blocked() {
 		return (me() != false
-			? me()->squelched($this->uploader())
+			? me()->blocked($this->uploader())
 			: false);
 	}
 	
@@ -606,10 +614,15 @@ class Upload {
 	public function commentLabel($showvotes=true) {
 		$comments = $this->comments();
 
-		$retval = ($comments == 0 ? "no" : $comments)." comment".($comments == 1 ? "" :"s");
+		$retval = '<span class="comments">'.$comments."</span>&nbsp;"
+		         .'<span class="commentlabel">comment'.($comments == 1 ? "" :"s")."</span>";
 		if(!$showvotes) return $retval;
-		$retval .= " (+".$this->goods()." -".$this->bads()
-		        . ($this->tmbos() > 0 ? " x".$this->tmbos() : "").")";
+
+		$retval .= '&nbsp;('
+		          .'+<span class="goods">'.$this->goods().'</span>'
+		          .'&nbsp;-<span class="bads">'.$this->bads().'</span>'
+		          .($this->tmbos() > 0 ? '&nbsp;x<span class="tmbos">'.$this->tmbos().'</span>' : "")
+		          .")";
 		return $retval;
 	}
 
@@ -652,7 +665,8 @@ class Upload {
 				"vote_tmbo" => $this->tmbos(),
 				"vote_repost" => $this->tiars(),
 				"comments" => $this->comments(),
-				"filtered" => $this->filtered()
+				"filtered" => $this->filtered(),
+				"last_active" => $this->last_active()
 			);
 		if($this->type() != "topic" && $this->file() != '') {
 			$ret["link_file"] = $this->URL();
@@ -808,7 +822,7 @@ class Comment {
 		 * +-----------+
 		 * 3 rows in set (12.21 sec)
 		 *
-		 * thus this code is more clever than it really should need to.
+		 * thus this code is more clever than it really should need to be.
 		 */
 		
 		return (1 == $this->getCommentRow("offensive") ? true : false);
@@ -827,8 +841,9 @@ class Comment {
 		 *  +--------+
 		 *  3 rows in set (14.39 sec)
 		 *
-		 * thus this code is more clever than it really should need to.
+		 * thus this code is more clever than it really should need to be.
 		 */
+		
 		return (1 == $this->getCommentRow("repost") ? true : false);
 	}
 	
@@ -837,12 +852,21 @@ class Comment {
 	}
 	
 	public function text() {
-		return $this->getCommentRow("comment");
+		$comment = $this->getCommentRow("comment");
+		if($this->blocked() && strlen($comment) > 0) {
+			$comment = "yes, there's a comment. no, you can't see it.";
+		}
+		return $comment;
 	}
 	
 	public function HTMLcomment() {
 		$comment = $this->text();
 		if($comment == "") return "";
+		
+		if($this->blocked()) {
+			$context = me()->squelched($this->commenter()) ? "squelched" : "blocked";
+			return "<div class='squelched'>[ $context ]</div>";
+		}
 
 		$comment = htmlEscape($comment);
 
@@ -928,6 +952,10 @@ class Comment {
 		}
 		
 		return $this->data["commenter"];
+	}
+	
+	public function blocked() {
+		return me()->blocked($this->commenter());
 	}
 
 	public function api_data() {
@@ -1123,15 +1151,14 @@ class User {
 	
 	public function location() {
 		if(!array_key_exists("location", $this->data)) {
-		
-			$sql = "SELECT x AS latitude, y AS longitude, timestamp 
-			        FROM maxxer_locations WHERE mapversion = 'google' AND userid = ".$this->data["userid"];
-			$result = tmbo_query($sql);
+			$locs = core_getlocation(array("userid" => $this->id()));
 			
-			if(mysql_num_rows($result) !== 1)
+			if(count($locs) !== 1)
 				$this->data["location"] = false;
 			else
-				$this->data["location"] = mysql_fetch_assoc($result);
+				$this->data["location"] = array("latitude" => $locs[0]["latitude"],
+				                                "longitude" => $locs[0]["longitude"],
+				                                "timestamp" => $locs[0]["timestamp"]);
 		}
 		
 		return $this->data["location"];
@@ -1172,23 +1199,54 @@ class User {
 			trigger_error("target must be a userid or User object", E_USER_ERROR);
 		}
 		
-		if(!array_key_exists("squelched", $this->data)) {
+		if(!array_key_exists("squelched", $this->data)
+		|| !array_key_exists("squelched_by", $this->data)) {
+			
+			// data consistency
+			assert('!array_key_exists("squelched", $this->data)');
+			assert('!array_key_exists("squelched_by", $this->data)');
 			$this->data["squelched"] = array();
-			$sql = "SELECT squelched FROM offensive_squelch WHERE userid=".$this->id();
+			$this->data["squelched_by"] = array();
+
+			$sql = "SELECT userid,squelched FROM offensive_squelch WHERE userid=".$this->id()." OR squelched=".$this->id();
 			$result = tmbo_query($sql);
 
 			while($row = mysql_fetch_array($result)) {
-				$this->data["squelched"][] = $row["squelched"];
+				if($row["userid"] == $this->id()) {
+					$this->data["squelched"][] = $row["squelched"];
+				} else {
+					$this->data["squelched_by"][] = $row["userid"];
+				}
 			}
 		}
 		
 		return in_array($target, $this->data["squelched"]);
 	}
+	
+	public function blocked($target) {
+		if($this->status() == "admin") {
+			return $this->squelched($target);
+		}
+
+		if(is_object($target)) {
+			$target = $target->id();
+		}
+		
+		return $this->squelched($target) || in_array($target, $this->data["squelched_by"]);
+	}
 
 	// squelch a user
 	public function squelch($target) {
-		// populate our local squelch cache
-		$this->squelched(0);
+		// sanity check
+		if(me()->id() != $this->id() && me()->status() != "admin") {
+			trigger_error(me()->username()." can not squelch on ".$this->username()."'s behalf!", E_USER_ERROR);
+		}
+		
+		// is this redundant?
+		if($this->squelched($target)) {
+			return;
+		}
+		
 		// make sure user exists and all that
 		if(is_object($target)) {
 			$target = $target->id();
@@ -1203,17 +1261,21 @@ class User {
 		
 		$sql = "INSERT INTO offensive_squelch(userid, squelched) VALUES ( ".$this->id().", $target )";
 		tmbo_query( $sql );
-		
-		foreach($this->data["squelched"] as $squelchee) {
-			if($squelchee == $target) return;
-		}
 		$this->data["squelched"][] = $target;
 	}
 	
 	// unsquelch a user
 	public function unsquelch($target) {
-		// populate our local squelch cache
-		$this->squelched(0);
+		// sanity check
+		if(me()->id() != $this->id() && me()->status() != "admin") {
+			trigger_error(me()->username()." can not squelch on ".$this->username()."'s behalf!", E_USER_ERROR);
+		}
+		
+		// is this redundant?
+		if(!$this->squelched($target)) {
+			return;
+		}
+		
 		// make sure user exists and all that
 		if(is_object($target)) {
 			$target = $target->id();
@@ -1228,10 +1290,7 @@ class User {
 		
 		$sql = "DELETE FROM offensive_squelch WHERE userid=".$this->id()." AND squelched=$target";
 		tmbo_query($sql);
-		
-		foreach($this->data["squelched"] as $key => $squelchee) {
-			if($squelchee == $target) unset($this->data["squelched"][$key]);
-		}
+		unset($this->data["squelched"][$target]);
 	}
 	
 	/*
@@ -1263,7 +1322,18 @@ class User {
 	 */
 	public function getPref($name) {
 		global $redis;
-		return $redis->get($this->id().':'.$name);
+		
+		require("offensive/data/preferences.inc");
+		if(!in_array($name, $prefnames))
+			trigger_error("$name is not a valid preference name!", E_USER_ERROR);
+		
+		$value = $redis->get($this->id().':'.$name);
+		
+		if($name == "sortorder_discussions" && $value == "") {
+			return "date_desc";
+		}
+		
+		return $value;
 	}
 	
 	public function setPref($name, $value) {

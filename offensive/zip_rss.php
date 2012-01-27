@@ -31,14 +31,14 @@
 ?><rss version="2.0">
 	<channel>
 		<title>[ this might be offensive ] : archives</title>
-		<link>http://<?= $_SERVER['SERVER_NAME'] ?>/offensive/</link>
+		<link>https://<?= $_SERVER['SERVER_NAME'] ?>/offensive/</link>
 		<description>[ this might be offensive ]</description>
 		<lastBuildDate><?= gmdate($dateFormat, $time); ?></lastBuildDate>
 
 <?php
 	foreach( $fileList as $file ) {
 	
-	$url = "http://".$_SERVER['SERVER_NAME']."/offensive/zips/$file";
+	$url = "https://".$_SERVER['SERVER_NAME']."/offensive/zips/$file";
 ?>
 	<item>
 		<title><?php echo $file?></title>

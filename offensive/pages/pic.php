@@ -7,6 +7,7 @@
 	require_once("offensive/assets/classes.inc");
 	require_once("offensive/assets/core.inc");
 	require_once("offensive/assets/comments.inc");
+	require_once('offensive/assets/pickupLink.inc');
 
 	mustLogIn();
 	time_start($ptime);
@@ -22,7 +23,6 @@
 	}
 
 	$upload = core_getupload($id);
-
 	if(!$upload->exists()) {
 		header( "Location: /offensive/" );
 		exit;
@@ -40,71 +40,20 @@
 
 	###########################################################################
 	// update pickuplinks
-	switch($upload->type()) {
-		case "image":
-			$cookiename = me()->id()."lastpic";
-			$prefname = "ipickup";
-			break;
-		case "audio":
-			$cookiename = me()->id()."lasttrack";
-			$prefname = "apickup";
-			break;
-		case "avatar":
-			$cookiename = me()->id()."lastavatar";
-			$prefname = "ypickup";
-	}
-
-	// update the pickup cookie
-	if(!array_key_exists($cookiename, $_COOKIE) ||
-	   !is_intger($_COOKIE[$cookiename]) ||
-	   $_COOKIE[$cookiename] < $upload->id()) {
-		setcookie( $cookiename, $upload->id(), time() + 3600*24*365*10, "/offensive/");
-	}
-
 	global $autoplay;
-	$autoplay = false;
+	$autoplay = update_pickuplinks($upload, $upload->type());
 
-	// update the pickup db entry
-	if(me()->getPref($prefname) == false || me()->getPref($prefname) < $upload->id()) {
-		// if this account has not been this far forward in the stream before, autoplay.
-		$autoplay = !$upload->filtered();
-		me()->setPref($prefname, $upload->id());
-	}
-	
 	if(array_key_exists('loop', $_REQUEST)) {
 		$autoplay = true;
 	}
 
 	###########################################################################
 	function get_random_id($upload) {
-		switch($upload->type()) {
-			case "image":
-				$cookiename = me()->id()."lastpic";
-				break;
-			case "audio":
-				$cookiename = me()->id()."lasttrack";
-				break;
-			case "avatar":
-				$cookiename = me()->id()."lastavatar";
-				break;
-		}
+		$pickuplinks = get_pickuplinks($upload->type());
 
-		if(array_key_exists($cookiename, $_COOKIE)) {
-			$cookiepic = $_COOKIE[$cookiename];
-		} else {
-			// this should never happen, since in normal browsing you have to hit
-			// pic.php at least once with an id argument in order to use random.
-			$cookiepic = 0;
-		}
-
-		/*
-		 * since pic.php sets the ipickup db preference and the pickupid in the cookie
-		 * at the beginning of execution if they are invalid, it's safe to skip
-		 * existence and type checks at this point.
-		 */
 		$filter = me()->getPref("hide_nsfw") ? " AND nsfw = 0" : "";
 		$filter .= me()->getPref("hide_tmbo") ? " AND tmbo = 0" : "";
-		$sql = "SELECT id FROM offensive_uploads WHERE type='".$upload->type()."' AND status='normal' AND id < ".min(me()->getPref('ipickup'), $cookiepic).$filter." ORDER BY RAND() LIMIT 1";
+		$sql = "SELECT id FROM offensive_uploads WHERE type='".$upload->type()."' AND status='normal' AND id < ".min($pickuplinks).$filter." ORDER BY RAND() LIMIT 1";
 		$res = tmbo_query($sql);
 		$row = mysql_fetch_assoc( $res );
 		return($row['id']);
@@ -127,258 +76,131 @@
 		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 		<META NAME="ROBOTS" CONTENT="NOARCHIVE" />
 		<title>[<?= $upload->type() ?>] : <?= $upload->filename() ?> </title>
-		<link rel="stylesheet" type="text/css" href="/styles/pic.css"/>
+		<link rel="stylesheet" type="text/css" href="/styles/pic.css?v=0.0.1"/>
 		<!-- <? if($upload->next_filtered()) { ?>
 			<link rel="prefetch" href="<?= $_SERVER['PHP_SELF'] ?>?id=<?= $upload->next_filtered()->id() ?>"/>
 		<? } ?> -->
 
-		<script type="text/javascript" src="/offensive/js/jquery-1.2.6.min.js"></script>
-		<!-- XXX: a lot of this picui stuff is going to have to move into this header so it can be customized -->
-		<script type="text/javascript" src="/offensive/js/picui.js"></script>
+		<script type="text/javascript" src="/offensive/js/jquery-1.7.1.min.js"></script>
+		<script type="text/javascript" src="/offensive/js/picui.js?v=0.0.3"></script>
 		<script type="text/javascript" src="/offensive/js/subscriptions.js"></script>
 		<script type="text/javascript" src="/offensive/js/jqModal.js"></script>
-		<script type="text/javascript" src="/offensive/js/jqDnR.js"></script>
+		<script type="text/javascript" src="/offensive/js/jqDnR.js?v=0.0.1"></script>
 		<script type="text/javascript">
-			self.file_id = "";
-
-			// prevent sites from hosting this page in a frame;
-			if( window != top ) {
-				top.location.href = window.location.href;
-			}
+      <? require("offensive/data/keynav.inc"); ?>
+      function composite_keycode(e)
+      {
+        var keycode = (e.which == null) ? e.keyCode : e.which;
+				if(e.shiftKey) {
+    		  keycode |= <?= KEY_SHIFT ?>;
+    		}
+    		if(e.altKey) {
+    		  keycode |= <?= KEY_ALT ?>;
+    		}
+    		if(e.ctrlKey) {
+    		  keycode |= <?= KEY_CTRL ?>;
+    		}
+    		if(e.metaKey) {
+    		  keycode |= <?= KEY_META ?>;
+    		}
+    		// TODO: remove key-agnosticism
+    		keycode |= <?= KEY_META_AWARE ?>;
+    		
+    		return keycode;
+      }
 
 			// handle a keybased event. this code was incorporated from offensive.js, which has now been deprecated
 			function handle_keypress(o,e)
 			{
-				var id;
+			  // potential actions
+			  function nav_to_id(id) {
+          if(document.getElementById(id)) {
+  					document.location.href = document.getElementById(id).href;
+  				}
+        }
+        
+      	function key_next()     { nav_to_id("next"); };
+      	function key_prev()     { nav_to_id("previous"); };
+      	function key_comments() { nav_to_id("comments"); };
+      	function key_index()    { nav_to_id("index"); };
+        function key_good() { do_vote($("#good")); };
+      	function key_bad()  { do_vote($("#bad")); };
+      	function key_quick() { $("#dialog").jqmShow(); };
+      	function key_subscribe() { handle_subscribe($('.subscribe_toggle:visible'),e,$("#good").attr("name")); };
+        function key_random() { document.location.href = "/offensive/pages/pic.php?id=<?= $upload->id() ?>&random"; };
+      	
 				if(e == null)  return true;
+        var keycode = composite_keycode(e);
 
-				var keycode = (e.which == null) ? e.keyCode : e.which;
-				switch( keycode ) {
-					<?
-					require("offensive/data/keynav.inc");
-					// get the user's keyboard navigation preferences
-					$prefs = array();
-					foreach($options as $option => $foo) {
-						if($option == "noselect") continue;
-						$val = me()->getPref($option);
-						if($val) {
-							$prefs[$option] = unserialize($val);
-						}
+        <?// get the user's keyboard navigation preferences
+				$prefs = array();
+				foreach($key_options as $option => $foo) {
+					if($option == "noselect") continue;
+					$val = me()->getPref($option);
+					if($val) {
+						$prefs[$option] = unserialize($val);
 					}
-
-					if(count($prefs) == 0) {
-						// use the default keybindings, the user has set nothing special.
-						?>
-						case 61:  // +
-						case 107: // + (numpad)
-						case 187: // =
-						case 174: // Wii +
-							e.preventDefault();
-							id = $("#good");
-							if(id.parent().hasClass('on')) {
-								do_vote(id);
-							}
-							return;
-							break;
-
-						case 109: // - (numpad)
-						case 189: // -
-						case 170: // Wii -
-							e.preventDefault();
-							id = $("#bad");
-							if(id.parent().hasClass('on')) {
-								do_vote(id);
-							}
-							return;
-							break;
-
-						case 81:  // q
-							e.preventDefault();
-							$("#dialog").jqmShow();
-							return;
-							break;
-
-						case 191: // ?
-							e.preventDefault();
-							document.location.href = "/offensive/pages/pic.php?id=<?= $upload->id() ?>&random";
-							return;
-							break;
-
-					// following not ajaxified
-						case 39:  // →
-						case 177: // Wii Right
-							e.preventDefault();
-							id = "previous";
-							break;
-
-						case 37:  // ←
-						case 178: // Wii Left
-							e.preventDefault();
-							id = "next";
-							break;
-
-						case 38:  // ↑
-						case 175: // Wii Up
-							e.preventDefault();
-							id = "index";
-							break;
-
-						case 40:  // ↓
-						case 176: // Wii Down
-							e.preventDefault();
-							id = "comments";
-							break;
-						<?
-						$escape = array("27");
-					} else {
-						if(array_key_exists("key_good", $prefs)) {
-							foreach($prefs["key_good"] as $code) {
-								echo "case $code:\n";
-							}
-							?>
-							e.preventDefault();
-							id = $("#good");
-							if(id.parent().hasClass('on')) {
-								do_vote(id);
-							}
-							return;
-							break;
-							<?
-						}
-
-						if(array_key_exists("key_bad", $prefs)) {
-							foreach($prefs["key_bad"] as $code) {
-								echo "case $code:\n";
-							}
-							?>
-							e.preventDefault();
-							id = $("#bad");
-							if(id.parent().hasClass('on')) {
-								do_vote(id);
-							}
-							return;
-							break;
-							<?
-						}
-
-						if(array_key_exists("key_quick", $prefs)) {
-							foreach($prefs["key_quick"] as $code) {
-								echo "case $code:\n";
-							}
-							?>
-							e.preventDefault();
-							$("#dialog").jqmShow();
-							return;
-							break;
-							<?
-						}
-
-						if(array_key_exists("key_random", $prefs)) {
-							foreach($prefs["key_random"] as $code) {
-								echo "case $code:\n";
-							}
-							?>
-							e.preventDefault();
-							document.location.href = "/offensive/pages/pic.php?id=<?= $upload->id() ?>&random";
-							return;
-							break;
-							<?
-						}
-
-						if(array_key_exists("key_prev", $prefs)) {
-							foreach($prefs["key_prev"] as $code) {
-								echo "case $code:\n";
-							}
-							?>
-							e.preventDefault();
-							id = "previous";
-							break;
-							<?
-						}
-
-						if(array_key_exists("key_next", $prefs)) {
-							foreach($prefs["key_next"] as $code) {
-								echo "case $code:\n";
-							}
-							?>
-							e.preventDefault();
-							id = "next";
-							break;
-							<?
-						}
-
-						if(array_key_exists("key_index", $prefs)) {
-							foreach($prefs["key_index"] as $code) {
-								echo "case $code:\n";
-							}
-							?>
-							e.preventDefault();
-							id = "index";
-							break;
-							<?
-						}
-
-						if(array_key_exists("key_comments", $prefs)) {
-							foreach($prefs["key_comments"] as $code) {
-								echo "case $code:\n";
-							}
-							?>
-							e.preventDefault();
-							id = "comments";
-							break;
-							<?
-						}
-
-						if(array_key_exists("key_subscribe", $prefs)) {
-							foreach($prefs["key_subscribe"] as $code) {
-								echo "case $code:\n";
-							}
-							?>
-							sub=$('.subscribe_toggle:visible');
-							handle_subscribe(sub,e,$("#good").attr("name"));
-							return;
-							break;
-							<?
-						}
-
-						if(array_key_exists("key_escape", $prefs)) {
-							$escape = $prefs["key_escape"];
-						} else {
-							$escape = array();
-						}
-					}
-					?>
 				}
-				if( id && document.getElementById( id ) ) {
-					document.location.href = document.getElementById( id ).href;
-					return false;
-				}
-				return true;
+				if(count($prefs) == 0) {
+				  $prefs = $key_defaults;
+			  }
+        
+        foreach($prefs as $action => $codes) {
+          foreach($codes as $code) {
+            // TODO: remove key-agnosticism
+            if($code <= KEY_CODE_MASK) {
+              // code is modifier-agnostic ?>
+            if(<?= $code ?> == (keycode & <?= KEY_CODE_MASK ?>)) {
+            <? } else {
+              // code is modifier-strict ?>
+            if(<?= $code ?> == keycode) {
+            <? } ?>
+              
+              e.preventDefault();
+              <?= $action ?>();
+              return;
+            }
+        
+        <?}
+        }?>
+
+				return;
 			}
 
 			// handle a keybased event. this code was incorporated from offensive.js, which has now been deprecated
 			function handle_qc_keypress(o,e)
 			{
-				if(e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return true;
+			  // potential actions
+			  function escape() {
+			    e.preventDefault();
+					$("#dialog").jqmHide();
+					return;
+			  }
 
 				var id;
 				if(e == null)  {
 					return true;
 				}
 
-				var keycode = (e.which == null) ? e.keyCode : e.which;
-				switch( keycode ) {
-					<?
-					foreach($escape as $keycode) {
-						echo "case $keycode:\n";
-					}
-					if(count($escape) > 0) { ?>
-						e.preventDefault();
-						$("#dialog").jqmHide();
-						return;
-						break;
-					<? } ?>
-				}
+				var keycode = composite_keycode(e);
+
+				<?
+				if(array_key_exists("key_escape", $prefs)) {
+				  foreach($prefs["key_escape"] as $code) {
+				    // TODO: remove key-agnosticism
+            if($code <= KEY_CODE_MASK) {
+              // code is modifier-agnostic ?>
+            if(<?= $code ?> == (keycode & <?= KEY_CODE_MASK ?>)) {
+            <? } else {
+              // code is modifier-strict ?>
+            if(<?= $code ?> == keycode) {
+            <? } ?>
+
+              escape();
+              return;
+            }
+				<?}
+			  }?>
 				return true;
 			}
 
@@ -422,7 +244,7 @@
 
 		<div id="content">
 			<div id="heading" style="white-space:nowrap;">
-				&nbsp;&nbsp;
+				&nbsp;&nbsp;<span id="navigation_controls">
 				<?
 				/*
 				 * navigation buttons, prev index next are dependant on type
@@ -445,36 +267,39 @@
 
 				if($upload->next_filtered()) {
 					$style = ($upload->next_filtered()->is_nsfw() || $upload->next_filtered()->is_tmbo() ? 'style="font-style:italic; color: #990000"' : "") ?>
-					<a id="next" <?= $style ?> href="<?= $_SERVER['PHP_SELF'] ?>?id=<?= $upload->next_filtered()->id() ?>" title="<?= str_replace('"', '\\"', $upload->next_filtered()->filename()) ?>">newer</a>
+					<a id="next" <?= $style ?> href="<?= Link::upload($upload->next_filtered()) ?>" title="<?= str_replace('"', '\\"', $upload->next_filtered()->filename()) ?>">newer</a>
 				<? } else { ?>
 					<a href="/offensive/?c=<?= $index ?>" id="next" style="visibility:hidden">newer</a>
 				<? } ?>
 				. <a id="index" href="/offensive/?c=<?= $index ?>">index</a> .
 				<? if($upload->prev_filtered()) {
 					$style = ($upload->prev_filtered()->is_nsfw() || $upload->prev_filtered()->is_tmbo() ? 'style="font-style:italic; color: #990000"' : "") ?>
-					<a id="previous" <?= $style ?> href="<?= $_SERVER['PHP_SELF'] ?>?id=<?= $upload->prev_filtered()->id() ?>" title="<?= str_replace('"', '\\"', $upload->prev_filtered()->filename()) ?>">older</a>
+					<a id="previous" <?= $style ?> href="<?= Link::upload($upload->prev_filtered()) ?>" title="<?= str_replace('"', '\\"', $upload->prev_filtered()->filename()) ?>">older</a>
 				<? } else { ?>
 					<a id="previous" href="/offensive/?c=<?= $index ?>" style="visibility:hidden">older</a>
 				<? } ?>
+				</span>
 
 				<!--
 					comment block
 				-->
-				<a style="margin-left:48px;"
-				   id="comments"
-				   href="/offensive/?c=comments&fileid=<?= $upload->id() ?>">comments</a>
-				(<span id="count_comment"><?= $upload->comments() ?></span>c
-				+<span id="count_good"><?= $upload->goods() ?></span>
-				-<span id="count_bad"><?= $upload->bads() ?></span><?
-				if($upload->tmbos() > 0) { ?>
-					<span style=\"color:#990000\">x<?= $upload->tmbos() ?></span>
-				<? } ?>)
-				&nbsp;(<a id="quickcomment" class="jqModal" href="#">quick</a>)
+				<span id="voting_stats">
+					<a style="margin-left:48px;"
+					   id="comments"
+					   href="/offensive/?c=comments&fileid=<?= $upload->id() ?>">comments</a>
+					(<span id="count_comment"><?= $upload->comments() ?></span>c
+					+<span id="count_good"><?= $upload->goods() ?></span>
+					-<span id="count_bad"><?= $upload->bads() ?></span><?
+					if($upload->tmbos() > 0) { ?>
+						<span style=\"color:#990000\">x<?= $upload->tmbos() ?></span>
+					<? } ?>)
+					<span id="quicklink">&nbsp;(<a id="quickcomment" class="jqModal" href="#">quick</a>)</span>
+				</span>
 
 				<!--
 					voting block
 				-->
-				<span style="margin-left:40px;">
+				<span id="voting_controls" style="margin-left:40px;">
 					<?
 					if(canVote($upload->id()) && $upload->file()) {
 						$good_href = "href=\"/offensive/?c=comments&submit=submit&fileid=$id&vote=this%20is%20good&redirect=true\"";
@@ -495,7 +320,7 @@
 				<!--
 					subscribe block
 				-->
-				<span style="margin-left:48px;">
+				<span id="subscribe" style="margin-left:48px;">
 					<?
 					if($upload->subscribed()) { ?>
 						<a class="subscribe_toggle" id="unsubscribeLink" href="/offensive/subscribe.php?un=1&fileid=<?= $id ?>" title="take this file off my 'unread comments' watch list.">unsubscribe</a>
@@ -507,21 +332,23 @@
 				<!--
 				    filter block
 				-->
-				<span style="margin-left:48px;">filters:</span>
-				<span style="margin-left:5px;"><?
-				        if(me()->getPref("hide_nsfw") == 1) { ?>
-				                <a href="/offensive/setPref.php?p=hide_nsfw&v=">nsfw(on)</a>
-				        <? } else { ?>
-				                <a href="/offensive/setPref.php?p=hide_nsfw&v=1">nsfw(off)</a>
-				        <? } ?>
-				</span>
-
-				<span style="margin-left:5px;"><?
-				        if(me()->getPref("hide_tmbo") == 1) { ?>
-				                        <a href="/offensive/setPref.php?p=hide_tmbo&v=">tmbo(on)</a>
-				        <? } else { ?>
-				                        <a href="/offensive/setPref.php?p=hide_tmbo&v=1">tmbo(off)</a>
-				        <? } ?>
+				<span id="filter_controls">
+					<span style="margin-left:48px;">filters:</span>
+					<span style="margin-left:5px;"><?
+					        if(me()->getPref("hide_nsfw") == 1) { ?>
+					                <a href="/offensive/setPref.php?p=hide_nsfw&v=">nsfw(on)</a>
+					        <? } else { ?>
+					                <a href="/offensive/setPref.php?p=hide_nsfw&v=1">nsfw(off)</a>
+					        <? } ?>
+					</span>
+        	
+					<span style="margin-left:5px;"><?
+					        if(me()->getPref("hide_tmbo") == 1) { ?>
+					                        <a href="/offensive/setPref.php?p=hide_tmbo&v=">tmbo(on)</a>
+					        <? } else { ?>
+					                        <a href="/offensive/setPref.php?p=hide_tmbo&v=1">tmbo(off)</a>
+					        <? } ?>
+					</span>
 				</span>
 			</div>
 
@@ -555,19 +382,6 @@
 			-->
 			<span style="color:#999999">
 				uploaded by <?= $upload->uploader()->htmlUsername() ?> @ <?= $upload->timestamp() ?>
-			</span>
-
-			<!--
-				squelch block
-			-->
-			<span style="margin-left:48px">
-				<?
-				if(me()->squelched($upload->uploader()->id())) {
-					?><a id="unsquelchLink" style="color:#999999; text-decoration:underline" href="/offensive/setPref.php?unsq=<?= $upload->uploader()->id() ?>">unsquelch <?= $upload->uploader()->username() ?></a><?
-				} else {
-					?><a id="squelchLink" style="color:#999999; text-decoration:underline" href="/offensive/setPref.php?sq=<?= $upload->uploader()->id() ?>">squelch <?= $upload->uploader()->username() ?></a><?
-				}
-				?>
 			</span>
 			<br/><br/>
 			
@@ -677,12 +491,12 @@
 				} else { ?>
 					<div style="padding:128px;">[ got nothin' for ya ]</div><?
 				}
-			} else {
-
+			} else if($upload->type() == "image" || $upload->type() == "avatar") {
 				if( $upload->filtered() ) {
 					?><div style="padding:128px;">[ <a id="imageLink" href="<?= $upload->URL() ?>" target="_blank">filtered</a>:<?
-						if($upload->squelched()) {
-							echo " squelched <!-- ".$upload->uploader()->id()
+						if($upload->blocked()) {
+							$context = me()->squelched($upload->uploader()) ? "squelched" : "blocked";
+							echo " $context <!-- ".$upload->uploader()->id()
 							     ." - ".$upload->uploader()->username()." -->";
 						}
 						if($upload->filtered_nsfw()) {
@@ -712,6 +526,9 @@
 		<?
 		if(me()->status() == "admin") {
 			?>
+			<!--
+			page stats block
+			-->
 			<br />
 		
 			<center><div style="color:#ccc;"><?= number_format(time_end($ptime), 3)."s php, ".number_format($querytime, 3)."s sql, ".count($queries)." queries\n\n <!--\n\n";
