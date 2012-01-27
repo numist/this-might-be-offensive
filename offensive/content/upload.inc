@@ -46,7 +46,7 @@
 
 				?>
 
-						<p>You have <? echo $remaining ?> upload<? echo $remaining === 1 ? "" : "s"?> left.</p>
+						<!--<p>You have <? echo $remaining ?> upload<? echo $remaining === 1 ? "" : "s"?> left.</p>-->
 
 						<p>If you haven't already, please take a look at <a href="./?c=faq">the rules</a> before uploading.</p>
 

@@ -218,25 +218,30 @@ function recentComments( $uid ) {
 	<div style="padding:8px;"><table width="535px">
 <?
 
-	$comments = core_getcomments(array("limit" => 100, "userid" => $uid, "votefilter" => "c"));
+	// TODO: THIS IS REALLY SLOW
+	//$comments = core_getcomments(array("limit" => 100, "userid" => $uid, "votefilter" => "c", "sort" => "date_desc"));
+	
+	$sql="SELECT up.*, offensive_comments.id as commentid
+	      FROM offensive_uploads up, offensive_comments
+	      WHERE offensive_comments.userid = $uid
+	      AND up.id = offensive_comments.fileid
+	      AND comment <> \"\"
+	      ORDER  BY offensive_comments.timestamp DESC 
+	      LIMIT 100";
+	$result = tmbo_query( $sql );
+	
 	$seen = array();
 	$count = 0;
-	foreach($comments as $comment) {
-		$upload = $comment->upload();
+	while( false !== ($row = mysql_fetch_assoc( $result )) && $count < 15) {
+		$upload = new Upload($row);
 		
-		// avoid duplicates
-		if(array_key_exists($comment->upload()->id(), $seen) && $seen[$comment->upload()->id()] == true) {
-			continue;
-		}
-		$seen[$comment->upload()->id()] = true;
+		if(array_key_exists($upload->id(), $seen)) continue;
+		$seen[$upload->id()] = true;
 		$count++;
 		
 		$css = isset($css) && strpos($css, "even") !== false ? "oddfile odd_row" : "evenfile even_row";
-		?><tr class="<?= $css ?>"><td><div style="white-space:nowrap; width:535px; overflow:hidden;"><a class="<?= $css ?>" href="?c=comments&fileid=<?= $upload->id() ?>#<?= $comment->id() ?>"><?= $upload->htmlFilename() ?></a></div></td></tr><?
+		?><tr class="<?= $css ?>"><td><div style="white-space:nowrap; width:535px; overflow:hidden;"><a class="<?= $css ?>" href="?c=comments&fileid=<?= $upload->id() ?>#<?= $row['commentid'] ?>"><?= $upload->htmlFilename() ?></a></div></td></tr><?
 
-		if($count >= 15) {
-			break;
-		}
 	}
 ?>
 	</table></div></td></tr>

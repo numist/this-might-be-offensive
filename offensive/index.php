@@ -103,7 +103,7 @@ $timelimit = 10;
 	<link rel="icon" href="/favicon.ico" />
 	<link rel="shortcut icon" href="/favicon.ico" />
 	<link rel="stylesheet" type="text/css" href="/offensive/filepilestyle.css" />
-	<link rel="stylesheet" type="text/css" href="/styles/oldskool.css"/>
+	<link rel="stylesheet" type="text/css" href="/styles/oldskool.css?v=0.0.1"/>
 
 	
 <style type="text/css">
