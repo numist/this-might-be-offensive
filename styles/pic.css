@@ -82,6 +82,10 @@ body {
 	line-height:15px;
 }
 
+textarea#qc_comment {
+  width: 470px;
+}
+
 #qc_vote {
 }
 
