@@ -129,7 +129,7 @@ function sql_get_markers($max_marker_level) {
 	}
 
 	while ($row = @mysql_fetch_assoc($result)) {
-	  if(!me()->blocked($row["userid"])) {
+	  if(!me()->squelched($row["userid"])) {
 	    $row['min_zoom'] = $max_marker_level+1;
 	    array_push($markers, $row);
     }
@@ -157,7 +157,7 @@ function sql_get_markers_at_zoom($level) {
 	    die('Invalid query: ' . mysql_error());
 	}
 	while ($row = @mysql_fetch_array($result)) {
-		if(!me()->blocked($row["userid"])) {
+		if(!me()->squelched($row["userid"])) {
 	    array_push($markers,$row);
 		}
 	}

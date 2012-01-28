@@ -494,9 +494,8 @@
 			} else if($upload->type() == "image" || $upload->type() == "avatar") {
 				if( $upload->filtered() ) {
 					?><div style="padding:128px;">[ <a id="imageLink" href="<?= $upload->URL() ?>" target="_blank">filtered</a>:<?
-						if($upload->blocked()) {
-							$context = me()->squelched($upload->uploader()) ? "squelched" : "blocked";
-							echo " $context <!-- ".$upload->uploader()->id()
+						if($upload->squelched()) {
+							echo " squelched <!-- ".$upload->uploader()->id()
 							     ." - ".$upload->uploader()->username()." -->";
 						}
 						if($upload->filtered_nsfw()) {

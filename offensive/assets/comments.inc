@@ -7,16 +7,31 @@ require_once("offensive/assets/classes.inc");
  * there are two reason a user would not be able to vote:
  *  1. the user uploaded the file
  *  2. the user has already voted
+ *  3. the user is blocked by/to the uploader
  */
 function canVote($fileid, $userid=null) {
 	if($userid == null) $userid = me() ? me()->id() : null;
 	if($userid == null) return false;
 
-	if(alreadyVoted($fileid, $userid)) return false;
-
 	$file = new Upload($fileid);
 	if($file->uploader()->id() == $userid) return false;
+	if(me() && $file->blocked()) return false;
 
+	if(alreadyVoted($fileid, $userid)) return false;
+
+	return true;
+}
+
+/*
+ * return if a user is allowed to comment on a thread
+ */
+function canComment($fileid, $userid=null) {
+	if($userid == null) $userid = me() ? me()->id() : null;
+	if($userid == null) return false;
+	
+	$file = new Upload($fileid);
+	if(me() && me()->status() != "admin" && $file->blocked()) return false;
+	
 	return true;
 }
 

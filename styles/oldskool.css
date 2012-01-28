@@ -55,6 +55,10 @@ a.userLink {
 	line-height:21px;
 }
 
+.blocked, a.blocked {
+	color:#9999cc;
+}
+
 .squelched, a.squelched {
 	color:#9999cc;
 	font-size:10px;
