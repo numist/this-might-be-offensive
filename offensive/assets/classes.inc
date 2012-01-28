@@ -395,7 +395,7 @@ class Upload {
 	 * filtering code
 	 */
 	public function filtered() {
-		return $this->blocked() ||
+		return $this->squelched() ||
 		       $this->filtered_nsfw() ||
 		       $this->filtered_tmbo() ||
 		       $this->filtered_bad();
@@ -404,6 +404,12 @@ class Upload {
 	public function blocked() {
 		return (me() != false
 			? me()->blocked($this->uploader())
+			: false);
+	}
+
+	public function squelched() {
+		return (me() != false
+			? me()->squelched($this->uploader())
 			: false);
 	}
 	
@@ -853,7 +859,7 @@ class Comment {
 	
 	public function text() {
 		$comment = $this->getCommentRow("comment");
-		if($this->blocked() && strlen($comment) > 0) {
+		if($this->squelched() && strlen($comment) > 0) {
 			$comment = "yes, there's a comment. no, you can't see it.";
 		}
 		return $comment;
@@ -862,10 +868,9 @@ class Comment {
 	public function HTMLcomment() {
 		$comment = $this->text();
 		if($comment == "") return "";
-		
-		if($this->blocked()) {
-			$context = me()->squelched($this->commenter()) ? "squelched" : "blocked";
-			return "<div class='squelched'>[ $context ]</div>";
+
+		if($this->squelched()) {
+			return "<div class='squelched'>[ squelched ]</div>";
 		}
 
 		$comment = htmlEscape($comment);
@@ -887,6 +892,10 @@ class Comment {
 		$comment = trim($comment);
 
 		$comment = nl2br($comment);
+
+		if($this->blocked()) {
+			return "<span class='blocked'>$comment</span>";
+		}
 
 		return $comment;
 	}
@@ -956,6 +965,10 @@ class Comment {
 	
 	public function blocked() {
 		return me()->blocked($this->commenter());
+	}
+	
+	public function squelched() {
+		return me()->squelched($this->commenter());
 	}
 
 	public function api_data() {
@@ -1224,10 +1237,6 @@ class User {
 	}
 	
 	public function blocked($target) {
-		if($this->status() == "admin") {
-			return $this->squelched($target);
-		}
-
 		if(is_object($target)) {
 			$target = $target->id();
 		}
