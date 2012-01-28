@@ -175,7 +175,7 @@
 		$ret = array();
 		while($row = mysql_fetch_assoc($result)) {
 			$upload = new Upload($row);
-			if(!$upload->blocked()) {
+			if(!$upload->squelched()) {
 				$ret[] = $upload;
 			}
 		}
@@ -206,7 +206,7 @@
 		}
 		
 		
-		if($upload->blocked()) {
+		if($upload->squelched()) {
 			require("offensive/403.php");
 		}
 		
@@ -229,7 +229,7 @@
 		                                  WHERE type='avatar' AND userid=u.userid)";
 		
 		if($userid !== false) {
-			if(me()->blocked($userid)) {
+			if(me()->squelched($userid)) {
 				require("offensive/403.php");
 			}
 			
@@ -282,7 +282,7 @@
 		
 		while($row = mysql_fetch_assoc($result)) {
 			$upload = new Upload($row);
-			if(!$upload->blocked()) {
+			if(!$upload->squelched()) {
 				$ret[] = $upload;
 			}
 		}
@@ -501,7 +501,7 @@
 		
 		while($row = mysql_fetch_assoc($result)) {
 			$upload = new Upload($row);
-			if(!$upload->blocked()) {
+			if(!$upload->squelched()) {
 				$ret[] = $upload;
 			}
 		}
@@ -691,7 +691,7 @@
 		
 		$rows = array();
 		while($row = mysql_fetch_assoc($result)) {
-			if(!me()->blocked($row["userid"])) {
+			if(!me()->squelched($row["userid"])) {
 				$rows[] = $row;
 			}
 		}

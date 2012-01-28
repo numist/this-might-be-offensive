@@ -42,7 +42,8 @@ function api_getquickcommentbox() {
 	$upload = new Upload($fileid);
 
 	// start building the HTML that will be inserted into the quick comment box directly
-	?>
+	
+	if(canComment($upload->id())) {?>
 	<a name="form"></a>
 	<form id="qc_form">
 		<p>
@@ -81,6 +82,7 @@ function api_getquickcommentbox() {
 			</p>
 		</div>
 	</form>
+	<? } ?>
 	<div id="qc_comments">
 	<?php	// now fetch all the comments so you can see the comments in the quickcomment box
 	$comments = $upload->getComments();

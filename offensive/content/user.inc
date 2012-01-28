@@ -156,7 +156,7 @@
 						<?
 							if($avatar) {
 // XXX: avatar history
-								if($avatar->file() && !$avatar->blocked()) {
+								if($avatar->file() && !$avatar->squelched()) {
 								?>
 									<div class="piletitle" style="margin-bottom:12px;">
 										<a href="pages/pic.php?id=<?= $avatar->id() ?>"><?= $name ?> is gorgeous.</a>
@@ -209,7 +209,7 @@
 }
 
 function recentComments( $uid ) {
-	if(me()->blocked($uid)) {
+	if(me()->squelched($uid)) {
 		return;
 	}
 	
@@ -308,7 +308,7 @@ function setStatusForm( $id, $status, $email ) {
 }
 
 function votingRecord( $id, $name ) {
-	if(me()->blocked($id)) {
+	if(me()->squelched($id)) {
 		return;
 	}
 	
@@ -340,7 +340,7 @@ function votingRecord( $id, $name ) {
 
 function contributions($usrid) {
 	global $them;
-	if(me()->blocked($them)) {
+	if(me()->squelched($them)) {
 		return;
 	}
 	
