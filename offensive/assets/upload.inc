@@ -755,7 +755,6 @@ function upload_checksize(&$postdata) {
 		$postdata['tmpname'] = $newtmp;
 		$postdata['filename'] = $newfilename;
 		$postdata['file_extension'] = ".jpg";
-		$postdata['format'] = "jpg";
 		$postdata['format_name'] = "jpg";
 
 		$postdata['noresample'] = $postdata['resample'];
@@ -784,7 +783,7 @@ function upload_checksize(&$postdata) {
 			<input type=\"submit\" name=\"resample\" value=\"Compress my file.\"/>
 			<input type=\"submit\" name=\"noresample\" value=\"Post it anyway.\"/>
 		</form>";
-	if(array_key_exists('format', $postdata) && $postdata['format'] == 'gif') $message .= "<br /><br />(If this image is animated, don't click the \"Compress\" button!)";
+	if(array_key_exists('format_name', $postdata) && $postdata['format_name'] == 'gif') $message .= "<br /><br />(If this image is animated, don't click the \"Compress\" button!)";
 
 	box($message, "whoa, nelly.");
 	$_SESSION['postdata'] = serialize($postdata);
