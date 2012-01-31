@@ -15,7 +15,7 @@
 
 	function head() {
 		?>
-		<link href="/styles/grid.css?v=1.01" type="text/css" rel="stylesheet">
+		<link href="/styles/grid.css?v=1.0.4" type="text/css" rel="stylesheet">
 		<script type="text/javascript" src="/offensive/js/jquery-1.7.1.min.js"></script>
 		<!-- lazyload_bottom -->
 		<script type="text/javascript">

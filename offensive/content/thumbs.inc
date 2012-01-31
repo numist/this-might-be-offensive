@@ -25,7 +25,7 @@
 		<link id="gallery" rel="alternate" href="<?= Link::rss("pic") ?>&gallery=true" type="application/rss+xml" title="PicLens feed" />
 		<link rel="alternate" type="application/rss+xml" title="image stream" href="<?= Link::rss("pic") ?>" />
 		<link rel="alternate" type="application/rss+xml" title="daily archives" href="<?= Link::rss("zip") ?>" />
-		<link href="/styles/grid.css?v=1.01" type="text/css" rel="stylesheet">
+		<link href="/styles/grid.css?v=1.0.4" type="text/css" rel="stylesheet">
 		<script type="text/javascript" src="/offensive/js/tmbolib.js?v=0.0.3"></script>
 		<script type="text/javascript" src="/offensive/js/jquery-1.7.1.min.js"></script>
 		<script type="text/javascript" src="/offensive/js/pickuplink_visibility.js?v=0.0.2"></script>
