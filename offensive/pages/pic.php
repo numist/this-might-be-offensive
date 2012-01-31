@@ -82,11 +82,17 @@
 		<? } ?> -->
 
 		<script type="text/javascript" src="/offensive/js/jquery-1.7.1.min.js"></script>
-		<script type="text/javascript" src="/offensive/js/picui.js?v=0.0.3"></script>
+		<script type="text/javascript" src="/offensive/js/picui.js?v=0.0.6"></script>
 		<script type="text/javascript" src="/offensive/js/subscriptions.js"></script>
 		<script type="text/javascript" src="/offensive/js/jqModal.js"></script>
 		<script type="text/javascript" src="/offensive/js/jqDnR.js?v=0.0.1"></script>
 		<script type="text/javascript">
+			var irsz_enabled = true,
+			    irsz_selector = function(e) { return $(e).find("a#imageLink img").last(); },
+			    irsz_min_height = 400, irsz_min_width = 400,
+			    irsz_auto = true,
+			    irsz_padding = [16, 114];
+		
       <? require("offensive/data/keynav.inc"); ?>
       function composite_keycode(e)
       {
@@ -212,6 +218,7 @@
 			}
 
 		</script>
+		<script type="text/javascript" src="/offensive/js/irsz.js?v=0.0.3"></script>
 	</head>
 	<body id="pic">
 		<!-- message -->
@@ -371,7 +378,7 @@
 				echo "<a href=\"".$upload->URL()."\" target=\"_blank\"><span $style>" . htmlEscape($upload->filename()) . "</span></a>";
 
 			?>
-			<span style="color:#999999"><?
+			<span id="dimensions" style="color:#999999"><?
 				if($upload->file() != "")
 					echo getFileSize($upload->file());
 			?></span>
@@ -511,7 +518,7 @@
 				} else { ?>
 					<div class="<?php echo $upload->is_nsfw() == 1 ? 'nsfw' : 'image' ?> u<?= $upload->uploader()->id() ?>">
 						<? if($upload->file() != "") { ?>
-							<a id="imageLink" href="<?= $upload->URL() ?>" onclick="resizeImage('image'); return false;"><img src="<?= $upload->URL() ?>" style="border:none" id="image" /></a>
+							<a id="imageLink" href="<?= $upload->URL() ?>"><img src="<?= $upload->URL() ?>" style="border:none" id="image" /></a>
 						<? } else { ?>
 							<div style="padding:128px;">[ got nothin' for ya ]</div>
 						<? } ?>
@@ -519,7 +526,6 @@
 					<?
 				} 
 			} ?>
-			<br/>
 		</div>
     	
 		<?
@@ -544,10 +550,7 @@
 ?>			</center>
 			<?
 		}
-		?>
-		
-		<br />&nbsp;
-    	
+		?>    	
 		<? include_once("analytics.inc"); ?>
 	</body>
 </html>
