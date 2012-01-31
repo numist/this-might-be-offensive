@@ -240,16 +240,6 @@ $timelimit = 10;
 					</div>
 				<div class="blackbar"></div>
 			</div>
-<!--
-			<div class="contentbox">
-				<div class="blackbar"></div>
-					<div class="heading">brought to you by:</div>
-					<div class="bluebox" style="text-align:center">
-						<a href="http://tengun.net">tengun.net</a>
-					</div>
-				<div class="blackbar"></div>
-			</div>
--->
 			<? if(login()) { // archive <--> bottom restricted block ?>
 				<div class="contentbox">
 					<div class="blackbar"></div>
@@ -298,15 +288,16 @@ $timelimit = 10;
 						aim: <a href="aim:goim?screenname=themaxxcom">themaxxcom</a><br>
 					</div>
 					<div class="blackbar"></div>
-				</div>
-				<? if($c != "online" && me()->status() == "admin") { ?>
-					<div class="contentbox">
-						<div class="blackbar"></div>
-						<? if($c != "comments") whosOn();
-						else whosubscribed(); ?>
-						<div class="blackbar"></div>
-					</div>
-				<? } 
+				</div><?
+					if($c != "comments" && $c != "online" && me()->status() == "admin") { whosOn(); }
+					else if($c == "comments") {
+						if(!array_key_exists("fileid", $_REQUEST)
+						|| !is_intger($_REQUEST['fileid']))
+						{ trigger_error("non-numeric fileid!", E_USER_ERROR); }
+						$upload = core_getupload($_REQUEST['fileid']);
+						if($upload->uploader()->id() == me()->id() || me()->status() == "admin")
+						{ whosubscribed($upload); }
+					}
 			} // archive <--> bottom restricted block ?>
 		</div> <!-- end left column -->
 		
@@ -438,6 +429,8 @@ $timelimit = 10;
 		list($nonline) = mysql_fetch_array($result);
 
 		// start us off. ?>
+	<div class="contentbox">
+		<div class="blackbar"></div>
 		<div class="heading">who's on:</div>
 		<div class="bluebox">
 			<table style="width:100%"><?
@@ -459,12 +452,12 @@ $timelimit = 10;
 				} ?>
 			</table>
 		</div>
+		<div class="blackbar"></div>
+	</div>
 	<? }
 
-	function whosubscribed() {
-		if(!is_intger($_REQUEST['fileid'])) trigger_error("non-numeric fileid!", E_USER_ERROR);
-
-		$sql = "SELECT DISTINCT u.userid, u.username FROM offensive_subscriptions sub JOIN users u ON sub.userid = u.userid WHERE fileid = ".$_REQUEST['fileid']." ORDER BY u.username ASC";
+	function whosubscribed($upload) {
+		$sql = "SELECT DISTINCT u.userid, u.username, u.account_status FROM offensive_subscriptions sub JOIN users u ON sub.userid = u.userid WHERE fileid = ".$upload->id()." ORDER BY u.username ASC";
 		$result = tmbo_query($sql);
 
 		if(mysql_num_rows($result) == 0) { ?>
@@ -473,13 +466,18 @@ $timelimit = 10;
 		}
 
 		// start us off. ?>
+	<div class="contentbox">
+		<div class="blackbar"></div>
 		<div class="heading">subscribers:</div>
 		<div class="bluebox">
 			<table style="width:100%">
-				<? while(false !== (list($userid, $username) = mysql_fetch_array($result))) {
+				<? while(false !== ($row = mysql_fetch_array($result))) {
+					$user = new User($row);
 					$css = (!isset($css) || $css == "odd") ? "even" : "odd"; ?>
-					<tr class="<?= $css?>_row"><td class="<?= $css ?>file"><a href="./?c=user&userid=<?= $userid ?>"><?= $username ?></a></td></tr>
+					<tr class="<?= $css?>_row"><td class="<?= $css ?>file"><?= id(new User($row))->htmlUsername() ?></td></tr>
 				<? } ?>
 			</table>
 		</div>
+		<div class="blackbar"></div>
+	</div>
 	<? } ?>
