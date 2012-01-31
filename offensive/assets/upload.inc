@@ -741,7 +741,7 @@ function upload_checksize(&$postdata) {
 		$newfilename = substr($postdata['filename'], 0, 0 - strlen($postdata['file_extension'])).".jpg";
 		
 		$image = new Imagick("$tmpdir/{$postdata['tmpname']}");
-		$image->setImageCompression(Imagick::COMPRESSION_JPEG); 
+		$image->setImageCompression(imagick::COMPRESSION_JPEG); 
 		$image->setImageCompressionQuality(90); 
 		if(!$image->writeImage("$tmpdir/$newtmp")) {  
 			trigger_error("ImageMagick/writeImage failed", E_USER_ERROR);
