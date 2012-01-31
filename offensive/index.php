@@ -343,7 +343,6 @@ $timelimit = 10;
 
 <br clear="all">
 <div class="textlinks" style="text-align:center">
-	<hr width="300" />
 
 	<? require('includes/footer.txt'); ?>
 
