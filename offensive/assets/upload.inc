@@ -102,7 +102,7 @@ function requestDetail() {
 	return $string;
 }
 
-function getTransform($orientation) {
+function needTransform($orientation) {
 	/*
 	 *   1        2       3      4         5            6           7          8
      *
@@ -115,29 +115,44 @@ function getTransform($orientation) {
 
 	switch($orientation) {
 		case 2:
-			return "-flop";
+		case 3:
+		case 4:
+		case 5:
+		case 6:
+		case 7:
+		case 8:
+			return true;
+		default:
+			return false;
+	}
+}
+
+function imageTransform($image, $orientation) {
+	switch($orientation) {
+		case 2:
+			$image->flopImage();
 			break;
 		case 3:
-			return "-rotate 180";
+			$image->rotateImage(new ImagickPixel(), 180);
 			break;
 		case 4:
-			return "-flip";
+			$image->flipImage();
 			break;
-		case 5:
-			return "-transpose";
+		case 5:	
+			$image->transposeImage();
 			break;
 		case 6:
-			return "-rotate 90";
+			$image->rotateImage(new ImagickPixel(), 90);
 			break;
 		case 7:
-			return "-transverse";
+			$image->transverseImage();
 			break;
-		case 8:
-			return "-rotate 270";
+		case 8: 
+			$image->rotateImage(new ImagickPixel(), 270);
 			break;
 		default:
-			return "";
 	}
+	return $image;
 }
 
 function killUpload($postdata) {
@@ -652,7 +667,7 @@ function upload_audio($postdata) {
 
 ###############################################################################
 // does the upload have reasonable dimensions? (pictures only)
-function upload_checkdims($postdata) {
+function upload_checkdims(&$postdata) {
 	global $tmpdir;
 
 	if(upload_type($postdata) == "topic" || upload_type($postdata) == "audio")
@@ -661,10 +676,16 @@ function upload_checkdims($postdata) {
 	if(array_key_exists("noresize", $postdata))
 		return false;
 
-	if (array_key_exists("resize", $postdata)) {
-		$cmd = "convert -resize 1024x1024 $tmpdir/".$postdata['tmpname']." $tmpdir/".$postdata['tmpname'];
-		$err = shell_exec($cmd);
-		if(strlen($err) > 0) trigger_error("ImageMagick failed: $err", E_USER_ERROR);
+	if (array_key_exists("resize", $postdata)) {		
+		$image = new Imagick("$tmpdir/{$postdata['tmpname']}");
+		
+		// XXX maybe use a specific filter. Gotta play with it for best results.
+		$image->resizeImage(1024,1024, imagick::FILTER_UNDEFINED, 1, true);
+		
+		if(!$image->writeImage("$tmpdir/{$postdata['tmpname']}")) {  
+			trigger_error("ImageMagick/writeImage failed", E_USER_ERROR);
+		}
+		$image->destroy();
 
 		$postdata['noresize'] = $postdata['resize'];
 		unset($postdata['resize']);
@@ -718,12 +739,15 @@ function upload_checksize(&$postdata) {
 		// convert from file.ext to file.jpg, quality 90
 		$newtmp = substr($postdata['tmpname'], 0, 0 - strlen($postdata['file_extension'])).".jpg";
 		$newfilename = substr($postdata['filename'], 0, 0 - strlen($postdata['file_extension'])).".jpg";
-
-		$cmd = "convert -quality 90 $tmpdir/".$postdata['tmpname']." $tmpdir/$newtmp";
-		$err = shell_exec($cmd);
-		if(strlen($err) > 0)
-			trigger_error("ImageMagick failed with: $err", E_USER_ERROR);
-
+		
+		$image = new Imagick("$tmpdir/{$postdata['tmpname']}");
+		$image->setImageCompression(imagick::COMPRESSION_JPEG); 
+		$image->setImageCompressionQuality(90); 
+		if(!$image->writeImage("$tmpdir/$newtmp")) {  
+			trigger_error("ImageMagick/writeImage failed", E_USER_ERROR);
+		}
+		$image->destroy();
+		
 		// clean up the (potentially) extra file
 		if($newfilename != $postdata['filename'])
 			unlink("$tmpdir/{$postdata['tmpname']}");
@@ -731,7 +755,6 @@ function upload_checksize(&$postdata) {
 		$postdata['tmpname'] = $newtmp;
 		$postdata['filename'] = $newfilename;
 		$postdata['file_extension'] = ".jpg";
-		$postdata['format'] = "jpg";
 		$postdata['format_name'] = "jpg";
 
 		$postdata['noresample'] = $postdata['resample'];
@@ -760,7 +783,7 @@ function upload_checksize(&$postdata) {
 			<input type=\"submit\" name=\"resample\" value=\"Compress my file.\"/>
 			<input type=\"submit\" name=\"noresample\" value=\"Post it anyway.\"/>
 		</form>";
-	if($postdata['format'] == 'gif') $message .= "<br /><br />(If this image is animated, don't click the \"Compress\" button!)";
+	if(array_key_exists('format_name', $postdata) && $postdata['format_name'] == 'gif') $message .= "<br /><br />(If this image is animated, don't click the \"Compress\" button!)";
 
 	box($message, "whoa, nelly.");
 	$_SESSION['postdata'] = serialize($postdata);
@@ -839,7 +862,7 @@ function upload_checkrepost(&$postdata) {
 	return true;
 }
 
-function upload_checkrotation($postdata) {
+function upload_checkrotation(&$postdata) {
 	global $tmpdir;
 
 	if(upload_type($postdata) == "topic" || upload_type($postdata) == "audio")
@@ -850,19 +873,19 @@ function upload_checkrotation($postdata) {
 		$exif = @exif_read_data($tmpdir."/".$postdata['tmpname']);
 
 		if($exif && array_key_exists("Orientation", $exif)) {
-			$transform = getTransform($exif['Orientation']);
-			if($transform != "") {
-				// convert.
-				$cmd = "convert $transform $tmpdir/{$postdata['tmpname']} $tmpdir/{$postdata['tmpname']}";
-				$err = shell_exec($cmd);
-				if(strlen($err) > 0) trigger_error("ImageMagick failed: $err", E_USER_ERROR);
+			$image = new Imagick("$tmpdir/{$postdata['tmpname']}");
+			$image = imageTransform($image, $exif['Orientation']);
+			
+			if(!$image->writeImage("$tmpdir/{$postdata['tmpname']}")) {  
+				trigger_error("ImageMagick/writeImage failed", E_USER_ERROR);
 			}
+			$image->destroy();
 		}
 		// avoid re-rotating (or attempting to) again
 		$postdata['norotate'] = $postdata['rotate'];
 		unset($postdata['rotate']);
 	}
-
+	
 	if(array_key_exists("norotate", $postdata) ||
 	   array_key_exists("rotate", $postdata)) {
 		if(file_exists("$tmpdir/th{$postdata['tmpname']}"))
@@ -873,7 +896,7 @@ function upload_checkrotation($postdata) {
 
 	if(array_key_exists("norotate", $postdata))
 		return false;
-
+	
 	$filename = $tmpdir."/".$postdata['tmpname'];
 	if(function_exists("exif_read_data")) {
 		$exif = @exif_read_data($filename);
@@ -883,18 +906,22 @@ function upload_checkrotation($postdata) {
 		return false;
 	}
 
-	$transform = getTransform($exif['Orientation']);
-
-	if($transform == "")
+	if(!needTransform($exif['Orientation']))
 		return false;
-
-	$cmd = "convert -resize 100x100 $tmpdir/{$postdata['tmpname']} $tmpdir/th{$postdata['tmpname']}";
-	$err = shell_exec($cmd);
-	if(strlen($err) > 0) trigger_error("ImageMagick failed: $err", E_USER_ERROR);
-
-	$cmd = "convert $transform -resize 100x100 $tmpdir/{$postdata['tmpname']} $tmpdir/rh{$postdata['tmpname']}";
-	$err = shell_exec($cmd);
-	if(strlen($err) > 0) trigger_error("ImageMagick failed: $err", E_USER_ERROR);
+	
+	$thfile  = $tmpdir . '/th' . $postdata['tmpname'];
+	$rhfile  = $tmpdir . '/rh' . $postdata['tmpname'];
+	
+	$image = new Imagick("$tmpdir/{$postdata['tmpname']}");
+	$image->resizeImage(100,100, imagick::FILTER_UNDEFINED, 1, true);
+	if(!$image->writeImage($thfile)) {  
+		trigger_error("ImageMagick/writeImage failed", E_USER_ERROR);
+	}
+	$image = imageTransform($image, $exif['Orientation']);
+	if(!$image->writeImage($rhfile)) {  
+		trigger_error("ImageMagick/writeImage failed", E_USER_ERROR);
+	}
+	$image->destroy();
 
 	$message = "Is it sideways?<br />If you want, I can try rotating it for you.<br/><br/>
 	<center><table><tr><td align='middle'>Original</td><td align='middle'>Fixed</td></tr>
@@ -969,12 +996,22 @@ function upload_insert_file($postdata) {
 
 		// generate the thumbnail
 		// XXX: this is what's failing
-		$cmd = "/usr/bin/convert -define jpeg:size=800x800 $tmpdir/".$postdata['tmpname']."[0] -thumbnail 133x100^ -gravity center -extent 133x100 $tmpdir/th".$postdata['tmpname'];
-		$err = shell_exec($cmd);
-		if(strlen($err) > 0) trigger_error("ImageMagick failed: $err", E_USER_ERROR);
+	
+		$thfile  = $tmpdir . '/th' . $postdata['tmpname'];
+
+		$image = new Imagick("$tmpdir/{$postdata['tmpname']}");
+		$image->setGravity(imagick::GRAVITY_CENTER);
+		if(!$image->cropThumbnailImage(133,100)) {
+			trigger_error("ImageMagick/cropThumbnailImage failed", E_USER_ERROR);
+		}
+		$image->setImagePage(0, 0, 0, 0);
+		if(!$image->writeImage($thfile)) {
+			trigger_error("ImageMagick/writeImage failed", E_USER_ERROR);
+		}
+		$image->destroy();
 
 		// move into place
-		rename($tmpdir."/th".$postdata['tmpname'],
+		rename($thfile,
 		     "$path/thumbs/th$fileid".$postdata['file_extension'])
 			or trigger_error("could not copy thumbnail to $path/thumbs!", E_USER_ERROR);
 	} else if(upload_type($postdata) == "audio") {
@@ -1005,9 +1042,17 @@ function upload_insert_file($postdata) {
 				// generate the thumbnail if necessary
 				list($width, $height, $type, $attr) = getimagesize($thumbname);
 				if($width > 100 || $height > 100) {
-					$cmd = "convert -resize 100x100 $thumbname $thumbname";
-					$err = shell_exec($cmd);
-					if(strlen($err) > 0) trigger_error("ImageMagick failed: $err", E_USER_ERROR);
+					
+					$image = new Imagick($thumbname);
+					$image->setGravity(imagick::GRAVITY_CENTER);
+					if(!$image->cropThumbnailImage(100,100)) {
+						trigger_error("ImageMagick/cropThumbnailImage failed", E_USER_ERROR);
+					}
+					$image->setImagePage(0, 0, 0, 0);
+					if(!$image->writeImage($thumbname)) {
+						trigger_error("ImageMagick/writeImage failed", E_USER_ERROR);
+					}
+					$image->destroy();
 				}
 			}
 		}
