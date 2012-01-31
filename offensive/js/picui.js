@@ -27,6 +27,10 @@ $(document).ready(function() {
 
 	// quick comment
 	handle_quickcomment();
+	
+	image_dimensions(irsz_selector(document), function(width, height) {
+	  $("span#dimensions").append(", "+width+"x"+height);
+	});
 });
 
 // prevent sites from hosting this page in a frame;
@@ -205,44 +209,11 @@ function increase_count(id) {
 	$(id).html(count);
 }
 
-// Resizing images
-
-// This does the math and recomputes the size of the image according to
-// the width of the window, then sets it
-var original_height=null;
-var original_width=null;
-function resizeImage(imageID) {
-  var width = 0; var height = 0;
-  var img = $('#'+imageID);
-
-  var maxWidth = $(window).width();
-  // normalize the widths coming back 
-  if ($.browser.opera || $.browser.mozilla) {
-    maxWidth=maxWidth+5;
-  }
-  if ($.browser.msie) {
-    maxWidth=maxWidth+8;
-  }
-  maxWidth=maxWidth-30;    // for the surrounding HTML
-
-  // Are we going back to the original size?
-  if ( original_height != null && original_width != null ) {
-     img.width(original_width);
-     img.height(original_height);
-     original_width=null;
-     original_height=null;
-     return;
-  }
-
-  // do nothing if we fit already
-  if (img.width() < maxWidth) {
-     return;
-  }
-
-  original_height = img.height();
-  original_width = img.width();
-  var fact = maxWidth / img.width();
-  height = Math.round(img.height() * fact);
-  img.width(maxWidth);
-  img.height(height);
+// from: https://github.com/numist/jslib/blob/master/irsz.js
+function image_dimensions(image, func) {
+  image = $(image);
+  if(image.length != 1 || image.attr("src") == undefined) { return; }
+  $("<img/>") // Make in memory copy of image to avoid css issues
+  .attr("src", image.attr("src"))
+  .load(function() {func(this.width, this.height);});
 }
