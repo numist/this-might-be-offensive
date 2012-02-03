@@ -128,17 +128,6 @@ $timelimit = 10;
 </style>
 
 <script type="text/javascript">
-	function gochat()
-	{
-		w = 792;
-		h = 646;
-		l = (screen.width-w)/2;
-		t = (screen.height-h)/2;
-		widthHeight = "width="+w+",height="+h+",left="+l+",top="+t+",menubar=no,resizable=yes,scrollbars=no,status=no,toolbar=no,location=no";
-		window.open("/offensive/irc/chat.php","tmbo_chat",widthHeight);
-		return true
-	}
-	
 	/* image rollover stuff */
 	function changesrc(a,im)
 	{
@@ -206,8 +195,9 @@ $timelimit = 10;
 				?>
 				<div class="contentbox">
 					<div class="blackbar"></div>
-						<div class="heading">get info:</div>
+						<div class="heading">community:</div>
 						<div class="bluebox">
+							<p><a href="http://chat.efnet.org:9090/?channels=themaxx&nick=<?= urlencode(me()->username()); ?>" target="_blank">chat</a></p>
 							<p><a href="/offensive/?c=map">maxxer world map</a></p>
 							<p><a href="<?= $_SERVER['PHP_SELF'] ?>?c=referral">invite a friend</a></p>						
 							<p><a href="<?= $_SERVER['PHP_SELF'] ?>?c=faq">FAQ, rules, etc.</a></p>
@@ -284,7 +274,6 @@ $timelimit = 10;
 					<div class="blackbar"></div>
 					<div class="heading">contact:</div>
 					<div class="bluebox">
-						<a href="#" onClick="gochat(); return false;">chat</a><br>
 						<a href="/contact/">email</a><br>
 						aim: <a href="aim:goim?screenname=themaxxcom">themaxxcom</a><br>
 					</div>
