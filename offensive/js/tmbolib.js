@@ -13,6 +13,17 @@ if (typeof String.prototype.startsWith != 'function') {
   };
 }
 
+if (typeof String.prototype.endsWith != 'function') {
+  String.prototype.endsWith = function (str){
+    if(this.length < str.length) {
+      // if this.length - str.length == -1, this could cause a false positive
+      return false;
+    }
+
+    return this.lastIndexOf(str) == this.length - str.length;
+  }
+}
+
 function getURLParam(param) {
   var href = window.location.href;
   if(href.indexOf("?") > -1) {
