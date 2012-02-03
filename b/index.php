@@ -62,7 +62,7 @@ function changesrc(a,im)
 }
 </script>
 
-
+<? include_once("analytics.inc"); ?>
 </head>
 <body bgcolor="#FFFFEE" text="#800000" link="#0000EE" vlink="#0000EE">
 <div id="header"><span id="navtop">
@@ -360,5 +360,4 @@ for($i = 0; $i < 10; $i++) {
 	</font>
 </center>
 </div>
-<? include_once("analytics.inc"); ?>
 </body></html>

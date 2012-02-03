@@ -220,6 +220,7 @@
 
 		</script>
 		<script type="text/javascript" src="/offensive/js/irsz.js?v=0.0.6"></script>
+		<? include_once("analytics.inc"); ?>
 	</head>
 	<body id="pic">
 		<!-- message -->
@@ -553,7 +554,6 @@
 ?>			</center>
 			<?
 		}
-		?>    	
-		<? include_once("analytics.inc"); ?>
+		?>
 	</body>
 </html>

@@ -151,8 +151,9 @@ $timelimit = 10;
 	if( function_exists( 'head' ) ) {
 		head();
 	}
-?>
 
+	include_once("analytics.inc");
+?>
 </head>
 
 <body bgcolor="#333366" link="#000066" vlink="#000033">
@@ -374,9 +375,6 @@ $timelimit = 10;
 	?>
 </div>
 <br />
-
-<? include_once("analytics.inc"); ?>
-
 </body>
 </html>
 <?

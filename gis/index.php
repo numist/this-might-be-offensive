@@ -323,6 +323,7 @@
 
             div, table {font-size:13px}
         </style>
+				<? include_once("analytics.inc") ?>
     </head>
     <body id="gsr" topmargin="3" marginheight="3" class="   ">
         <textarea id="csi" style="display:none">
@@ -620,6 +621,5 @@
             <div id="xjsi">
             </div>
         </div>
-<? include_once("analytics.inc") ?>
     </body>
 </html>
