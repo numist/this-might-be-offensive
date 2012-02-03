@@ -81,8 +81,9 @@
 			<link rel="prefetch" href="<?= $_SERVER['PHP_SELF'] ?>?id=<?= $upload->next_filtered()->id() ?>"/>
 		<? } ?> -->
 
+		<script type="text/javascript" src="/offensive/js/tmbolib.js?v=0.0.4"></script>
 		<script type="text/javascript" src="/offensive/js/jquery-1.7.1.min.js"></script>
-		<script type="text/javascript" src="/offensive/js/picui.js?v=0.0.6"></script>
+		<script type="text/javascript" src="/offensive/js/picui.js?v=0.0.9"></script>
 		<script type="text/javascript" src="/offensive/js/subscriptions.js"></script>
 		<script type="text/javascript" src="/offensive/js/jqModal.js"></script>
 		<script type="text/javascript" src="/offensive/js/jqDnR.js?v=0.0.1"></script>
@@ -218,7 +219,8 @@
 			}
 
 		</script>
-		<script type="text/javascript" src="/offensive/js/irsz.js?v=0.0.3"></script>
+		<script type="text/javascript" src="/offensive/js/irsz.js?v=0.0.6"></script>
+		<? include_once("analytics.inc"); ?>
 	</head>
 	<body id="pic">
 		<!-- message -->
@@ -517,8 +519,10 @@
 					?> ]</div><?
 				} else { ?>
 					<div class="<?php echo $upload->is_nsfw() == 1 ? 'nsfw' : 'image' ?> u<?= $upload->uploader()->id() ?>">
-						<? if($upload->file() != "") { ?>
-							<a id="imageLink" href="<?= $upload->URL() ?>"><img src="<?= $upload->URL() ?>" style="border:none" id="image" /></a>
+						<? if($upload->file() != "") {
+							$dimensions = $upload->dimensions(); ?>
+							<a id="imageLink" href="<?= $upload->URL() ?>"><img src="<?= $upload->URL() ?>" style="border:none" id="image"
+								 max-width="<?= $dimensions[0] ?>px" max-height="<?= $dimensions[1] ?>px"/></a>
 						<? } else { ?>
 							<div style="padding:128px;">[ got nothin' for ya ]</div>
 						<? } ?>
@@ -550,7 +554,6 @@
 ?>			</center>
 			<?
 		}
-		?>    	
-		<? include_once("analytics.inc"); ?>
+		?>
 	</body>
 </html>

@@ -211,9 +211,30 @@ function increase_count(id) {
 
 // from: https://github.com/numist/jslib/blob/master/irsz.js
 function image_dimensions(image, func) {
+  var attr_width = "max-width", attr_height = "max-height", units = "px", image_width, image_height;
   image = $(image);
   if(image.length != 1 || image.attr("src") == undefined) { return; }
-  $("<img/>") // Make in memory copy of image to avoid css issues
-  .attr("src", image.attr("src"))
-  .load(function() {func(this.width, this.height);});
+  
+  if(image.filter("["+attr_width+"]["+attr_height+"]").length == 1) {
+    // found cached/supplied image dimensions
+    var pixels_width, pixels_height;
+    image_width = image.attr(attr_width);
+    pixels_width = parseInt(image_width.endsWith(units)
+                          ? image_width.substr(0, image_width.lastIndexOf(units))
+                          : image_width);
+    image_height = image.attr(attr_height);
+    pixels_height = parseInt(image_height.endsWith(units)
+                           ? image_height.substr(0, image_height.lastIndexOf(units))
+                           : image_height);
+    func(pixels_width, pixels_height);
+  } else {
+    // get dimensions from image. make a copy in memory to avoid css issues.
+    $("<img/>")
+      .attr("src", image.attr("src"))
+      .load(function() {
+        image_width = this.width, image_height = this.height;
+        image.attr(attr_width, image_width+units).attr(attr_height, image_height+units);
+        func(image_width, image_height);
+      });
+  }
 }

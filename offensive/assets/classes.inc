@@ -652,6 +652,27 @@ class Upload {
 		return (count( $tags ) > 0 ? "<span class=\"tags\">" . implode( "", $tags ) . "</span> " : "")
 		       .htmlEscape($this->filename());
 	}
+	
+	public function dimensions() {
+		$file = $this->file();
+		if(strlen($file) == 0) {
+			trigger_error("tried to get dimensions for an upload without a file", E_USER_WARNING);
+			return false;
+		}
+		
+		if($this->type() == "audio") {
+			trigger_error("no support yet for dimensions of audio files (or their album art)", E_USER_WARNING);
+			return array("?", "?");
+		}
+		
+		$arr = getimagesize($file);
+		if($arr === false) {
+			trigger_error($file." is not a valid image", E_USER_WARNING);
+			return array("?", "?");
+		}
+		          // width  , height
+		return array($arr[0], $arr[1]);
+	}
 
 	// API support
 	public function api_data() {
