@@ -1,6 +1,10 @@
 <?
 
 class Link {
+	static function mainpage() {
+		return Link::content(me() ? me()->getPref("index") : "main");
+	}
+	
 	// pagination links (search query_string)
 	static function content($page) {
 		assert('is_string($page)');

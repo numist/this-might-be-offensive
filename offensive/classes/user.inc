@@ -341,6 +341,10 @@ class User {
 		
 		$value = $redis->get($this->id().':'.$name);
 		
+		// defaults
+		if($name == "index" && $value == "") {
+			return "main";
+		}
 		if($name == "sortorder_discussions" && $value == "") {
 			return "date_desc";
 		}
