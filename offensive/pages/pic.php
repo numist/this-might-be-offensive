@@ -7,7 +7,6 @@
 	require_once("offensive/assets/classes.inc");
 	require_once("offensive/assets/core.inc");
 	require_once("offensive/assets/comments.inc");
-	require_once('offensive/assets/pickupLink.inc');
 
 	mustLogIn();
 	time_start($ptime);

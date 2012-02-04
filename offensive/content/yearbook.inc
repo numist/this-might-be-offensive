@@ -6,7 +6,6 @@
 	require_once( 'offensive/assets/tabs.inc' );
 	require_once( 'offensive/assets/classes.inc' );
 	require_once( 'offensive/assets/core.inc' );
-	require_once('offensive/assets/pickupLink.inc');
 
 	function start() {
 		mustLogIn();

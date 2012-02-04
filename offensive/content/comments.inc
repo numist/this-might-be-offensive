@@ -6,7 +6,6 @@
 	require_once("offensive/assets/tabs.inc");
 	require_once("offensive/assets/comments.inc");
 	require_once("offensive/assets/classes.inc");
-	require_once('offensive/assets/pickupLink.inc');
 
 	function additionalCssFor($vote) {
 		if(strpos($vote, 'bad') > 0) return " bad";
