@@ -101,16 +101,16 @@ class PickupLink {
 		
 		// output correct pickuplink
 		if($dbpic == $cookiepic && $dbpic !== false) {
-			?><div id="pickuplink" fileid="<?= $dbpic ?>" style="display: none;"><b><a href="pages/pic.php?id=<?= $dbpic ?>" id="pickUp">click here to pick up where you left off</a></b></div><?
+			?><div id="pickuplink" fileid="<?= $dbpic ?>" style="display: none;"><b><a href="<?= Link::upload($dbpic) ?>" id="pickUp">click here to pick up where you left off</a></b></div><?
 		} else if ($dbpic && $cookiepic){
 			?><div id="pickuplink"><b>pick up where you left off 
-				(<a href="pages/pic.php?id=<?= $cookiepic ?>" fileid="<?= $cookiepic ?>" id="pickUp">on this computer</a> | 
-				<a href="pages/pic.php?id=<?= $dbpic ?>" fileid="<?= $dbpic ?>" id="pickUp">on this account</a>)</b></div><?
+				(<a href="<?= Link::upload($cookiepic) ?>" fileid="<?= $cookiepic ?>" id="pickUp">on this computer</a> | 
+				<a href="<?= Link::upload($dbpic) ?>" fileid="<?= $dbpic ?>" id="pickUp">on this account</a>)</b></div><?
 		} else if ($cookiepic !== false) {
 			trigger_error("this shouldn't ever happen anymore...", E_USER_NOTICE);
-			?><div id="pickuplink" fileid="<?= $cookiepic ?>" style="display: none;"><b><a href="pages/pic.php?id=<?= $cookiepic ?>" id="pickUp">pick up where you left off on this computer</a></b></div><?
+			?><div id="pickuplink" fileid="<?= $cookiepic ?>" style="display: none;"><b><a href="<?= Link::upload($cookiepic) ?>" id="pickUp">pick up where you left off on this computer</a></b></div><?
 		} else if ($dbpic !== false) {
-			?><div id="pickuplink" fileid="<?= $dbpic ?>" style="display: none;"><b><a href="pages/pic.php?id=<?= $dbpic ?>" id="pickUp">pick up where you left off on this account</a></b></div><?
+			?><div id="pickuplink" fileid="<?= $dbpic ?>" style="display: none;"><b><a href="<?= Link::upload($dbpic) ?>" id="pickUp">pick up where you left off on this account</a></b></div><?
 		}
 	}
 }
