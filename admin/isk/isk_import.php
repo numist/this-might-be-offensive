@@ -70,10 +70,15 @@ function fetch_db_images($dbuser = "", $dbpass = "", $database= "", $dbhost = ""
 	}
 
 	// read images from database
-	$months = ($_SERVER['argc'] > 1 && is_numeric($_SERVER['argv'][1]) ? $_SERVER['argv'][1] : 1);
+	assert('$_SERVER["argc"] == 3');
+	assert('is_numeric($_SERVER["argv"][1])');
+	assert('is_numeric($_SERVER["argv"][2])');
+	
+	$startid = $_SERVER['argv'][1];
+	$endid = $_SERVER['argv'][2];
 	
 	$sql = "SELECT * FROM offensive_uploads WHERE type='image' 
-	                                        AND timestamp > DATE_SUB(NOW(), INTERVAL $months MONTH) 
+	                                        AND id >= $startid AND id <= $endid
 	                                        ORDER by timestamp ASC";
 	                                        
 	$result = mysql_query($sql);
@@ -88,7 +93,7 @@ function fetch_db_images($dbuser = "", $dbpass = "", $database= "", $dbhost = ""
 }
 
 function add_to_isk($images) {
-	
+
 	// create ISK object
 	$isk = new Isk;
 
