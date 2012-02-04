@@ -72,7 +72,7 @@ function fetch_db_images($dbuser = "", $dbpass = "", $database= "", $dbhost = ""
 	$months = ($_SERVER['argc'] > 1 && is_numeric($_SERVER['argv'][1]) ? $_SERVER['argv'][1] : 1);
 	
 	$sql = "SELECT * FROM offensive_uploads WHERE type='image' 
-	                                        AND timestamp > DATE_SUB(NOW(), INTERVAL $months DAY) 
+	                                        AND timestamp > DATE_SUB(NOW(), INTERVAL $months MONTH) 
 	                                        ORDER by timestamp ASC";
 	                                        
 	$result = mysql_query($sql);
