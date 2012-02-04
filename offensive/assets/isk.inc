@@ -56,11 +56,12 @@ class Isk {
 	public function img_blob($path) {
 		$image = new Imagick($path);
 		
-	        if($image->getImageWidth() > $image->getImageHeight()) {
-	        	$image->resizeImage(0,300, imagick::FILTER_UNDEFINED, 1, false);
-	        } else {
-	        	$image->resizeImage(300,0, imagick::FILTER_UNDEFINED, 1, false);
-	        }
+		$max_dimension = 300;
+		if($image->getImageWidth() > $image->getImageHeight() && $image->getImageWidth() > $max_dimension) {
+			$image->resizeImage(0,$max_dimension, imagick::FILTER_UNDEFINED, 1, false);
+		} else if($image->getImageHeight() > $max_dimension) {
+			$image->resizeImage($max_dimension,0, imagick::FILTER_UNDEFINED, 1, false);
+		}
 		$blob = $image->getImageBlob();
 		$image->destroy();
 		
