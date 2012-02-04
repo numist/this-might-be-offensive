@@ -29,7 +29,7 @@ if($avatar == false) {
 	}
 	
 	// XXX: this could do with some filtering.
-	$thumb = "<a href='/offensive/pages/pic.php?id=".$avatar->id()."' target='_blank'><img src='" . $avatar->thumbURL() . "' ".(is_array($info) ? $info[3] : "")." border='0' /></a>";
+	$thumb = "<a href='".Link::upload($avatar)."' target='_blank'><img src='" . $avatar->thumbURL() . "' ".(is_array($info) ? $info[3] : "")." border='0' /></a>";
 }
 
 $referer = $user->referred_by();
@@ -49,7 +49,7 @@ if(count($possearr) == 0) {
 	$posse = "";
 	$overflow = "";
 } else {
-	$posse = "<p style='line-height: 10px; margin: 4px 0px 3px 0px;'><a style='text-decoration: none;' href='/offensive/?c=posse&amp;userid=".$user->id()."'>".$user->username()." has a posse</a>";
+	$posse = "<p style='line-height: 10px; margin: 4px 0px 3px 0px;'><a style='text-decoration: none;' href='".Link::content("posse")."&userid=".$user->id()."'>".$user->username()." has a posse</a>";
 	
 	$posse_markers = 0;
 	$posse_list = "";
@@ -74,7 +74,7 @@ if(count($possearr) == 0) {
 		<table>
 			<tr>
 				<td><?= $thumb ?></td>
-				<td><h2><a style="text-decoration: none;" href="/offensive/?c=user&userid=<?= $user->id() ?>">&nbsp;&nbsp;<?= $user->username() ?></a></h2></td>
+				<td><h2><a style="text-decoration: none;" href="<?= Link::user($user) ?>">&nbsp;&nbsp;<?= $user->username() ?></a></h2></td>
 			</tr>
 		</table>
 		<?= $refer ?>

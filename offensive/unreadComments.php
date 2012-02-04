@@ -11,12 +11,12 @@
 
 		$uid = $_SESSION['userid'];
 
-		$sql = "SELECT DISTINCT b.fileid, u.filename, b.commentid
+		$sql = "SELECT DISTINCT u.*, b.commentid
 					FROM offensive_uploads u, offensive_subscriptions b
 					WHERE b.userid = $uid 
 						AND u.id = b.fileid
 						AND b.commentid IS NOT NULL
-					group by fileid
+					GROUP BY u.id
 					LIMIT 50";
 
 		$result = tmbo_query( $sql );
@@ -35,8 +35,8 @@
 	
 		while( $row = mysql_fetch_assoc( $result ) ) {
 			$css = $css == "evenfile" ? "oddfile" : "evenfile";
-	?>
-			<div class="clipper"><a class="<?= $css ?>" href="./?c=comments&amp;fileid=<?= $row['fileid'] ?>#<?= $row['commentid']?>"><?= htmlspecialchars( $row['filename'] ) ?></a></div>
+			// XXX: rejigger the query and use Link::comment ?>
+			<div class="clipper"><a class="<?= $css ?>" href="<?= Link::thread(new Upload($row)) ?>#<?= $row['commentid']?>"><?= htmlspecialchars( $row['filename'] ) ?></a></div>
 	<?
 	
 		}

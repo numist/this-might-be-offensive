@@ -12,10 +12,10 @@
 	$row = mysql_fetch_array( $result );
 
 	if( mysql_num_rows( $result ) == 1 ) {
-		header( "Location:./?c=user&userid=" .  $row['userid'] );
+		header("Location: ".Link::user($row['userid']));
 	}
 	else {
-		header( "Location: " . $_SERVER['HTTP_REFERER'] );
+		header("Location: ".$_SERVER['HTTP_REFERER']);
 	}
 
 ?>

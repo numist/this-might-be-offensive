@@ -1,4 +1,4 @@
 <?
-	header( "Location: " . $_SERVER['PHP_SELF'] . "?c=comments&fileid=211604" );
+	header("Location: ".Link::thread(211604));
 	exit;
 ?>

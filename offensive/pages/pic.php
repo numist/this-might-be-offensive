@@ -7,7 +7,6 @@
 	require_once("offensive/assets/classes.inc");
 	require_once("offensive/assets/core.inc");
 	require_once("offensive/assets/comments.inc");
-	require_once('offensive/assets/pickupLink.inc');
 
 	mustLogIn();
 	time_start($ptime);
@@ -27,21 +26,23 @@
 		header( "Location: /offensive/" );
 		exit;
 	}
+	PickupLink::content($upload->type());
 
 	if(array_key_exists("random", $_REQUEST)) {
-		header("Location: /offensive/pages/pic.php?id=".get_random_id($upload));
+		header("Location: ".Link::upload(get_random_id($upload)));
 		exit;
 	}
 
 	if($upload->type() == "topic") {
-		header("Location: /offensive/?c=comments&fileid=".$id);
+		header("Location: ".Link::thread($id));
 		exit;
 	}
 
 	###########################################################################
 	// update pickuplinks
 	global $autoplay;
-	$autoplay = update_pickuplinks($upload, $upload->type());
+
+	$autoplay = PickupLink::update($upload);
 
 	if(array_key_exists('loop', $_REQUEST)) {
 		$autoplay = true;
@@ -49,7 +50,7 @@
 
 	###########################################################################
 	function get_random_id($upload) {
-		$pickuplinks = get_pickuplinks($upload->type());
+		$pickuplinks = PickupLink::get();
 
 		$filter = me()->getPref("hide_nsfw") ? " AND nsfw = 0" : "";
 		$filter .= me()->getPref("hide_tmbo") ? " AND tmbo = 0" : "";
@@ -134,7 +135,7 @@
       	function key_bad()  { do_vote($("#bad")); };
       	function key_quick() { $("#dialog").jqmShow(); };
       	function key_subscribe() { handle_subscribe($('.subscribe_toggle:visible'),e,$("#good").attr("name")); };
-        function key_random() { document.location.href = "/offensive/pages/pic.php?id=<?= $upload->id() ?>&random"; };
+        function key_random() { document.location.href = "<?= Link::upload($upload) ?>&random"; };
       	
 				if(e == null)  return true;
         var keycode = composite_keycode(e);
@@ -235,7 +236,7 @@
 				keyboard commands:<br />
 				← = newer. ↑ = index. → = older. ↓ = comments . + or = votes [ this is good ]. - votes [ this is bad ] .<br />
 				q = quick comment, Esc closes quick comment box, ? = random image.<br />
-				( change 'em at your <a href="/offensive/?c=settings">settings</a> page. )
+				( change 'em at your <a href="<?= Link::content("settings") ?>">settings</a> page. )
 			</div>
 		<? } ?>
 
@@ -268,9 +269,6 @@
 						break;
 					default:
 						$index = me()->getPref("index");
-						if($index == "") {
-							$index = "main";
-						}
 						break;
 				}
 
@@ -278,14 +276,14 @@
 					$style = ($upload->next_filtered()->is_nsfw() || $upload->next_filtered()->is_tmbo() ? 'style="font-style:italic; color: #990000"' : "") ?>
 					<a id="next" <?= $style ?> href="<?= Link::upload($upload->next_filtered()) ?>" title="<?= str_replace('"', '\\"', $upload->next_filtered()->filename()) ?>">newer</a>
 				<? } else { ?>
-					<a href="/offensive/?c=<?= $index ?>" id="next" style="visibility:hidden">newer</a>
+					<a href="<?= Link::content($index) ?>" id="next" style="visibility:hidden">newer</a>
 				<? } ?>
-				. <a id="index" href="/offensive/?c=<?= $index ?>">index</a> .
+				. <a id="index" href="<?= Link::content($index) ?>">index</a> .
 				<? if($upload->prev_filtered()) {
 					$style = ($upload->prev_filtered()->is_nsfw() || $upload->prev_filtered()->is_tmbo() ? 'style="font-style:italic; color: #990000"' : "") ?>
 					<a id="previous" <?= $style ?> href="<?= Link::upload($upload->prev_filtered()) ?>" title="<?= str_replace('"', '\\"', $upload->prev_filtered()->filename()) ?>">older</a>
 				<? } else { ?>
-					<a id="previous" href="/offensive/?c=<?= $index ?>" style="visibility:hidden">older</a>
+					<a id="previous" href="<?= Link::content($index) ?>" style="visibility:hidden">older</a>
 				<? } ?>
 				</span>
 
@@ -295,7 +293,7 @@
 				<span id="voting_stats">
 					<a style="margin-left:48px;"
 					   id="comments"
-					   href="/offensive/?c=comments&fileid=<?= $upload->id() ?>">comments</a>
+					   href="<?= Link::thread($upload) ?>">comments</a>
 					(<span id="count_comment"><?= $upload->comments() ?></span>c
 					+<span id="count_good"><?= $upload->goods() ?></span>
 					-<span id="count_bad"><?= $upload->bads() ?></span><?
@@ -311,6 +309,7 @@
 				<span id="voting_controls" style="margin-left:40px;">
 					<?
 					if(canVote($upload->id()) && $upload->file()) {
+						// TODO: clean up
 						$good_href = "href=\"/offensive/?c=comments&submit=submit&fileid=$id&vote=this%20is%20good&redirect=true\"";
 						$bad_href = "href=\"/offensive/?c=comments&submit=submit&fileid=$id&vote=this%20is%20bad&redirect=true\"";
 						$class = "on";
@@ -345,17 +344,17 @@
 					<span style="margin-left:48px;">filters:</span>
 					<span style="margin-left:5px;"><?
 					        if(me()->getPref("hide_nsfw") == 1) { ?>
-					                <a href="/offensive/setPref.php?p=hide_nsfw&v=">nsfw(on)</a>
+					                <a href="<?= Link::setPref("hide_nsfw", "") ?>">nsfw(on)</a>
 					        <? } else { ?>
-					                <a href="/offensive/setPref.php?p=hide_nsfw&v=1">nsfw(off)</a>
+					                <a href="<?= Link::setPref("hide_nsfw", 1) ?>">nsfw(off)</a>
 					        <? } ?>
 					</span>
         	
 					<span style="margin-left:5px;"><?
 					        if(me()->getPref("hide_tmbo") == 1) { ?>
-					                        <a href="/offensive/setPref.php?p=hide_tmbo&v=">tmbo(on)</a>
+					                        <a href="<?= Link::setPref("hide_tmbo", "") ?>">tmbo(on)</a>
 					        <? } else { ?>
-					                        <a href="/offensive/setPref.php?p=hide_tmbo&v=1">tmbo(off)</a>
+					                        <a href="<?= Link::setPref("hide_tmbo", 1) ?>">tmbo(off)</a>
 					        <? } ?>
 					</span>
 				</span>
@@ -369,10 +368,10 @@
 			<br />
 			<?
 				if($upload->is_nsfw()) { ?>
-					<a style="color:#990000;" href="/offensive/setPref.php?p=hide_nsfw&v=<?= me()->getPref("hide_nsfw") == 1 ? "" : "1" ?>" title="<?= me()->getPref("hide_nsfw") == 1 ? "show" : "hide" ?> images that are not safe for work">[nsfw]</a><?
+					<a style="color:#990000;" href="<?= Link::setPref("hide_nsfw", (me()->getPref("hide_nsfw") == 1 ? "" : "1")) ?>" title="<?= me()->getPref("hide_nsfw") == 1 ? "show" : "hide" ?> images that are not safe for work">[nsfw]</a><?
 				}
 				if($upload->is_tmbo()) { ?>
-					<a style="color:#990000;" href="/offensive/setPref.php?p=hide_tmbo&v=<?= me()->getPref("hide_tmbo") == 1 ? "" : "1" ?>" title="<?= me()->getPref("hide_tmbo") == 1 ? "show" : "hide" ?> images that might be offensive">[tmbo]</a><?
+					<a style="color:#990000;" href="<?= Link::setPref("hide_tmbo", (me()->getPref("hide_tmbo") == 1 ? "" : "1")) ?>" title="<?= me()->getPref("hide_tmbo") == 1 ? "show" : "hide" ?> images that might be offensive">[tmbo]</a><?
 				}
 
 				$style = ($upload->is_tmbo() || $upload->is_nsfw()) ? "style=\"margin-left:.3em\"" : "";
@@ -493,7 +492,7 @@
 					<table><tr><td style="text-align:right" width="480px">
 							&nbsp;
 							<? if(!array_key_exists('loop', $_REQUEST)) { ?>
-									<a style="color:#999999; text-decoration:underline" href="/offensive/pages/pic.php?id=<?= $upload->id() ?>&loop">loop</a>
+									<a style="color:#999999; text-decoration:underline" href="<?= Link::upload($upload) ?>&loop">loop</a>
 							<? } ?>
 					</td></tr></table>
 					<?

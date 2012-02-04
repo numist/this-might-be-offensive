@@ -69,9 +69,7 @@ $timelimit = 10;
 			mustLogIn();
 		}
 		
-		$c = (me()->getPref("index") == "thumbs") ? 
-		      "thumbs" : "main";
-		header("Location: ./?c=$c");
+		header("Location: ".Link::mainpage());
 		exit;
 	}
 
@@ -135,6 +133,8 @@ $timelimit = 10;
 		x.src=im;
 	}
 </script>
+<script type="text/javascript" src="/offensive/js/jquery-1.7.1.min.js"></script>
+<script type="text/javascript" src="/offensive/js/tmbolib.js?v=0.0.4"></script>
 
 <?
 	if( function_exists( 'head' ) ) {
@@ -164,7 +164,7 @@ $timelimit = 10;
 
 	<div id="content">
 	
-		<div id="titleimg"><a href="./"><img src="graphics/offensive.gif" alt="[ this might be offensive ]" id="offensive" width="285" height="37" border="0"></a></div>
+		<div id="titleimg"><a href="<?= Link::mainpage() ?>"><img src="graphics/offensive.gif" alt="[ this might be offensive ]" id="offensive" width="285" height="37" border="0"></a></div>
 
 	
 		<div id="leftcol">
@@ -176,11 +176,11 @@ $timelimit = 10;
 						<div class="bluebox">
 							<p>hi <b><?= me()->htmlUsername() ?></b>!</p>
 							
-							<p><a href="index.php?c=upload">upload</a></p>
+							<p><a href="<?= Link::content("upload") ?>">upload</a></p>
 							
-							<p><a href="./?c=subscriptions">subscribed threads</a></p>
+							<p><a href="<?= Link::content("subscriptions") ?>">subscribed threads</a></p>
 							
-							<p><a href="./?c=settings">settings</a></p>
+							<p><a href="<?= Link::content("settings") ?>">settings</a></p>
             	
 							<p><a href="logout.php">log out</a></p>
 						</div>
@@ -198,10 +198,10 @@ $timelimit = 10;
 						<div class="heading">community:</div>
 						<div class="bluebox">
 							<p><a href="http://chat.efnet.org:9090/?channels=themaxx&nick=<?= urlencode(me()->username()); ?>" target="_blank">chat</a></p>
-							<p><a href="/offensive/?c=map">maxxer world map</a></p>
-							<p><a href="<?= $_SERVER['PHP_SELF'] ?>?c=referral">invite a friend</a></p>						
-							<p><a href="<?= $_SERVER['PHP_SELF'] ?>?c=faq">FAQ, rules, etc.</a></p>
-							<!-- <p><a href="./?c=stats">stats</a></p> -->						
+							<p><a href="<?= Link::content("map") ?>">maxxer world map</a></p>
+							<p><a href="<?= Link::content("referral") ?>">invite a friend</a></p>						
+							<p><a href="<?= Link::content("faq") ?>">FAQ, rules, etc.</a></p>
+							<!-- <p><a href="<?= Link::content("stats") ?>">stats</a></p> -->						
 						</div>
 					<div class="blackbar"></div>
 				</div>
@@ -226,7 +226,7 @@ $timelimit = 10;
 						</div>
 						<br/>
 						<div style="text-align:center">						
-							<a href="./?c=ppsub"><img src="graphics/paypal_subscribe.gif" border="0"/></a>
+							<a href="<?= Link::content("ppsub") ?>"><img src="graphics/paypal_subscribe.gif" border="0"/></a>
 						</div>
 					</div>
 				<div class="blackbar"></div>
@@ -254,7 +254,7 @@ $timelimit = 10;
 
 					<div class="heading" style="text-align:center">
 						<span class='orange'>
-							<a class="orange" href="./?c=hof">hall of fame</a>
+							<a class="orange" href="<?= Link::content("hof") ?>">hall of fame</a>
 						</span>
 					</div>
 					<div class="blackbar"></div>
@@ -348,7 +348,7 @@ $timelimit = 10;
 	
 	if(me()->status() == "admin") {
 		?>
-		<div class="textlinks"><?= number_format(time_end($ptime), 3)."s php, ".number_format($querytime, 3)."s sql, ".count($queries)." queries\n\n <!--\n\n";
+		<div class="textlinks"><?= number_format(time_end($ptime), 3)."s php, ".number_format($querytime, 3)."s sql, ".count($queries)." queries\n\n <!-- query statistics: \n";
 			var_dump($queries);
 			echo "\n\n-->\n\n"; ?></div>
 		<?
@@ -394,9 +394,9 @@ $timelimit = 10;
 			<div class="bluebox">
 				<? while( $row = mysql_fetch_assoc( $result ) ) {
 					$css = isset($css) && $css == "evenfile" ? "oddfile" : "evenfile"; 
-					$upload = new Upload($row); ?>
-				
-					<div class="clipper"><a class="<?= $css ?>" href="?c=comments&fileid=<?= $upload->id() ?>#<?= $row['commentid']?>"><?= $upload->htmlFilename() ?></a></div>
+					$upload = new Upload($row);
+					// XXX: rejigger the query and use Link::comment ?>
+					<div class="clipper"><a class="<?= $css ?>" href="<?= Link::thread($upload) ?>#<?= $row['commentid']?>"><?= $upload->htmlFilename() ?></a></div>
 				<? } ?>
 			</div>
 			<div class="heading" style="text-align:center">
@@ -410,6 +410,7 @@ $timelimit = 10;
 	function whosOn() {
 		global $userlimit, $timelimit;
 
+		// XXX: is it any faster to combine this and the next query?
 		// get the total number of users online
 		$sql = "SELECT COUNT(*) FROM users WHERE timestamp > DATE_SUB( now( ) , INTERVAL $timelimit MINUTE)";
 		$result = tmbo_query($sql);
@@ -423,11 +424,11 @@ $timelimit = 10;
 			<table style="width:100%"><?
 				$uid = me() ? me()->id() : 0;
 				// list out the latest people to do something
-				$sql = "SELECT userid, username FROM users WHERE timestamp > DATE_SUB( now( ) , INTERVAL $timelimit MINUTE) && userid != $uid ORDER BY timestamp DESC LIMIT $userlimit";
+				$sql = "SELECT * FROM users WHERE timestamp > DATE_SUB( now( ) , INTERVAL $timelimit MINUTE) && userid != $uid ORDER BY timestamp DESC LIMIT $userlimit";
 				$result = tmbo_query($sql);
-				while(false !== (list($userid, $username) = mysql_fetch_array($result))) {
+				while(false !== ($row = mysql_fetch_array($result))) {
 					$css = (!isset($css) || $css == "odd") ? "even" : "odd"; ?>
-					<tr class="<?= $css ?>_row"><td class="<?= $css ?>file"><a href="./?c=user&userid=<?= $userid ?>"><?= $username ?></a></td></tr>
+					<tr class="<?= $css ?>_row"><td class="<?= $css ?>file"><?= id(new User($row))->htmlUsername() ?></td></tr>
 				<? }
 
 				$css = (!isset($css) || $css == "odd") ? "even" : "odd";
@@ -435,7 +436,7 @@ $timelimit = 10;
 				if($nonline < $userlimit) {
 					?><tr class="<?= $css ?>_row"><td class="<?= $css ?>file">you.</td></tr><?
 				} else if($nonline > $userlimit) {
-					?><tr><td><a href="./?c=online">and <?= ($nonline - $userlimit) ?> more</a></td></tr><?
+					?><tr><td><a href="<?= Link::content("online") ?>">and <?= ($nonline - $userlimit) ?> more</a></td></tr><?
 				} ?>
 			</table>
 		</div>

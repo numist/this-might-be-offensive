@@ -29,7 +29,7 @@
     }
 
     function pickuplink() {
-        // <!-- <a href="/offensive/?c=settings">Show options...</a> -->
+        // <!-- <a href="Link::content("settings")">Show options...</a> -->
     	// get db pickuplink
 	    global $activeTab;
 	
@@ -48,15 +48,15 @@
 	
 	    // output correct pickuplink
 	    if($dbpic !== false && $dbpic == $cookiepic) {
-		    ?><a href="/offensive/pages/pic.php?id=<?= $dbpic ?>" id="pickUp">Pick up where you left off...</a><?
+		    ?><a href="<?= Link::upload($dbpic) ?>" id="pickUp">Pick up where you left off...</a><?
 	    } else if ($dbpic && $cookiepic){
 		    ?>Pick up where you left off 
-			    (<a href="/offensive/pages/pic.php?id=<?= $cookiepic ?>" id="pickUp">on this computer</a> | 
-			    <a href="/offensive/pages/pic.php?id=<?= $dbpic ?>" id="pickUp">on this account</a>)<?
+			    (<a href="<?= Link::upload($cookiepic) ?>" id="pickUp">on this computer</a> | 
+			    <a href="<?= Link::upload($dbpic) ?>" id="pickUp">on this account</a>)<?
 	    } else if ($cookiepic) {
-		    ?><a href="/offensive/pages/pic.php?id=<?= $cookiepic ?>" id="pickUp">Pick up where you left off...</a><?
+		    ?><a href="<?= Link::upload($cookiepic) ?>" id="pickUp">Pick up where you left off...</a><?
 	    } else if ($dbpic) {
-	    	?><a href="/offensive/pages/pic.php?id=<?= $dbpic ?>" id="pickUp">Pick up where you left off...</a><?
+	    	?><a href="<?= Link::upload($dbpic) ?>" id="pickUp">Pick up where you left off...</a><?
 	    }
     }
 
@@ -332,21 +332,21 @@
         </noscript>
         <div id="gbar">
             <nobr>
-                <a href="/offensive/?c=discussions" class="gb1">Web</a>
+                <a href="<?= Link::content("discussions") ?>" class="gb1">Web</a>
  
                 <b class="gb1">Images</b>
  
-                <a href="/offensive/?c=audio" class="gb1">Audio</a>
+                <a href="<?= Link::content("audio") ?>" class="gb1">Audio</a>
  
-                <a href="/offensive/?c=map" class="gb1">Map</a>
+                <a href="<?= Link::content("map") ?>" class="gb1">Map</a>
  
-                <a href="/offensive/?c=changeblog" class="gb1">News</a>
+                <a href="<?= Link::content("changeblog") ?>" class="gb1">News</a>
  
                 <a href="http://www.timemachinists.com/tmbs.html" class="gb1">Shopping</a>
  
-                <a href="/offensive/?c=yearbook" class="gb1">Yearbook</a>
+                <a href="<?= Link::content("yearbook") ?>" class="gb1">Yearbook</a>
  
-                <a href="/offensive/?c=hof" class="gb3"><u>more</u><small>▼</small></a>
+                <a href="<?= Link::content("hof") ?>" class="gb3"><u>more</u><small>▼</small></a>
             </nobr>
         </div>
         <div id="guser" width="100%">
@@ -361,7 +361,7 @@
                 | 
                 <span id="gbe">
                 </span>
-                <a href="/offensive/?c=settings" class="gb3"><u>Settings</u> <small>▼</small><div id="gbs" style="left: auto; right: 67px; top: 24px; visibility: hidden; width: 157px; height: 40px; "></div></a>
+                <a href="<?= Link::content("settings") ?>" class="gb3"><u>Settings</u> <small>▼</small><div id="gbs" style="left: auto; right: 67px; top: 24px; visibility: hidden; width: 157px; height: 40px; "></div></a>
                 | 
                 <a href="/offensive/logout.php" class="gb4">Sign out</a>
             </nobr>
@@ -371,7 +371,7 @@
         <div class="gbh" style="right:0">
         </div>
         <div id="cnt">
-            <form id="tsf" name="gs" method="GET" action="/offensive/?c=search">
+            <form id="tsf" name="gs" method="GET" action="<?= Link::content("search") ?>">
 				<input type="hidden" name="c" value="findfile">
                 <table id="sft" class="ts" style="clear:both;margin:19px 16px 20px 15px">
                     <tbody>
@@ -394,7 +394,7 @@
                                                 <input type="submit" name="btnG" class="lsb" style="margin:0 2px 0 5px" value="Search">
                                             </td>
                                             <td style="padding:0 6px" class="nobr xsm">
-                                                <a href="/offensive/?c=search">
+                                                <a href="<?= Link::content("search") ?>">
                                                     Advanced Search
                                                 </a>
                                                 <br>
@@ -408,7 +408,7 @@
                                         SafeSearch:&nbsp;
                                     </div>
                                     <div id="ss-status" style="float:left;position:relative">
-                                        <a class="gb3" style="cursor:pointer;padding-bottom:0" href="/offensive/?c=settings"><u><?
+                                        <a class="gb3" style="cursor:pointer;padding-bottom:0" href="<?= Link::content("settings") ?>"><u><?
     if(me()->getPref("hide_tmbo") && me()->getPref("hide_nsfw")) echo "Strict";
     else if(!me()->getPref("hide_tmbo") && !me()->getPref("hide_nsfw")) echo "Off";
     else echo "Moderate";
@@ -430,7 +430,7 @@
                 <div id="prs">
                     <span id="imgtbbc">
                         <span class="crumbs">
-                            <a href="/offensive/?c=discussions" class="bcl">Web</a>
+                            <a href="<?= Link::content("discussions") ?>" class="bcl">Web</a>
                             <i>
                                 ›
                             </i>
@@ -443,7 +443,7 @@
                         <span id="rptglbl" class="">
                         </span>
                         <span>
-                            <!-- <a href="/offensive/?c=settings">Show options...</a> -->
+                            <!-- <a href="<?= Link::content("settings") ?>">Show options...</a> -->
                             <?= pickuplink() ?>
                         </span>
                     </span>
@@ -497,7 +497,7 @@
                                                     $upload = $row[$col];
                                         ?>
                                             <td id="tDataImage<?= $total++ ?>" style="<?= ($first ? "padding-top:0px" : "padding-top: 20px") ?>" align="left" nowrap="" valign="bottom" width="16.666666%">
-                                                <a href="/offensive/pages/pic.php?id=<?= $upload->id() ?>">
+                                                <a href="<?= Link::upload($upload) ?>">
                                                     <img style="border:1px solid;vertical-align:bottom" src="<?= ($upload->filtered() ? "/offensive/graphics/th-filtered.gif" : $upload->thumbURL()) ?>">
                                                 </a>
                                             </td>
@@ -604,7 +604,7 @@
             </div>
             <div style="text-align:center;margin-top:1.4em" class="clr">
                 <div id="bsf" style="padding:1.8em 0;margin-top:0">
-                    <form method="GET" action="/offensive/?c=search">
+                    <form method="GET" action="<?= Link::content("search") ?>">
                         <div>
 				            <input type="hidden" name="c" value="findfile">
                             <input class="lst" type="text" name="findfile" size="41" maxlength="2048" value="thismight.be/offensive" title="Search">

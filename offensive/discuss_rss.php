@@ -45,7 +45,7 @@ conditionalGet($lastBuildTime);
 
 		<item>
 			<title><![CDATA[<?= $upload->filename() ?> (started by <?= $upload->uploader()->username() ?>)]]></title>
-			<link>https://<?= $_SERVER['SERVER_NAME'] ?>/offensive/?c=comments&fileid=<?= $upload->id() ?></link>
+			<link>https://<?= $_SERVER['SERVER_NAME'].Link::thread($upload) ?></link>
 			<description><![CDATA[<?
 				$comments = $upload->getComments();
 				if(count($comments) > 0) {
@@ -55,7 +55,7 @@ conditionalGet($lastBuildTime);
 				}
 			?>]]></description>
 			<pubDate><?= date( "r", strtotime( $upload->timestamp() ) ) ?></pubDate>			
-			<comments><![CDATA[https://<?= $_SERVER['SERVER_NAME'] ?>/offensive/page.php?c=comments&fileid=<?= $upload->id() ?>]]></comments>
+			<comments><![CDATA[https://<?= $_SERVER['SERVER_NAME'].Link::thread($upload) ?>]]></comments>
 		</item>
 <?
 	}
