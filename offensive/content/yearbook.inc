@@ -95,27 +95,8 @@
 
 		// output loop
 		foreach($result as $upload) {
-			?>
-					<li fileid="<?= $upload->id() ?>">
-						<div class="thumbcontainer">
-							<div><a href="pages/pic.php?id=<?= $upload->id() ?>"
-								<? if($upload->filtered()) { ?>
-								onMouseOver='changesrc("th<?= $upload->id()?>","<?= $upload->thumbURL() ?>")'
-								onMouseOut='changesrc("th<?= $upload->id() ?>","/offensive/graphics/th-filtered.gif")'
-								<? } ?>
-							><img name="th<?= $upload->id()?>"
-								src="<?= $upload->filtered()
-									? "/offensive/graphics/th-filtered.gif"
-									: $upload->thumbURL() ?>"
-								>
-							</a></div>
-							<div class="score">
-								<a href="./?c=user&userid=<?= $upload->uploader()->id() ?>"><?= $upload->uploader()->username() ?></a>
-								<a href="./?c=comments&fileid=<?= $upload->id() ?>">[c]</a>
-							</div>
-						</div>
-					</li>
-				<?php } ?>
+			require("offensive/template/thumbitem_avatar.inc");
+		} ?>
 				</ul>
 			</div>
 			<div id="bottom">
