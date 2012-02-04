@@ -77,7 +77,7 @@ function fetch_db_images($dbuser = "", $dbpass = "", $database= "", $dbhost = ""
 	$startid = $_SERVER['argv'][1];
 	$endid = $_SERVER['argv'][2];
 	
-	$sql = "SELECT * FROM offensive_uploads WHERE type='image' 
+	$sql = "SELECT * FROM offensive_uploads WHERE type='image' AND status='normal'
 	                                        AND id >= $startid AND id <= $endid
 	                                        ORDER by timestamp ASC";
 	                                        
@@ -113,7 +113,7 @@ function add_to_isk($images) {
 		if(!$isk->add($image["path"], $image['id'])) {
 		  echo " failed";
 		}
-		echo "\n"
+		echo "\n";
 	}
 	$isk->save();
 	unset($isk);
