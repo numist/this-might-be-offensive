@@ -66,10 +66,24 @@ class Isk {
 		$image->destroy();
 		
 		return $blob;
-	}		
+	}
 	
 	// add image to ISK
-	public function add($id, $img) {
+	public function add($image_path, $fileid) {
+		$blob = $this->img_blob($image_path);
+		if($this->error()) {
+			return false;
+		}
+
+		$this->_add($fileid, $blob);
+		if($this->error()) {
+			return false;
+		}
+		
+		return true;
+	}
+	
+	private function _add($id, $img) {
 		$msg = new xmlrpcmsg('addImgBlob',
 				array(	php_xmlrpc_encode(1), 					// dbID = 1
 					php_xmlrpc_encode($id),					// img id

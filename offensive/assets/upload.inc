@@ -812,7 +812,7 @@ function upload_checkisk(&$postdata) {
 	$postdata['hash'] = getHash($tmpdir."/".$postdata['tmpname']);
 	if(strlen($postdata['hash']) < 15) trigger_error("bad hash?", E_USER_ERROR);
 	
-	$isk = new Isk;
+	$isk = new Isk();
 	
 	$blob = $isk->img_blob($_SERVER['DOCUMENT_ROOT'] . '/offensive/'.$tmpdir."/".$postdata['tmpname']);
 	if($isk->error()) {
@@ -1171,40 +1171,27 @@ function upload_insert_file($postdata) {
 	        VALUES ( " . $_SESSION['userid'] . ", $fileid ) ";
 	tmbo_query( $sql );
 
-	$image_path = $_SERVER['DOCUMENT_ROOT'] . "/offensive/uploads/$year/$month/$day/".upload_type($postdata)."/". $fileid."_".$postdata['filename'];
+	$upload = new Upload($fileid);
 	
-	add_to_isk($image_path, $fileid);
+	$isk = new Isk();
+	if($isk->add($upload->file(), $upload->id())) {
+		$isk->save();
+	}
 
 	unset($_SESSION['postdata']);
 
 	$message = "<p>
-		Thanks. Your upload can be viewed <a href=\"".Link::upload($fileid)."\">here</a>.
+		Thanks. Your upload can be viewed <a href=\"".Link::upload($upload)."\">here</a>.
 	</p>
 	<p>
-			You may <a href=\"".Link::thread($fileid)."\">comment on this file here</a>.
+			You may <a href=\"".Link::thread($upload)."\">comment on this file here</a>.
 	</p>
 	<p>
-		<a href=\"".Link::listFor($fileid)."\">Back to the list</a>
+		<a href=\"".Link::listFor($upload)."\">Back to the list</a>
 	</p>";
 	box($message, "yummy.");
 	if(upload_type($postdata) != "avatar")
 		uploadForm(true);
-}
-
-function add_to_isk($image_path, $fileid) {
-	$isk = new Isk;	
-	
-	$blob = $isk->img_blob($image_path);
-	if($isk->error()) {
-		return false;
-	}
-	
-	$isk->add($fileid, $blob);
-	if($isk->error()) {
-		return false;
-	}
-	
-	$isk->save();
 }
 
 function upload_insert_topic() {

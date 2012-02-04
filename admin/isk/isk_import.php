@@ -95,7 +95,7 @@ function fetch_db_images($dbuser = "", $dbpass = "", $database= "", $dbhost = ""
 function add_to_isk($images) {
 
 	// create ISK object
-	$isk = new Isk;
+	$isk = new Isk();
 
 	// loop over images and add them to ISK
 	$counter = 0;
@@ -104,14 +104,16 @@ function add_to_isk($images) {
 	    echo "skipping " . $image['path'] . "\n";
 	    continue;
 	  } else {
-		  echo "adding " . $image['path'] . "\n";
+		  echo "adding " . $image['path'];
 		}
 		$counter++;
 		if(!($counter % 500)) {
 		  $isk->save();
 		}
-		$img = $isk->img_blob($image['path']);
-		$isk->add($image['id'], $img);
+		if(!$isk->add($image["path"], $image['id'])) {
+		  echo " failed";
+		}
+		echo "\n"
 	}
 	$isk->save();
 	unset($isk);
