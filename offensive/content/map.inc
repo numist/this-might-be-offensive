@@ -51,7 +51,7 @@
 			</form>
 		</div>
 <?php } ?>
-		<div id="map_edit" style="border: 1px solid black; padding: 0; margin: 0; text-align: center; background-color: #fff; width: 100px; height: 15px;"><b><a href="/offensive/?c=map<?php echo $edit ? '">Back' : '&action=edit">Add/Edit'?></a></b></div>
+		<div id="map_edit" style="border: 1px solid black; padding: 0; margin: 0; text-align: center; background-color: #fff; width: 100px; height: 15px;"><b><a href="<?= Link::content("map").($edit ? '">Back' : '&action=edit">Add/Edit') ?></a></b></div>
 		<script><?= ($edit ? "editmap($userid);" : "loadmap();") ?></script>
 		<div class="blackbar"></div>
 	</div>

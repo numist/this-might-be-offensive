@@ -37,8 +37,8 @@
 		<? tabs(); ?>
 
 		<div style="padding-top:8px;background:#ccccff;background-image:url( graphics/subtab_bg.gif );background-position:top left;background-repeat:repeat-x">
-			<div class="<?= ($view == 'hof' ? 'tabon' : 'taboff') ?>"><a href="./?c=hof">all time</a></div>
-			<div class="<?= ($view == 'today' ? 'tabon' : 'taboff') ?>"><a href="./?c=hof&t=today">past 24 hours</a></div>
+			<div class="<?= ($view == 'hof' ? 'tabon' : 'taboff') ?>"><a href="<?= Link::content("hof") ?>">all time</a></div>
+			<div class="<?= ($view == 'today' ? 'tabon' : 'taboff') ?>"><a href="<?= Link::content("hof") ?>&t=today">past 24 hours</a></div>
 			<div class="tabspacer" style="background:none">&nbsp;</div>
 		</div>
 
@@ -100,13 +100,13 @@
 								<? echo ++$count ?>.
 							</div>
 							<div class="col col2 <?= $cssw ?>">
-								<a href="pages/pic.php?id=<?= $upload->id() ?>"><?= $upload->htmlFilename()?></a>
+								<a href="<?= Link::upload($upload) ?>"><?= $upload->htmlFilename()?></a>
 							</div>
 							<div class="col col3 <?= $cssw ?>">
 								<?= $upload->uploader()->htmlUsername(); ?>
 							</div>
 							<div class="col col4 <?= $cssw ?>">
-								<a href="./?c=comments&fileid=<?= $upload->id() ?>"><?= $upload->comments() ?></a>
+								<a href="<?= Link::thread($upload) ?>"><?= $upload->comments() ?></a>
 							</div>
 							<div class="col col5 <?= $cssw ?>">
 								+<?= $upload->goods() ?>

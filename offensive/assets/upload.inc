@@ -830,7 +830,7 @@ function upload_checkrepost(&$postdata) {
 			if(upload_type($postdata) == "image" || upload_type($postdata) == "avatar") { ?>
 				<td height="100px" width="100px">
 
-					<a href="pages/pic.php?id=<?= $upload->id() ?>"
+					<a href="<?= Link::upload($upload) ?>"
 						<? if($upload->filtered()) { ?>
 							onMouseOver='changesrc("th<?= $upload->id()?>","<?= $upload->thumbURL() ?>")'
 							onMouseOut='changesrc("th<?= $upload->id() ?>","/offensive/graphics/th-filtered.gif")'
@@ -843,7 +843,7 @@ function upload_checkrepost(&$postdata) {
 
 				</td>
 			<? } ?>
-		<td><a href="/offensive/?c=comments&fileid=<?= $upload->id(); ?>" target="_blank"><?= htmlEscape($upload->filename()) ?></a></td>
+		<td><a href="<?= Link::thread($upload); ?>" target="_blank"><?= htmlEscape($upload->filename()) ?></a></td>
 		</tr><?
 	}
 	?></table></center><br />
@@ -1079,13 +1079,13 @@ function upload_insert_file($postdata) {
 	unset($_SESSION['postdata']);
 
 	$message = "<p>
-		Thanks. Your upload can be viewed <a href=\"./pages/pic.php?id=$fileid\">here</a>.
+		Thanks. Your upload can be viewed <a href=\"".Link::upload($fileid)."\">here</a>.
 	</p>
 	<p>
-			You may <a href=\"./?c=comments&fileid=$fileid\">comment on this file here</a>.
+			You may <a href=\"".Link::thread($fileid)."\">comment on this file here</a>.
 	</p>
 	<p>
-		<a href=\"./\">Back to the list</a>
+		<a href=\"".Link::listFor($fileid)."\">Back to the list</a>
 	</p>";
 	box($message, "yummy.");
 	if(upload_type($postdata) != "avatar")

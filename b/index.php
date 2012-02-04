@@ -25,7 +25,7 @@ function poast($comment, $image, $upload) {
 				echo $com[$i] . "<br />";
 			}?>
 				<blockquote>
-					<span class="abbr">Comment too long. Click <a href="/offensive/?c=comments&fileid=<?= $upload->id() ?>#<?= $comment->id() ?>">here</a> to view the full text.</span>
+					<span class="abbr">Comment too long. Click <a href="<?= Link::comment($comment) ?>">here</a> to view the full text.</span>
 				</blockquote>
 			<?
 		}
@@ -68,19 +68,19 @@ function changesrc(a,im)
 <div id="header"><span id="navtop">
 
 [
-<a href="/offensive/?c=user&userid=499" title="asshat">a</a> /
-<a href="/offensive/?c=discussions" title="Message Board">d</a> /
-<a href="/offensive/?c=hof" title="Hall of Fame">h</a> /
-<a href="/offensive/?c=referral" title="Invite a Friend">i</a> /
-<a href="/offensive/map/gmap.php" title="World Map">m</a> /
-<a href="/offensive/?c=faq" title="Rules & Stuff">r</a> /
-<a href="/offensive/?c=search" title="Search">s</a> /
-<a href="/offensive/?c=yearbook" title="Yearbook">y</a>
+<a href="<?= Link::user(499) ?>" title="asshat">a</a> /
+<a href="<?= Link::content("discussions") ?>" title="Message Board">d</a> /
+<a href="<?= Link::content("hof") ?>" title="Hall of Fame">h</a> /
+<a href="<?= Link::content("referral") ?>" title="Invite a Friend">i</a> /
+<a href="<?= Link::content("map") ?>" title="World Map">m</a> /
+<a href="<?= Link::content("faq") ?>" title="Rules & Stuff">r</a> /
+<a href="<?= Link::content("search") ?>" title="Search">s</a> /
+<a href="<?= Link::content("yearbook") ?>" title="Yearbook">y</a>
 ]
 
-[<a href="/offensive/?c=changeblog" title="tmbo Status">status</a>]
+[<a href="<?= Link::content("changeblog") ?>" title="tmbo Status">status</a>]
 
-</span><span id="navtopr">[<a href="/offensive/?c=discussions" target="_top">Home</a>]</span></div><br/>
+</span><span id="navtopr">[<a href="<?= Link::content("discussions") ?>" target="_top">Home</a>]</span></div><br/>
 <center><div class="logo">
 <img width=300 height=100 src="http://static.4chan.org/dontblockthis/title/batou01.gif"><br>
 <font size=5>
@@ -89,7 +89,7 @@ function changesrc(a,im)
 <div style='position:relative'></div><div align="center" class="postarea">
 
 <form method="post"
-	action="/offensive/?c=upload"
+	action="<?= Link::content("upload") ?>"
 	enctype="multipart/form-data">
 	<table cellpadding=1 cellspacing=1>
 		<tr>
@@ -130,7 +130,7 @@ function changesrc(a,im)
 							<LI>Supported file types are: GIF, JPG, PNG 
 							<LI>Maximum file size allowed is <?= ini_get("upload_max_filesize") ?>. 
 							<LI>Images greater than 100x100 pixels will be thumbnailed. 
-							<LI>Read the <a href="/offensive/?c=faq">rules</a> before posting. 
+							<LI>Read the <a href="<?= Link::content("faq") ?>">rules</a> before posting. 
 							<LI><img src="jpn-flag.jpg"> <a href="http://en.wikipedia.org/wiki/Knowledge">チンポについて</a> - <a href="http://en.wikipedia.org/wiki/Penis">翻訳</a>
 						</td>
 					</tr>
@@ -183,7 +183,7 @@ while( $image = mysql_fetch_assoc( $result ) )
 
 <!-- loopy -->
 <span class="filesize">
-	File: <a href="<?= "/offensive/pages/pic.php?id=".$upload->id() ?>"><?= htmlEscape($upload->filename()) ?></a> - (<?= byte_format(filesize($filepath))?>, <?
+	File: <a href="<?= Link::upload($upload) ?>"><?= htmlEscape($upload->filename()) ?></a> - (<?= byte_format(filesize($filepath))?>, <?
 
 $info = getimagesize($filepath);
 echo $info[0]."x".$info[1];
@@ -214,8 +214,8 @@ echo $info[0]."x".$info[1];
 <?= date("m/d/y(D)H:i:s", $time) ?>
 <span></span>
 <span id="nothread<?= $upload->id() ?>">
-	<a href="/offensive/pages/pic.php?id=<?= $upload->id() ?>" class="quotejs">No.<?= $upload->id() ?></a>
-	&nbsp; [<a href="/offensive/?c=comments&fileid=<?= $upload->id() ?>">Reply</a>]
+	<a href="<?= Link::upload($upload) ?>" class="quotejs">No.<?= $upload->id() ?></a>
+	&nbsp; [<a href="<?= Link::thread($upload) ?>">Reply</a>]
 </span><br />
 <!--<blockquote>So ur with ur honey and yur making out wen the phone rigns. U anser it n the vioce is &quot;wut r u doing wit my daughter?&quot; U tell ur girl n she say &quot;my dad is ded&quot;. THEN WHO WAS PHONE?
 <br /><span class="abbr">Comment too long. Click <a href="res/60550329.html#60550329">here</a> to view the full text.</span></blockquote>-->
@@ -275,7 +275,7 @@ echo $info[0]."x".$info[1];
 			date("m/d/y(D)H:i:s", strtotime($comment['comment_timestamp']));
 			?><span></span>
 			<span id="norep<?= $comment['commentid'] ?>">
-				<a href="/offensive/?c=comments&fileid=<?= $upload->id() ?>#<?= $comment['commentid'] ?>" class="quotejs">No.<?= $comment['commentid'] ?></a>
+				<a href="<?= Link::comment($comment['commentid']) ?>" class="quotejs">No.<?= $comment['commentid'] ?></a>
 			</span>
 			<? poast($comment, $image, $upload); ?>
 		</td>
@@ -314,7 +314,7 @@ for($i = 0; $i < 10; $i++) {
 	if($p == $i) {
 		echo "[<b>".($i + 1)."</b>]";
 	} else {
-		echo "[<a href=\"/tmbo/?p=$i\">".($i + 1)."</a>]";
+		echo "[<a href=\"/b/?p=$i\">".($i + 1)."</a>]";
 	}
 }
 ?>
@@ -332,28 +332,28 @@ for($i = 0; $i < 10; $i++) {
 <span id="navbot">
 
 [
-<a href="/offensive/?c=user&userid=499" title="asshat">a</a> /
-<a href="/offensive/?c=discussions" title="Message Board">d</a> /
-<a href="/offensive/?c=hof" title="Hall of Fame">h</a> /
-<a href="/offensive/?c=referral" title="Invite a Friend">i</a>
-<a href="/offensive/map/gmap.php" title="World Map">m</a> /
-<a href="/offensive/?c=faq" title="Rules & Stuff">r</a> /
-<a href="/offensive/?c=search" title="Search">s</a> /
-<a href="/offensive/?c=yearbook" title="Yearbook">y</a> 
+<a href="<?= Link::user(499) ?>" title="asshat">a</a> /
+<a href="<?= Link::content("discussions") ?>" title="Message Board">d</a> /
+<a href="<?= Link::content("hof") ?>" title="Hall of Fame">h</a> /
+<a href="<?= Link::content("referral") ?>" title="Invite a Friend">i</a>
+<a href="<?= Link::content("map") ?>" title="World Map">m</a> /
+<a href="<?= Link::content("faq") ?>" title="Rules & Stuff">r</a> /
+<a href="<?= Link::content("search") ?>" title="Search">s</a> /
+<a href="<?= Link::content("yearbook") ?>" title="Yearbook">y</a> 
 ]
 
-[<a href="/offensive/?c=changeblog" title="tmbo Status">status</a>]
+[<a href="<?= Link::content("changeblog") ?>" title="tmbo Status">status</a>]
 
 </span>
 
-<span id="navbotr">[<a href="/offensive/?c=discussions" target="_top">Home</a>]</span>
+<span id="navbotr">[<a href="<?= Link::content("discussions") ?>" target="_top">Home</a>]</span>
 
 <br><br>
 <center>
 	<font size="2">
 		- <a href="http://images.google.com/" target="_top">futaba</a> + 
-		<a href="/offensive/?c=user&userid=143" target="_top">futallaby</a> + 
-		<a href="/offensive/?c=user&userid=151" target="_top">yotsuba</a> -
+		<a href="<?= Link::user(143) ?>" target="_top">futallaby</a> + 
+		<a href="<?= Link::user(151) ?>" target="_top">yotsuba</a> -
 		<br>
 		All trademarks and copyrights on this page are owned by their respective parties. 
 		Images uploaded are the responsibility of the Poster. Comments are owned by the Poster.

@@ -1,6 +1,34 @@
 <?
 
 class Link {
+	static function setPref($key, $value) {
+		require("offensive/data/preferences.inc");
+		if(!in_array($key, $prefnames))
+			trigger_error("$key is not a valid preference name!", E_USER_ERROR);
+		
+		return "/offensive/setPref.php?p=".$key."&v=".$value;
+	}
+	
+	static function listFor($upload) {
+		if(!is_object($upload)) {
+			$upload = new Upload($upload);
+		}
+		
+		switch($upload->type()) {
+			case "topic":
+				return Link::content("discussions");
+			case "audio":
+				return Link::content("audio");
+			case "avatar":
+				return Link::content("yearbook");
+			default:
+				trigger_error("unknown type ".$upload->type(), E_USER_WARNING);
+				// intentional fall-through
+			case "image":
+				return Link::mainpage();
+		}
+	}
+	
 	static function mainpage() {
 		return Link::content(me() ? me()->getPref("index") : "main");
 	}

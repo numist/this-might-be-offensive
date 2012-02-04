@@ -70,7 +70,7 @@
 			?>
 						<li class="grid_row" fileid="<?= $row['fileid'] ?>">
 							<div class="col col1 <?= $css ?>">
-								<a href="./?c=comments&fileid=<?= $row['fileid'] ?>"><?= $row['filename'] ?></a>
+								<a href="<?= Link::thread($row['fileid']) ?>"><?= $row['filename'] ?></a>
 							</div>
 							<div class="col col2 <?= $css ?>">
 								<a href="subscribe.php?un=1&fileid=<?= $row['fileid'] ?>" title="take this thread off my 'unread comments' watch list.">unsubscribe</a>

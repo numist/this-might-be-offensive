@@ -23,8 +23,7 @@
 		 * user's preferences.
 		 */
 		if($redirect == "") {
-			$redirect = '/offensive/?c='.((me()->getPref("index") == "thumbs") ? 
-			      "thumbs" : "main");
+			$redirect = Link::mainpage();
 		}
 		header( "Location: " . $redirect );
 		exit;
@@ -40,8 +39,7 @@
 		 * user's preferences.
 		 */
 		if(!$redirect) {
-			$redirect = '/offensive/?c='.((me()->getPref("index") == "thumbs") ? 
-			      "thumbs" : "main");
+			$redirect = Link::mainpage();
 		}
 		header( "Location: " . $redirect );
 		exit;

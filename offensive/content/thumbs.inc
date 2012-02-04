@@ -75,7 +75,7 @@
 		<div id="grid-container">
 			<div id="commands">
 				<div class="floatleft"><? PickupLink::emit(); ?></div>
-				<div class="floatright"><a href="./?c=main<?= query_string("c", "&") ?>">text view</a></div>
+				<div class="floatright"><a href="<?= Link::content("main").query_string("c", "&") ?>">text view</a></div>
 			</div>
 			<div class="grid_thumbs" id="thumbnails">
 				<ul>

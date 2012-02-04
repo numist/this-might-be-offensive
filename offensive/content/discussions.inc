@@ -48,7 +48,7 @@
 			<div id="grid-container">
 				<div id="commands">
 					<div class="floatright">
-						<a href="./?c=newtopic">new topic</a>
+						<a href="<?= Link::content("newtopic") ?>">new topic</a>
 					</div>
 				</div>
 <?

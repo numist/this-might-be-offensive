@@ -48,7 +48,7 @@
 		
 		if(array_key_exists("revoke", $_REQUEST)) {
 			core_destroytoken($_REQUEST["revoke"]);
-			header("Location: /offensive/?c=settings");
+			header("Location: ".Link::content("settings"));
 			exit;
 		}
 	}
@@ -79,25 +79,25 @@
 		<div style="text-align:center">
 			<span><?
 				if(me()->getPref("hide_nsfw") == 1) { ?>
-					<a href="/offensive/setPref.php?p=hide_nsfw&v=">turn nsfw filter off</a>
+					<a href="<?= Link::setPref("hide_nsfw", "") ?>">turn nsfw filter off</a>
 				<? } else { ?>
-					<a href="/offensive/setPref.php?p=hide_nsfw&v=1">turn nsfw filter on</a>
+					<a href="<?= Link::setPref("hide_nsfw", 1) ?>">turn nsfw filter on</a>
 				<? } ?>
 			</span>
 						
 			<span style="margin-left:48px;"><?
 				if(me()->getPref("hide_tmbo") == 1) { ?>
-					<a href="/offensive/setPref.php?p=hide_tmbo&v=">turn tmbo filter off</a>
+					<a href="<?= Link::setPref("hide_tmbo", "") ?>">turn tmbo filter off</a>
 				<? } else { ?>
-					<a href="/offensive/setPref.php?p=hide_tmbo&v=1">turn tmbo filter on</a>
+					<a href="<?= Link::setPref("hide_tmbo", 1) ?>">turn tmbo filter on</a>
 				<? } ?>
 			</span>
 			
 			<span style="margin-left:48px;"><?
 				if(me()->getPref("hide_bad") == 1) { ?>
-					<a href="/offensive/setPref.php?p=hide_bad&v=">turn bad filter off</a>
+					<a href="<?= Link::setPref("hide_bad", "") ?>">turn bad filter off</a>
 				<? } else { ?>
-					<a href="/offensive/setPref.php?p=hide_bad&v=1">turn bad filter on</a>
+					<a href="<?= Link::setPref("hide_bad", 1) ?>">turn bad filter on</a>
 				<? } ?>
 			</span>
 		</div>
@@ -124,7 +124,7 @@
 			</tr>
 		</textarea>
 		<div id="keynav">
-			<form id="keynav_form" action="/offensive/?c=settings" method="post">
+			<form id="keynav_form" action="<?= Link::content("settings") ?>" method="post">
 				<p>choose your own special keyboard nav settings. pick an action from the dropdown, choose a key to make it happen. </p><p>if you see a number in the box instead of a letter, the number is the keycode for the pressed key, which sometimes varies based on keyboard layout.</p><p>if the box has a letter, but the letter is wrong, please let someone know.</p><p>if you try to use the same key for multiple things, I can't help you.  it probably won't work correctly, so don't bother.</p>
 			
 				<table style="margin-left: 140px;">

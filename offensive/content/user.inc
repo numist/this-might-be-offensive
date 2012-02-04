@@ -36,7 +36,7 @@
 
 			<input type="hidden" name="avatar" value="1"/>
 			<input type="hidden" name="c" value="upload"/>
-			<input type="hidden" name="redirect" value="./?c=user&userid=<?= me()->id() ?>"/>
+			<input type="hidden" name="redirect" value="<?= Link::user(me()) ?>"/>
 		
 			<input type="file" name="image"/>
 			<input type="submit" value="upload yearbook picture"/>
@@ -105,21 +105,18 @@
 						<span style="color:#666699">
 							<? echo "$name has been around since $accountDateMessage."?>
 							<? if( $referredby ) { ?>
-								(thanks to <a href="./?c=<?= $_REQUEST['c'] ?>&userid=<?= $referredby->id() ?>" style="color:#666699"><?= $referredby->username() ?></a>.)
+								(thanks to <?= $referredby->htmlUsername() ?>.)
 							<? } ?>
 							<? if( isset( $ip ) ) { ?>
-								<br/>Last seen on <?= date( "F d, Y", strtotime($timestamp) ) ?><? if( me()->status() == "admin" ) { ?> from <?= $ip ?> (<a href="./?c=iphistory&uid=<?= $usrid ?>">view history</a>)<? } ?>.
+								<br/>Last seen on <?= date( "F d, Y", strtotime($timestamp) ) ?><? if( me()->status() == "admin" ) { ?> from <?= $ip ?> (<a href="<?= Link::content("iphistory") ?>&uid=<?= $usrid ?>">view history</a>)<? } ?>.
 								<?
 									if( me()->status() == "admin" ) {
-										$sql = "SELECT DISTINCT userid, username, account_status FROM users WHERE last_login_ip = '$ip' AND userid != $usrid" ;
+										$sql = "SELECT DISTINCT * FROM users WHERE last_login_ip = '$ip' AND userid != $usrid" ;
 										$result = tmbo_query( $sql );
 										if( mysql_num_rows( $result ) > 0 ) {
 											?><br/>Other users with the same ip:<br/><?
 											while( $row = mysql_fetch_assoc( $result ) ) {
-												?>
-													<a href="./?c=user&userid=<?= $row['userid'] ?>"><?= $row['username'] ?></a> ( <?= $row['account_status']?> )
-													<br/>
-												<?
+												echo id(new User($row))->htmlUsername()."<br/>";
 											}
 										}
 									}
@@ -159,7 +156,7 @@
 								if($avatar->file() && !$avatar->squelched()) {
 								?>
 									<div class="piletitle" style="margin-bottom:12px;">
-										<a href="pages/pic.php?id=<?= $avatar->id() ?>"><?= $name ?> is gorgeous.</a>
+										<a href="<?= Link::upload($avatar) ?>"><?= $name ?> is gorgeous.</a>
 									</div>
 									<!-- next onclick="img.src=arr[i]" -->
 								<?
@@ -180,13 +177,14 @@
 							
 						?>
 								<div class="piletitle" style="margin-bottom:12px;">
-									<a href="./?c=posse&userid=<?=$usrid?>"><?= $name ?> has a posse.</a>
+									<a href="<?= Link::content("posse")."&userid=".$usrid ?>"><?= $name ?> has a posse.</a>
 								</div>
 
 						<?
 							}
 						?><div style="clear:both"></div><?
 
+							// XXX: wow this is old
 							if( file_exists( "map/users/$usrid.jpg" ) ) {
 								?><div style="text-align:center;margin-bottom:12px;"><a href="map/"><img src="map/users/<?= $usrid?>.jpg" width="500" height="250"/></a></div><?
 							}
@@ -238,9 +236,10 @@ function recentComments( $uid ) {
 		if(array_key_exists($upload->id(), $seen)) continue;
 		$seen[$upload->id()] = true;
 		$count++;
-		
+
 		$css = isset($css) && strpos($css, "even") !== false ? "oddfile odd_row" : "evenfile even_row";
-		?><tr class="<?= $css ?>"><td><div style="white-space:nowrap; width:535px; overflow:hidden;"><a class="<?= $css ?>" href="?c=comments&fileid=<?= $upload->id() ?>#<?= $row['commentid'] ?>"><?= $upload->htmlFilename() ?></a></div></td></tr><?
+		// XXX: rejigger the query and use Link::comment
+		?><tr class="<?= $css ?>"><td><div style="white-space:nowrap; width:535px; overflow:hidden;"><a class="<?= $css ?>" href="<?= Link::thread($upload) ?>#<?= $row['commentid'] ?>"><?= $upload->htmlFilename() ?></a></div></td></tr><?
 
 	}
 ?>
@@ -333,7 +332,7 @@ function votingRecord( $id, $name ) {
 		?><div class="piletitle" style="margin-bottom:12px;"><?echo $name ?>'s voting record: +<?= $good ?> -<?= $bad ?><?
 	}
 
-?> (<a href="./?c=votedetail&userid=<?= $id ?>">click for details</a>)</div>
+?> (<a href="<?= Link::content("votedetail")."&userid=".$id ?>">click for details</a>)</div>
 <?
 
 }
@@ -346,8 +345,7 @@ function contributions($usrid) {
 	
 	?><tr><td>
 	<div class="piletitle">
-		<a href="/offensive/?c=<?= (me()->getPref("index") == "thumbs") ? 
-		      "thumbs" : "main" ?>&userid=<?= $usrid?>"><?= $them->username() ?>'<?= substr($them->username(), -1) == "s" ? "" : "s" ?> contributions to society:</a>
+		<a href="<?= Link::mainpage() ?>&userid=<?= $usrid?>"><?= $them->username() ?>'<?= substr($them->username(), -1) == "s" ? "" : "s" ?> contributions to society:</a>
 		<!-- +<?php echo isset($good_votes) ? $good_votes : 0; ?> -<?php echo isset($bad_votes) ? $bad_votes : 0; ?> (<a href="./?c=uservotedetail&userid=<?= $usrid ?>">click for details</a>)--></div>
 		</td></tr>
 		<tr><td valign="top">
@@ -361,16 +359,11 @@ function contributions($usrid) {
 		$css = isset($css) && strpos($css, "even") !== false ? "oddfile odd_row" : "evenfile even_row";
 		?>
 			<tr class="<?= $css ?>">
-				<td style="width:100%"><div style="overflow:hidden;white-space:nowrap;width:285px;"><a class="<?= $css ?>" href="<?
-				if($upload->type() != "topic") 
-					echo "pages/pic.php?id=".$upload->id();
-				else
-					echo "/offensive/?c=comments&fileid=".$upload->id();
-				?>"><?= $upload->htmlFilename(true) ?></div></td>
-				<td class="<?php echo $css?>" style="text-align:right;white-space:nowrap;width:100%">
-					<a href="./?c=comments&fileid=<?php echo $upload->id() ?>" class="<?= $css?>"><?=$upload->commentLabel(!($upload->type() == 'topic'));?></a>
+				<td style="width:100%"><div style="overflow:hidden;white-space:nowrap;width:285px;"><a class="<?= $css ?>" href="<?= Link::upload($upload) ?>"><?= $upload->htmlFilename(true) ?></div></td>
+				<td class="<?= $css?>" style="text-align:right;white-space:nowrap;width:100%">
+					<a href="<?= Link::thread($upload) ?>" class="<?= $css?>"><?=$upload->commentLabel(!($upload->type() == 'topic'));?></a>
 				</td>
-				<td style="text-align:right;white-space:nowrap;width:100%" class="<?= $css?>"><?php echo $upload->timestamp() ?></td>
+				<td style="text-align:right;white-space:nowrap;width:100%" class="<?= $css?>"><?= $upload->timestamp() ?></td>
 			</tr>
 		<?
 	}

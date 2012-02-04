@@ -28,23 +28,18 @@
 
 <table width="100%">
 
-<!--	<tr style="background:#bbbbee;text-align:center;">
-		<td><b><a href="./?c=discussions&order=up.timestamp">sort by thread creation date</a></b></td>
-		<td><b><a href="./?c=discussions&order=thecount">comment count</a></b></td>
-		<td><b><a href="./?c=discussions&order=latest">latest comment</a></b></td>
-	</tr> -->
 	<tr class="even_row">
 		<td>you</td>
 		<td style="text-align:right">now</td>
 	</tr>
 	<?
 		$css = "even";
-		$sql = "SELECT userid, username, timestamp FROM users WHERE timestamp > DATE_SUB( now( ) , INTERVAL $timelimit MINUTE) && userid != ".me()->id()." ORDER BY timestamp DESC";
+		$sql = "SELECT * FROM users WHERE timestamp > DATE_SUB( now( ) , INTERVAL $timelimit MINUTE) && userid != ".me()->id()." ORDER BY timestamp DESC";
 		$result = tmbo_query( $sql );
 		while(false !== ($row = mysql_fetch_assoc( $result ) )) {
 			$css = $css == "odd" ? "even" : "odd"; ?>
 				<tr class="<?= $css ?>_row">
-					<td><a href="./?c=user&userid=<?= $row['userid']?>"><?= $row['username'] ?></a></td>
+					<td><?= id(new User($row))->htmlUsername() ?></td>
 					<td style="text-align:right"><?
 		$timeago = time() - strtotime($row['timestamp']);
 		$minago = (int)($timeago / 60);

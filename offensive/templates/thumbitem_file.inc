@@ -26,7 +26,7 @@ if(!defined("TMBO") || !isset($upload)) {
 		</div>
 		<div>
 			<span class="score">
-				<a href="./?c=comments&fileid=<?= $upload->id() ?>"><?= $upload->commentLabel(); ?></a>
+				<a href="<?= Link::thread($upload) ?>"><?= $upload->commentLabel(); ?></a>
 			</span>
 		</div>
   </div>

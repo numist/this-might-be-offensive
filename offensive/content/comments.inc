@@ -78,19 +78,18 @@
 			}
 
 			if( array_key_exists("redirect", $_REQUEST) ) {
-				header( "Location: /offensive/pages/pic.php?id=" . $_REQUEST['fileid'] );
+				header("Location: ".Link::upload($_REQUEST['fileid']));
 				exit;
 			}
 			
 			// redirecting to the same place prevents 'reload' from reposting the comment.
-			header( "Location: " . $_SERVER['PHP_SELF'] . "?c=comments&fileid=" . $_REQUEST['fileid'] . ( is_numeric($commentid) ? "#".$commentid : "") );
+			header("Location: ".(is_numeric($commentid) ? Link::comment($commentid) : Link::thread($_REQUEST['fileid'])));
 			exit;
 		}
 	}
 
 	function head() {
 ?>
-	<script type="text/javascript" src="/offensive/js/jquery-1.7.1.min.js"></script>
 	<script type="text/javascript" src="/offensive/js/subscriptions.js"></script>
 
 	<script type="text/javascript">
@@ -109,11 +108,11 @@
 	
 	function toggleThumbnailLink() {
 		?><div style="margin:4px;font-weight:bold"><?
-			if(me()->getPref("thumbnails_in_comments") == 1 || me()->getPref("thumbnails_in_comments") === false) {
-				?><a href="setPref.php?p=thumbnails_in_comments&v=0">hide thumbnail</a><?
+			if(me()->getPref("thumbnails_in_comments") == 1) {
+				?><a href="<?= Link::setPref("thumbnails_in_comments", 0) ?>">hide thumbnail</a><?
 			}
 			else {
-				?><a href="setPref.php?p=thumbnails_in_comments&v=1">show thumbnail</a><?
+				?><a href="<?= Link::setPref("thumbnails_in_comments", 1) ?>">show thumbnail</a><?
 			}
 		?></div><?
 
@@ -129,7 +128,7 @@
 		$comments_heading = "the dorks who came before you said:";
 		$add_comment_heading = $comments_exist ? "and then you came along and were all:" : "you were first on the scene and were all:";
 
-		$href = "/offensive/pages/pic.php?id=".$upload->id();
+		$href = Link::upload($upload);
 ?>	
 
 <div class="contentbox">
@@ -188,7 +187,7 @@
 		?>" style="<?= nextStyle($commentnum++)?>">
 				<?= $comment->HTMLcomment(); ?>
 				<br />
-				<div class="timestamp"><a href="#<?= $comment->id() ?>"><?= $comment->timestamp() ?></a></div>
+				<div class="timestamp"><a href="<?= Link::comment($comment) ?>"><?= $comment->timestamp() ?></a></div>
 				
 				&raquo; <?= $commenter->htmlUsername() ?>
 				
@@ -228,7 +227,7 @@
 				<div style="background:#ccccff; border-top:1px solid #000033">
 					<div style="float:right"><? toggleThumbnailLink() ?></div>
 					<?
-						if(me()->getPref("thumbnails_in_comments") == 1 || me()->getPref("thumbnails_in_comments") === false) {
+						if(me()->getPref("thumbnails_in_comments") == 1) {
 							?>
 							
 							<a href="<?= $href ?>"
@@ -270,7 +269,7 @@
 
 					<div>
 					<? if ($upload->type() != "topic") { ?>
-						<a class="heading" id="pic" href="pages/pic.php?id=<?= $upload->id() ?>"><?= $upload->htmlFilename(); ?></a><br/>
+						<a class="heading" id="pic" href="<?= Link::upload($upload) ?>"><?= $upload->htmlFilename(); ?></a><br/>
 					<? }
 						else {
 						 ?>&nbsp;<?
