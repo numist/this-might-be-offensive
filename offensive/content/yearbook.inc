@@ -80,7 +80,7 @@
 ?>
 		<div id="grid-container">
 			<div id="commands">
-				<div class="floatleft"><? print_pickuplink() ?></div>
+				<div class="floatleft"><? PickupLink::emit() ?></div>
 				<div class="floatright">
 					<? if($args["sort"] !== 'uname_asc') { ?>
 					<a href="./?c=yearbook&sort=uname_asc">sort by username</a>

@@ -35,7 +35,8 @@
 
 		// update pickuplink for discussions
 		if($upload->type() == "topic") {
-			update_pickuplinks($upload, $upload->type());
+			PickupLink::content($upload->type());
+			PickupLink::update($upload);
 		}
 
 	

@@ -98,7 +98,7 @@
 							</div>
 						</li>
 <?
-						$pickuplinks = get_pickuplinks();
+						$pickuplinks = PickupLink::get();
 						$first = array_key_exists("p", $args) && $args["p"] > 0 ? false : true;
 						foreach( $result as $upload ) {
 							$css = (isset($css) && strpos($css, "even_row") !== false) ? "odd_row" : "even_row";

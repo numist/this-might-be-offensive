@@ -66,7 +66,7 @@
 		<div id="grid-container">
 			<div id="commands">
 				<div class="floatleft">
-					<? print_pickuplink(); ?>
+					<? PickupLink::emit(); ?>
 				</div>
 				<div class="floatright">&nbsp;</div>
 			</div>

@@ -27,6 +27,7 @@
 		header( "Location: /offensive/" );
 		exit;
 	}
+	PickupLink::content($upload->type());
 
 	if(array_key_exists("random", $_REQUEST)) {
 		header("Location: /offensive/pages/pic.php?id=".get_random_id($upload));
@@ -41,7 +42,8 @@
 	###########################################################################
 	// update pickuplinks
 	global $autoplay;
-	$autoplay = update_pickuplinks($upload, $upload->type());
+
+	$autoplay = PickupLink::update($upload);
 
 	if(array_key_exists('loop', $_REQUEST)) {
 		$autoplay = true;
@@ -49,7 +51,7 @@
 
 	###########################################################################
 	function get_random_id($upload) {
-		$pickuplinks = get_pickuplinks($upload->type());
+		$pickuplinks = PickupLink::get();
 
 		$filter = me()->getPref("hide_nsfw") ? " AND nsfw = 0" : "";
 		$filter .= me()->getPref("hide_tmbo") ? " AND tmbo = 0" : "";

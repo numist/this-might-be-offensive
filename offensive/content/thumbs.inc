@@ -77,7 +77,7 @@
 	<div class="bluebox">
 		<div id="grid-container">
 			<div id="commands">
-				<div class="floatleft"><? print_pickuplink(); ?></div>
+				<div class="floatleft"><? PickupLink::emit(); ?></div>
 				<div class="floatright"><a href="./?c=main<?= query_string("c", "&") ?>">text view</a></div>
 			</div>
 			<div class="grid_thumbs" id="thumbnails">
