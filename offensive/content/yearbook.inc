@@ -94,7 +94,7 @@
 
 		// output loop
 		foreach($result as $upload) {
-			require("offensive/template/thumbitem_avatar.inc");
+			require("offensive/templates/thumbitem_avatar.inc");
 		} ?>
 				</ul>
 			</div>
