@@ -56,7 +56,6 @@
 	function head()
 	{
 ?>
-	<script type="text/javascript" src="/offensive/js/jquery-1.7.1.min.js"></script>
 	<script type="text/javascript" src="/offensive/js/settings.php"></script>
 <?php
 	}
