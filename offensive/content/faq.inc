@@ -50,15 +50,6 @@ function body() {
 
 	</div>
 
-	<a href="#employee" name="employee"></a>
-	<div class="heading">
-		how is the employee of the month calculated?
-	</div>
-	
-	
-	<div class="bluebox">
-		<p>It's the number of good votes received on files uploaded in the past 30 days.</p>
-	</div>
 	<div class="blackbar"></div>
 </div>
 
