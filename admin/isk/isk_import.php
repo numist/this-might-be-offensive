@@ -33,6 +33,7 @@ echo "Done.\n";
 function add_image_path($images = array()) {
 	foreach($images as $image) {
 		$path = imgPath($image['timestamp'], $image['id'], $image['filename']);
+		if(!file_exists($path)) continue;
 		$image['path'] = $path;
 		$new_images[] = $image;
 	}
