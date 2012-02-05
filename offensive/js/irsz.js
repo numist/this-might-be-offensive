@@ -20,8 +20,9 @@
     irsz_selector(document).each(function(i, e) {
       // attach click handler for manual zooming
       $(e).click(function(){
+        var prevwidth = $(this).width();
         image_toggle(this, false);
-        return false;
+        return prevwidth == $(this).width();
       });
       
       // if iages are already loaded, fit them
@@ -64,14 +65,17 @@
     }
   }
   
+  function resetcursor(image) { image.style.cursor = "auto"; }
+  
   // zoom image in/out
   function image_toggle(image, animate) {
-    if(!irsz_enabled) { return; }
+    if(!irsz_enabled) { resetcursor(image); return; }
     
     image_dimensions(image, function(actual_width, actual_height) {
       // check both dimensions in case there's a bug elsewhere we're resetting
       if($(image).width() < actual_width || $(image).height < actual_height) {
         $(image).addClass(noresize_class);
+        image.style.cursor = "url(/offensive/graphics/zoom_out.cur),default";
         image_resize(image, actual_width, actual_height, animate);
       } else {
         $(image).removeClass(noresize_class);
@@ -81,8 +85,7 @@
   }
   
   function image_fit(image, animate) {
-    if(!irsz_enabled) { return; }
-    if($(image).hasClass(noresize_class)) { return; }
+    if(!irsz_enabled) { resetcursor(image); return; }
     
     image_dimensions(image, function(actual_width, actual_height) {
       var aspect_ratio = Math.max(actual_width / actual_height, actual_height / actual_width),
@@ -136,7 +139,21 @@
         }
       }
       
-      if(new_height != $(image).height() && new_height <= actual_height) {
+      if($(image).hasClass(noresize_class)) {
+        if(new_height < actual_height && new_width < actual_width) {
+          image.style.cursor = "url(/offensive/graphics/zoom_out.cur),default";
+        } else {
+          resetcursor(image);
+        }
+        return;
+      }
+      
+      if(new_height != $(image).height()) {
+        if(new_height < actual_height) {
+          image.style.cursor = "url(/offensive/graphics/zoom_in.cur),default";
+        } else {
+          resetcursor(image);
+        }
         image_resize(image, new_width, new_height, animate);
       }
     });
