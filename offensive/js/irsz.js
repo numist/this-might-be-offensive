@@ -88,8 +88,7 @@
     if(!irsz_enabled) { resetcursor(image); return; }
     
     image_dimensions(image, function(actual_width, actual_height) {
-      var aspect_ratio = Math.max(actual_width / actual_height, actual_height / actual_width),
-          target_width = $(window).width() - irsz_padding[0],
+      var target_width = $(window).width() - irsz_padding[0],
           target_height = $(window).height() - irsz_padding[1],
           new_height = 0,
           new_width = 0,
@@ -106,14 +105,21 @@
         return Math.round(actual_height * width / actual_width);
       }
       
-      if(aspect_ratio > 2) {
-        // if ratio > 2, check and fit to *smaller* image dimension (assume image intended to be scrolled)
+      if(/scroll/.test($(image).attr("src"))) {
+        // if a scroller, check and fit to *smaller* image dimension
+        // this assumes the image is intended to be scrolled in one dimension
         if(actual_width < actual_height) {
           new_width = target_width > irsz_min_width ? target_width : irsz_min_width;
           new_height = compute_height(new_width);
         } else {
           new_height = target_height > irsz_min_height ? target_height : irsz_min_height;
           new_width = compute_width(new_height);
+        }
+        
+        // correct for oversizing
+        if(new_width > actual_width || new_height > actual_height) {
+          new_width = actual_width;
+          new_height = actual_height;
         }
       } else {
         // fit image entirely within viewport
@@ -139,6 +145,7 @@
         }
       }
       
+      // image toggle blocker
       if($(image).hasClass(noresize_class)) {
         if(new_height < actual_height && new_width < actual_width) {
           image.style.cursor = "url(/offensive/graphics/zoom_out.cur),default";
@@ -148,6 +155,7 @@
         return;
       }
       
+      // resize image
       if(new_height != $(image).height()) {
         if(new_height < actual_height) {
           image.style.cursor = "url(/offensive/graphics/zoom_in.cur),default";
