@@ -32,8 +32,8 @@ foreach ($locations as $location){
 	// ADD TO XML DOCUMENT NODE
 	echo '<marker ';
 	echo 'userid="' . $location['userid'] . '" ';
-	echo 'lat="' . $row['latitude'] . '" ';
-	echo 'lon="' . $row['longitude'] . '" ';
+	echo 'lat="' . $location['latitude'] . '" ';
+	echo 'lon="' . $location['longitude'] . '" ';
 	echo '/>';
 }
 echo '</markers>';
