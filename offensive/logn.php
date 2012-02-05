@@ -59,6 +59,7 @@
 <head>
 	<title><?= $_SERVER['SERVER_NAME'] ?> : do we know you?</title>
 	<link rel="stylesheet" type="text/css" href="/styles/sparse.css"/>
+	<? include_once("analytics.inc"); ?>
 </head>
 
 
