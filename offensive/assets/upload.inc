@@ -640,8 +640,13 @@ function upload_type(&$postdata) {
 function upload_image($postdata) {
 	if(upload_largerthan($postdata, 4*1024*1024)) return false;
 	if(upload_checkrotation($postdata)) return false;
-	if(upload_checkisk($postdata)) return false;
-	if(upload_checkrepost($postdata)) return false;			// keep as fallback
+	$lowercase_filename = strtolower($postdata['filename']);
+	if(!strstr($lowercase_filename, "[repost]") &&
+	   !strstr($lowercase_filename, "[tiar]") &&
+	   !strstr($lowercase_filename, "[irlard]")) {
+		if(upload_checkisk($postdata)) return false;
+		if(upload_checkrepost($postdata)) return false;			// keep as fallback
+	}
 	if(upload_checkdims($postdata)) return false;
 	if(upload_checksize($postdata)) return false;
 	return upload_insert_file($postdata);
@@ -1072,6 +1077,15 @@ function upload_insert_file($postdata) {
 
 	if(strlen($postdata['hash']) < 15)
 		$postdata['hash'] = getHash($tmpdir."/".$postdata['tmpname']);
+
+	// if the proper file extension isn't there (as determined by upload_type()), we append it.
+	// note: not replacing on purpose.  should be indicator when someone tries goofy shit
+	// also, adds extra extension on "alternative" file extensions: jpeg versus jpg.  acceptable losses!
+	$proper_extension = ".".$postdata["format_name"];
+	if(substr_compare(strtolower($postdata['filename']), $proper_extension, -strlen($proper_extension), strlen($proper_extension)) != 0) {
+		$postdata['filename'] = $postdata['filename'].".".$postdata["format_name"];
+		$postdata['file_extension'] = $proper_extension;
+	}
 
 	$sql = "INSERT INTO offensive_uploads ( userid,filename,ip,nsfw,tmbo,hash,type,status )
 			   VALUES ( " . $_SESSION['userid'] . ", '" .
