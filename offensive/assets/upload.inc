@@ -853,7 +853,7 @@ function upload_checkisk(&$postdata) {
 			if(upload_type($postdata) == "image" || upload_type($postdata) == "avatar") { ?>
 				<td height="100px" width="100px">
 
-					<a href="pages/pic.php?id=<?= $upload->id() ?>"
+					<a href="<?= Link::upload($upload) ?>"
 						<? if($upload->filtered()) { ?>
 							onMouseOver='changesrc("th<?= $upload->id()?>","<?= $upload->thumbURL() ?>")'
 							onMouseOut='changesrc("th<?= $upload->id() ?>","/offensive/graphics/th-filtered.gif")'
@@ -866,7 +866,7 @@ function upload_checkisk(&$postdata) {
 
 				</td>
 			<? } ?>
-		<td><a href="/offensive/?c=comments&fileid=<?= $upload->id(); ?>" target="_blank"><?= htmlEscape($upload->filename()) ?></a></td>
+		<td><a href="<?= Link::thread($upload); ?>" target="_blank"><?= htmlEscape($upload->filename()) ?></a></td>
 		</tr><?
 	}
 	?></table></center><br />
