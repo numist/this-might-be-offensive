@@ -91,7 +91,7 @@
 		<script type="text/javascript">
 			var irsz_enabled = true,
 			    irsz_selector = function(e) { return $(e).find("a#imageLink img").last(); },
-			    irsz_min_height = 400, irsz_min_width = 400,
+			    irsz_min_height = 40, irsz_min_width = 40,
 			    irsz_auto = true,
 			    irsz_padding = [16, 114];
 		
@@ -220,7 +220,7 @@
 			}
 
 		</script>
-		<script type="text/javascript" src="/offensive/js/irsz.js?v=0.0.8"></script>
+		<script type="text/javascript" src="/offensive/js/irsz.js?v=0.0.9"></script>
 		<? include_once("analytics.inc"); ?>
 	</head>
 	<body id="pic">
