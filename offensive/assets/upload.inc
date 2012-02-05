@@ -1085,12 +1085,10 @@ function upload_insert_file($postdata) {
 	                   : "";
 	if(($current_extension == "" || $current_extension != $proper_extension)
 	&& !($proper_extension == ".jpg" && $current_extension == ".jpeg")) {
-		trigger_error($current_extension, E_USER_WARNING);
 		if(in_array($current_extension, array(".jpg", ".jpeg", ".gif", ".png", ".tiff", ".tif", ".bmp"))) {
 			// replace the extension if the upload already has an image extension
 			$postdata['filename'] = substr($postdata['filename'], 0, strrpos($postdata['filename'], ".")).$proper_extension;
 		} else {
-			trigger_error("DO NOT POST", E_USER_ERROR);
 			// append otherwise
 			$postdata['filename'] = $postdata['filename'].".".$postdata["format_name"];
 		}
