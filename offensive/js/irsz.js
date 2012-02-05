@@ -139,6 +139,13 @@
         }
       }
       
+      // correct for oversizing
+      if(new_width > actual_width || new_height > actual_height) {
+        new_width = actual_width;
+        new_height = actual_height;
+      }
+      
+      // image toggle blocker
       if($(image).hasClass(noresize_class)) {
         if(new_height < actual_height && new_width < actual_width) {
           image.style.cursor = "url(/offensive/graphics/zoom_out.cur),default";
@@ -148,6 +155,7 @@
         return;
       }
       
+      // resize image
       if(new_height != $(image).height()) {
         if(new_height < actual_height) {
           image.style.cursor = "url(/offensive/graphics/zoom_in.cur),default";
