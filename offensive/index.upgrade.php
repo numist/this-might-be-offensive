@@ -1,5 +1,10 @@
 <?
-header("HTTP/1.0 502 Bad Gateway");
+	header("HTTP/1.0 502 Bad Gateway");
+	header('Content-type: text/html');
+	
+	if(!defined("TMBO")) {
+		set_include_path("..");
+	}
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
         "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
@@ -23,7 +28,7 @@ header("HTTP/1.0 502 Bad Gateway");
 			font-size:10px;
 		}
 	</style>
-	
+	<? include_once("analytics.inc"); ?>
 </head>
 
 
