@@ -23,6 +23,8 @@ class Isk {
 		$result = &$this->client->send($msg);
 		
 		if(!$result->faultCode()) {
+			$this->errno = 0;
+			$this->errmsg = "";
 			$value = $result->value();
 			return ($value->arraysize() > 0) ? true : false;
 		} else {
@@ -43,6 +45,8 @@ class Isk {
 		$result = &$this->client->send($msg);
 		
 		if(!$result->faultCode()) {
+			$this->errno = 0;
+			$this->errmsg = "";
 			$value = $result->value();
 			return $value->scalarval();			
 		} else {
@@ -92,6 +96,8 @@ class Isk {
 		$result = &$this->client->send($msg);
 		
 		if(!$result->faultCode()) {
+			$this->errno = 0;
+			$this->errmsg = "";
 			return true;
 		} else {
 			$this->errno = $result->faultCode();
@@ -119,7 +125,9 @@ class Isk {
 				if($matchpct > 70) {
 					$iskIds[] = $imgid;
 				}
-			}		
+			}
+			$this->errno = 0;
+			$this->errmsg = "";
 		} else {
 			$this->errno = $result->faultCode();
 			$this->errmsg = $result->faultString();
@@ -134,6 +142,8 @@ class Isk {
 		$result = &$this->client->send($msg);
 		
 		if(!$result->faultCode()) {
+			$this->errno = 0;
+			$this->errmsg = "";
 			return true;
 		} else {
 			$this->errno = $result->faultCode();
