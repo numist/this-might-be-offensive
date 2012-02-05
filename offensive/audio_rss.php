@@ -62,7 +62,7 @@ header( "Content-type: text/xml" );
 ?>
 		<item>
 			<title><![CDATA[<?= $filename ?> (uploaded by <?= $upload->uploader()->username() ?>)]]></title>
-			<link>https://<?= $_SERVER['SERVER_NAME'] ?>/offensive/pages/pic.php?id=<?= $upload->id() ?></link>
+			<link>https://<?= $_SERVER['SERVER_NAME'] ?><?= Link::upload($upload) ?></link>
 			<enclosure url="<?= $fileURL ?>" length="<?= filesize( $upload->file() ) ?>" type="audio/mpeg"/>
 			<description><?
 			
@@ -135,7 +135,7 @@ header( "Content-type: text/xml" );
 			?>
 			</description>
 			<pubDate><? echo date( "r", strtotime( $upload->timestamp() ) ) ?></pubDate>			
-			<comments><![CDATA[https://<?= $_SERVER['SERVER_NAME'] ?>/offensive/?c=comments&fileid=<?= $upload->id() ?>]]></comments>
+			<comments><![CDATA[https://<?= $_SERVER['SERVER_NAME'].Link::thread($upload) ?>]]></comments>
 		</item>
 <?
 	}

@@ -1,6 +1,7 @@
 <?
 	set_include_path("..");
 	require_once("offensive/assets/header.inc");
+	require_once("offensive/assets/comments.inc");
 	// Include, and check we've got a connection to the database.
 	require_once( 'admin/mysqlConnectionInfo.inc' );
 	if(!isset($link) || !$link) $link = openDbConnection();
@@ -22,18 +23,5 @@
 		echo "<html><head><script type=\"text/javascript\">history.go(-1);</script></head><body /></html>";
 	}
 	exit;
-
-	function subscribe($fid) {
-		$sql = "SELECT * FROM offensive_subscriptions WHERE userid = ".me()->id()." AND fileid = $fid";
-		if(mysql_num_rows(tmbo_query($sql)) > 0) return;
-
-		$sql = "INSERT INTO offensive_subscriptions (userid, fileid) VALUES (".me()->id().", $fid )";
-		tmbo_query( $sql );
-	}
-
-	function unsubscribe($fid) {
-		$sql = "DELETE FROM offensive_subscriptions WHERE userid=".me()->id()." AND fileid=$fid";
-		tmbo_query( $sql );
-	}
 
 ?>

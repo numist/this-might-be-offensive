@@ -6,7 +6,6 @@
 	require_once( 'offensive/assets/tabs.inc' );
 	require_once( 'offensive/assets/classes.inc' );
 	require_once( 'offensive/assets/core.inc' );
-	require_once('offensive/assets/pickupLink.inc');
 
 	function start() {
 		mustLogIn();
@@ -23,7 +22,6 @@
 	function head() {
 		?>
 		<link href="/styles/grid.css?v=1.0.4" type="text/css" rel="stylesheet">
-		<script type="text/javascript" src="/offensive/js/jquery-1.7.1.min.js"></script>
 		<script type="text/javascript" src="/offensive/js/pickuplink_visibility.js?v=0.0.2"></script>
 		<!-- lazyload_bottom -->
 		<script type="text/javascript" src="/offensive/js/lazyload_bottom.js?v=0.0.5"></script>
@@ -80,7 +78,7 @@
 ?>
 		<div id="grid-container">
 			<div id="commands">
-				<div class="floatleft"><? print_pickuplink() ?></div>
+				<div class="floatleft"><? PickupLink::emit() ?></div>
 				<div class="floatright">
 					<? if($args["sort"] !== 'uname_asc') { ?>
 					<a href="./?c=yearbook&sort=uname_asc">sort by username</a>
@@ -96,27 +94,8 @@
 
 		// output loop
 		foreach($result as $upload) {
-			?>
-					<li fileid="<?= $upload->id() ?>">
-						<div class="thumbcontainer">
-							<div><a href="pages/pic.php?id=<?= $upload->id() ?>"
-								<? if($upload->filtered()) { ?>
-								onMouseOver='changesrc("th<?= $upload->id()?>","<?= $upload->thumbURL() ?>")'
-								onMouseOut='changesrc("th<?= $upload->id() ?>","/offensive/graphics/th-filtered.gif")'
-								<? } ?>
-							><img name="th<?= $upload->id()?>"
-								src="<?= $upload->filtered()
-									? "/offensive/graphics/th-filtered.gif"
-									: $upload->thumbURL() ?>"
-								>
-							</a></div>
-							<div class="score">
-								<a href="./?c=user&userid=<?= $upload->uploader()->id() ?>"><?= $upload->uploader()->username() ?></a>
-								<a href="./?c=comments&fileid=<?= $upload->id() ?>">[c]</a>
-							</div>
-						</div>
-					</li>
-				<?php } ?>
+			require("offensive/templates/thumbitem_avatar.inc");
+		} ?>
 				</ul>
 			</div>
 			<div id="bottom">

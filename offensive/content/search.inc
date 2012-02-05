@@ -128,27 +128,27 @@
 						    // changeblog special header
 							if($upload->id() == "211604") {
 								?>
-								<a class="heading" id="pic" href="./?c=changeblog">changeblog</a>
+								<a class="heading" id="pic" href="<?= Link::content("changeblog") ?>">changeblog</a>
 								<br/><span style="color:#666699">beat to fit. paint to match.</span><br/>
 								<?
 							} else if( $upload->type() == 'topic' ) {
 								$prefix = $uploader->status() == "admin" ? "" : "don't blame me,";
 								?>
-								<a class="heading" id="pic" href="./?c=comments&fileid=<?= $upload->id() ?>"><?= $upload->htmlFilename(); ?></a>
+								<a class="heading" id="pic" href="<?= Link::thread($upload) ?>"><?= $upload->htmlFilename(); ?></a>
 								<?
-								?><br/><span style="color:#666699"><?= $prefix ?> <a href="./?c=user&userid=<?= $uploader->id() ?>" style="color:#666699"><?= $uploader->username() ?></a> started it.</span><br/>
+								?><br/><span style="color:#666699"><?= $prefix ?> <a href="<?= Link::user($uploader) ?>" style="color:#666699"><?= $uploader->username() ?></a> started it.</span><br/>
 						<?
 							} else {
 						?>
-								<a class="heading" id="pic" href="pages/pic.php?id=<?= $upload->id() ?>"><?= $upload->htmlFilename(); ?></a><br/><span style="color:#666699">uploaded by <a href="./?c=user&userid=<?= $uploader->id() ?>" style="color:#666699"><?= $uploader->username() ?></a></span><br/>
+								<a class="heading" id="pic" href="<?= Link::upload($upload) ?>"><?= $upload->htmlFilename(); ?></a><br/><span style="color:#666699">uploaded by <a href="<?= Link::user($uploader) ?>" style="color:#666699"><?= $uploader->username() ?></a></span><br/>
 						<?
 							}	
 						?></div>
 				<div class="entry">
 				<?= $comment->HTMLcomment(); ?><br/>
 					 
-	 	 			<div class="timestamp"><?= $result['match'] ?>% <a href="./?c=comments&fileid=<?= $comment->upload()->id() ?>#<?= $comment->id() ?>"><?= $comment->timestamp() ?></a></div>
-					&raquo; <a href="./?c=user&userid=<?= $comment->commenter()->id() ?>"> <?= $comment->commenter()->username() ?></a>
+	 	 			<div class="timestamp"><?= $result['match'] ?>% <a href="<?= Link::comment($comment) ?>"><?= $comment->timestamp() ?></a></div>
+					&raquo; <?= $commenter->htmlUsername() ?>
 	
 				<?
 

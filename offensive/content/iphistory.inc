@@ -6,6 +6,10 @@
 	require_once( 'offensive/assets/tabs.inc' );
 	require_once( 'offensive/assets/functions.inc' );
 	
+	if(!array_key_exists("uid", $_REQUEST)) {
+		trigger_error("must provide uid", E_USER_ERROR);
+	}
+	
 	function start() {
 		mustLogIn();
 
@@ -65,8 +69,8 @@
 
 			?>
 				<tr class="<?= $css ?>">
-					<td><div class="clipper"><a href="./?c=user&userid=<?= $row['userid'] ?>"><?= $row['ip'] ?></a></div></td>
-					<td><div class="clipper"><a href="./?c=user&userid=<?= $row['userid'] ?>"><?= $row['timestamp'] ?></a></div></td>					
+					<td><div class="clipper"><a href="<?= Link::user($row['userid']) ?>"><?= $row['ip'] ?></a></div></td>
+					<td><div class="clipper"><a href="<?= Link::user($row['userid']) ?>"><?= $row['timestamp'] ?></a></div></td>					
 				</tr>
 			<?
 		}

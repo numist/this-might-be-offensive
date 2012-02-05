@@ -64,7 +64,7 @@ conditionalGet($lastBuildTime);
 				<guid isPermaLink="false">tmbo-<?= $upload->id() ?></guid>
 			<? } else { ?>
 				<title><![CDATA[<?= $filename ?> (uploaded by <?= $upload->uploader()->username() ?>)]]></title>
-				<link>https://<?= $_SERVER['SERVER_NAME'] ?>/offensive/pages/pic.php?id=<?= $upload->id() ?></link>
+				<link>https://<?= $_SERVER['SERVER_NAME'] ?><?= Link::upload($upload) ?></link>
 				<description><![CDATA[<? // TODO: pretty this up like audio
 					if($fileURL != '') { 
 						?><img src="<?= $fileURL ?>"/><?
@@ -73,7 +73,7 @@ conditionalGet($lastBuildTime);
 					}
 				?>]]></description>
 				<pubDate><? echo gmdate( "r", strtotime( $upload->timestamp() ) ) ?></pubDate>			
-				<comments><![CDATA[https://<?= $_SERVER['SERVER_NAME'] ?>/offensive/?c=comments&fileid=<?= $upload->id() ?>]]></comments>
+				<comments><![CDATA[https://<?= $_SERVER['SERVER_NAME'].Link::thread($upload) ?>]]></comments>
 			<? } ?>
 		</item>
 <?

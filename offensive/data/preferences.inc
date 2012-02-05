@@ -49,6 +49,12 @@ $prefnames = array(
 	"key_random",
 	// subscription toggle
 	"key_subscribe"
-    );
+);
+
+$prefdefaults = array(
+	"index" => "main",
+	"sortorder_discussions" => "date_desc",
+	"thumbnails_in_comments" => "1"
+);
 
 ?>

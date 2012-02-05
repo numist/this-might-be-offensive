@@ -1,6 +1,8 @@
 <?
 
 require_once("offensive/assets/id3.inc");
+require_once("offensive/assets/xmlrpc.inc");
+require_once("offensive/assets/isk.inc");
 
 // TODO: move all calls to uploadForm() out, indicate with return values.
 
@@ -637,8 +639,9 @@ function upload_type(&$postdata) {
 ###############################################################################
 function upload_image($postdata) {
 	if(upload_largerthan($postdata, 4*1024*1024)) return false;
-	if(upload_checkrepost($postdata)) return false;
 	if(upload_checkrotation($postdata)) return false;
+	if(upload_checkisk($postdata)) return false;
+	if(upload_checkrepost($postdata)) return false;			// keep as fallback
 	if(upload_checkdims($postdata)) return false;
 	if(upload_checksize($postdata)) return false;
 	return upload_insert_file($postdata);
@@ -790,6 +793,98 @@ function upload_checksize(&$postdata) {
 	return true;
 }
 
+function upload_checkisk(&$postdata) {
+	global $tmpdir;
+
+	if(upload_type($postdata) == "topic")
+		trigger_error("isk only works on files", E_USER_ERROR);
+	
+	if(array_key_exists("repost", $postdata))
+		return false;
+
+	// do we want to use ISK?
+	$config = parse_ini_file("admin/.config");
+	if($config['use_isk'] != "1") {
+		return false;
+	}
+	
+	// we still need a hash in case we want to revert to the old system
+	$postdata['hash'] = getHash($tmpdir."/".$postdata['tmpname']);
+	if(strlen($postdata['hash']) < 15) trigger_error("bad hash?", E_USER_ERROR);
+	
+	$isk = new Isk();
+	
+	$blob = $isk->img_blob($_SERVER['DOCUMENT_ROOT'] . '/offensive/'.$tmpdir."/".$postdata['tmpname']);
+	if($isk->error()) {
+		return false;
+	}
+	
+	$iskIds = $isk->find($blob);
+	if($isk->error()) {
+		return false;
+	}
+	
+	if(count($iskIds) < 1) return false;
+	
+	$string = implode(',', $iskIds);
+	$sql = "SELECT *
+			FROM offensive_uploads
+			WHERE id IN (" . implode(',', $iskIds) .  ")
+			ORDER by timestamp DESC";
+			
+	$result = tmbo_query( $sql );
+	
+	if( mysql_num_rows( $result ) == 0 ) return false;
+	
+	?>
+<div class="contentbox">
+	<div class="blackbar"></div>
+	<div class="heading">poster child:</div>
+	<div class="bluebox">
+	<div style="text-align:center">
+	Your file looks similar to:
+	<br /><center>
+	<table><?	
+	while($row = mysql_fetch_assoc($result)) {
+		$upload = new Upload($row);
+		$css = (isset($css) && $css == "even_row") ? "odd_row" : "even_row";
+		
+		?><tr class="<?= $css ?>"><?
+			if(upload_type($postdata) == "image" || upload_type($postdata) == "avatar") { ?>
+				<td height="100px" width="100px">
+
+					<a href="<?= Link::upload($upload) ?>"
+						<? if($upload->filtered()) { ?>
+							onMouseOver='changesrc("th<?= $upload->id()?>","<?= $upload->thumbURL() ?>")'
+							onMouseOut='changesrc("th<?= $upload->id() ?>","/offensive/graphics/th-filtered.gif")'
+						<? } ?>
+						><img name="th<?= $upload->id()?>"
+							src="<?= $upload->filtered()
+							? "/offensive/graphics/th-filtered.gif" 
+							: $upload->thumbURL() ?>"
+					/></a>
+
+				</td>
+			<? } ?>
+		<td><a href="<?= Link::thread($upload); ?>" target="_blank"><?= htmlEscape($upload->filename()) ?></a></td>
+		</tr><?
+	}
+	?></table></center><br />
+	<form action="<?= $_SERVER['PHP_SELF'] ?>" method="POST">
+		<input type="hidden" name="c" value="upload">
+		<input type="submit" name="killit" value="Cancel this upload."/>
+		<input type="submit" name="repost" value="Post it anyway."/>
+	</form>
+	</div>
+	</div>
+	<div class="blackbar"></div>
+</div>
+
+	<?
+	$_SESSION['postdata'] = serialize($postdata);
+	return true;
+}
+
 // has this upload been posted before? (images and audio only)
 function upload_checkrepost(&$postdata) {
 	global $tmpdir;
@@ -830,7 +925,7 @@ function upload_checkrepost(&$postdata) {
 			if(upload_type($postdata) == "image" || upload_type($postdata) == "avatar") { ?>
 				<td height="100px" width="100px">
 
-					<a href="pages/pic.php?id=<?= $upload->id() ?>"
+					<a href="<?= Link::upload($upload) ?>"
 						<? if($upload->filtered()) { ?>
 							onMouseOver='changesrc("th<?= $upload->id()?>","<?= $upload->thumbURL() ?>")'
 							onMouseOut='changesrc("th<?= $upload->id() ?>","/offensive/graphics/th-filtered.gif")'
@@ -843,7 +938,7 @@ function upload_checkrepost(&$postdata) {
 
 				</td>
 			<? } ?>
-		<td><a href="/offensive/?c=comments&fileid=<?= $upload->id(); ?>" target="_blank"><?= htmlEscape($upload->filename()) ?></a></td>
+		<td><a href="<?= Link::thread($upload); ?>" target="_blank"><?= htmlEscape($upload->filename()) ?></a></td>
 		</tr><?
 	}
 	?></table></center><br />
@@ -1076,16 +1171,23 @@ function upload_insert_file($postdata) {
 	        VALUES ( " . $_SESSION['userid'] . ", $fileid ) ";
 	tmbo_query( $sql );
 
+	$upload = new Upload($fileid);
+	
+	$isk = new Isk();
+	if($isk->add($upload->file(), $upload->id())) {
+		$isk->save();
+	}
+
 	unset($_SESSION['postdata']);
 
 	$message = "<p>
-		Thanks. Your upload can be viewed <a href=\"./pages/pic.php?id=$fileid\">here</a>.
+		Thanks. Your upload can be viewed <a href=\"".Link::upload($upload)."\">here</a>.
 	</p>
 	<p>
-			You may <a href=\"./?c=comments&fileid=$fileid\">comment on this file here</a>.
+			You may <a href=\"".Link::thread($upload)."\">comment on this file here</a>.
 	</p>
 	<p>
-		<a href=\"./\">Back to the list</a>
+		<a href=\"".Link::listFor($upload)."\">Back to the list</a>
 	</p>";
 	box($message, "yummy.");
 	if(upload_type($postdata) != "avatar")

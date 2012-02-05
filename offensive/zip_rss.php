@@ -22,7 +22,7 @@
 	
 	rsort( $fileList );
 	
-	$time = filectime($path."/".$fileList[0]);
+	$time = count($fileList) > 0 ? filectime($path."/".$fileList[0]) : 0;
 	conditionalGet($time);
 	
 	header('Content-type: text/xml');

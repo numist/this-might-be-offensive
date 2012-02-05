@@ -39,29 +39,11 @@
 	
 				<p>no can do.</p>
 				
-				<? if(isset($upload) && is_object($upload) && me()) { ?><p><?
-
-					$index="";
-					switch($upload->type()) {
-						case "avatar":
-							$index = "yearbook";
-							break;
-						case "audio":
-							$index = "audio";
-							break;
-						default:
-							$index = me()->getPref("index");
-							if($index == "") {
-								$index = "main";
-							}
-							break;
-					}
-				?>
-					
-				<a id="index" href="/offensive/?c=<?= $index ?>">up</a>
-					
-				</p><? } ?>
-	
+				<? if(isset($upload) && is_object($upload) && me()) { ?>
+					<p>
+						<a id="index" href="<?= Link::listFor($upload) ?>">up</a>
+					</p>
+				<? } ?>
 			</td>
 		</tr>
 	</table>
