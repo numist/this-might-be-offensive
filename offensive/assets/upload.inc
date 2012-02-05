@@ -1078,15 +1078,26 @@ function upload_insert_file($postdata) {
 	if(strlen($postdata['hash']) < 15)
 		$postdata['hash'] = getHash($tmpdir."/".$postdata['tmpname']);
 
-	// if the proper file extension isn't there (as determined by upload_type()), we append it.
-	// note: not replacing on purpose.  should be indicator when someone tries goofy shit
-	// also, adds extra extension on "alternative" file extensions: jpeg versus jpg.  acceptable losses!
+	// if filename doesn't include the proper file extension (as determined by upload_type()), add it.
 	$proper_extension = ".".$postdata["format_name"];
-	if(substr_compare(strtolower($postdata['filename']), $proper_extension, -strlen($proper_extension), strlen($proper_extension)) != 0) {
-		$postdata['filename'] = $postdata['filename'].".".$postdata["format_name"];
+	$current_extension = strpos($postdata['filename'], ".") !== false
+	                   ? substr(strtolower($postdata['filename']), strrpos($postdata['filename'], "."))
+	                   : "";
+	if(($current_extension == "" || $current_extension != $proper_extension)
+	&& !($proper_extension == ".jpg" && $current_extension == ".jpeg")) {
+		trigger_error($current_extension, E_USER_WARNING);
+		if(in_array($current_extension, array(".jpg", ".jpeg", ".gif", ".png", ".tiff", ".tif", ".bmp"))) {
+			// replace the extension if the upload already has an image extension
+			$postdata['filename'] = substr($postdata['filename'], 0, strrpos($postdata['filename'], ".")).$proper_extension;
+		} else {
+			trigger_error("DO NOT POST", E_USER_ERROR);
+			// append otherwise
+			$postdata['filename'] = $postdata['filename'].".".$postdata["format_name"];
+		}
 		$postdata['file_extension'] = $proper_extension;
 	}
 
+	// get a fileid for this upload and prepare the landing site
 	$sql = "INSERT INTO offensive_uploads ( userid,filename,ip,nsfw,tmbo,hash,type,status )
 			   VALUES ( " . $_SESSION['userid'] . ", '" .
 			                sqlEscape( $postdata['filename'] ) . "', '" .
