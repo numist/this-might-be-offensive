@@ -27,7 +27,7 @@
 			font-size:10px;
 		}
 	</style>
-	
+	<? include_once("analytics.inc"); ?>
 </head>
 
 
