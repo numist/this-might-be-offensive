@@ -19,7 +19,8 @@
 					postComment($tid, "", 0, 0, $_REQUEST['comment'], true);
 				}
 				
-				header( "Location: " . $_SERVER['PHP_SELF'] . "?c=comments&fileid=" . $tid );
+				header("Location: ".Link::thread($tid));
+				exit;
 			}
 		}
 	}

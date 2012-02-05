@@ -6,7 +6,6 @@
 	require_once( 'offensive/assets/tabs.inc' );
 	require_once("offensive/assets/classes.inc");
 	require_once("offensive/assets/core.inc");
-	require_once('offensive/assets/pickupLink.inc');
 
 	function start() {
 		mustLogIn();
@@ -16,8 +15,6 @@
 		?>
 		<link rel="alternate" type="application/rss+xml" title="discussions" href="<?= Link::rss("discuss") ?>" />
 		<link href="/styles/grid.css?v=1.0.4" type="text/css" rel="stylesheet">
-		<script type="text/javascript" src="/offensive/js/tmbolib.js?v=0.0.3"></script>
-		<script type="text/javascript" src="/offensive/js/jquery-1.7.1.min.js"></script>
 		<? if(count($_GET) == 1 && array_key_exists("c", $_GET)) { ?>
 			<!-- lazyload_changes are only used if on a base page (?c=main not ?c=main&foo=bar) -->
     	<script type="text/javascript" src="/offensive/js/lazyload_changes.js?v=0.0.11"></script>
@@ -51,7 +48,7 @@
 			<div id="grid-container">
 				<div id="commands">
 					<div class="floatright">
-						<a href="./?c=newtopic">new topic</a>
+						<a href="<?= Link::content("newtopic") ?>">new topic</a>
 					</div>
 				</div>
 <?
@@ -98,7 +95,7 @@
 							</div>
 						</li>
 <?
-						$pickuplinks = get_pickuplinks();
+						$pickuplinks = PickupLink::get();
 						$first = array_key_exists("p", $args) && $args["p"] > 0 ? false : true;
 						foreach( $result as $upload ) {
 							$css = (isset($css) && strpos($css, "even_row") !== false) ? "odd_row" : "even_row";

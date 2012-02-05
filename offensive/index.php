@@ -69,9 +69,7 @@ $timelimit = 10;
 			mustLogIn();
 		}
 		
-		$c = (me()->getPref("index") == "thumbs") ? 
-		      "thumbs" : "main";
-		header("Location: ./?c=$c");
+		header("Location: ".Link::mainpage());
 		exit;
 	}
 
@@ -128,17 +126,6 @@ $timelimit = 10;
 </style>
 
 <script type="text/javascript">
-	function gochat()
-	{
-		w = 792;
-		h = 646;
-		l = (screen.width-w)/2;
-		t = (screen.height-h)/2;
-		widthHeight = "width="+w+",height="+h+",left="+l+",top="+t+",menubar=no,resizable=yes,scrollbars=no,status=no,toolbar=no,location=no";
-		window.open("/offensive/irc/chat.php","tmbo_chat",widthHeight);
-		return true
-	}
-	
 	/* image rollover stuff */
 	function changesrc(a,im)
 	{
@@ -146,13 +133,16 @@ $timelimit = 10;
 		x.src=im;
 	}
 </script>
+<script type="text/javascript" src="/offensive/js/jquery-1.7.1.min.js"></script>
+<script type="text/javascript" src="/offensive/js/tmbolib.js?v=0.0.4"></script>
 
 <?
 	if( function_exists( 'head' ) ) {
 		head();
 	}
-?>
 
+	include_once("analytics.inc");
+?>
 </head>
 
 <body bgcolor="#333366" link="#000066" vlink="#000033">
@@ -174,7 +164,7 @@ $timelimit = 10;
 
 	<div id="content">
 	
-		<div id="titleimg"><a href="./"><img src="graphics/offensive.gif" alt="[ this might be offensive ]" id="offensive" width="285" height="37" border="0"></a></div>
+		<div id="titleimg"><a href="<?= Link::mainpage() ?>"><img src="graphics/offensive.gif" alt="[ this might be offensive ]" id="offensive" width="285" height="37" border="0"></a></div>
 
 	
 		<div id="leftcol">
@@ -186,11 +176,11 @@ $timelimit = 10;
 						<div class="bluebox">
 							<p>hi <b><?= me()->htmlUsername() ?></b>!</p>
 							
-							<p><a href="index.php?c=upload">upload</a></p>
+							<p><a href="<?= Link::content("upload") ?>">upload</a></p>
 							
-							<p><a href="./?c=subscriptions">subscribed threads</a></p>
+							<p><a href="<?= Link::content("subscriptions") ?>">subscribed threads</a></p>
 							
-							<p><a href="./?c=settings">settings</a></p>
+							<p><a href="<?= Link::content("settings") ?>">settings</a></p>
             	
 							<p><a href="logout.php">log out</a></p>
 						</div>
@@ -205,12 +195,13 @@ $timelimit = 10;
 				?>
 				<div class="contentbox">
 					<div class="blackbar"></div>
-						<div class="heading">get info:</div>
+						<div class="heading">community:</div>
 						<div class="bluebox">
-							<p><a href="/offensive/?c=map">maxxer world map</a></p>
-							<p><a href="<?= $_SERVER['PHP_SELF'] ?>?c=referral">invite a friend</a></p>						
-							<p><a href="<?= $_SERVER['PHP_SELF'] ?>?c=faq">FAQ, rules, etc.</a></p>
-							<!-- <p><a href="./?c=stats">stats</a></p> -->						
+							<p><a href="http://chat.efnet.org:9090/?channels=themaxx&nick=<?= urlencode(me()->username()); ?>" target="_blank">chat</a></p>
+							<p><a href="<?= Link::content("map") ?>">maxxer world map</a></p>
+							<p><a href="<?= Link::content("referral") ?>">invite a friend</a></p>						
+							<p><a href="<?= Link::content("faq") ?>">FAQ, rules, etc.</a></p>
+							<!-- <p><a href="<?= Link::content("stats") ?>">stats</a></p> -->						
 						</div>
 					<div class="blackbar"></div>
 				</div>
@@ -235,21 +226,11 @@ $timelimit = 10;
 						</div>
 						<br/>
 						<div style="text-align:center">						
-							<a href="./?c=ppsub"><img src="graphics/paypal_subscribe.gif" border="0"/></a>
+							<a href="<?= Link::content("ppsub") ?>"><img src="graphics/paypal_subscribe.gif" border="0"/></a>
 						</div>
 					</div>
 				<div class="blackbar"></div>
 			</div>
-<!--
-			<div class="contentbox">
-				<div class="blackbar"></div>
-					<div class="heading">brought to you by:</div>
-					<div class="bluebox" style="text-align:center">
-						<a href="http://tengun.net">tengun.net</a>
-					</div>
-				<div class="blackbar"></div>
-			</div>
--->
 			<? if(login()) { // archive <--> bottom restricted block ?>
 				<div class="contentbox">
 					<div class="blackbar"></div>
@@ -273,7 +254,7 @@ $timelimit = 10;
 
 					<div class="heading" style="text-align:center">
 						<span class='orange'>
-							<a class="orange" href="./?c=hof">hall of fame</a>
+							<a class="orange" href="<?= Link::content("hof") ?>">hall of fame</a>
 						</span>
 					</div>
 					<div class="blackbar"></div>
@@ -293,20 +274,20 @@ $timelimit = 10;
 					<div class="blackbar"></div>
 					<div class="heading">contact:</div>
 					<div class="bluebox">
-						<a href="#" onClick="gochat(); return false;">chat</a><br>
 						<a href="/contact/">email</a><br>
 						aim: <a href="aim:goim?screenname=themaxxcom">themaxxcom</a><br>
 					</div>
 					<div class="blackbar"></div>
-				</div>
-				<? if($c != "online" && me()->status() == "admin") { ?>
-					<div class="contentbox">
-						<div class="blackbar"></div>
-						<? if($c != "comments") whosOn();
-						else whosubscribed(); ?>
-						<div class="blackbar"></div>
-					</div>
-				<? } 
+				</div><?
+					if($c != "comments" && $c != "online" && me()->status() == "admin") { whosOn(); }
+					else if($c == "comments") {
+						if(!array_key_exists("fileid", $_REQUEST)
+						|| !is_intger($_REQUEST['fileid']))
+						{ trigger_error("non-numeric fileid!", E_USER_ERROR); }
+						$upload = core_getupload($_REQUEST['fileid']);
+						if($upload->uploader()->id() == me()->id() || me()->status() == "admin")
+						{ whosubscribed($upload); }
+					}
 			} // archive <--> bottom restricted block ?>
 		</div> <!-- end left column -->
 		
@@ -367,7 +348,7 @@ $timelimit = 10;
 	
 	if(me()->status() == "admin") {
 		?>
-		<div class="textlinks"><?= number_format(time_end($ptime), 3)."s php, ".number_format($querytime, 3)."s sql, ".count($queries)." queries\n\n <!--\n\n";
+		<div class="textlinks"><?= number_format(time_end($ptime), 3)."s php, ".number_format($querytime, 3)."s sql, ".count($queries)." queries\n\n <!-- query statistics: \n";
 			var_dump($queries);
 			echo "\n\n-->\n\n"; ?></div>
 		<?
@@ -383,9 +364,6 @@ $timelimit = 10;
 	?>
 </div>
 <br />
-
-<? include_once("analytics.inc"); ?>
-
 </body>
 </html>
 <?
@@ -416,9 +394,9 @@ $timelimit = 10;
 			<div class="bluebox">
 				<? while( $row = mysql_fetch_assoc( $result ) ) {
 					$css = isset($css) && $css == "evenfile" ? "oddfile" : "evenfile"; 
-					$upload = new Upload($row); ?>
-				
-					<div class="clipper"><a class="<?= $css ?>" href="?c=comments&fileid=<?= $upload->id() ?>#<?= $row['commentid']?>"><?= $upload->htmlFilename() ?></a></div>
+					$upload = new Upload($row);
+					// XXX: rejigger the query and use Link::comment ?>
+					<div class="clipper"><a class="<?= $css ?>" href="<?= Link::thread($upload) ?>#<?= $row['commentid']?>"><?= $upload->htmlFilename() ?></a></div>
 				<? } ?>
 			</div>
 			<div class="heading" style="text-align:center">
@@ -432,22 +410,25 @@ $timelimit = 10;
 	function whosOn() {
 		global $userlimit, $timelimit;
 
+		// XXX: is it any faster to combine this and the next query?
 		// get the total number of users online
 		$sql = "SELECT COUNT(*) FROM users WHERE timestamp > DATE_SUB( now( ) , INTERVAL $timelimit MINUTE)";
 		$result = tmbo_query($sql);
 		list($nonline) = mysql_fetch_array($result);
 
 		// start us off. ?>
+	<div class="contentbox">
+		<div class="blackbar"></div>
 		<div class="heading">who's on:</div>
 		<div class="bluebox">
 			<table style="width:100%"><?
 				$uid = me() ? me()->id() : 0;
 				// list out the latest people to do something
-				$sql = "SELECT userid, username FROM users WHERE timestamp > DATE_SUB( now( ) , INTERVAL $timelimit MINUTE) && userid != $uid ORDER BY timestamp DESC LIMIT $userlimit";
+				$sql = "SELECT * FROM users WHERE timestamp > DATE_SUB( now( ) , INTERVAL $timelimit MINUTE) && userid != $uid ORDER BY timestamp DESC LIMIT $userlimit";
 				$result = tmbo_query($sql);
-				while(false !== (list($userid, $username) = mysql_fetch_array($result))) {
+				while(false !== ($row = mysql_fetch_array($result))) {
 					$css = (!isset($css) || $css == "odd") ? "even" : "odd"; ?>
-					<tr class="<?= $css ?>_row"><td class="<?= $css ?>file"><a href="./?c=user&userid=<?= $userid ?>"><?= $username ?></a></td></tr>
+					<tr class="<?= $css ?>_row"><td class="<?= $css ?>file"><?= id(new User($row))->htmlUsername() ?></td></tr>
 				<? }
 
 				$css = (!isset($css) || $css == "odd") ? "even" : "odd";
@@ -455,16 +436,16 @@ $timelimit = 10;
 				if($nonline < $userlimit) {
 					?><tr class="<?= $css ?>_row"><td class="<?= $css ?>file">you.</td></tr><?
 				} else if($nonline > $userlimit) {
-					?><tr><td><a href="./?c=online">and <?= ($nonline - $userlimit) ?> more</a></td></tr><?
+					?><tr><td><a href="<?= Link::content("online") ?>">and <?= ($nonline - $userlimit) ?> more</a></td></tr><?
 				} ?>
 			</table>
 		</div>
+		<div class="blackbar"></div>
+	</div>
 	<? }
 
-	function whosubscribed() {
-		if(!is_intger($_REQUEST['fileid'])) trigger_error("non-numeric fileid!", E_USER_ERROR);
-
-		$sql = "SELECT DISTINCT u.userid, u.username FROM offensive_subscriptions sub JOIN users u ON sub.userid = u.userid WHERE fileid = ".$_REQUEST['fileid']." ORDER BY u.username ASC";
+	function whosubscribed($upload) {
+		$sql = "SELECT DISTINCT u.userid, u.username, u.account_status FROM offensive_subscriptions sub JOIN users u ON sub.userid = u.userid WHERE fileid = ".$upload->id()." ORDER BY u.username ASC";
 		$result = tmbo_query($sql);
 
 		if(mysql_num_rows($result) == 0) { ?>
@@ -473,13 +454,18 @@ $timelimit = 10;
 		}
 
 		// start us off. ?>
+	<div class="contentbox">
+		<div class="blackbar"></div>
 		<div class="heading">subscribers:</div>
 		<div class="bluebox">
 			<table style="width:100%">
-				<? while(false !== (list($userid, $username) = mysql_fetch_array($result))) {
+				<? while(false !== ($row = mysql_fetch_array($result))) {
+					$user = new User($row);
 					$css = (!isset($css) || $css == "odd") ? "even" : "odd"; ?>
-					<tr class="<?= $css?>_row"><td class="<?= $css ?>file"><a href="./?c=user&userid=<?= $userid ?>"><?= $username ?></a></td></tr>
+					<tr class="<?= $css?>_row"><td class="<?= $css ?>file"><?= id(new User($row))->htmlUsername() ?></td></tr>
 				<? } ?>
 			</table>
 		</div>
+		<div class="blackbar"></div>
+	</div>
 	<? } ?>

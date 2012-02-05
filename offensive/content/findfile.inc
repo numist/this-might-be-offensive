@@ -67,13 +67,13 @@
 			<tr class="<? echo $css ?>" style="<?= $style ?>">
 				<? if( $upload->type() == 'topic') { ?>
 					<td width="100px"><? echo date( "Y-m-d", strtotime( $upload->timestamp() ) ) ?></td>
-					<td><a class="<?echo $css ?>" href="./?c=comments&fileid=<? echo $upload->id() ?>"><?= $filename ?></a></td>
-					<td width="100px" align="center"><a class="<?echo $css ?>" href="./?c=comments&fileid=<? echo $upload->id() ?>"><?=
+					<td><a class="<?echo $css ?>" href="<?= Link::thread($upload) ?>"><?= $filename ?></a></td>
+					<td width="100px" align="center"><a class="<?echo $css ?>" href="<?= Link::thread($upload) ?>"><?=
 						$upload->commentLabel(false);
 						?></td>
 				<? } else { ?>
 					<td width="100px" height="100px">
-					<a href="pages/pic.php?id=<?= $upload->id() ?>"
+					<a href="<?= Link::upload($upload) ?>"
 						<? if($upload->filtered()) { ?>
 							onMouseOver='changesrc("th<?= $upload->id()?>","<?= $upload->thumbURL() ?>")'
 					 		onMouseOut='changesrc("th<?= $upload->id() ?>","/offensive/graphics/th-filtered.gif")'
@@ -84,8 +84,8 @@
 							: $upload->thumbURL() ?>"
 					/></a>
 					</td>
-					<td><a class="<?echo $css ?>" href="./pages/pic.php?id=<? echo $upload->id() ?>"><?= $filename ?></a> (uploaded by <?= htmlEscape($upload->uploader()->username()) ?>)<? echo  $expired ?></td>
-					<td width="170px" align="center"><a class="<?echo $css ?>" href="./?c=comments&fileid=<? echo $upload->id() ?>"><nobr><?= 
+					<td><a class="<?echo $css ?>" href="<?= Link::upload($upload) ?>"><?= $filename ?></a> (uploaded by <?= htmlEscape($upload->uploader()->username()) ?>)<? echo  $expired ?></td>
+					<td width="170px" align="center"><a class="<?= $css ?>" href="<?= Link::thread($upload) ?>"><nobr><?= 
 						$upload->commentLabel();
 					?></nobr><br /><?=
 						date( "Y-m-d", strtotime( $upload->timestamp() ) )

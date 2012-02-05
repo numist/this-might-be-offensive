@@ -1,6 +1,8 @@
 <?
 
 require_once("offensive/assets/id3.inc");
+require_once("offensive/assets/xmlrpc.inc");
+require_once("offensive/assets/isk.inc");
 
 // TODO: move all calls to uploadForm() out, indicate with return values.
 
@@ -102,7 +104,7 @@ function requestDetail() {
 	return $string;
 }
 
-function getTransform($orientation) {
+function needTransform($orientation) {
 	/*
 	 *   1        2       3      4         5            6           7          8
      *
@@ -115,29 +117,44 @@ function getTransform($orientation) {
 
 	switch($orientation) {
 		case 2:
-			return "-flop";
+		case 3:
+		case 4:
+		case 5:
+		case 6:
+		case 7:
+		case 8:
+			return true;
+		default:
+			return false;
+	}
+}
+
+function imageTransform($image, $orientation) {
+	switch($orientation) {
+		case 2:
+			$image->flopImage();
 			break;
 		case 3:
-			return "-rotate 180";
+			$image->rotateImage(new ImagickPixel(), 180);
 			break;
 		case 4:
-			return "-flip";
+			$image->flipImage();
 			break;
-		case 5:
-			return "-transpose";
+		case 5:	
+			$image->transposeImage();
 			break;
 		case 6:
-			return "-rotate 90";
+			$image->rotateImage(new ImagickPixel(), 90);
 			break;
 		case 7:
-			return "-transverse";
+			$image->transverseImage();
 			break;
-		case 8:
-			return "-rotate 270";
+		case 8: 
+			$image->rotateImage(new ImagickPixel(), 270);
 			break;
 		default:
-			return "";
 	}
+	return $image;
 }
 
 function killUpload($postdata) {
@@ -622,8 +639,9 @@ function upload_type(&$postdata) {
 ###############################################################################
 function upload_image($postdata) {
 	if(upload_largerthan($postdata, 4*1024*1024)) return false;
-	if(upload_checkrepost($postdata)) return false;
 	if(upload_checkrotation($postdata)) return false;
+	if(upload_checkisk($postdata)) return false;
+	if(upload_checkrepost($postdata)) return false;			// keep as fallback
 	if(upload_checkdims($postdata)) return false;
 	if(upload_checksize($postdata)) return false;
 	return upload_insert_file($postdata);
@@ -652,7 +670,7 @@ function upload_audio($postdata) {
 
 ###############################################################################
 // does the upload have reasonable dimensions? (pictures only)
-function upload_checkdims($postdata) {
+function upload_checkdims(&$postdata) {
 	global $tmpdir;
 
 	if(upload_type($postdata) == "topic" || upload_type($postdata) == "audio")
@@ -661,10 +679,16 @@ function upload_checkdims($postdata) {
 	if(array_key_exists("noresize", $postdata))
 		return false;
 
-	if (array_key_exists("resize", $postdata)) {
-		$cmd = "convert -resize 1024x1024 $tmpdir/".$postdata['tmpname']." $tmpdir/".$postdata['tmpname'];
-		$err = shell_exec($cmd);
-		if(strlen($err) > 0) trigger_error("ImageMagick failed: $err", E_USER_ERROR);
+	if (array_key_exists("resize", $postdata)) {		
+		$image = new Imagick("$tmpdir/{$postdata['tmpname']}");
+		
+		// XXX maybe use a specific filter. Gotta play with it for best results.
+		$image->resizeImage(1024,1024, imagick::FILTER_UNDEFINED, 1, true);
+		
+		if(!$image->writeImage("$tmpdir/{$postdata['tmpname']}")) {  
+			trigger_error("ImageMagick/writeImage failed", E_USER_ERROR);
+		}
+		$image->destroy();
 
 		$postdata['noresize'] = $postdata['resize'];
 		unset($postdata['resize']);
@@ -718,12 +742,15 @@ function upload_checksize(&$postdata) {
 		// convert from file.ext to file.jpg, quality 90
 		$newtmp = substr($postdata['tmpname'], 0, 0 - strlen($postdata['file_extension'])).".jpg";
 		$newfilename = substr($postdata['filename'], 0, 0 - strlen($postdata['file_extension'])).".jpg";
-
-		$cmd = "convert -quality 90 $tmpdir/".$postdata['tmpname']." $tmpdir/$newtmp";
-		$err = shell_exec($cmd);
-		if(strlen($err) > 0)
-			trigger_error("ImageMagick failed with: $err", E_USER_ERROR);
-
+		
+		$image = new Imagick("$tmpdir/{$postdata['tmpname']}");
+		$image->setImageCompression(imagick::COMPRESSION_JPEG); 
+		$image->setImageCompressionQuality(90); 
+		if(!$image->writeImage("$tmpdir/$newtmp")) {  
+			trigger_error("ImageMagick/writeImage failed", E_USER_ERROR);
+		}
+		$image->destroy();
+		
 		// clean up the (potentially) extra file
 		if($newfilename != $postdata['filename'])
 			unlink("$tmpdir/{$postdata['tmpname']}");
@@ -731,7 +758,6 @@ function upload_checksize(&$postdata) {
 		$postdata['tmpname'] = $newtmp;
 		$postdata['filename'] = $newfilename;
 		$postdata['file_extension'] = ".jpg";
-		$postdata['format'] = "jpg";
 		$postdata['format_name'] = "jpg";
 
 		$postdata['noresample'] = $postdata['resample'];
@@ -760,9 +786,101 @@ function upload_checksize(&$postdata) {
 			<input type=\"submit\" name=\"resample\" value=\"Compress my file.\"/>
 			<input type=\"submit\" name=\"noresample\" value=\"Post it anyway.\"/>
 		</form>";
-	if($postdata['format'] == 'gif') $message .= "<br /><br />(If this image is animated, don't click the \"Compress\" button!)";
+	if(array_key_exists('format_name', $postdata) && $postdata['format_name'] == 'gif') $message .= "<br /><br />(If this image is animated, don't click the \"Compress\" button!)";
 
 	box($message, "whoa, nelly.");
+	$_SESSION['postdata'] = serialize($postdata);
+	return true;
+}
+
+function upload_checkisk(&$postdata) {
+	global $tmpdir;
+
+	if(upload_type($postdata) == "topic")
+		trigger_error("isk only works on files", E_USER_ERROR);
+	
+	if(array_key_exists("repost", $postdata))
+		return false;
+
+	// do we want to use ISK?
+	$config = parse_ini_file("admin/.config");
+	if($config['use_isk'] != "1") {
+		return false;
+	}
+	
+	// we still need a hash in case we want to revert to the old system
+	$postdata['hash'] = getHash($tmpdir."/".$postdata['tmpname']);
+	if(strlen($postdata['hash']) < 15) trigger_error("bad hash?", E_USER_ERROR);
+	
+	$isk = new Isk();
+	
+	$blob = $isk->img_blob($_SERVER['DOCUMENT_ROOT'] . '/offensive/'.$tmpdir."/".$postdata['tmpname']);
+	if($isk->error()) {
+		return false;
+	}
+	
+	$iskIds = $isk->find($blob);
+	if($isk->error()) {
+		return false;
+	}
+	
+	if(count($iskIds) < 1) return false;
+	
+	$string = implode(',', $iskIds);
+	$sql = "SELECT *
+			FROM offensive_uploads
+			WHERE id IN (" . implode(',', $iskIds) .  ")
+			ORDER by timestamp DESC";
+			
+	$result = tmbo_query( $sql );
+	
+	if( mysql_num_rows( $result ) == 0 ) return false;
+	
+	?>
+<div class="contentbox">
+	<div class="blackbar"></div>
+	<div class="heading">poster child:</div>
+	<div class="bluebox">
+	<div style="text-align:center">
+	Your file looks similar to:
+	<br /><center>
+	<table><?	
+	while($row = mysql_fetch_assoc($result)) {
+		$upload = new Upload($row);
+		$css = (isset($css) && $css == "even_row") ? "odd_row" : "even_row";
+		
+		?><tr class="<?= $css ?>"><?
+			if(upload_type($postdata) == "image" || upload_type($postdata) == "avatar") { ?>
+				<td height="100px" width="100px">
+
+					<a href="<?= Link::upload($upload) ?>"
+						<? if($upload->filtered()) { ?>
+							onMouseOver='changesrc("th<?= $upload->id()?>","<?= $upload->thumbURL() ?>")'
+							onMouseOut='changesrc("th<?= $upload->id() ?>","/offensive/graphics/th-filtered.gif")'
+						<? } ?>
+						><img name="th<?= $upload->id()?>"
+							src="<?= $upload->filtered()
+							? "/offensive/graphics/th-filtered.gif" 
+							: $upload->thumbURL() ?>"
+					/></a>
+
+				</td>
+			<? } ?>
+		<td><a href="<?= Link::thread($upload); ?>" target="_blank"><?= htmlEscape($upload->filename()) ?></a></td>
+		</tr><?
+	}
+	?></table></center><br />
+	<form action="<?= $_SERVER['PHP_SELF'] ?>" method="POST">
+		<input type="hidden" name="c" value="upload">
+		<input type="submit" name="killit" value="Cancel this upload."/>
+		<input type="submit" name="repost" value="Post it anyway."/>
+	</form>
+	</div>
+	</div>
+	<div class="blackbar"></div>
+</div>
+
+	<?
 	$_SESSION['postdata'] = serialize($postdata);
 	return true;
 }
@@ -807,7 +925,7 @@ function upload_checkrepost(&$postdata) {
 			if(upload_type($postdata) == "image" || upload_type($postdata) == "avatar") { ?>
 				<td height="100px" width="100px">
 
-					<a href="pages/pic.php?id=<?= $upload->id() ?>"
+					<a href="<?= Link::upload($upload) ?>"
 						<? if($upload->filtered()) { ?>
 							onMouseOver='changesrc("th<?= $upload->id()?>","<?= $upload->thumbURL() ?>")'
 							onMouseOut='changesrc("th<?= $upload->id() ?>","/offensive/graphics/th-filtered.gif")'
@@ -820,7 +938,7 @@ function upload_checkrepost(&$postdata) {
 
 				</td>
 			<? } ?>
-		<td><a href="/offensive/?c=comments&fileid=<?= $upload->id(); ?>" target="_blank"><?= htmlEscape($upload->filename()) ?></a></td>
+		<td><a href="<?= Link::thread($upload); ?>" target="_blank"><?= htmlEscape($upload->filename()) ?></a></td>
 		</tr><?
 	}
 	?></table></center><br />
@@ -839,7 +957,7 @@ function upload_checkrepost(&$postdata) {
 	return true;
 }
 
-function upload_checkrotation($postdata) {
+function upload_checkrotation(&$postdata) {
 	global $tmpdir;
 
 	if(upload_type($postdata) == "topic" || upload_type($postdata) == "audio")
@@ -850,19 +968,19 @@ function upload_checkrotation($postdata) {
 		$exif = @exif_read_data($tmpdir."/".$postdata['tmpname']);
 
 		if($exif && array_key_exists("Orientation", $exif)) {
-			$transform = getTransform($exif['Orientation']);
-			if($transform != "") {
-				// convert.
-				$cmd = "convert $transform $tmpdir/{$postdata['tmpname']} $tmpdir/{$postdata['tmpname']}";
-				$err = shell_exec($cmd);
-				if(strlen($err) > 0) trigger_error("ImageMagick failed: $err", E_USER_ERROR);
+			$image = new Imagick("$tmpdir/{$postdata['tmpname']}");
+			$image = imageTransform($image, $exif['Orientation']);
+			
+			if(!$image->writeImage("$tmpdir/{$postdata['tmpname']}")) {  
+				trigger_error("ImageMagick/writeImage failed", E_USER_ERROR);
 			}
+			$image->destroy();
 		}
 		// avoid re-rotating (or attempting to) again
 		$postdata['norotate'] = $postdata['rotate'];
 		unset($postdata['rotate']);
 	}
-
+	
 	if(array_key_exists("norotate", $postdata) ||
 	   array_key_exists("rotate", $postdata)) {
 		if(file_exists("$tmpdir/th{$postdata['tmpname']}"))
@@ -873,7 +991,7 @@ function upload_checkrotation($postdata) {
 
 	if(array_key_exists("norotate", $postdata))
 		return false;
-
+	
 	$filename = $tmpdir."/".$postdata['tmpname'];
 	if(function_exists("exif_read_data")) {
 		$exif = @exif_read_data($filename);
@@ -883,18 +1001,22 @@ function upload_checkrotation($postdata) {
 		return false;
 	}
 
-	$transform = getTransform($exif['Orientation']);
-
-	if($transform == "")
+	if(!needTransform($exif['Orientation']))
 		return false;
-
-	$cmd = "convert -resize 100x100 $tmpdir/{$postdata['tmpname']} $tmpdir/th{$postdata['tmpname']}";
-	$err = shell_exec($cmd);
-	if(strlen($err) > 0) trigger_error("ImageMagick failed: $err", E_USER_ERROR);
-
-	$cmd = "convert $transform -resize 100x100 $tmpdir/{$postdata['tmpname']} $tmpdir/rh{$postdata['tmpname']}";
-	$err = shell_exec($cmd);
-	if(strlen($err) > 0) trigger_error("ImageMagick failed: $err", E_USER_ERROR);
+	
+	$thfile  = $tmpdir . '/th' . $postdata['tmpname'];
+	$rhfile  = $tmpdir . '/rh' . $postdata['tmpname'];
+	
+	$image = new Imagick("$tmpdir/{$postdata['tmpname']}");
+	$image->resizeImage(100,100, imagick::FILTER_UNDEFINED, 1, true);
+	if(!$image->writeImage($thfile)) {  
+		trigger_error("ImageMagick/writeImage failed", E_USER_ERROR);
+	}
+	$image = imageTransform($image, $exif['Orientation']);
+	if(!$image->writeImage($rhfile)) {  
+		trigger_error("ImageMagick/writeImage failed", E_USER_ERROR);
+	}
+	$image->destroy();
 
 	$message = "Is it sideways?<br />If you want, I can try rotating it for you.<br/><br/>
 	<center><table><tr><td align='middle'>Original</td><td align='middle'>Fixed</td></tr>
@@ -969,12 +1091,22 @@ function upload_insert_file($postdata) {
 
 		// generate the thumbnail
 		// XXX: this is what's failing
-		$cmd = "/usr/bin/convert -define jpeg:size=800x800 $tmpdir/".$postdata['tmpname']."[0] -thumbnail 133x100^ -gravity center -extent 133x100 $tmpdir/th".$postdata['tmpname'];
-		$err = shell_exec($cmd);
-		if(strlen($err) > 0) trigger_error("ImageMagick failed: $err", E_USER_ERROR);
+	
+		$thfile  = $tmpdir . '/th' . $postdata['tmpname'];
+
+		$image = new Imagick("$tmpdir/{$postdata['tmpname']}");
+		$image->setGravity(imagick::GRAVITY_CENTER);
+		if(!$image->cropThumbnailImage(133,100)) {
+			trigger_error("ImageMagick/cropThumbnailImage failed", E_USER_ERROR);
+		}
+		$image->setImagePage(0, 0, 0, 0);
+		if(!$image->writeImage($thfile)) {
+			trigger_error("ImageMagick/writeImage failed", E_USER_ERROR);
+		}
+		$image->destroy();
 
 		// move into place
-		rename($tmpdir."/th".$postdata['tmpname'],
+		rename($thfile,
 		     "$path/thumbs/th$fileid".$postdata['file_extension'])
 			or trigger_error("could not copy thumbnail to $path/thumbs!", E_USER_ERROR);
 	} else if(upload_type($postdata) == "audio") {
@@ -1005,9 +1137,17 @@ function upload_insert_file($postdata) {
 				// generate the thumbnail if necessary
 				list($width, $height, $type, $attr) = getimagesize($thumbname);
 				if($width > 100 || $height > 100) {
-					$cmd = "convert -resize 100x100 $thumbname $thumbname";
-					$err = shell_exec($cmd);
-					if(strlen($err) > 0) trigger_error("ImageMagick failed: $err", E_USER_ERROR);
+					
+					$image = new Imagick($thumbname);
+					$image->setGravity(imagick::GRAVITY_CENTER);
+					if(!$image->cropThumbnailImage(100,100)) {
+						trigger_error("ImageMagick/cropThumbnailImage failed", E_USER_ERROR);
+					}
+					$image->setImagePage(0, 0, 0, 0);
+					if(!$image->writeImage($thumbname)) {
+						trigger_error("ImageMagick/writeImage failed", E_USER_ERROR);
+					}
+					$image->destroy();
 				}
 			}
 		}
@@ -1031,16 +1171,23 @@ function upload_insert_file($postdata) {
 	        VALUES ( " . $_SESSION['userid'] . ", $fileid ) ";
 	tmbo_query( $sql );
 
+	$upload = new Upload($fileid);
+	
+	$isk = new Isk();
+	if($isk->add($upload->file(), $upload->id())) {
+		$isk->save();
+	}
+
 	unset($_SESSION['postdata']);
 
 	$message = "<p>
-		Thanks. Your upload can be viewed <a href=\"./pages/pic.php?id=$fileid\">here</a>.
+		Thanks. Your upload can be viewed <a href=\"".Link::upload($upload)."\">here</a>.
 	</p>
 	<p>
-			You may <a href=\"./?c=comments&fileid=$fileid\">comment on this file here</a>.
+			You may <a href=\"".Link::thread($upload)."\">comment on this file here</a>.
 	</p>
 	<p>
-		<a href=\"./\">Back to the list</a>
+		<a href=\"".Link::listFor($upload)."\">Back to the list</a>
 	</p>";
 	box($message, "yummy.");
 	if(upload_type($postdata) != "avatar")

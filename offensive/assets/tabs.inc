@@ -10,17 +10,12 @@
 
 
 <div>
-	<div class="<?= cssFor('images') ?>"><a href="/offensive/<? 
-		if(me()) {
-			echo "?c=".((me()->getPref("index") == "thumbs") ? 
-	      "thumbs" : "main"); 
-		}
-	?>">images</a></div>
-	<div class="<?= cssFor('discussions') ?>"><a href="/offensive/?c=discussions">discussions</a></div>
-	<div class="<?= cssFor('hof') ?>"><a href="/offensive/?c=hof">hall of fame</a></div>	
-	<div class="<?= cssFor('audio') ?>"><a href="/offensive/?c=audio">audio</a></div>	
-	<div class="<?= cssFor('yearbook') ?>"><a href="/offensive/?c=yearbook">yearbook</a></div>	
-	<div class="<?= cssFor('search') ?>"><a href="/offensive/?c=search">search</a></div>	
+	<div class="<?= cssFor('images') ?>"><a href="<?= Link::mainpage() ?>">images</a></div>
+	<div class="<?= cssFor('discussions') ?>"><a href="<?= Link::content("discussions") ?>">discussions</a></div>
+	<div class="<?= cssFor('hof') ?>"><a href="<?= Link::content("hof") ?>">hall of fame</a></div>	
+	<div class="<?= cssFor('audio') ?>"><a href="<?= Link::content("audio") ?>">audio</a></div>	
+	<div class="<?= cssFor('yearbook') ?>"><a href="<?= Link::content("yearbook") ?>">yearbook</a></div>	
+	<div class="<?= cssFor('search') ?>"><a href="<?= Link::content("search") ?>">search</a></div>	
 
 	<div class="tabspacer">&nbsp;</div>
 </div>

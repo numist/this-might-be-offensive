@@ -17,7 +17,6 @@
 	function head() {
 		?>
 		<link href="/styles/grid.css?v=1.0.4" type="text/css" rel="stylesheet">
-		<script type="text/javascript" src="/offensive/js/jquery-1.7.1.min.js"></script>
 		<!-- lazyload_bottom -->
 		<script type="text/javascript">
 			function prep_item(item, neighbor) {
@@ -71,7 +70,7 @@
 			?>
 						<li class="grid_row" fileid="<?= $row['fileid'] ?>">
 							<div class="col col1 <?= $css ?>">
-								<a href="./?c=comments&fileid=<?= $row['fileid'] ?>"><?= $row['filename'] ?></a>
+								<a href="<?= Link::thread($row['fileid']) ?>"><?= $row['filename'] ?></a>
 							</div>
 							<div class="col col2 <?= $css ?>">
 								<a href="subscribe.php?un=1&fileid=<?= $row['fileid'] ?>" title="take this thread off my 'unread comments' watch list.">unsubscribe</a>

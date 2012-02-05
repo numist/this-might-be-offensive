@@ -23,8 +23,7 @@
 		 * user's preferences.
 		 */
 		if($redirect == "") {
-			$redirect = '/offensive/?c='.((me()->getPref("index") == "thumbs") ? 
-			      "thumbs" : "main");
+			$redirect = Link::mainpage();
 		}
 		header( "Location: " . $redirect );
 		exit;
@@ -40,8 +39,7 @@
 		 * user's preferences.
 		 */
 		if(!$redirect) {
-			$redirect = '/offensive/?c='.((me()->getPref("index") == "thumbs") ? 
-			      "thumbs" : "main");
+			$redirect = Link::mainpage();
 		}
 		header( "Location: " . $redirect );
 		exit;
@@ -61,6 +59,7 @@
 <head>
 	<title><?= $_SERVER['SERVER_NAME'] ?> : do we know you?</title>
 	<link rel="stylesheet" type="text/css" href="/styles/sparse.css"/>
+	<? include_once("analytics.inc"); ?>
 </head>
 
 

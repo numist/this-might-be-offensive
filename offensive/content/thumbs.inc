@@ -5,7 +5,6 @@
 	require_once( 'offensive/assets/tabs.inc' );
 	require_once("offensive/assets/classes.inc");
 	require_once("offensive/assets/core.inc");
-	require_once('offensive/assets/pickupLink.inc');
 
 	function start() {
 		mustLogIn();
@@ -26,8 +25,6 @@
 		<link rel="alternate" type="application/rss+xml" title="image stream" href="<?= Link::rss("pic") ?>" />
 		<link rel="alternate" type="application/rss+xml" title="daily archives" href="<?= Link::rss("zip") ?>" />
 		<link href="/styles/grid.css?v=1.0.4" type="text/css" rel="stylesheet">
-		<script type="text/javascript" src="/offensive/js/tmbolib.js?v=0.0.3"></script>
-		<script type="text/javascript" src="/offensive/js/jquery-1.7.1.min.js"></script>
 		<script type="text/javascript" src="/offensive/js/pickuplink_visibility.js?v=0.0.2"></script>
 		<? if(count($_GET) == 1 && array_key_exists("c", $_GET)) { ?>
 			<!-- lazyload_changes are only used if on a base page (?c=main not ?c=main&foo=bar) -->
@@ -77,8 +74,8 @@
 	<div class="bluebox">
 		<div id="grid-container">
 			<div id="commands">
-				<div class="floatleft"><? print_pickuplink(); ?></div>
-				<div class="floatright"><a href="./?c=main<?= query_string("c", "&") ?>">text view</a></div>
+				<div class="floatleft"><? PickupLink::emit(); ?></div>
+				<div class="floatright"><a href="<?= Link::content("main").query_string("c", "&") ?>">text view</a></div>
 			</div>
 			<div class="grid_thumbs" id="thumbnails">
 				<ul>

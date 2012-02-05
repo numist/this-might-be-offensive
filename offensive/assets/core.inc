@@ -190,6 +190,11 @@
 		$id =   check_arg("id", "integer", $args);
 		handle_errors();
 		
+		static $done = array();
+		if(in_array($id, $done)) {
+			return new Upload($id);
+		}
+		
 		$upload = new Upload($id);
 		
 		$sql = uploadsql()." AND up.id = $id";
@@ -209,6 +214,8 @@
 		if($upload->squelched()) {
 			require("offensive/403.php");
 		}
+		
+		$done[] = $upload->id();
 		
 		return $upload;
 	}
