@@ -1122,7 +1122,7 @@ function upload_insert_file($postdata) {
 		// generate the thumbnail
 		// XXX: this is what's failing
 	
-                // okay to always tack on the extra file extension because we'll be renaming shortly
+		// okay to always tack on the extra file extension because we'll be renaming shortly
 		$thfile  = $tmpdir . '/th' . $postdata['tmpname'] . $postdata['file_extension'];
 
 		$image = new Imagick("$tmpdir/{$postdata['tmpname']}");
