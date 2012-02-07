@@ -220,7 +220,7 @@
 			}
 
 		</script>
-		<script type="text/javascript" src="/offensive/js/irsz.js?v=0.0.9"></script>
+		<script type="text/javascript" src="/offensive/js/irsz.js?v=0.0.10"></script>
 		<? include_once("analytics.inc"); ?>
 	</head>
 	<body id="pic">
