@@ -105,35 +105,30 @@
         return Math.round(actual_height * width / actual_width);
       }
       
+      // fit image entirely within viewport
+      w_width = target_width > irsz_min_width ? target_width : irsz_min_width;
+      w_height = compute_height(w_width);
+      h_height = target_height > irsz_min_height ? target_height : irsz_min_height;
+      h_width = compute_width(h_height);
+      
+      // do not enlarge image beyond its limits
+      w_width = w_width < actual_width ? w_width : actual_width;
+      w_height = w_height < actual_height ? w_height : actual_height;
+      h_width = h_width < actual_width ? h_width : actual_width;
+      h_height = h_height < actual_height ? h_height : actual_height;
+      
       if(/scroll/.test($(image).attr("src"))) {
-        // if a scroller, check and fit to *smaller* image dimension
+        // if a scroller, check and fit one dimension
         // this assumes the image is intended to be scrolled in one dimension
-        if(actual_width < actual_height) {
-          new_width = target_width > irsz_min_width ? target_width : irsz_min_width;
-          new_height = compute_height(new_width);
+        if(w_height < h_height) {
+          new_width = h_width;
+          new_height = h_height;
         } else {
-          new_height = target_height > irsz_min_height ? target_height : irsz_min_height;
-          new_width = compute_width(new_height);
-        }
-        
-        // correct for oversizing
-        if(new_width > actual_width || new_height > actual_height) {
-          new_width = actual_width;
-          new_height = actual_height;
+          new_width = w_width;
+          new_height = w_height;
         }
       } else {
-        // fit image entirely within viewport
-        w_width = target_width > irsz_min_width ? target_width : irsz_min_width;
-        w_height = compute_height(w_width);
-        h_height = target_height > irsz_min_height ? target_height : irsz_min_height;
-        h_width = compute_width(h_height);
-        
-        // do not enlarge image beyond its limits
-        w_width = w_width < actual_width ? w_width : actual_width;
-        w_height = w_height < actual_height ? w_height : actual_height;
-        h_width = h_width < actual_width ? h_width : actual_width;
-        h_height = h_height < actual_height ? h_height : actual_height;
-
+        // fit image entirely in viewport
         if(w_height > h_height) {
           // width-based dimensions are too tall
           new_width = h_width;

@@ -116,39 +116,29 @@
 			}
 			
 			// load the class cache
-			core_getcomment($comments);
+			$comments = core_getcomment($comments);
 			
-			foreach($results as $result) {
-				$comment = $result['comment'];
-				$upload = $comment->upload();
-				$uploader = $upload->uploader();
-				?>
+			foreach($comments as $comment) {
+				$upload = $comment->upload(); ?>
 				<div class="contentbox">
-						<div class="heading"><?
-						    // changeblog special header
-							if($upload->id() == "211604") {
-								?>
-								<a class="heading" id="pic" href="<?= Link::content("changeblog") ?>">changeblog</a>
-								<br/><span style="color:#666699">beat to fit. paint to match.</span><br/>
-								<?
-							} else if( $upload->type() == 'topic' ) {
-								$prefix = $uploader->status() == "admin" ? "" : "don't blame me,";
-								?>
-								<a class="heading" id="pic" href="<?= Link::thread($upload) ?>"><?= $upload->htmlFilename(); ?></a>
-								<?
-								?><br/><span style="color:#666699"><?= $prefix ?> <a href="<?= Link::user($uploader) ?>" style="color:#666699"><?= $uploader->username() ?></a> started it.</span><br/>
-						<?
-							} else {
-						?>
-								<a class="heading" id="pic" href="<?= Link::upload($upload) ?>"><?= $upload->htmlFilename(); ?></a><br/><span style="color:#666699">uploaded by <a href="<?= Link::user($uploader) ?>" style="color:#666699"><?= $uploader->username() ?></a></span><br/>
-						<?
-							}	
-						?></div>
+					<div class="heading"><?
+					  // changeblog special header
+						if($upload->id() == "211604") { ?>
+							<a class="heading" id="pic" href="<?= Link::content("changeblog") ?>">changeblog</a>
+							<br/><span style="color:#666699">beat to fit. paint to match.</span><br/>
+					<? } else if( $upload->type() == 'topic' ) {
+							$prefix = $upload->uploader()->status() == "admin" ? "" : "don't blame me,"; ?>
+							<a class="heading" id="pic" href="<?= Link::thread($upload) ?>"><?= $upload->htmlFilename(); ?></a>
+								<br/><span style="color:#666699"><?= $prefix ?> <a href="<?= Link::user($upload->uploader()) ?>" style="color:#666699"><?= $upload->uploader()->username() ?></a> started it.</span><br/>
+					<? } else { ?>
+							<a class="heading" id="pic" href="<?= Link::upload($upload) ?>"><?= $upload->htmlFilename(); ?></a><br/><span style="color:#666699">uploaded by <?= $upload->uploader()->htmlUsername() ?></span><br/>
+					<? } ?>
+					</div>
 				<div class="entry">
 				<?= $comment->HTMLcomment(); ?><br/>
 					 
 	 	 			<div class="timestamp"><?= $result['match'] ?>% <a href="<?= Link::comment($comment) ?>"><?= $comment->timestamp() ?></a></div>
-					&raquo; <?= $commenter->htmlUsername() ?>
+					&raquo; <?= $comment->commenter()->htmlUsername() ?>
 	
 				<?
 
