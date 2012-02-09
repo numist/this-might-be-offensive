@@ -1096,6 +1096,7 @@ function upload_insert_file($postdata) {
 
 		$image = new Imagick("$tmpdir/{$postdata['tmpname']}");
 		$image->setGravity(imagick::GRAVITY_CENTER);
+		$image->flattenImages();
 		if(!$image->cropThumbnailImage(133,100)) {
 			trigger_error("ImageMagick/cropThumbnailImage failed", E_USER_ERROR);
 		}
@@ -1140,6 +1141,7 @@ function upload_insert_file($postdata) {
 					
 					$image = new Imagick($thumbname);
 					$image->setGravity(imagick::GRAVITY_CENTER);
+					$image->flattenImages();
 					if(!$image->cropThumbnailImage(100,100)) {
 						trigger_error("ImageMagick/cropThumbnailImage failed", E_USER_ERROR);
 					}
