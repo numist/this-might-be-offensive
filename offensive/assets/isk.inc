@@ -61,9 +61,9 @@ class Isk {
 		$image = new Imagick($path);
 		
 		$max_dimension = 300;
-		if($image->getImageWidth() > $image->getImageHeight() && $image->getImageWidth() > $max_dimension) {
+		if($image->getImageWidth() > $image->getImageHeight() && $image->getImageHeight() > $max_dimension) {
 			$image->resizeImage(0,$max_dimension, imagick::FILTER_UNDEFINED, 1, false);
-		} else if($image->getImageHeight() > $max_dimension) {
+		} else if($image->getImageWidth() > $max_dimension) {
 			$image->resizeImage($max_dimension,0, imagick::FILTER_UNDEFINED, 1, false);
 		}
 		$blob = $image->getImageBlob();
