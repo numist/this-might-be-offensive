@@ -311,7 +311,7 @@ function loginWithToken($nothing) {
 		$token = new Token($tokenid);
 		if(!$token->exists()) {
 			//failedLogIn("");
-			return false;
+			return null;
 		}
 		
 		// don't update the token's row unless it's been a minute since the last update.
@@ -324,7 +324,6 @@ function loginWithToken($nothing) {
 			global $readonly;
 			$readonly = true;
 		}
-		
 		return logInUser(new User(array("userid" => $token->userid())), false);
 	}
 	return null;
