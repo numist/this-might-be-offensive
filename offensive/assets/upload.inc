@@ -61,6 +61,20 @@ function numUploadsToday() {
 	return $row[ 'thecount' ];
 }
 
+function needCompression($filename) {
+	$filesize = filesize($filename);	
+	list($width, $height, $type, $attr) = getimagesize($filename);
+
+	$bytesPerPixel = 0.0;
+	$expectedFileSize = round(($width * $height * 0.2)/1024);
+	$bytesPerPixel = ( 1.0 * $filesize / (1.0 * $width * $height ) );
+	$filesize = round($filesize/1024);
+	if($bytesPerPixel <= 0.45)
+		return false;	
+	
+	return true;
+}
+
 function numAllowedUploads() {
 	if(!me()) return 0;
 
@@ -711,17 +725,23 @@ function upload_checkdims(&$postdata) {
 
 	if (array_key_exists("resize", $postdata)) {		
 		$image = new Imagick("$tmpdir/{$postdata['tmpname']}");
-		
+
 		// XXX maybe use a specific filter. Gotta play with it for best results.
-		$image->resizeImage(1024,1024, imagick::FILTER_UNDEFINED, 1, true);
-		
+		$image->resizeImage(1600, 1600, imagick::FILTER_UNDEFINED, 1, true);
+				
 		if(!$image->writeImage("$tmpdir/{$postdata['tmpname']}")) {  
 			trigger_error("ImageMagick/writeImage failed", E_USER_ERROR);
 		}
+		
+		if(needCompression("$tmpdir/{$postdata['tmpname']}")) {
+			$postdata['resample'] = 'Compress my file';
+		}
+		
 		$image->destroy();
 
 		$postdata['noresize'] = $postdata['resize'];
 		unset($postdata['resize']);
+		
 		return false;
 	}
 
@@ -769,6 +789,7 @@ function upload_checksize(&$postdata) {
 		return false;
 
 	if(array_key_exists("resample", $postdata)) {
+		
 		// convert from file.ext to file.jpg, quality 90
 		$newtmp = substr($postdata['tmpname'], 0, 0 - strlen($postdata['file_extension'])).".jpg";
 		$newfilename = substr($postdata['filename'], 0, 0 - strlen($postdata['file_extension'])).".jpg";
@@ -796,17 +817,7 @@ function upload_checksize(&$postdata) {
 		return false;
 	}
 
-	// this stuff is for extra large (uncompressed) images.  not sure if we care as much.
-	$filesize = filesize($tmpdir."/".$postdata['tmpname']);
-
-	list($width, $height, $type, $attr) = getimagesize($tmpdir."/".$postdata['tmpname']);
-
-	$bytesPerPixel = 0.0;
-	$expectedFileSize = round(($width * $height * 0.2)/1024);
-	$bytesPerPixel = ( 1.0 * $filesize / (1.0 * $width * $height ) );
-	$filesize = round($filesize/1024);
-
-	if($bytesPerPixel <= 0.45)
+	if(!needCompression($tmpdir."/".$postdata['tmpname'])) 
 		return false;
 
 	$message = "This image has a pretty big filesize for its dimensions. Expected file size: ${expectedFileSize}k. Your file: ${filesize}k.<br />If you want, I can resample it as an 90% quality JPG image.<br /><br />
