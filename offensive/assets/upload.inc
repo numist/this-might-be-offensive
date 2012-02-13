@@ -68,8 +68,7 @@ function needCompression($filename) {
 	$bytesPerPixel = 0.0;
 	$expectedFileSize = round(($width * $height * 0.2)/1024);
 	$bytesPerPixel = ( 1.0 * $filesize / (1.0 * $width * $height ) );
-	$filesize = round($filesize/1024);
-	if($bytesPerPixel <= 0.45)
+	if($bytesPerPixel <= 0.75)
 		return false;	
 	
 	return true;
@@ -727,14 +726,16 @@ function upload_checkdims(&$postdata) {
 		$image = new Imagick("$tmpdir/{$postdata['tmpname']}");
 
 		// XXX maybe use a specific filter. Gotta play with it for best results.
-		$image->resizeImage(1600, 1600, imagick::FILTER_UNDEFINED, 1, true);
+		$image->resizeImage(1024, 1024, imagick::FILTER_UNDEFINED, 1, true);
 				
 		if(!$image->writeImage("$tmpdir/{$postdata['tmpname']}")) {  
 			trigger_error("ImageMagick/writeImage failed", E_USER_ERROR);
 		}
 		
 		if(needCompression("$tmpdir/{$postdata['tmpname']}")) {
-			$postdata['resample'] = 'Compress my file';
+			$postdata['resample'] = true;
+		} else {
+			$postdata['noresample'] = true;
 		}
 		
 		$image->destroy();
@@ -789,7 +790,6 @@ function upload_checksize(&$postdata) {
 		return false;
 
 	if(array_key_exists("resample", $postdata)) {
-		
 		// convert from file.ext to file.jpg, quality 90
 		$newtmp = substr($postdata['tmpname'], 0, 0 - strlen($postdata['file_extension'])).".jpg";
 		$newfilename = substr($postdata['filename'], 0, 0 - strlen($postdata['file_extension'])).".jpg";
@@ -820,6 +820,7 @@ function upload_checksize(&$postdata) {
 	if(!needCompression($tmpdir."/".$postdata['tmpname'])) 
 		return false;
 
+	$filesize = round(filesize($filename) / 1024);
 	$message = "This image has a pretty big filesize for its dimensions. Expected file size: ${expectedFileSize}k. Your file: ${filesize}k.<br />If you want, I can resample it as an 90% quality JPG image.<br /><br />
 		<form action=\"{$_SERVER['PHP_SELF']}\" method=\"POST\">
 			<input type=\"hidden\" name=\"c\" value=\"upload\">
