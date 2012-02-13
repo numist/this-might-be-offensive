@@ -1175,9 +1175,11 @@ function upload_insert_file($postdata) {
 
 	$upload = new Upload($fileid);
 	
-	$isk = new Isk();
-	if($isk->add($upload->file(), $upload->id())) {
-		$isk->save();
+	if($upload->type() == "image") {
+		$isk = new Isk();
+		if($isk->add($upload->file(), $upload->id())) {
+			$isk->save();
+		}
 	}
 
 	unset($_SESSION['postdata']);
