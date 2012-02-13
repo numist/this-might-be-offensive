@@ -279,8 +279,7 @@ class Upload {
 		if(!array_key_exists("next", $this->data)) {
 			$blocksql = "";
 			if(me()) {
-				$blocksql = "AND userid NOT IN (SELECT squelched FROM offensive_squelch WHERE userid = ".me()->id().")
-                       AND userid NOT IN (SELECT userid FROM offensive_squelch WHERE squelched = ".me()->id().")";
+				$blocksql = "AND userid NOT IN (SELECT squelched FROM offensive_squelch WHERE userid = ".me()->id().")";
 			}
 			
 			$sql = "SELECT * FROM offensive_uploads WHERE id > {$this->id()} AND type='{$this->type()}' AND status='normal'
@@ -309,7 +308,6 @@ class Upload {
 					$tmbo_sql
 					$nsfw_sql
 					AND userid NOT IN (SELECT squelched FROM offensive_squelch WHERE userid = {$me->id()})
-					AND userid NOT IN (SELECT userid FROM offensive_squelch WHERE squelched = {$me->id()})
 					ORDER BY id ASC LIMIT 1";
 			$result = tmbo_query($sql);
 			if(mysql_num_rows($result) == 0) {
@@ -324,9 +322,13 @@ class Upload {
 	
 	public function prev() {
 		if(!array_key_exists("prev", $this->data)) {
-      
-			$sql = "SELECT * FROM offensive_uploads WHERE id < ".$this->id()." AND type='".$this->type()."' AND status='normal'
-					ORDER BY id DESC LIMIT 1";
+			$blocksql = "";
+			if(me()) {
+				$blocksql = "AND userid NOT IN (SELECT squelched FROM offensive_squelch WHERE userid = ".me()->id().")";
+			}
+			$sql = "SELECT * FROM offensive_uploads WHERE id < {$this->id()} AND type='{$this->type()}' AND status='normal'
+			       $blocksql
+			       ORDER BY id DESC LIMIT 1";
 			$result = tmbo_query($sql);
 			if(mysql_num_rows($result) == 0) {
 				$this->data["prev"] = false;
@@ -340,6 +342,7 @@ class Upload {
 
 	public function prev_filtered() {
 		if(!me()) return $this->prev();
+		$me = me();
 
 		if(!array_key_exists("prev_filtered", $this->data)) {
 			$tmbo_sql = me()->getPref("hide_tmbo") ? " AND NOT tmbo " : "";
@@ -348,7 +351,7 @@ class Upload {
 			$sql = "SELECT * FROM offensive_uploads WHERE id < {$this->id()} AND type='{$this->type()}' AND status='normal'
           			$tmbo_sql
           			$nsfw_sql
-					AND userid NOT IN (SELECT squelched FROM offensive_squelch WHERE userid = ".me()->id()." )
+					AND userid NOT IN (SELECT squelched FROM offensive_squelch WHERE userid = {$me->id()} )
 					ORDER BY id DESC LIMIT 1";
 			$result = tmbo_query($sql);
 			if(mysql_num_rows($result) == 0) {
