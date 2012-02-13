@@ -163,6 +163,7 @@
   }
   
   function image_resize(image, new_width, new_height, animate) {
+    var old_width = $(image).width(), old_height = $(image).height();
     if(animate) {
       $(image).animate({
           width: new_width+"px",
@@ -171,6 +172,9 @@
     } else {
       image.style.height = new_height+"px";
       image.style.width = new_width+"px";
+    }
+    if(new_width != old_width || new_height != old_height) {
+      $(image).resize();
     }
   }
 })();

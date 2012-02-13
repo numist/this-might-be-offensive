@@ -84,7 +84,7 @@
 
 		<script type="text/javascript" src="/offensive/js/tmbolib.js?v=0.0.4"></script>
 		<script type="text/javascript" src="/offensive/js/jquery-1.7.1.min.js"></script>
-		<script type="text/javascript" src="/offensive/js/picui.js?v=0.0.9"></script>
+		<script type="text/javascript" src="/offensive/js/picui.js?v=0.0.10"></script>
 		<script type="text/javascript" src="/offensive/js/subscriptions.js"></script>
 		<script type="text/javascript" src="/offensive/js/jqModal.js"></script>
 		<script type="text/javascript" src="/offensive/js/jqDnR.js?v=0.0.1"></script>
@@ -220,7 +220,7 @@
 			}
 
 		</script>
-		<script type="text/javascript" src="/offensive/js/irsz.js?v=0.0.10"></script>
+		<script type="text/javascript" src="/offensive/js/irsz.js?v=0.0.11"></script>
 		<? include_once("analytics.inc"); ?>
 	</head>
 	<body id="pic">
