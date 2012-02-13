@@ -96,31 +96,51 @@ function tmbo_error_handler($errno, $errstr, $errfile, $errline, $errcontext) {
 
 		if(!($errno & error_reporting())) return;
 
-        if(isset($_SESSION['status']) && $_SESSION['status'] == "admin" && $errno & $critical) {
+        if(me() && me()->status() == "admin" && $errno & $critical) {
                 echo "<br />\n".
-                     "<b>".$errortype[$errno]."</b>: ".nl2br($errstr)." in ".
+                     "<b>".$errortype[$errno]."</b>: ".nl2br(htmlentities($errstr))." in ".
 		     "<b>$shortfile</b> on line <b>$errline</b><br />";
         }
 
         // handle fatal errors by sending users to the kaboom page, don't redirect admins
         if($errno & (E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR)) {
-                if((!array_key_exists("status", $_SESSION) ||
-				   $_SESSION['status'] != "admin") && ob_get_level() > 0) {
-					ob_end_clean();
-					require("offensive/index.outoforder.php");
-				} else if (array_key_exists("status", $_SESSION) &&
-					       $_SESSION['status'] == "admin") {
-					ob_start();
-					var_dump(debug_backtrace());
-					$trace = nl2br(ob_get_contents());
-					ob_end_clean();
-					echo $trace;
-				}
-                exit;
+					if((!me() || me()->status() != "admin") && ob_get_level() > 0) {
+						ob_end_clean();
+						require("offensive/index.outoforder.php");
+					} else if (array_key_exists("status", $_SESSION) &&
+					           $_SESSION['status'] == "admin") {
+						ob_start();
+						var_dump(debug_backtrace());
+						$trace = nl2br(ob_get_contents());
+						ob_end_clean();
+						echo $trace;
+					}
+					exit;
         }
 }
 set_error_handler("tmbo_error_handler");
 error_reporting(E_STRICT | E_ALL);
+
+function tmbo_exception_handler($exception) {
+	if(is_null($exception)) return;
+	
+	error_log("Uncaught exception: ".$exception->getMessage());
+	
+	if((!me() || me()->status() != "admin") && ob_get_level() > 0) {
+		ob_end_clean();
+		require("offensive/index.outoforder.php");
+	} else if (array_key_exists("status", $_SESSION) &&
+	           $_SESSION['status'] == "admin") {
+		echo "<br /><b>Uncaught exception</b>: ".$exception->getMessage()."<br /><br />";
+		ob_start();
+		var_dump(debug_backtrace());
+		$trace = nl2br(ob_get_contents());
+		ob_end_clean();
+		echo $trace;
+	}
+	exit;
+}
+set_exception_handler("tmbo_exception_handler");
 
 /* timezone error fix applies to all pages */
 date_default_timezone_set("America/Los_Angeles");
