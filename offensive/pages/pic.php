@@ -221,7 +221,7 @@
 		 });});
 
 		</script>
-		<script type="text/javascript" src="/offensive/js/irsz.js?v=0.0.12"></script>
+		<script type="text/javascript" src="/offensive/js/irsz.js?v=0.0.13"></script>
 		<script type="text/javascript" src="/offensive/js/picui.js?v=0.0.11"></script>
 		<? include_once("analytics.inc"); ?>
 	</head>
