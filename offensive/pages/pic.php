@@ -131,6 +131,7 @@
       	function key_quick() { $("#dialog").jqmShow(); };
       	function key_subscribe() { handle_subscribe($('.subscribe_toggle:visible'),e,$("#good").attr("name")); };
         function key_random() { document.location.href = "<?= Link::upload($upload) ?>&random"; };
+        function key_image_toggle() { theimage().irsz("toggle"); };
       	
 				if(e == null)  return true;
         var keycode = composite_keycode(e);

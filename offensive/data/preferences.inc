@@ -48,7 +48,9 @@ $prefnames = array(
 	// random image jump
 	"key_random",
 	// subscription toggle
-	"key_subscribe"
+	"key_subscribe",
+	// image resize toggle
+	"key_image_toggle"
 );
 
 $prefdefaults = array(
