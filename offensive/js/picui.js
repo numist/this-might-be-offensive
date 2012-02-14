@@ -28,11 +28,13 @@ $(document).ready(function() {
 	// quick comment
 	handle_quickcomment();
 	
-	image_dimensions(irsz_selector(document), function(width, height) {
+	// image dimensions
+	image_dimensions(theimage(), function(width, height) {
 	  $("span#dimensions").append(", "+width+"x"+height+' <span id="scaled"></span>');
 	});
 	
-	irsz_selector(document).resize(function() {
+	// scaling factor
+	theimage().resize(function() {
 	  var current_width = $(this).width(), current_height = $(this).height();
 	  image_dimensions(this, function(actual_width, actual_height) {
 	    if(actual_width != current_width || actual_height != current_height) {
