@@ -84,9 +84,8 @@
 
 		<script type="text/javascript" src="/offensive/js/tmbolib.js?v=0.0.4"></script>
 		<script type="text/javascript" src="/offensive/js/jquery-1.7.1.min.js"></script>
+		<script type="text/javascript" src="/offensive/js/jquery.ba-outside-events.min.js"></script>
 		<script type="text/javascript" src="/offensive/js/subscriptions.js"></script>
-		<script type="text/javascript" src="/offensive/js/jqModal.js"></script>
-		<script type="text/javascript" src="/offensive/js/jqDnR.js?v=0.0.1"></script>
 		<script type="text/javascript">
 			var theimage = function() { return $(document).find("a#imageLink img").last(); };
 
@@ -128,7 +127,6 @@
       	function key_index()    { nav_to_id("index"); };
         function key_good() { do_vote($("#good")); };
       	function key_bad()  { do_vote($("#bad")); };
-      	function key_quick() { $("#dialog").jqmShow(); };
       	function key_subscribe() { handle_subscribe($('.subscribe_toggle:visible'),e,$("#good").attr("name")); };
         function key_random() { document.location.href = "<?= Link::upload($upload) ?>&random"; };
         function key_image_toggle() { theimage().irsz("toggle"); };
@@ -171,43 +169,6 @@
 				return;
 			}
 
-			// handle a keybased event. this code was incorporated from offensive.js, which has now been deprecated
-			function handle_qc_keypress(o,e)
-			{
-			  // potential actions
-			  function escape() {
-			    e.preventDefault();
-					$("#dialog").jqmHide();
-					return;
-			  }
-
-				var id;
-				if(e == null)  {
-					return true;
-				}
-
-				var keycode = composite_keycode(e);
-
-				<?
-				if(array_key_exists("key_escape", $prefs)) {
-				  foreach($prefs["key_escape"] as $code) {
-				    // TODO: remove key-agnosticism
-            if($code <= KEY_CODE_MASK) {
-              // code is modifier-agnostic ?>
-            if(<?= $code ?> == (keycode & <?= KEY_CODE_MASK ?>)) {
-            <? } else {
-              // code is modifier-strict ?>
-            if(<?= $code ?> == keycode) {
-            <? } ?>
-
-              escape();
-              return;
-            }
-				<?}
-			  }?>
-				return true;
-			}
-
 			/* image rollover stuff */
 			function changesrc(a,im)
 			{
@@ -239,21 +200,9 @@
 				keyboard commands:<br />
 				← = newer. ↑ = index. → = older. ↓ = comments . + or = votes [ this is good ]. - votes [ this is bad ] .<br />
 				q = quick comment, Esc closes quick comment box, ? = random image.<br />
-				( change 'em at your <a href="<?= Link::content("settings") ?>">settings</a> page. )
+				( change 'em in your <a href="<?= Link::content("settings") ?>">settings</a>. )
 			</div>
 		<? } ?>
-
-		<!-- this window is not visible unless you do a quick comment -->
-		<!-- data is fetched using ajax in js and put in #qc_bluebox  -->
-		<div class="jqmWindow" id="dialog">
-			<div class="blackbar"></div>
-			<div class="heading"><table style="width: 100%;"><tr>
-				<td align="left">let's hear it</td>
-				<td class="qc_close" align="right"><a href="#" class="jqmClose">Close</a></td>
-			</tr></table></div>
-			<div class="bluebox" id="qc_bluebox" style="text-align: center">
-			</div>
-		</div> <!-- end quickcomment -->
 
 		<div id="content">
 			<div id="heading" style="white-space:nowrap;">
