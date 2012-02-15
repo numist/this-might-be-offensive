@@ -150,9 +150,13 @@ function postComment($fileid, $vote, $repost, $offensive, $comment, $subscribe=n
 		$vote = "";
 	}
 
+	// sometimes, subscribe the commenter.
+	if($comment || $vote == "this is bad" || $subscribe) {
+		subscribe($fileid);
+	}
+
 	// prevent empty comments from being inserted
 	if(!($comment || $vote || $offensive || $repost)) {
-		trigger_error("nothing to do", E_USER_NOTICE);
 		return false;
 	}
 
@@ -206,11 +210,6 @@ function postComment($fileid, $vote, $repost, $offensive, $comment, $subscribe=n
 		updateSubscriptions($fileid, $commentid);
 		// mark your own as read
 		clearSubscription($fileid, me()->id());
-	}
-
-	// sometimes, subscribe the commenter.
-	if($comment || $vote == "this is bad" || $subscribe) {
-		subscribe($fileid);
 	}
 
 	return $commentid;
