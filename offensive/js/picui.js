@@ -25,9 +25,6 @@ $(document).ready(function() {
 		$("#instructions").toggle();
 	});
 
-	// quick comment
-	handle_quickcomment();
-	
 	// image dimensions
 	image_dimensions(theimage(), function(width, height) {
 	  $("span#dimensions").append(", "+width+"x"+height+' <span id="scaled"></span>');

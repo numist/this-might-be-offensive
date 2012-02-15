@@ -46,3 +46,74 @@ body {
 audio {
 	width: 500px;
 }
+
+/* comments */
+#qc_commentrows {
+  margin-top: 10px;
+  overflow: auto;
+}
+
+a,
+#pic a.userLink
+{
+	text-decoration:underline;
+	color:#000099;
+}
+
+a:visited,
+#pic a.userLink {
+	color:#333366;
+}
+
+a.userLink {
+	color:#666699;
+}
+
+.bluebox,.entry {
+	background: #ccccff;
+	padding: 10px;
+	font-family: verdana;
+	font-size: 10px;
+}
+
+.entry {
+	padding: 10px;
+	font-size: 11px;
+	line-height:21px;
+}
+
+.blocked, a.blocked {
+	color:#9999cc;
+}
+
+.squelched, a.squelched {
+	color:#9999cc;
+	font-size:10px;
+}
+
+.entry .squelched {
+	text-align:center;
+}
+
+.timestamp, .votecount {
+	color:#9999cc;
+}
+
+.timestamp {
+	font-size:10px;
+	padding-left:8px;
+	float:right;
+}
+
+.timestamp a {
+	color:#9999cc;
+	text-decoration:none;
+}
+
+#qc_form {
+  text-align: center;
+}
+
+textarea#qc_comment {
+  width: 95%;
+}

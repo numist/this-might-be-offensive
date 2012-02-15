@@ -21,7 +21,6 @@ $key_options = array(
 	// key_tiar
 	// key_pickup
 	"key_quick" => "quick reply",
-	"key_escape" => "close dialog",
 	"key_random" => "random image",
 	"key_image_toggle" => "resize image"
 	);
@@ -52,8 +51,6 @@ $key_defaults = array(
 	                   170 | KEY_META_AWARE), // Wii -
 	
 	"key_quick" => array(81 | KEY_META_AWARE), // q
-	
-	"key_escape" => array(27 | KEY_META_AWARE), // Esc
 	
 	"key_random" => array(191 | KEY_META_AWARE | KEY_SHIFT) // ?
 );

@@ -77,6 +77,7 @@
 		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 		<META NAME="ROBOTS" CONTENT="NOARCHIVE" />
 		<title>[<?= $upload->type() ?>] : <?= $upload->filename() ?> </title>
+		<link rel="stylesheet" type="text/css" href="/styles/jquery-ui-1.8.17.custom.css"/>
 		<link rel="stylesheet" type="text/css" href="/styles/pic.css?v=0.0.2"/>
 		<!-- <? if($upload->next_filtered()) { ?>
 			<link rel="prefetch" href="<?= $_SERVER['PHP_SELF'] ?>?id=<?= $upload->next_filtered()->id() ?>"/>
@@ -84,6 +85,7 @@
 
 		<script type="text/javascript" src="/offensive/js/tmbolib.js?v=0.0.4"></script>
 		<script type="text/javascript" src="/offensive/js/jquery-1.7.1.min.js"></script>
+		<script type="text/javascript" src="/offensive/js/jquery-ui-1.8.17.custom.min.js"></script>
 		<script type="text/javascript" src="/offensive/js/jquery.ba-outside-events.min.js"></script>
 		<script type="text/javascript" src="/offensive/js/subscriptions.js"></script>
 		<script type="text/javascript">
@@ -127,6 +129,7 @@
       	function key_index()    { nav_to_id("index"); };
         function key_good() { do_vote($("#good")); };
       	function key_bad()  { do_vote($("#bad")); };
+      	function key_quick() { $("#dialog").dialog("open"); };
       	function key_subscribe() { handle_subscribe($('.subscribe_toggle:visible'),e,$("#good").attr("name")); };
         function key_random() { document.location.href = "<?= Link::upload($upload) ?>&random"; };
         function key_image_toggle() { theimage().irsz("toggle"); };
@@ -176,11 +179,40 @@
 				x.src=im;
 			}
 			
-			$(document).ready(function(){theimage().irsz({
-				min_height: 40, min_width: 40,
-				padding: [16, 114],
-				cursor_zoom_in: "url(/offensive/graphics/zoom_in.cur),default", cursor_zoom_out: "url(/offensive/graphics/zoom_out.cur),default"
-		 });});
+			$(document).ready(function(){
+				// set up the resizer
+				if(theimage().length) {
+					theimage().irsz({
+						min_height: 40, min_width: 40,
+						padding: [16, 114],
+						cursor_zoom_in: "url(/offensive/graphics/zoom_in.cur),default", cursor_zoom_out: "url(/offensive/graphics/zoom_out.cur),default"
+		 			});
+				}
+				
+				// set up the quick comment box
+				var height = ($("#dialog").height() > $(window).height() ? $(window).height() : $("#dialog").height()) - 150;
+				$("#dialog").dialog({
+					autoOpen: false,
+					title: "let's hear it",
+					width: "500px",
+					height: height,
+					open: function(event, ui) {
+						// fit comments to window
+						// better idea: get top of qc_commentrows and bottom of dialog, minus padding (10)
+						$("#qc_commentrows").height($("#dialog").height() - ($("form#qc_form").height() + 47))
+						// if we bind right away, the clickoutside event will fire immediately, cancelling the open
+						window.setTimeout(function() {
+							$("#dialog").bind("clickoutside", function(){ $("#dialog").dialog("close"); });
+						}, 100);
+					},
+					close: function(event, ui) {
+						$("#dialog").unbind("clickoutside");
+					}
+				});
+				// would bind to #dialog.resize, but due to a jQuery-ui bug it doesn't fire a resize event when its container resizes.
+				$(".ui-dialog").resize(function() { $("#qc_commentrows").height($("#dialog").height() - ($("form#qc_form").height() + 47)) });
+				$("#quickcomment").bind("click", function(e){ $("#dialog").dialog("open"); e.preventDefault(); });
+			});
 
 		</script>
 		<script type="text/javascript" src="/offensive/js/irsz.js?v=0.0.13"></script>
@@ -203,6 +235,61 @@
 				( change 'em in your <a href="<?= Link::content("settings") ?>">settings</a>. )
 			</div>
 		<? } ?>
+		
+		<!-- quick comment box -->
+		<div id="dialog">
+			<a name="form"></a>
+			<form id="qc_form">
+				<p>
+					<input type="hidden" value="329310" name="fileid" id="qc_fileid">
+					<input type="hidden" name="c" value="comments">
+					<textarea cols="64" rows="6" name="comment" id="qc_comment"></textarea>
+				</p>
+
+							<div id="qc_vote" style="text-align:left;margin-left:14%">
+						<table><tbody><tr><td width="200px">
+						<input class="qc_tigtib" id="qc_novote" type="radio" value="novote" name="vote" checked="">
+						<br>
+
+						<input class="qc_tigtib" type="radio" name="vote" value="this is good" id="qc_tig">
+						<label for="qc_tig">[ this is good ]</label><br>
+
+						<input class="qc_tigtib" type="radio" name="vote" value="this is bad" id="qc_tib">
+						<label for="qc_tib">[ this is bad ]</label><br>
+						</td>
+						<td>
+						<input type="checkbox" name="offensive" value="omg" id="tmbo">
+						<label for="tmbo">[ this might be offensive ]</label><br>
+
+						<input type="checkbox" name="repost" value="police" id="repost">
+						<label for="repost">[ this is a repost ]</label><br>
+						<input type="checkbox" name="subscribe" value="subscribe" id="subscribe">
+						<label for="subscribe">[ subscribe ]</label><br>
+						</td></tr></tbody></table>
+
+					</div>
+						<div id="qc_go" style="text-align: center">
+					<p>
+						<input type="submit" name="submit" value="go">
+					</p>
+				</div>
+			</form>
+			<div id="comments">
+			  <b>the dorks who came before you said: </b>
+			  <div id="qc_commentrows">
+					<?
+					$commentnum = 0;
+					$numgood = 0;
+					$numbad = 0;
+					foreach($upload->getComments() as $comment) {
+						if(strlen($comment->text()) == 0) continue;
+						$css = $style = $commentnum++ % 2 ? "background:#bbbbee;" : "background:#ccccff";;
+						require("offensive/templates/comment.inc");
+					}
+					?>
+			  </div>
+			</div>
+		</div>
 
 		<div id="content">
 			<div id="heading" style="white-space:nowrap;">
@@ -252,7 +339,7 @@
 					if($upload->tmbos() > 0) { ?>
 						<span style=\"color:#990000\">x<?= $upload->tmbos() ?></span>
 					<? } ?>)
-					<span id="quicklink">&nbsp;(<a id="quickcomment" class="jqModal" href="#">quick</a>)</span>
+					<span id="quicklink">&nbsp;(<a id="quickcomment" href="#">quick</a>)</span>
 				</span>
 
 				<!--

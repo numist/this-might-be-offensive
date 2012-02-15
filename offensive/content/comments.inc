@@ -7,12 +7,6 @@
 	require_once("offensive/assets/comments.inc");
 	require_once("offensive/assets/classes.inc");
 
-	function additionalCssFor($vote) {
-		if(strpos($vote, 'bad') > 0) return " bad";
-		if(strpos($vote, 'good') > 0) return " good";
-		return "";
-	}
-
 	function title() {
 		global $upload;
 		return "[discuss] : " . $upload->filename();
@@ -171,7 +165,6 @@
 			echo "<b>$comments_heading</b>";
         }
 
-		global $warudo;
 		$numgood = 0;
 		$numbad = 0;
 		foreach($upload->getComments() as $comment) {
