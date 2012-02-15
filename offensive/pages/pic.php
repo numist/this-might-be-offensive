@@ -225,19 +225,22 @@
 						$(this).unbind("clickoutside");
 					},
 					dragStart: function(event, ui) {
-					  $(this).parent(".ui-dialog").fadeTo("fast", 0.7);
+					  $(this).dialog("widget").fadeTo("fast", 0.7);
 					},
 					dragStop: function(event, ui) {
-					  $(this).parent(".ui-dialog").fadeTo("fast", 1);
+						var self = $(this), widget = self.dialog("widget");
+					  self.dialog("widget").fadeTo("fast", 1);
+						// remember the location of the box so it doesn't move itself next time it's opened
+						self.dialog("option", "position", [widget.offset().left, widget.offset().top])
 					},
 					resizeStart: function(event, ui) {
-					  $(this).parent(".ui-dialog").fadeTo("fast", 0.7);
+					  $(this).dialog("widget").fadeTo("fast", 0.7);
 					},
 					resize: function(event, ui) {
 						qc_fit(this);
 					},
 					resizeStop: function(event, ui) {
-					  $(this).parent(".ui-dialog").fadeTo("fast", 1);
+					  $(this).dialog("widget").fadeTo("fast", 1);
 					}
 				});
 				// quick link
