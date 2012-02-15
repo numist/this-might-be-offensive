@@ -220,8 +220,14 @@
 					dragStop: function(event, ui) {
 					  $(this).parent(".ui-dialog").fadeTo("fast", 1);
 					},
+					resizeStart: function(event, ui) {
+					  $(this).parent(".ui-dialog").fadeTo("fast", 0.7);
+					},
 					resize: function(event, ui) {
 						qc_fit();
+					},
+					resizeStop: function(event, ui) {
+					  $(this).parent(".ui-dialog").fadeTo("fast", 1);
 					}
 				});
 				// quick link
