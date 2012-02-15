@@ -14,7 +14,7 @@ if (typeof String.prototype.startsWith != 'function') {
 }
 
 if (typeof String.prototype.endsWith != 'function') {
-  String.prototype.endsWith = function (str){
+  String.prototype.endsWith = function (str) {
     if(this.length < str.length) {
       // if this.length - str.length == -1, this could cause a false positive
       return false;
@@ -23,6 +23,17 @@ if (typeof String.prototype.endsWith != 'function') {
     return this.lastIndexOf(str) == this.length - str.length;
   }
 }
+
+if (typeof String.prototype.parseInt != 'function') {
+  String.prototype.parseInt = function () {
+    return parseInt(this);
+  }
+}
+
+jQuery.fn.hasAttr = function(name) {  
+  // fucking browsers.
+  return this.attr(name) !== undefined && this.attr(name) !== false;
+};
 
 function getURLParam(param) {
   var href = window.location.href;

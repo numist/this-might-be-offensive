@@ -115,5 +115,15 @@ a.userLink {
 }
 
 textarea#qc_comment {
-  width: 95%;
+  margin-bottom: 1em;
+}
+
+input[name="submit"] {
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+#qc_dialog {
+  padding-top: 10px;
+  padding-bottom: 10px;
 }

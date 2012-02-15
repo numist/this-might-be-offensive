@@ -83,8 +83,8 @@
 			<link rel="prefetch" href="<?= $_SERVER['PHP_SELF'] ?>?id=<?= $upload->next_filtered()->id() ?>"/>
 		<? } ?> -->
 
-		<script type="text/javascript" src="/offensive/js/tmbolib.js?v=0.0.4"></script>
 		<script type="text/javascript" src="/offensive/js/jquery-1.7.1.min.js"></script>
+		<script type="text/javascript" src="/offensive/js/tmbolib.js?v=0.0.5"></script>
 		<script type="text/javascript" src="/offensive/js/jquery-ui-1.8.17.custom.min.js"></script>
 		<script type="text/javascript" src="/offensive/js/jquery.ba-outside-events.min.js"></script>
 		<script type="text/javascript" src="/offensive/js/subscriptions.js"></script>
@@ -189,30 +189,34 @@
 		 			});
 				}
 				
-				function qc_fit() {
+				function qc_fit(dialog) {
+					dialog = $(dialog);
+					
+					// since we're resizing elements in JS anyway, make the textarea fit correctly
+					var textarea = dialog.find("textarea#qc_comment");
+					textarea.width(dialog.width() - (textarea.css("padding-left").parseInt() + textarea.css("padding-right").parseInt()));
+					
 					// commentrows height = bottom of dialog(top of dialog + height of dialog) - top of comments
-					$("#qc_commentrows").height($("#qc_dialog").offset().top + $("#qc_dialog").height() - $("#qc_commentrows").offset().top);
+					var commentRows = dialog.find("#qc_commentrows");
+					if(commentRows.children().length > 0) {
+						commentRows.height(dialog.offset().top + dialog.height() - commentRows.offset().top);
+					}
 				}
 				
 				// set up the quick comment box
-				var qcInitialHeight = $("#qc_dialog").height() > $(window).height() - 150
-				                      ? $(window).height() - 150
-				                      : $("#qc_dialog").height();
 				$("#qc_dialog").dialog({
 					autoOpen: false,
 					title: "let's hear it",
 					width: "500px",
-					height: qcInitialHeight,
 					open: function(event, ui) {
 						var self = this;
 						// disable normal keybindings
 						// fit comments to dialog
-						qc_fit();
+						qc_fit(self);
 						// if we bind right away, the clickoutside event will fire immediately, cancelling the open
 						window.setTimeout(function(){$(self).bind("clickoutside", function(){$(self).dialog("close");});},0);
 						// get comments
-							// set comment header "dorks before you" if applicable
-							// set header "let's hear it" vs "first on the scene"
+							// add comments to qc_commentrows
 							// fit comments to dialog
 					},
 					close: function(event, ui) {
@@ -230,7 +234,7 @@
 					  $(this).parent(".ui-dialog").fadeTo("fast", 0.7);
 					},
 					resize: function(event, ui) {
-						qc_fit();
+						qc_fit(this);
 					},
 					resizeStop: function(event, ui) {
 					  $(this).parent(".ui-dialog").fadeTo("fast", 1);
@@ -266,11 +270,9 @@
 		<div id="qc_dialog">
 			<a name="form"></a>
 			<form id="qc_form">
-				<p>
 					<input type="hidden" value="329310" name="fileid" id="qc_fileid">
 					<input type="hidden" name="c" value="comments">
 					<textarea cols="64" rows="6" name="comment" id="qc_comment"></textarea>
-				</p>
 
 							<div id="qc_vote" style="text-align:left;margin-left:14%">
 						<table><tbody><tr><td width="200px">
@@ -294,25 +296,13 @@
 						</td></tr></tbody></table>
 
 					</div>
-						<div id="qc_go" style="text-align: center">
-					<p>
+					<div id="qc_go" style="text-align: center">
 						<input type="submit" name="submit" value="go">
-					</p>
-				</div>
+					</div>
 			</form>
-			<div id="qc_comments">
-			  <b>the dorks who came before you said: </b>
+			<div id="qc_comments" loading>
 			  <div id="qc_commentrows">
-					<?
-					$commentnum = 0;
-					$numgood = 0;
-					$numbad = 0;
-					foreach($upload->getComments() as $comment) {
-						if(strlen($comment->text()) == 0) continue;
-						$css = $style = $commentnum++ % 2 ? "background:#bbbbee;" : "background:#ccccff";;
-						require("offensive/templates/comment.inc");
-					}
-					?>
+					loading…
 			  </div>
 			</div>
 		</div>

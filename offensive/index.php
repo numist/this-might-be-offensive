@@ -134,7 +134,7 @@ $timelimit = 10;
 	}
 </script>
 <script type="text/javascript" src="/offensive/js/jquery-1.7.1.min.js"></script>
-<script type="text/javascript" src="/offensive/js/tmbolib.js?v=0.0.4"></script>
+<script type="text/javascript" src="/offensive/js/tmbolib.js?v=0.0.5"></script>
 
 <?
 	if( function_exists( 'head' ) ) {
