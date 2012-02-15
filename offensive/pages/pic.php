@@ -189,6 +189,11 @@
 		 			});
 				}
 				
+				function qc_fit() {
+					// better idea: get top of qc_commentrows and bottom of dialog, minus padding (10)
+					$("#qc_commentrows").height($("#dialog").height() - ($("form#qc_form").height() + 47));
+				}
+				
 				// set up the quick comment box
 				var height = ($("#dialog").height() > $(window).height() ? $(window).height() : $("#dialog").height()) - 150;
 				$("#dialog").dialog({
@@ -197,26 +202,29 @@
 					width: "500px",
 					height: height,
 					open: function(event, ui) {
-						// fit comments to window
-						// better idea: get top of qc_commentrows and bottom of dialog, minus padding (10)
-						$("#qc_commentrows").height($("#dialog").height() - ($("form#qc_form").height() + 47))
+						var self = this;
+						// disable normal keybindings
+						// fit comments to dialog
+						qc_fit();
 						// if we bind right away, the clickoutside event will fire immediately, cancelling the open
-						window.setTimeout(function() {
-							$("#dialog").bind("clickoutside", function(){ $("#dialog").dialog("close"); });
-						}, 100);
+						window.setTimeout(function(){$(self).bind("clickoutside", function(){$(self).dialog("close");});},0);
 					},
 					close: function(event, ui) {
-						$("#dialog").unbind("clickoutside");
+						// re-enable normal keybindings
+						// clean up bindings
+						$(this).unbind("clickoutside");
+					},
+					dragStart: function(event, ui) {
+					  $(this).parent(".ui-dialog").fadeTo("fast", 0.7);
+					},
+					dragStop: function(event, ui) {
+					  $(this).parent(".ui-dialog").fadeTo("fast", 1);
+					},
+					resize: function(event, ui) {
+						qc_fit();
 					}
-				})
-				.bind("dialogdragstart", function(event, ui) {
-				  $(".ui-dialog").fadeTo("fast", 0.7);
-				})
-				.bind("dialogdragstop", function(event, ui) {
-				  $(".ui-dialog").fadeTo("fast", 1);
 				});
-				// would bind to #dialog.resize, but due to a jQuery-ui bug it doesn't fire a resize event when its container resizes.
-				$(".ui-dialog").resize(function() { $("#qc_commentrows").height($("#dialog").height() - ($("form#qc_form").height() + 47)) });
+				// quick link
 				$("#quickcomment").bind("click", function(e){ $("#dialog").dialog("open"); e.preventDefault(); });
 			});
 
