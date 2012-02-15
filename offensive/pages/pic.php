@@ -190,17 +190,19 @@
 				}
 				
 				function qc_fit() {
-					// better idea: get top of qc_commentrows and bottom of dialog, minus padding (10)
-					$("#qc_commentrows").height($("#dialog").height() - ($("form#qc_form").height() + 47));
+					// commentrows height = bottom of dialog(top of dialog + height of dialog) - top of comments
+					$("#qc_commentrows").height($("#dialog").offset().top + $("#dialog").height() - $("#qc_commentrows").offset().top);
 				}
 				
 				// set up the quick comment box
-				var height = ($("#dialog").height() > $(window).height() ? $(window).height() : $("#dialog").height()) - 150;
+				var qcInitialHeight = $("#dialog").height() > $(window).height() - 150
+				                      ? $(window).height() - 150
+				                      : $("#dialog").height();
 				$("#dialog").dialog({
 					autoOpen: false,
 					title: "let's hear it",
 					width: "500px",
-					height: height,
+					height: qcInitialHeight,
 					open: function(event, ui) {
 						var self = this;
 						// disable normal keybindings
