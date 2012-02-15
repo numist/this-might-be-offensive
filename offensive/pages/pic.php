@@ -129,7 +129,7 @@
       	function key_index()    { nav_to_id("index"); };
         function key_good() { do_vote($("#good")); };
       	function key_bad()  { do_vote($("#bad")); };
-      	function key_quick() { $("#dialog").dialog("open"); };
+      	function key_quick() { $("#qc_dialog").dialog("open"); };
       	function key_subscribe() { handle_subscribe($('.subscribe_toggle:visible'),e,$("#good").attr("name")); };
         function key_random() { document.location.href = "<?= Link::upload($upload) ?>&random"; };
         function key_image_toggle() { theimage().irsz("toggle"); };
@@ -191,14 +191,14 @@
 				
 				function qc_fit() {
 					// commentrows height = bottom of dialog(top of dialog + height of dialog) - top of comments
-					$("#qc_commentrows").height($("#dialog").offset().top + $("#dialog").height() - $("#qc_commentrows").offset().top);
+					$("#qc_commentrows").height($("#qc_dialog").offset().top + $("#qc_dialog").height() - $("#qc_commentrows").offset().top);
 				}
 				
 				// set up the quick comment box
-				var qcInitialHeight = $("#dialog").height() > $(window).height() - 150
+				var qcInitialHeight = $("#qc_dialog").height() > $(window).height() - 150
 				                      ? $(window).height() - 150
-				                      : $("#dialog").height();
-				$("#dialog").dialog({
+				                      : $("#qc_dialog").height();
+				$("#qc_dialog").dialog({
 					autoOpen: false,
 					title: "let's hear it",
 					width: "500px",
@@ -210,6 +210,10 @@
 						qc_fit();
 						// if we bind right away, the clickoutside event will fire immediately, cancelling the open
 						window.setTimeout(function(){$(self).bind("clickoutside", function(){$(self).dialog("close");});},0);
+						// get comments
+							// set comment header "dorks before you" if applicable
+							// set header "let's hear it" vs "first on the scene"
+							// fit comments to dialog
 					},
 					close: function(event, ui) {
 						// re-enable normal keybindings
@@ -233,7 +237,7 @@
 					}
 				});
 				// quick link
-				$("#quickcomment").bind("click", function(e){ $("#dialog").dialog("open"); e.preventDefault(); });
+				$("#quickcomment").bind("click", function(e){ $("#qc_dialog").dialog("open"); e.preventDefault(); });
 			});
 
 		</script>
@@ -259,7 +263,7 @@
 		<? } ?>
 		
 		<!-- quick comment box -->
-		<div id="dialog">
+		<div id="qc_dialog">
 			<a name="form"></a>
 			<form id="qc_form">
 				<p>
@@ -296,7 +300,7 @@
 					</p>
 				</div>
 			</form>
-			<div id="comments">
+			<div id="qc_comments">
 			  <b>the dorks who came before you said: </b>
 			  <div id="qc_commentrows">
 					<?
