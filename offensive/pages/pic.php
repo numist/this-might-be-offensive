@@ -208,6 +208,12 @@
 					close: function(event, ui) {
 						$("#dialog").unbind("clickoutside");
 					}
+				})
+				.bind("dialogdragstart", function(event, ui) {
+				  $(".ui-dialog").fadeTo("fast", 0.7);
+				})
+				.bind("dialogdragstop", function(event, ui) {
+				  $(".ui-dialog").fadeTo("fast", 1);
 				});
 				// would bind to #dialog.resize, but due to a jQuery-ui bug it doesn't fire a resize event when its container resizes.
 				$(".ui-dialog").resize(function() { $("#qc_commentrows").height($("#dialog").height() - ($("form#qc_form").height() + 47)) });
