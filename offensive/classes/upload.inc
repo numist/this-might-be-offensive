@@ -251,6 +251,9 @@ class Upload {
 	 * comment slinging code
 	 */
 	public function getComments() {
+		if(!$this->exists()) {
+			require("offensive/404.php");
+		}
 		if(!array_key_exists("thecomments", $this->data)) {
 			$this->data["thecomments"] = array();
 			
