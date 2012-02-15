@@ -214,7 +214,7 @@
 						// fit comments to dialog
 						qc_fit(self);
 						// if we bind right away, the clickoutside event will fire immediately, cancelling the open
-						window.setTimeout(function(){$(self).bind("clickoutside", function(){$(self).dialog("close");});},0);
+						window.setTimeout(function(){$(self).parent(".ui-dialog").bind("clickoutside", function(){$(self).dialog("close");});},0);
 						// get comments
 							// add comments to qc_commentrows
 							// fit comments to dialog
