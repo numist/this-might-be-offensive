@@ -63,7 +63,7 @@ function qc_dialog_init() {
 			var commentRows = dialog.find("#qc_commentrows");
 			if(commentRows.children().length > 0) {
 				commentRows.height(dialog.height() - (commentRows.position().top
-				                                     +(commentRows.outerHeight(true) - commentRows.height()));
+				                                     +(commentRows.outerHeight(true) - commentRows.height())));
 			}
 		}
 
