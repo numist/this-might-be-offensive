@@ -75,6 +75,7 @@ audio {
 	padding: 10px;
 	font-size: 11px;
 	line-height:21px;
+	word-wrap: break-word;
 }
 
 #qc_dialog .blocked, a.blocked {

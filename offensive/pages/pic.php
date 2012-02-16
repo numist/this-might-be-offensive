@@ -78,7 +78,7 @@
 		<META NAME="ROBOTS" CONTENT="NOARCHIVE" />
 		<title>[<?= $upload->type() ?>] : <?= $upload->filename() ?> </title>
 		<link rel="stylesheet" type="text/css" href="/styles/jquery-ui-1.8.17.custom.css"/>
-		<link rel="stylesheet" type="text/css" href="/styles/pic.css?v=0.0.4"/>
+		<link rel="stylesheet" type="text/css" href="/styles/pic.css?v=0.0.5"/>
 		<!-- <? if($upload->next_filtered()) { ?>
 			<link rel="prefetch" href="<?= $_SERVER['PHP_SELF'] ?>?id=<?= $upload->next_filtered()->id() ?>"/>
 		<? } ?> -->
@@ -170,6 +170,65 @@
 
 				return;
 			}
+<<<<<<< HEAD
+=======
+
+			// handle a keybased event. this code was incorporated from offensive.js, which has now been deprecated
+			function handle_qc_keypress(o,e)
+			{
+			  // potential actions
+			  function escape() {
+			    e.preventDefault();
+					$("#dialog").jqmHide();
+					return;
+			  }
+
+				var id;
+				if(e == null)  {
+					return true;
+				}
+
+				var keycode = composite_keycode(e);
+
+				<?
+				if(array_key_exists("key_escape", $prefs)) {
+				  foreach($prefs["key_escape"] as $code) {
+				    // TODO: remove key-agnosticism
+            if($code <= KEY_CODE_MASK) {
+              // code is modifier-agnostic ?>
+            if(<?= $code ?> == (keycode & <?= KEY_CODE_MASK ?>)) {
+            <? } else {
+              // code is modifier-strict ?>
+            if(<?= $code ?> == keycode) {
+            <? } ?>
+
+              escape();
+              return;
+            }
+				<?}
+			  }?>
+				return true;
+			}
+
+			/* image rollover stuff */
+			function changesrc(a,im)
+			{
+				x = eval("document."+a);
+				x.src=im;
+			}
+			
+			$(document).ready(function(){
+				theimage().height(theimage().attr("max-height"));
+				var ypad = theimage().offset().top + $(document).height() - (theimage().offset().top + theimage().outerHeight(true));
+				var xpad = $("div#content").outerWidth(true) - $("div#content").width();
+				theimage().irsz({
+					min_height: 40, min_width: 40,
+					padding: [xpad, ypad],
+					cursor_zoom_in: "url(/offensive/graphics/zoom_in.cur),default", cursor_zoom_out: "url(/offensive/graphics/zoom_out.cur),default"
+		 		});
+			});
+
+>>>>>>> develop
 		</script>
 		<script type="text/javascript" src="/offensive/js/irsz.js?v=0.0.14"></script>
 		<script type="text/javascript" src="/offensive/js/picui.js?v=0.0.14"></script>
