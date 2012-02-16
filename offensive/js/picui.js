@@ -85,12 +85,27 @@ var qc_dialog_init = function() {
 			handle_comment_post(comment, vote, tmbo, repost, subscribe);
 		});
 
+		$("#qc_commentrows").scroll(function(){
+			self = $(this);
+			if(self.scrollTop() > 0) {
+				self.attr("scrollTop", self.scrollTop());
+			} else {
+				self.removeAttr("scrollTop");
+			}
+		});
+
 		return {
 			autoOpen: false,
 			title: "please stand by",
 			width: "500px",
 			open: function(event, ui) {
 				var self = this;
+				var commentRows = $("#qc_commentrows");
+				// restore scroll state
+				if(commentRows.hasAttr("scrollTop")) {
+					commentRows.scrollTop(commentRows.attr("scrollTop"));
+				}
+				
 				// disable normal keybindings
 				$(document).unbind("keydown");
 				// fit contents to dialog
@@ -105,7 +120,6 @@ var qc_dialog_init = function() {
 						});
 					}, 0);
 
-				var commentRows = $("#qc_commentrows");
 				var comments = $("#qc_comments");
 				if(!comments.hasAttr("loading")) {
 					// get comments
@@ -130,6 +144,9 @@ var qc_dialog_init = function() {
           	
 							// remember how many comments we were displaying before
 							var thecount = commentRows.children().length;
+							var atBottom = $(self).height() > 0
+							            && commentRows.scrollTop() > 0
+							            && commentRows.scrollTop() == commentRows.get(0).scrollHeight - commentRows.height();
 							
 							// remove loading feedback
 							if(thecount == 0) {
@@ -145,16 +162,21 @@ var qc_dialog_init = function() {
 								}
 								commentRows.append(filteredData);
 								if(thecount == 0) {
-									// update headers
-									qc_headers(self);
+									// put some padding between the form and the comments
+									$("#qc_form").css("padding-bottom", "10px");
 								}
-								// put some padding between the form and the comments
-								$("#qc_form").css("padding-bottom", "10px");
+								// scroll down if user had already scrolled to bottom
+								if(atBottom) {
+									// don't scroll more than one window height
+									commentRows.scrollTop(Math.min(commentRows.scrollTop() + commentRows.height(),
+									                               commentRows.get(0).scrollHeight - commentRows.height()));
+								}
 	      		  } else if(commentRows.children().length == 0) {
-								qc_headers(self);
 								// there should never be a case where there were comments and then the API returns none, but plan for failure!
 								comments.hide();
 							}
+							// update headers
+							qc_headers(self);
        	  	},
        	  	complete: function(jqXHR, textStatus) {
 							// failed API query
