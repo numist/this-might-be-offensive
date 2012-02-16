@@ -22,7 +22,8 @@ $key_options = array(
 	// key_pickup
 	"key_quick" => "quick reply",
 	"key_escape" => "close dialog",
-	"key_random" => "random image"
+	"key_random" => "random image",
+	"key_image_toggle" => "resize image"
 	);
 
 // TODO: remove key-agnosticism

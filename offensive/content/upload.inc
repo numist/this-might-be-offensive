@@ -55,13 +55,12 @@
 					<form method="post"
 							action="<?php echo $_SERVER['PHP_SELF']?>"
 							enctype="multipart/form-data"
-							onsubmit="return validate()"
 					>
 
 							<table border="0" cellpadding="4" cellspacing="0" style="text-align:left;margin-left:auto;margin-right:auto">
 								<tr>
 									<td style="text-align:right"><label for="image">file:</label></td>
-									<td><input type="file" name="image" id="image" onchange="setFileName( this )"/></td>
+									<td><input type="file" name="image" id="image" /></td>
 								</tr>
 								<tr>
 									<td></td>

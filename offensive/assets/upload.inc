@@ -61,6 +61,19 @@ function numUploadsToday() {
 	return $row[ 'thecount' ];
 }
 
+function needCompression($filename) {
+	$filesize = filesize($filename);	
+	list($width, $height, $type, $attr) = getimagesize($filename);
+
+	$bytesPerPixel = 0.0;
+	$expectedFileSize = round(($width * $height * 0.2)/1024);
+	$bytesPerPixel = ( 1.0 * $filesize / (1.0 * $width * $height ) );
+	if($bytesPerPixel <= 0.75)
+		return false;	
+	
+	return true;
+}
+
 function numAllowedUploads() {
 	if(!me()) return 0;
 
@@ -296,148 +309,149 @@ function upload_type(&$postdata) {
 
 		// AC-3   - audio      - Dolby AC-3 / Dolby Digital
 		'ac3'  => array(
-					'pattern'   => '^\x0B\x77',
-					'group'     => 'audio-forbidden',
+					'pattern'    => '^\x0B\x77',
+					'group'      => 'audio-forbidden',
 				  ),
 
 		// AAC  - audio       - Advanced Audio Coding (AAC) - ADIF format
 		'adif' => array(
-					'pattern'   => '^ADIF',
-					'group'     => 'audio-forbidden',
+					'pattern'    => '^ADIF',
+					'group'      => 'audio-forbidden',
 				  ),
 
 
 		// AAC  - audio       - Advanced Audio Coding (AAC) - ADTS format (very similar to MP3)
 		'adts' => array(
-					'pattern'   => '^\xFF[\xF0-\xF1\xF8-\xF9]',
-					'group'     => 'audio-forbidden',
+					'pattern'    => '^\xFF[\xF0-\xF1\xF8-\xF9]',
+					'group'      => 'audio-forbidden',
 				  ),
 
 
 		// AU   - audio       - NeXT/Sun AUdio (AU)
 		'au'   => array(
-					'pattern'   => '^\.snd',
-					'group'     => 'audio-forbidden',
+					'pattern'    => '^\.snd',
+					'group'      => 'audio-forbidden',
 				  ),
 
 		// AVR  - audio       - Audio Visual Research
 		'avr'  => array(
-					'pattern'   => '^2BIT',
-					'group'     => 'audio-forbidden',
+					'pattern'    => '^2BIT',
+					'group'      => 'audio-forbidden',
 				  ),
 
 		// BONK - audio       - Bonk v0.9+
 		'bonk' => array(
-					'pattern'   => '^\x00(BONK|INFO|META| ID3)',
-					'group'     => 'audio-forbidden',
+					'pattern'    => '^\x00(BONK|INFO|META| ID3)',
+					'group'      => 'audio-forbidden',
 				  ),
 
 		// FLAC - audio       - Free Lossless Audio Codec
 		'flac' => array(
-					'pattern'   => '^fLaC',
-					'group'     => 'audio-forbidden',
+					'pattern'    => '^fLaC',
+					'group'      => 'audio-forbidden',
 				  ),
 
 		// LA   - audio       - Lossless Audio (LA)
 		'la'   => array(
-					'pattern'   => '^LA0[2-4]',
-					'group'     => 'audio-forbidden',
+					'pattern'    => '^LA0[2-4]',
+					'group'      => 'audio-forbidden',
 				  ),
 
 		// LPAC - audio       - Lossless Predictive Audio Compression (LPAC)
 		'lpac' => array(
-					'pattern'   => '^LPAC',
-					'group'     => 'audio-forbidden',
+					'pattern'    => '^LPAC',
+					'group'      => 'audio-forbidden',
 				  ),
 
 		// MIDI - audio       - MIDI (Musical Instrument Digital Interface)
 		'midi' => array(
-					'pattern'   => '^MThd',
-					'group'     => 'audio-forbidden',
+					'pattern'    => '^MThd',
+					'group'      => 'audio-forbidden',
 				  ),
 
 		// MAC  - audio       - Monkey's Audio Compressor
 		'mac'  => array(
-					'pattern'   => '^MAC ',
-					'group'     => 'audio-forbidden',
+					'pattern'    => '^MAC ',
+					'group'      => 'audio-forbidden',
 				  ),
 
 		// MOD  - audio       - MODule (assorted sub-formats)
 		'mod'  => array(
-					'pattern'   => '^.{1080}(M.K.|[5-9]CHN|[1-3][0-9]CH)',
-					'group'     => 'audio-forbidden',
+					'pattern'    => '^.{1080}(M.K.|[5-9]CHN|[1-3][0-9]CH)',
+					'group'      => 'audio-forbidden',
 				  ),
 
 		// MOD  - audio       - MODule (Impulse Tracker)
 		'it'   => array(
-					'pattern'   => '^IMPM',
-					'group'     => 'audio-forbidden',
+					'pattern'    => '^IMPM',
+					'group'      => 'audio-forbidden',
 				  ),
 
 		// MOD  - audio       - MODule (eXtended Module, various sub-formats)
 		'xm'   => array(
-					'pattern'   => '^Extended Module',
-					'group'     => 'audio-forbidden',
+					'pattern'    => '^Extended Module',
+					'group'      => 'audio-forbidden',
 				  ),
 
 		// MOD  - audio       - MODule (ScreamTracker)
 		's3m'  => array(
-					'pattern'   => '^.{44}SCRM',
-					'group'     => 'audio-forbidden',
+					'pattern'    => '^.{44}SCRM',
+					'group'      => 'audio-forbidden',
 				  ),
 
 		// MPC  - audio       - Musepack / MPEGplus
 		'mpc'  => array(
-					'pattern'   => '^(MP\+|[\x00\x01\x10\x11\x40\x41\x50\x51\x80\x81\x90\x91\xC0\xC1\xD0\xD1][\x20-37][\x00\x20\x40\x60\x80\xA0\xC0\xE0])',
-					'group'     => 'audio-forbidden',
+					'pattern'    => '^(MP\+|[\x00\x01\x10\x11\x40\x41\x50\x51\x80\x81\x90\x91\xC0\xC1\xD0\xD1][\x20-37][\x00\x20\x40\x60\x80\xA0\xC0\xE0])',
+					'group'      => 'audio-forbidden',
 				  ),
 
 		// MP3  - audio       - MPEG-audio Layer 3 (very similar to AAC-ADTS)
 		'mp3'  => array(
-					'pattern'   => '^\xFF[\xE2-\xE7\xF2-\xF7\xFA-\xFF][\x00-\xEB]',
-					'group'     => 'audio',
+					'pattern'    => '^\xFF[\xE2-\xE7\xF2-\xF7\xFA-\xFF][\x00-\xEB]',
+					'group'      => 'audio',
+					'extensions' => array('.mp3', ),
 				  ),
 
 		// OFR  - audio       - OptimFROG
 		'ofr'  => array(
-					'pattern'   => '^(\*RIFF|OFR)',
-					'group'     => 'audio-forbidden',
+					'pattern'    => '^(\*RIFF|OFR)',
+					'group'      => 'audio-forbidden',
 				  ),
 
 		// RKAU - audio       - RKive AUdio compressor
 		'rkau' => array(
-					'pattern'   => '^RKA',
-					'group'     => 'audio-forbidden',
+					'pattern'    => '^RKA',
+					'group'      => 'audio-forbidden',
 				  ),
 
 		// SHN  - audio       - Shorten
 		'shn'  => array(
-					'pattern'   => '^ajkg',
-					'group'     => 'audio-forbidden',
+					'pattern'    => '^ajkg',
+					'group'      => 'audio-forbidden',
 				  ),
 
 		// TTA  - audio       - TTA Lossless Audio Compressor (http://tta.corecodec.org)
 		'tta'  => array(
-					'pattern'   => '^TTA',  // could also be '^TTA(\x01|\x02|\x03|2|1)'
-					'group'     => 'audio-forbidden',
+					'pattern'    => '^TTA',  // could also be '^TTA(\x01|\x02|\x03|2|1)'
+					'group'      => 'audio-forbidden',
 				  ),
 
 		// VOC  - audio       - Creative Voice (VOC)
 		'voc'  => array(
-					'pattern'   => '^Creative Voice File',
-					'group'     => 'audio-forbidden',
+					'pattern'    => '^Creative Voice File',
+					'group'      => 'audio-forbidden',
 				  ),
 
 		// VQF  - audio       - transform-domain weighted interleave Vector Quantization Format (VQF)
 		'vqf'  => array(
-					'pattern'   => '^TWIN',
-					'group'     => 'audio-forbidden',
+					'pattern'    => '^TWIN',
+					'group'      => 'audio-forbidden',
 				  ),
 
 		// WV  - audio        - WavPack (v4.0+)
 		'wv'   => array(
-					'pattern'   => '^wvpk',
-					'group'     => 'audio-forbidden',
+					'pattern'    => '^wvpk',
+					'group'      => 'audio-forbidden',
 				  ),
 
 
@@ -445,62 +459,62 @@ function upload_type(&$postdata) {
 
 		// ASF  - audio/video - Advanced Streaming Format, Windows Media Video, Windows Media Audio
 		'asf'  => array(
-					'pattern'   => '^\x30\x26\xB2\x75\x8E\x66\xCF\x11\xA6\xD9\x00\xAA\x00\x62\xCE\x6C',
-					'group'     => 'audio-video-forbidden',
+					'pattern'    => '^\x30\x26\xB2\x75\x8E\x66\xCF\x11\xA6\xD9\x00\xAA\x00\x62\xCE\x6C',
+					'group'      => 'audio-video-forbidden',
 				  ),
 
 		// BINK  - audio/video - Bink / Smacker
 		'bink' => array(
-					'pattern'   => '^(BIK|SMK)',
-					'group'     => 'audio-video-forbidden',
+					'pattern'    => '^(BIK|SMK)',
+					'group'      => 'audio-video-forbidden',
 				  ),
 
 		// MKAV - audio/video - Mastroka
 		'matroska' => array(
-					'pattern'   => '^\x1A\x45\xDF\xA3',
-					'group'     => 'audio-video-forbidden',
+					'pattern'    => '^\x1A\x45\xDF\xA3',
+					'group'      => 'audio-video-forbidden',
 				  ),
 
 		// MPEG - audio/video - MPEG (Moving Pictures Experts Group)
 		'mpeg' => array(
-					'pattern'   => '^\x00\x00\x01(\xBA|\xB3)',
-					'group'     => 'audio-video-forbidden',
+					'pattern'    => '^\x00\x00\x01(\xBA|\xB3)',
+					'group'      => 'audio-video-forbidden',
 				  ),
 
 		// NSV  - audio/video - Nullsoft Streaming Video (NSV)
 		'nsv'  => array(
-					'pattern'   => '^NSV[sf]',
-					'group'     => 'audio-video-forbidden',
+					'pattern'    => '^NSV[sf]',
+					'group'      => 'audio-video-forbidden',
 				  ),
 
 		// Ogg  - audio/video - Ogg (Ogg-Vorbis, Ogg-FLAC, Speex, Ogg-Theora(*), Ogg-Tarkin(*))
 		'ogg'  => array(
-					'pattern'   => '^OggS',
-					'group'     => 'audio-forbidden',
+					'pattern'    => '^OggS',
+					'group'      => 'audio-forbidden',
 				  ),
 
 		// QT   - audio/video - Quicktime
 		'quicktime' => array(
-					'pattern'   => '^.{4}(cmov|free|ftyp|mdat|moov|pnot|skip|wide)',
-					'group'     => 'audio-video-forbidden',
+					'pattern'    => '^.{4}(cmov|free|ftyp|mdat|moov|pnot|skip|wide)',
+					'group'      => 'audio-video-forbidden',
 				  ),
 
 		// RIFF - audio/video - Resource Interchange File Format (RIFF) / WAV / AVI / CD-audio / SDSS = renamed variant used by SmartSound QuickTracks (www.smartsound.com) / FORM = Audio Interchange File Format (AIFF)
 		'riff' => array(
-					'pattern'   => '^(RIFF|SDSS|FORM)',
-					'group'     => 'audio-video-forbidden',
+					'pattern'    => '^(RIFF|SDSS|FORM)',
+					'group'      => 'audio-video-forbidden',
 				  ),
 
 		// Real - audio/video - RealAudio, RealVideo
 		'real' => array(
-					'pattern'   => '^(\.RMF|.ra)',
-					'group'     => 'audio-video-forbidden',
+					'pattern'    => '^(\.RMF|.ra)',
+					'group'      => 'audio-video-forbidden',
 				  ),
 
 		// SWF - audio/video - ShockWave Flash
 		'swf' => array(
-					'pattern'   => '^(F|C)WS',
-					'group'     => 'audio-video-forbidden',
+					'pattern'    => '^(F|C)WS',
+					'group'      => 'audio-video-forbidden',
 				  ),
 
 
@@ -508,40 +522,45 @@ function upload_type(&$postdata) {
 
 		// BMP  - still image - Bitmap (Windows, OS/2; uncompressed, RLE8, RLE4)
 		'bmp'  => array(
-					'pattern'   => '^BM',
-					'group'     => 'image-forbidden',
+					'pattern'    => '^BM',
+					'group'      => 'image-forbidden',
+					'extensions' => array('.bmp', '.dib', ),
 				  ),
 
 		// GIF  - still image - Graphics Interchange Format
 		'gif'  => array(
-					'pattern'   => '^GIF',
-					'group'     => 'image',
+					'pattern'    => '^GIF',
+					'group'      => 'image',
+					'extensions' => array('.gif', ),
 				  ),
 
 		// JPEG - still image - Joint Photographic Experts Group (JPEG)
 		'jpg'  => array(
-					'pattern'   => '^\xFF\xD8\xFF',
-					'group'     => 'image',
+					'pattern'    => '^\xFF\xD8\xFF',
+					'group'      => 'image',
+					'extensions' => array('.jpeg', '.jpg', '.jpe', '.jfif', '.jif', ),
 				  ),
 
 		// PCD  - still image - Kodak Photo CD
 		'pcd'  => array(
-					'pattern'   => '^.{2048}PCD_IPI\x00',
-					'group'     => 'image-forbidden',
+					'pattern'    => '^.{2048}PCD_IPI\x00',
+					'group'      => 'image-forbidden',
 				  ),
 
 
 		// PNG  - still image - Portable Network Graphics (PNG)
 		'png'  => array(
-					'pattern'   => '^\x89\x50\x4E\x47\x0D\x0A\x1A\x0A',
-					'group'     => 'image',
+					'pattern'    => '^\x89\x50\x4E\x47\x0D\x0A\x1A\x0A',
+					'group'      => 'image',
+					'extensions' => array('.png', ), 
 				  ),
 
 
 		// TIFF  - still image - Tagged Information File Format (TIFF)
 		'tiff' => array(
-					'pattern'   => '^(II\x2A\x00|MM\x00\x2A)',
-					'group'     => 'image-forbidden',
+					'pattern'    => '^(II\x2A\x00|MM\x00\x2A)',
+					'group'      => 'image-forbidden',
+					'extensions' => array('.tif', '.tiff', ),
 				  ),
 
 
@@ -549,38 +568,38 @@ function upload_type(&$postdata) {
 
 		// ISO  - data        - International Standards Organization (ISO) CD-ROM Image
 		'iso'  => array(
-					'pattern'   => '^.{32769}CD001',
-					'group'     => 'misc-forbidden',
+					'pattern'    => '^.{32769}CD001',
+					'group'      => 'misc-forbidden',
 				  ),
 
 		// RAR  - data        - RAR compressed data
 		'rar'  => array(
-					'pattern'   => '^Rar\!',
-					'group'     => 'archive-forbidden',
+					'pattern'    => '^Rar\!',
+					'group'      => 'archive-forbidden',
 				  ),
 
 		// SZIP - audio       - SZIP compressed data
 		'szip' => array(
-					'pattern'   => '^SZ\x0A\x04',
-					'group'     => 'archive-forbidden',
+					'pattern'    => '^SZ\x0A\x04',
+					'group'      => 'archive-forbidden',
 				  ),
 
 		// TAR  - data        - TAR compressed data
 		'tar'  => array(
-					'pattern'   => '^.{100}[0-9\x20]{7}\x00[0-9\x20]{7}\x00[0-9\x20]{7}\x00[0-9\x20\x00]{12}[0-9\x20\x00]{12}',
-					'group'     => 'archive-forbidden',
+					'pattern'    => '^.{100}[0-9\x20]{7}\x00[0-9\x20]{7}\x00[0-9\x20]{7}\x00[0-9\x20\x00]{12}[0-9\x20\x00]{12}',
+					'group'      => 'archive-forbidden',
 				  ),
 
 		// GZIP  - data        - GZIP compressed data
 		'gz'  => array(
-					'pattern'   => '^\x1F\x8B\x08',
-					'group'     => 'archive-forbidden',
+					'pattern'    => '^\x1F\x8B\x08',
+					'group'      => 'archive-forbidden',
 				  ),
 
 		// ZIP  - data        - ZIP compressed data
 		'zip'  => array(
-					'pattern'   => '^PK\x03\x04',
-					'group'     => 'archive-forbidden',
+					'pattern'    => '^PK\x03\x04',
+					'group'      => 'archive-forbidden',
 				  )
 	);
 
@@ -611,6 +630,25 @@ function upload_type(&$postdata) {
 		// The /s switch on preg_match() forces preg_match() NOT to treat
 		// newline (0x0A) characters as special chars but do a binary match
 		if (preg_match('/'.$info['pattern'].'/s', $filedata)) {
+			// do we enforce extensions for this file format?
+			if(array_key_exists('extensions', $info)) {
+				$current_extension = strpos($postdata['filename'], ".") !== false
+				                     ? substr(strtolower($postdata['filename']), strrpos($postdata['filename'], "."))
+				                     : "";
+				if($current_extension == "") {
+					$postdata['filename'] = $postdata['filename'].".".$format_name;
+					$postdata['file_extension'] = ".".$format_name;
+				} else if(!in_array($current_extension, $info['extensions'])) {
+					if(in_array($current_extension, array(".jpg", ".jpeg", ".jpe", ".jfif", ".jif", ".gif", ".png", ".tiff", ".tif", ".bmp", ".dib"))) {
+						// replace the extension if the upload already has an image extension
+						$postdata['filename'] = substr($postdata['filename'], 0, strrpos($postdata['filename'], ".")).".".$format_name;
+					} else {
+						// append otherwise
+						$postdata['filename'] = $postdata['filename'].".".$format_name;
+					}
+					$postdata['file_extension'] = ".".$format_name;
+				}
+			}
 			$postdata["format_name"] = $format_name;
 			if($info['group'] == "image" && (array_key_exists('avatar', $_POST) ||
 			                                 array_key_exists('avatar', $postdata))) {
@@ -640,8 +678,13 @@ function upload_type(&$postdata) {
 function upload_image($postdata) {
 	if(upload_largerthan($postdata, 4*1024*1024)) return false;
 	if(upload_checkrotation($postdata)) return false;
-	if(upload_checkisk($postdata)) return false;
-	if(upload_checkrepost($postdata)) return false;			// keep as fallback
+	$lowercase_filename = strtolower($postdata['filename']);
+	if(!strstr($lowercase_filename, "[repost]") &&
+	   !strstr($lowercase_filename, "[tiar]") &&
+	   !strstr($lowercase_filename, "[irlard]")) {
+		if(upload_checkisk($postdata)) return false;
+		if(upload_checkrepost($postdata)) return false;			// keep as fallback
+	}
 	if(upload_checkdims($postdata)) return false;
 	if(upload_checksize($postdata)) return false;
 	return upload_insert_file($postdata);
@@ -681,17 +724,25 @@ function upload_checkdims(&$postdata) {
 
 	if (array_key_exists("resize", $postdata)) {		
 		$image = new Imagick("$tmpdir/{$postdata['tmpname']}");
-		
+
 		// XXX maybe use a specific filter. Gotta play with it for best results.
-		$image->resizeImage(1024,1024, imagick::FILTER_UNDEFINED, 1, true);
-		
+		$image->resizeImage(1024, 1024, imagick::FILTER_UNDEFINED, 1, true);
+				
 		if(!$image->writeImage("$tmpdir/{$postdata['tmpname']}")) {  
 			trigger_error("ImageMagick/writeImage failed", E_USER_ERROR);
 		}
+		
+		if(needCompression("$tmpdir/{$postdata['tmpname']}")) {
+			$postdata['resample'] = true;
+		} else {
+			$postdata['noresample'] = true;
+		}
+		
 		$image->destroy();
 
 		$postdata['noresize'] = $postdata['resize'];
 		unset($postdata['resize']);
+		
 		return false;
 	}
 
@@ -766,19 +817,10 @@ function upload_checksize(&$postdata) {
 		return false;
 	}
 
-	// this stuff is for extra large (uncompressed) images.  not sure if we care as much.
-	$filesize = filesize($tmpdir."/".$postdata['tmpname']);
-
-	list($width, $height, $type, $attr) = getimagesize($tmpdir."/".$postdata['tmpname']);
-
-	$bytesPerPixel = 0.0;
-	$expectedFileSize = round(($width * $height * 0.2)/1024);
-	$bytesPerPixel = ( 1.0 * $filesize / (1.0 * $width * $height ) );
-	$filesize = round($filesize/1024);
-
-	if($bytesPerPixel <= 0.45)
+	if(!needCompression($tmpdir."/".$postdata['tmpname'])) 
 		return false;
 
+	$filesize = round(filesize($filename) / 1024);
 	$message = "This image has a pretty big filesize for its dimensions. Expected file size: ${expectedFileSize}k. Your file: ${filesize}k.<br />If you want, I can resample it as an 90% quality JPG image.<br /><br />
 		<form action=\"{$_SERVER['PHP_SELF']}\" method=\"POST\">
 			<input type=\"hidden\" name=\"c\" value=\"upload\">
@@ -1073,6 +1115,7 @@ function upload_insert_file($postdata) {
 	if(strlen($postdata['hash']) < 15)
 		$postdata['hash'] = getHash($tmpdir."/".$postdata['tmpname']);
 
+	// get a fileid for this upload and prepare the landing site
 	$sql = "INSERT INTO offensive_uploads ( userid,filename,ip,nsfw,tmbo,hash,type,status )
 			   VALUES ( " . $_SESSION['userid'] . ", '" .
 			                sqlEscape( $postdata['filename'] ) . "', '" .
@@ -1092,7 +1135,8 @@ function upload_insert_file($postdata) {
 		// generate the thumbnail
 		// XXX: this is what's failing
 	
-		$thfile  = $tmpdir . '/th' . $postdata['tmpname'];
+		// okay to always tack on the extra file extension because we'll be renaming shortly
+		$thfile  = $tmpdir . '/th' . $postdata['tmpname'] . $postdata['file_extension'];
 
 		$image = new Imagick("$tmpdir/{$postdata['tmpname']}");
 		$image->setGravity(imagick::GRAVITY_CENTER);

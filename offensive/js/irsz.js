@@ -1,41 +1,107 @@
 // ©/info: https://github.com/numist/jslib/blob/master/irsz.js
-(function() {
-  $(document).ready(function() {
-    // if images are not already loaded, attach a function to fire on arrival
-    irsz_selector(document).load(function() {
-      if(irsz_auto) {
-        image_fit(this, false);
-      }
-    });
-    
-    // bind function to resize as needed during viewport resize
-    $(window).resize(function() {
-      if(irsz_auto) {
-        irsz_selector(document).each(function(i, e) {
-          image_fit(e, false);
-        });
-      }
-    });
-    
-    irsz_selector(document).each(function(i, e) {
-      // attach click handler for manual zooming
-      $(e).click(function(){
-        var prevwidth = $(this).width();
-        image_toggle(this, false);
-        return prevwidth == $(this).width();
+(function($) {
+  var self,
+  methods = {
+    init : function(opts) {
+      self.data("irsz", $.extend({
+        // do not act upon elements with images smaller than:
+        min_height: 400,
+        min_width: 400,
+
+        // automatically resize images when viewport is resized/on page load
+        auto: true,
+
+        // resize image (x, y) smaller than viewport
+        padding: [10, 10],
+
+        // custom cursors for when the click action on the image is resize, not the default action.
+        cursor_zoom_in: "auto",
+        cursor_zoom_out: "auto",
+
+        // keep images zoomed in when they were click-zoomed
+        noresize_class: "irsz_noresize"
+      }, opts || {}));
+
+      // if images are already loaded, fit them
+      apply_resize();
+
+      // if images are not already loaded, attach a function to fire on arrival
+      self.load(function() {
+        apply_resize();
       });
       
-      // if iages are already loaded, fit them
-      if(irsz_auto) {
-        image_fit(this, false);
-      }
-    });
-  });
-  
-  // keep images zoomed in when they were click-zoomed
-  var noresize_class = "irsz_noresize";
+      // bind function to resize as needed during viewport resize
+      $(window).bind("resize.irsz", function() {
+        apply_resize();
+      });
+      
+      // attach click handler for manual zooming
+      self.each(function() {
+        $(this).bind("click.irsz", function(e) {
+          var target = $(e.target);
+          var prevwidth = target.width();
+          image_toggle(target.get(0));
+          if (prevwidth != target.width()) {
+            e.preventDefault();
+          }
+          return true;
+        });
+      });
 
-  // get image's actual dimensions
+      return self;
+    },
+    toggle: function() {
+      if(self.data("irsz").auto == undefined) {
+        $.error("Must init plugin before calling members in jQuery.irsz");
+        return self;
+      }
+      
+      self.each(function() { image_toggle(this); });
+      return self;
+    },
+    destroy: function() {
+      if(self.data("irsz").auto == undefined) {
+        $.error("Must init plugin before calling members in jQuery.irsz");
+        return self;
+      }
+      
+      // unbind event handlers
+      $(window).unbind(".irsz");
+      self.each(function() {
+        $(this).unbind(".irsz");
+      });
+
+      // revert image, cursor, etc to normal state
+      self.each(function() {
+        var image = this;
+        image_dimensions(image, function(width, height){
+          image_resize(image, width, height);
+        })
+        // reset the cursor to its normal state
+        resetcursor(image);
+      });
+      
+      // destroy settings
+      self.data("irsz", {});
+      
+      return self;
+    }
+  };
+  
+  $.fn.irsz = function(method) {
+    self = this;
+    if(methods[method]) {
+      return methods[method].apply(self, Array.prototype.slice.call( arguments, 1 ));
+    } else if(typeof method === 'object' || ! method) {
+      return methods.init.apply(self, arguments);
+    } else {
+      $.error('Method ' +  method + ' does not exist on jQuery.irsz');
+    }
+  };
+
+  // private utility functions:
+
+  // get an image's actual dimensions
   function image_dimensions(image, func) {
     var attr_width = "max-width", attr_height = "max-height", units = "px", image_width, image_height;
     image = $(image);
@@ -65,39 +131,39 @@
     }
   }
   
-  function resetcursor(image) { image.style.cursor = "auto"; }
+  // manipulate the user's cursor
+  function resetcursor(image) { setcursor(image, "auto"); }
+  function setcursor(image, style) { image.style.cursor = style; }
   
   // zoom image in/out
-  function image_toggle(image, animate) {
-    if(!irsz_enabled) { resetcursor(image); return; }
-    
+  function image_toggle(image) {
     image_dimensions(image, function(actual_width, actual_height) {
       // check both dimensions in case there's a bug elsewhere we're resetting
       if($(image).width() < actual_width || $(image).height < actual_height) {
-        $(image).addClass(noresize_class);
-        image.style.cursor = "url(/offensive/graphics/zoom_out.cur),default";
-        image_resize(image, actual_width, actual_height, animate);
+        $(image).addClass(self.data("irsz").noresize_class);
+        setcursor(image, self.data("irsz").cursor_zoom_out);
+        image_resize(image, actual_width, actual_height);
       } else {
-        $(image).removeClass(noresize_class);
-        image_fit(image, animate);
+        $(image).removeClass(self.data("irsz").noresize_class);
+        image_fit(image);
       }
     });
   }
   
-  function image_fit(image, animate) {
-    if(!irsz_enabled) { resetcursor(image); return; }
-    
+  // fit image to the viewport
+  function image_fit(image) {
     image_dimensions(image, function(actual_width, actual_height) {
-      var target_width = $(window).width() - irsz_padding[0],
-          target_height = $(window).height() - irsz_padding[1],
+      var aspect_ratio = actual_width > actual_height ? actual_width / actual_height : actual_height / actual_width,
+          target_width = $(window).width() - self.data("irsz").padding[0],
+          target_height = $(window).height() - self.data("irsz").padding[1],
           new_height = 0,
           new_width = 0,
           w_width, w_height, h_width, h_height;
       
       // do not bother with images that are already smaller than the minima
-      if(actual_height < irsz_min_height) { return; }
-      if(actual_width < irsz_min_width) { return; }
-
+      if(actual_height < self.data("irsz").min_height) { return; }
+      if(actual_width < self.data("irsz").min_width) { return; }
+  
       function compute_width(height) {
         return Math.round(actual_width * height / actual_height);
       }
@@ -106,9 +172,9 @@
       }
       
       // fit image entirely within viewport
-      w_width = target_width > irsz_min_width ? target_width : irsz_min_width;
+      w_width = target_width > self.data("irsz").min_width ? target_width : self.data("irsz").min_width;
       w_height = compute_height(w_width);
-      h_height = target_height > irsz_min_height ? target_height : irsz_min_height;
+      h_height = target_height > self.data("irsz").min_height ? target_height : self.data("irsz").min_height;
       h_width = compute_width(h_height);
       
       // do not enlarge image beyond its limits
@@ -117,7 +183,7 @@
       h_width = h_width < actual_width ? h_width : actual_width;
       h_height = h_height < actual_height ? h_height : actual_height;
       
-      if(/scroll/.test($(image).attr("src"))) {
+      if(/scroll/.test($(image).attr("src")) || aspect_ratio > 3) {
         // if a scroller, check and fit one dimension
         // this assumes the image is intended to be scrolled in one dimension
         if(w_height < h_height) {
@@ -141,9 +207,9 @@
       }
       
       // image toggle blocker
-      if($(image).hasClass(noresize_class)) {
+      if($(image).hasClass(self.data("irsz").noresize_class)) {
         if(new_height < actual_height && new_width < actual_width) {
-          image.style.cursor = "url(/offensive/graphics/zoom_out.cur),default";
+          setcursor(image, self.data("irsz").cursor_zoom_out);
         } else {
           resetcursor(image);
         }
@@ -153,24 +219,33 @@
       // resize image
       if(new_height != $(image).height()) {
         if(new_height < actual_height) {
-          image.style.cursor = "url(/offensive/graphics/zoom_in.cur),default";
+          setcursor(image, self.data("irsz").cursor_zoom_in);
         } else {
           resetcursor(image);
         }
-        image_resize(image, new_width, new_height, animate);
+        image_resize(image, new_width, new_height);
       }
+      return;
     });
   }
   
-  function image_resize(image, new_width, new_height, animate) {
-    if(animate) {
-      $(image).animate({
-          width: new_width+"px",
-          height: new_height+"px"
-      }, 1500 );
-    } else {
-      image.style.height = new_height+"px";
-      image.style.width = new_width+"px";
+  function image_resize(image, new_width, new_height) {
+    var image = $(image), old_width = image.width(), old_height = image.height();
+    image.height(new_height+"px");
+    image.width(new_width+"px");
+
+    // propagate an event to support add-on features
+    if(new_width != old_width || new_height != old_height) {
+      image.resize();
+    }
+    return;
+  }
+  
+  function apply_resize() {
+    if(self.data("irsz").auto == true) {
+      self.each(function() {
+        image_fit(this);
+      });
     }
   }
-})();
+})(jQuery);

@@ -84,17 +84,12 @@
 
 		<script type="text/javascript" src="/offensive/js/tmbolib.js?v=0.0.4"></script>
 		<script type="text/javascript" src="/offensive/js/jquery-1.7.1.min.js"></script>
-		<script type="text/javascript" src="/offensive/js/picui.js?v=0.0.9"></script>
 		<script type="text/javascript" src="/offensive/js/subscriptions.js"></script>
 		<script type="text/javascript" src="/offensive/js/jqModal.js"></script>
 		<script type="text/javascript" src="/offensive/js/jqDnR.js?v=0.0.1"></script>
 		<script type="text/javascript">
-			var irsz_enabled = true,
-			    irsz_selector = function(e) { return $(e).find("a#imageLink img").last(); },
-			    irsz_min_height = 40, irsz_min_width = 40,
-			    irsz_auto = true,
-			    irsz_padding = [16, 114];
-		
+			var theimage = function() { return $(document).find("a#imageLink img").last(); };
+
       <? require("offensive/data/keynav.inc"); ?>
       function composite_keycode(e)
       {
@@ -136,6 +131,7 @@
       	function key_quick() { $("#dialog").jqmShow(); };
       	function key_subscribe() { handle_subscribe($('.subscribe_toggle:visible'),e,$("#good").attr("name")); };
         function key_random() { document.location.href = "<?= Link::upload($upload) ?>&random"; };
+        function key_image_toggle() { theimage().irsz("toggle"); };
       	
 				if(e == null)  return true;
         var keycode = composite_keycode(e);
@@ -218,9 +214,16 @@
 				x = eval("document."+a);
 				x.src=im;
 			}
+			
+			$(document).ready(function(){theimage().irsz({
+				min_height: 40, min_width: 40,
+				padding: [16, 114],
+				cursor_zoom_in: "url(/offensive/graphics/zoom_in.cur),default", cursor_zoom_out: "url(/offensive/graphics/zoom_out.cur),default"
+		 });});
 
 		</script>
-		<script type="text/javascript" src="/offensive/js/irsz.js?v=0.0.10"></script>
+		<script type="text/javascript" src="/offensive/js/irsz.js?v=0.0.13"></script>
+		<script type="text/javascript" src="/offensive/js/picui.js?v=0.0.11"></script>
 		<? include_once("analytics.inc"); ?>
 	</head>
 	<body id="pic">
