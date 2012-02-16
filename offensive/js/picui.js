@@ -57,14 +57,13 @@ function qc_dialog_init() {
 
 			// since we're resizing elements in JS anyway, make the textarea fit correctly
 			var textarea = dialog.find("textarea#qc_comment");
-			textarea.width(dialog.width() - (textarea.css("padding-left").parseInt() + textarea.css("padding-right").parseInt()));
+			textarea.width(dialog.width() - (textarea.outerWidth(true) - textarea.width()));
 
 			// commentrows height = bottom of dialog(top of dialog + height of dialog) - top of comments
 			var commentRows = dialog.find("#qc_commentrows");
 			if(commentRows.children().length > 0) {
 				commentRows.height(dialog.height() - (commentRows.position().top
-				                                     +commentRows.css("padding-top").parseInt()
-				                                     +commentRows.css("padding-bottom").parseInt()));
+				                                     +(commentRows.outerHeight(true) - commentRows.height()));
 			}
 		}
 
