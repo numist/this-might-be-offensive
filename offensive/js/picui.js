@@ -2,7 +2,7 @@
  * quick comments
  *****************************************************************************/
 
-var qc_dialog_init = function() {
+function qc_dialog_init() {
 
 		function qc_headers(dialog) {
 			var dialog = $(dialog);
@@ -85,6 +85,7 @@ var qc_dialog_init = function() {
 			handle_comment_post(comment, vote, tmbo, repost, subscribe);
 		});
 
+		// remember the scroll height
 		$("#qc_commentrows").scroll(function(){
 			self = $(this);
 			if(self.scrollTop() > 0) {
@@ -93,6 +94,18 @@ var qc_dialog_init = function() {
 				self.removeAttr("scrollTop");
 			}
 		});
+		
+		// remember location of the caret
+		function saveCaret(e) {
+			var self = $(this);
+			// Note: Capture the caret's position after the event has actually moved it
+			window.setTimeout(function(){
+				if(self.getCaretPosition() != undefined) {
+					self.attr("caret", self.getCaretPosition());
+				}
+			}, 0);
+		}
+		$("#qc_comment").on("keydown", saveCaret).on("click", saveCaret);
 
 		return {
 			autoOpen: false,
@@ -100,19 +113,26 @@ var qc_dialog_init = function() {
 			width: "500px",
 			open: function(event, ui) {
 				var self = this;
-				var commentRows = $("#qc_commentrows");
+
 				// restore scroll state
+				var commentRows = $("#qc_commentrows");
 				if(commentRows.hasAttr("scrollTop")) {
 					commentRows.scrollTop(commentRows.attr("scrollTop"));
 				}
 				
+				// restore caret position in comment box
+				var comment = $("#qc_comment");
+				var caret = comment.hasAttr("caret") ? comment.attr("caret") : 0;
+				comment.focus().setCaretPosition(caret);
+
 				// disable normal keybindings
 				$(document).unbind("keydown");
+				
 				// fit contents to dialog
 				qc_autosize(self);
 				
+				// clicking outside the box closes it
 				// Note: if we bind right away, the clickoutside event will fire immediately, cancelling the open
-				// Workaround: window.setTimeout(xxx, 0);
 				window.setTimeout(
 					function(){
 						$(self).dialog("widget").bind("clickoutside", function(){
@@ -120,6 +140,7 @@ var qc_dialog_init = function() {
 						});
 					}, 0);
 
+				// load comments into the quick window
 				var comments = $("#qc_comments");
 				if(!comments.hasAttr("loading")) {
 					// get comments
@@ -196,6 +217,7 @@ var qc_dialog_init = function() {
 				$(document).keydown(handle_keypress);
 				// clean up bindings
 				$(this).dialog("widget").unbind("clickoutside");
+				$("#qc_comment").unbind();
 			},
 			dragStart: function(event, ui) {
 			  $(this).dialog("widget").fadeTo("fast", 0.7);
@@ -221,6 +243,15 @@ var qc_dialog_init = function() {
 			}
 		};
 };
+
+function qc_form_reset() {
+	// reset the quick form
+	$("#qc_form textarea").val("");
+	$("#qc_comment").removeAttr("caret");
+	$("#qc_tmbo").removeAttr("checked");
+	$("#qc_repost").removeAttr("checked");
+	$("#qc_subscribe").removeAttr("checked");
+}
 
 /******************************************************************************
  * global actions
@@ -281,11 +312,7 @@ function handle_comment_post(comment, vote, tmbo, repost, subscribe) {
 				toggle_subscribe("subscribe", fileid, $("#subscribeLink"));
 			}
 			
-			// reset the quick form
-			$("#qc_form textarea").val("");
-			$("#qc_tmbo").removeAttr("checked");
-			$("#qc_repost").removeAttr("checked");
-			$("#qc_subscribe").removeAttr("checked");
+			qc_form_reset();
 
 			// disable voting
 			if(vote == "this is good" || vote == "this is bad") {

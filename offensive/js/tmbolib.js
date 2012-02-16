@@ -30,10 +30,50 @@ if (typeof String.prototype.parseInt != 'function') {
   }
 }
 
-jQuery.fn.hasAttr = function(name) {  
-  // fucking browsers.
-  return this.attr(name) !== undefined && this.attr(name) !== false;
-};
+(function($) {
+	$.fn.hasAttr = function(name) {  
+	  // fucking browsers.
+	  return this.attr(name) !== undefined && this.attr(name) !== false;
+	};
+  $.fn.setCaretPosition = function(pos) {
+		if(this.length == 0) return this;
+		var self = this.get(0);
+    if (self.setSelectionRange) {
+      self.setSelectionRange(pos, pos);
+    } else if (self.createTextRange) {
+      var range = self.createTextRange();
+      range.collapse(true);
+      range.moveEnd('character', pos);
+      range.moveStart('character', pos);
+      range.select();
+    }
+		return this;
+  };
+	$.fn.getCaretPosition = function() {
+		if(this.length == 0) return undefined;
+		if(this.filter(":focus").length == 0) return undefined;
+		var self = this.get(0);
+
+	  if (self.selectionStart) { 
+	    return self.selectionStart; 
+	  } else if (document.selection) { 
+	    self.focus(); 
+
+	    var r = document.selection.createRange(); 
+	    if (r == null) { 
+	      return 0; 
+	    } 
+
+	    var re = self.createTextRange(), 
+	        rc = re.duplicate(); 
+	    re.moveToBookmark(r.getBookmark()); 
+	    rc.setEndPoint('EndToStart', re); 
+
+	    return rc.text.length; 
+	  }  
+	  return 0;
+	}
+})(jQuery);
 
 function getURLParam(param) {
   var href = window.location.href;
