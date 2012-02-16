@@ -48,78 +48,77 @@ audio {
 }
 
 /* comments */
-a,
-#pic a.userLink
+#qc_dialog a,
+#qc_dialog #pic a.userLink
 {
 	text-decoration:underline;
 	color:#000099;
 }
 
-a:visited,
-#pic a.userLink {
+#qc_dialog a:visited,
+#qc_dialog #pic a.userLink {
 	color:#333366;
 }
 
-a.userLink {
+#qc_dialog a.userLink {
 	color:#666699;
 }
 
-.bluebox,.entry {
+#qc_dialog .bluebox,.entry {
 	background: #ccccff;
 	padding: 10px;
 	font-family: verdana;
 	font-size: 10px;
 }
 
-.entry {
+#qc_dialog .entry {
 	padding: 10px;
 	font-size: 11px;
 	line-height:21px;
 }
 
-.blocked, a.blocked {
+#qc_dialog .blocked, a.blocked {
 	color:#9999cc;
 }
 
-.squelched, a.squelched {
+#qc_dialog .squelched, a.squelched {
 	color:#9999cc;
 	font-size:10px;
 }
 
-.entry .squelched {
+#qc_dialog .entry .squelched {
 	text-align:center;
 }
 
-.timestamp, .votecount {
+#qc_dialog .timestamp, .votecount {
 	color:#9999cc;
 }
 
-.timestamp {
+#qc_dialog .timestamp {
 	font-size:10px;
 	padding-left:8px;
 	float:right;
 }
 
-.timestamp a {
+#qc_dialog .timestamp a {
 	color:#9999cc;
 	text-decoration:none;
 }
 
-#qc_form {
+#qc_dialog #qc_form {
   text-align: center;
 }
 
-textarea#qc_comment {
+#qc_dialog textarea#qc_comment {
   margin-bottom: 1em;
 }
 
-#qc_commentrows {
+#qc_dialog #qc_commentrows {
   margin-top: 10px;
   overflow: auto;
 }
 
-#qc_comments {
-  margin-top: 10px;
+#qc_dialog #qc_comments {
 }
 
 #qc_dialog input[name="submit"] {
