@@ -53,6 +53,7 @@ a.userLink {
 	padding: 10px;
 	font-size: 11px;
 	line-height:21px;
+	word-wrap: break-word;
 }
 
 .blocked, a.blocked {

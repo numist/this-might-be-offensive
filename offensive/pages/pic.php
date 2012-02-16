@@ -77,7 +77,7 @@
 		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 		<META NAME="ROBOTS" CONTENT="NOARCHIVE" />
 		<title>[<?= $upload->type() ?>] : <?= $upload->filename() ?> </title>
-		<link rel="stylesheet" type="text/css" href="/styles/pic.css?v=0.0.2"/>
+		<link rel="stylesheet" type="text/css" href="/styles/pic.css?v=0.0.3"/>
 		<!-- <? if($upload->next_filtered()) { ?>
 			<link rel="prefetch" href="<?= $_SERVER['PHP_SELF'] ?>?id=<?= $upload->next_filtered()->id() ?>"/>
 		<? } ?> -->

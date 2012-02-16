@@ -41,7 +41,7 @@
 <head>
 	<title></title>
 	<link rel="stylesheet" type="text/css" href="filepilestyle.css" />
-	<link rel="stylesheet" type="text/css" href="/styles/oldskool.css"/>
+	<link rel="stylesheet" type="text/css" href="/styles/oldskool.css?v=0.0.3"/>
 
 	<style type="text/css">
 		.vote, label {
