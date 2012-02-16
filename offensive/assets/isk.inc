@@ -91,7 +91,21 @@ class Isk {
 	}
 	
 	// add image to ISK
-	public function add($image_path, $fileid) {
+	public function add($image_path, $fileid, $replace=false) {
+		
+		// check if ID exists. 
+		if($this->img_exists($fileid)) {
+			if($replace) {
+				$this->delete($fileid);
+			} else {
+				return false;
+			}
+		}
+		
+		if($this->error()) {
+			return false;
+		}
+		
 		$blob = $this->img_blob($image_path);
 		if($this->error()) {
 			return false;
