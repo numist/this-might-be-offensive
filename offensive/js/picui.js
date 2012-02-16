@@ -216,7 +216,6 @@ function qc_dialog_init() {
 				$(document).keydown(handle_keypress);
 				// clean up bindings
 				$(this).dialog("widget").unbind("clickoutside");
-				$("#qc_comment").unbind();
 			},
 			dragStart: function(event, ui) {
 			  $(this).dialog("widget").fadeTo("fast", 0.7);
