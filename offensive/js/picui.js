@@ -38,10 +38,9 @@ function qc_dialog_init() {
 			}
 
 			// scale to fit content
-			var commentRows = dialog.find("#qc_commentrows"),
-			    listOffset = commentRows.outerHeight(true) - commentRows.height();
+			var commentRows = dialog.find("#qc_commentrows");
 			
-			dialog.height(commentRows.position().top + commentRows.get(0).scrollHeight - listOffset);
+			dialog.height(commentRows.position().top + commentRows.get(0).scrollHeight);
 			// limit the maximum height
 			// Note: using .dialog("option", "maxHeight") would restrict the user from embiggening it further
 			if(dialog.height() > $(window).height() - 150) {
@@ -50,7 +49,7 @@ function qc_dialog_init() {
 			// re-center the qc box since it's now not properly centered
 			dialog.dialog("option", "position", "center");
 
-			// since we changed the height, re-fit the contents
+			// since we may have changed the height, re-fit the contents
 			qc_fit(dialog);
 		}
 
@@ -64,8 +63,7 @@ function qc_dialog_init() {
 			// commentrows height = bottom of dialog(top of dialog + height of dialog) - top of comments
 			var commentRows = dialog.find("#qc_commentrows");
 			if(commentRows.children().length > 0) {
-				commentRows.height(dialog.height() - (commentRows.position().top
-				                                     +(commentRows.outerHeight(true) - commentRows.height())));
+				commentRows.height(dialog.height() - commentRows.position().top)
 			}
 		}
 
