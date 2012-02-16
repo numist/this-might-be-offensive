@@ -100,18 +100,18 @@ function add_to_isk($images) {
 	// loop over images and add them to ISK
 	$counter = 0;
 	foreach($images as $image) {
-	  if($isk->img_exists($image['id'])) {
-	    echo "skipping " . $image['path'] . "\n";
-	    continue;
-	  } else {
-		  echo "adding " . $image['path'];
-		}
 		$counter++;
 		if(!($counter % 500)) {
 		  $isk->save();
 		}
 		if(!$isk->add($image["path"], $image['id'])) {
-		  echo " failed";
+		  if($isk->error()) {
+		    echo "failed " . $isk->error_msg();
+		  } else {
+		    echo "skipping " . $image['path'];
+		  }
+		} else {
+		  echo "adding " . $image['path'];
 		}
 		echo "\n";
 	}
