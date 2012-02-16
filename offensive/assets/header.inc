@@ -51,9 +51,7 @@ if(!ssl()) {
 
 // if we are not an admin, buffer output until the end in case of fatal errors.
 session_start();
-if(!array_key_exists("status", $_SESSION) || $_SESSION['status'] != "admin") {
-        ob_start(null, 0);
-}
+ob_start("ob_gzhandler", 0);
 
 // in tmbo, the include path should be a singleton path to the webroot.
 if(false !== strpos(get_include_path(), PATH_SEPARATOR)) {
@@ -105,7 +103,9 @@ function tmbo_error_handler($errno, $errstr, $errfile, $errline, $errcontext) {
         // handle fatal errors by sending users to the kaboom page, don't redirect admins
         if($errno & (E_ERROR | E_CORE_ERROR | E_COMPILE_ERROR | E_USER_ERROR)) {
 					if((!me() || me()->status() != "admin") && ob_get_level() > 0) {
-						ob_end_clean();
+						while(ob_get_level() > 0) {
+							ob_end_clean();
+						}
 						require("offensive/index.outoforder.php");
 					} else if (array_key_exists("status", $_SESSION) &&
 					           $_SESSION['status'] == "admin") {
