@@ -436,9 +436,12 @@ $(document).ready(function() {
 	});
 	
 	// set up image resizer
+	theimage().height(theimage().attr("max-height"));
+	var ypad = theimage().offset().top + $(document).height() - (theimage().offset().top + theimage().outerHeight(true));
+	var xpad = $("div#content").outerWidth(true) - $("div#content").width();
 	theimage().irsz({
 		min_height: 40, min_width: 40,
-		padding: [16, 114],
+		padding: [xpad, ypad],
 		cursor_zoom_in: "url(/offensive/graphics/zoom_in.cur),default", cursor_zoom_out: "url(/offensive/graphics/zoom_out.cur),default"
 	})
 	.resize(	function() {
