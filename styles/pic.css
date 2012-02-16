@@ -109,8 +109,8 @@ audio {
   text-align: center;
 }
 
-#qc_dialog textarea#qc_comment {
-  margin-bottom: 1em;
+#qc_dialog div#qc_vote {
+  margin-top: 1em;
 }
 
 #qc_dialog #qc_commentrows {

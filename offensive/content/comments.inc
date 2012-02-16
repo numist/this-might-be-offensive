@@ -84,19 +84,7 @@
 
 	function head() {
 ?>
-	<script type="text/javascript" src="/offensive/js/subscriptions.js"></script>
-
-	<script type="text/javascript">
-		$(document).ready(function() {
-			$("#subscribeLink").click(function(e) {
-				handle_subscribe($(this),e,$("#fileid").attr("value"));
-			});
-			$("#unsubscribeLink").click(function(e) {
-				handle_subscribe($(this),e,$("#fileid").attr("value"));
-			});
-		});
-	</script>
-		
+	<script type="text/javascript" src="/offensive/js/subscriptions.js?v=0.0.1"></script>
 <?
 	}
 	

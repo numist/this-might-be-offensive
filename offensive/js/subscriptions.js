@@ -31,3 +31,12 @@ function handle_subscribe(o,e, imageid) {
 		$.get("/offensive/api.php/subscribe.php", { threadid: imageid, subscribe: 0 }, twiddle);
 	}
 }
+
+$(document).ready(function() {
+	$("#subscribeLink").click(function(e) {
+		handle_subscribe($(this),e,$("#fileid").attr("value"));
+	});
+	$("#unsubscribeLink").click(function(e) {
+		handle_subscribe($(this),e,$("#fileid").attr("value"));
+	});
+});

@@ -78,7 +78,7 @@
 		<META NAME="ROBOTS" CONTENT="NOARCHIVE" />
 		<title>[<?= $upload->type() ?>] : <?= $upload->filename() ?> </title>
 		<link rel="stylesheet" type="text/css" href="/styles/jquery-ui-1.8.17.custom.css"/>
-		<link rel="stylesheet" type="text/css" href="/styles/pic.css?v=0.0.2"/>
+		<link rel="stylesheet" type="text/css" href="/styles/pic.css?v=0.0.3"/>
 		<!-- <? if($upload->next_filtered()) { ?>
 			<link rel="prefetch" href="<?= $_SERVER['PHP_SELF'] ?>?id=<?= $upload->next_filtered()->id() ?>"/>
 		<? } ?> -->
@@ -87,35 +87,34 @@
 		<script type="text/javascript" src="/offensive/js/tmbolib.js?v=0.0.5"></script>
 		<script type="text/javascript" src="/offensive/js/jquery-ui-1.8.17.custom.min.js"></script>
 		<script type="text/javascript" src="/offensive/js/jquery.ba-outside-events.min.js"></script>
-		<script type="text/javascript" src="/offensive/js/subscriptions.js"></script>
+		<script type="text/javascript" src="/offensive/js/subscriptions.js?v=0.0.1"></script>
 		<script type="text/javascript">
-			var theimage = function() { return $(document).find("a#imageLink img").last(); };
-
-      <? require("offensive/data/keynav.inc"); ?>
-      function composite_keycode(e)
-      {
-        var keycode = (e.which == null) ? e.keyCode : e.which;
-				if(e.shiftKey) {
-    		  keycode |= <?= KEY_SHIFT ?>;
-    		}
-    		if(e.altKey) {
-    		  keycode |= <?= KEY_ALT ?>;
-    		}
-    		if(e.ctrlKey) {
-    		  keycode |= <?= KEY_CTRL ?>;
-    		}
-    		if(e.metaKey) {
-    		  keycode |= <?= KEY_META ?>;
-    		}
-    		// TODO: remove key-agnosticism
-    		keycode |= <?= KEY_META_AWARE ?>;
-    		
-    		return keycode;
-      }
-
 			// handle a keybased event. this code was incorporated from offensive.js, which has now been deprecated
-			function handle_keypress(o,e)
+			function handle_keypress(e)
 			{
+				// keycode translation
+	      <? require("offensive/data/keynav.inc"); ?>
+	      function composite_keycode(e)
+	      {
+	        var keycode = (e.which == null) ? e.keyCode : e.which;
+					if(e.shiftKey) {
+	    		  keycode |= <?= KEY_SHIFT ?>;
+	    		}
+	    		if(e.altKey) {
+	    		  keycode |= <?= KEY_ALT ?>;
+	    		}
+	    		if(e.ctrlKey) {
+	    		  keycode |= <?= KEY_CTRL ?>;
+	    		}
+	    		if(e.metaKey) {
+	    		  keycode |= <?= KEY_META ?>;
+	    		}
+	    		// TODO: remove key-agnosticism
+	    		keycode |= <?= KEY_META_AWARE ?>;
+
+	    		return keycode;
+	      }
+
 			  // potential actions
 			  function nav_to_id(id) {
           if(document.getElementById(id)) {
@@ -171,163 +170,9 @@
 
 				return;
 			}
-
-			/* image rollover stuff */
-			function changesrc(a,im)
-			{
-				x = eval("document."+a);
-				x.src=im;
-			}
-			
-			$(document).ready(function(){
-				// set up the resizer
-				if(theimage().length) {
-					theimage().irsz({
-						min_height: 40, min_width: 40,
-						padding: [16, 114],
-						cursor_zoom_in: "url(/offensive/graphics/zoom_in.cur),default", cursor_zoom_out: "url(/offensive/graphics/zoom_out.cur),default"
-		 			});
-				}
-				
-				function qc_fit(dialog) {
-					dialog = $(dialog);
-					
-					// since we're resizing elements in JS anyway, make the textarea fit correctly
-					var textarea = dialog.find("textarea#qc_comment");
-					textarea.width(dialog.width() - (textarea.css("padding-left").parseInt() + textarea.css("padding-right").parseInt()));
-					
-					// commentrows height = bottom of dialog(top of dialog + height of dialog) - top of comments
-					var commentRows = dialog.find("#qc_commentrows");
-					if(commentRows.children().length > 0) {
-						commentRows.height(dialog.height() - (commentRows.position().top
-						                                     +commentRows.css("padding-top").parseInt()
-						                                     +commentRows.css("padding-bottom").parseInt()));
-					}
-				}
-
-				function qc_headers(dialog) {
-					var dialog = $(dialog);
-				  if($("#qc_comments").hasAttr("loading")) {
-						return;
-					}
-					
-					if($("#qc_commentrows").children().length == 0) {
-						dialog.dialog("option", "title", "you're first on the scene");
-					} else {
-						dialog.dialog("option", "title", "let's hear it");
-						if($("#qc_comments").children("b").length == 0) {
-							$("#qc_comments").prepend("<b>the dorks who came before you said: </b>");
-						}
-					}
-				}
-				
-				// set up the quick comment box
-				$("#qc_dialog").dialog({
-					autoOpen: false,
-					title: "please stand by",
-					width: "500px",
-					open: function(event, ui) {
-						var self = this;
-						// disable normal keybindings
-						// fit comments to dialog
-						qc_fit(self);
-						// if we bind right away, the clickoutside event will fire immediately, cancelling the open
-						window.setTimeout(function(){$(self).parent(".ui-dialog").bind("clickoutside", function(){$(self).dialog("close");});},0);
-
-						var commentRows = $("#qc_commentrows");
-						var comments = $("#qc_comments");
-						
-						if(!comments.hasAttr("loading")) {
-							// get comments
-							$.ajax({
-		        	  type: 'GET',
-		        	  url: "/offensive/ui/api.php/getcomments.html?fileid="+getURLParam("id"),
-		        	  dataType: "html",
-								beforeSend: function() {
-									comments.attr("loading", "");
-									if(commentRows.children().length == 0) {
-										// user-facing loading feedback
-										commentRows.text("loading…");
-									}
-								},
-		        	  success: function(data) {
-									// call was not unsuccessful
-									if($(data).filter("div#comments").length != 1) {
-										return;
-									}
-									
-									// remove loading feedback
-									if(commentRows.children().length == 0) {
-										commentRows.text("");
-									}
-            	
-		        	    var filteredData = $(data).find("div.entry");
-									
-			      	    if(filteredData.length > 0) {
-										var thecount = commentRows.children().length;
-										comments.show();
-										if(thecount > 0) {
-											commentRows.children().remove();
-										}
-										commentRows.append(filteredData);
-										if(thecount == 0) {
-											// update headers
-											qc_headers(self);
-											// if we had no data before, initailize the quick box's size and position
-											$(self).height(Math.min($(self).height(), $(window).height() - 150))
-											// and re-center the qc box since it's now not properly centered
-											       .dialog("option", "position", "center");
-											// and re-fit the contents
-											qc_fit(self);
-										}
-			      	    } else if(commentRows.children().length == 0) {
-										qc_headers(self);
-										// there should never be a case where there were comments and then the API returns none, but plan for failure!
-										comments.hide();
-									}
-									comments.removeAttr("loading");
-		        	  },
-		        	  complete: function(jqXHR, textStatus) {
-									// failed API query
-									if(comments.hasAttr("loading")) {
-										commentRows.text("fuck. try again?");
-										comments.removeAttr("loading");
-									}
-		        	  }
-		        	});
-						}
-					},
-					close: function(event, ui) {
-						// re-enable normal keybindings
-						// clean up bindings
-						$(this).unbind("clickoutside");
-					},
-					dragStart: function(event, ui) {
-					  $(this).dialog("widget").fadeTo("fast", 0.7);
-					},
-					dragStop: function(event, ui) {
-						var self = $(this), widget = self.dialog("widget");
-					  self.dialog("widget").fadeTo("fast", 1);
-						// remember the location of the box so it doesn't move itself next time it's opened
-						self.dialog("option", "position", [widget.offset().left, widget.offset().top])
-					},
-					resizeStart: function(event, ui) {
-					  $(this).dialog("widget").fadeTo("fast", 0.7);
-					},
-					resize: function(event, ui) {
-						qc_fit(this);
-					},
-					resizeStop: function(event, ui) {
-					  $(this).dialog("widget").fadeTo("fast", 1);
-					}
-				});
-				// quick link
-				$("#quickcomment").bind("click", function(e){ $("#qc_dialog").dialog("open"); e.preventDefault(); });
-			});
-
 		</script>
-		<script type="text/javascript" src="/offensive/js/irsz.js?v=0.0.13"></script>
-		<script type="text/javascript" src="/offensive/js/picui.js?v=0.0.11"></script>
+		<script type="text/javascript" src="/offensive/js/irsz.js?v=0.0.14"></script>
+		<script type="text/javascript" src="/offensive/js/picui.js?v=0.0.12"></script>
 		<? include_once("analytics.inc"); ?>
 	</head>
 	<body id="pic">
@@ -350,33 +195,35 @@
 		<!-- quick comment box -->
 		<div id="qc_dialog">
 			<a name="form"></a>
-			<form id="qc_form">
+			<form id="qc_form"<? if(!canComment($upload->id())) { ?> style="display: none;"<? } ?>>
 					<input type="hidden" value="329310" name="fileid" id="qc_fileid">
 					<input type="hidden" name="c" value="comments">
 					<textarea cols="64" rows="6" name="comment" id="qc_comment"></textarea>
 
-							<div id="qc_vote" style="text-align:left;margin-left:14%">
-						<table><tbody><tr><td width="200px">
-						<input class="qc_tigtib" id="qc_novote" type="radio" value="novote" name="vote" checked="">
-						<br>
-
-						<input class="qc_tigtib" type="radio" name="vote" value="this is good" id="qc_tig">
-						<label for="qc_tig">[ this is good ]</label><br>
-
-						<input class="qc_tigtib" type="radio" name="vote" value="this is bad" id="qc_tib">
-						<label for="qc_tib">[ this is bad ]</label><br>
-						</td>
-						<td>
-						<input type="checkbox" name="offensive" value="omg" id="tmbo">
-						<label for="tmbo">[ this might be offensive ]</label><br>
-
-						<input type="checkbox" name="repost" value="police" id="repost">
-						<label for="repost">[ this is a repost ]</label><br>
-						<input type="checkbox" name="subscribe" value="subscribe" id="subscribe">
-						<label for="subscribe">[ subscribe ]</label><br>
-						</td></tr></tbody></table>
-
-					</div>
+					<? if(canVote($upload->id()) && $upload->file()) { ?>
+						<div id="qc_vote" style="text-align:left;margin-left:14%">
+							<table><tbody><tr><td width="200px">
+							<input class="qc_tigtib" id="qc_novote" type="radio" value="novote" name="vote" checked="">
+							<br>
+          	
+							<input class="qc_tigtib" type="radio" name="vote" value="this is good" id="qc_tig">
+							<label for="qc_tig">[ this is good ]</label><br>
+          	
+							<input class="qc_tigtib" type="radio" name="vote" value="this is bad" id="qc_tib">
+							<label for="qc_tib">[ this is bad ]</label><br>
+							</td>
+							<td>
+							<input type="checkbox" name="offensive" value="omg" id="qc_tmbo">
+							<label for="qc_tmbo">[ this might be offensive ]</label><br>
+          	
+							<input type="checkbox" name="repost" value="police" id="qc_repost">
+							<label for="qc_repost">[ this is a repost ]</label><br>
+							<input type="checkbox" name="subscribe" value="subscribe" id="qc_subscribe">
+							<label for="qc_subscribe">[ subscribe ]</label><br>
+							</td></tr></tbody></table>
+          	
+						</div>
+					<? } ?>
 					<div id="qc_go" style="text-align: center">
 						<input type="submit" name="submit" value="go">
 					</div>
@@ -433,7 +280,7 @@
 					+<span id="count_good"><?= $upload->goods() ?></span>
 					-<span id="count_bad"><?= $upload->bads() ?></span><?
 					if($upload->tmbos() > 0) { ?>
-						<span style=\"color:#990000\">x<?= $upload->tmbos() ?></span>
+						x<span id="count_tmbo" style=\"color:#990000\"><?= $upload->tmbos() ?></span>
 					<? } ?>)
 					<span id="quicklink">&nbsp;(<a id="quickcomment" href="#">quick</a>)</span>
 				</span>

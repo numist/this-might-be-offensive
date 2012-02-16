@@ -95,6 +95,8 @@
   };
   
   $.fn.irsz = function(method) {
+		if(this.length == 0) return this;
+
     self = this;
     if(methods[method]) {
       return methods[method].apply(self, Array.prototype.slice.call( arguments, 1 ));
