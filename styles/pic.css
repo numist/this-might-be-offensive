@@ -129,4 +129,5 @@ audio {
 #qc_dialog {
   padding-top: 10px;
   padding-bottom: 10px;
+	overflow:none;
 }
