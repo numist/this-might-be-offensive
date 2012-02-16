@@ -262,6 +262,7 @@ function qc_form_reset() {
 
 function bind_default_events() {
 	$(document).on("keydown.default", handle_keypress);
+	$(document).focus();
 }
 
 function unbind_default_events() {
