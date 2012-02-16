@@ -125,7 +125,7 @@ function qc_dialog_init() {
 				comment.focus().setCaretPosition(caret);
 
 				// disable normal keybindings
-				$(document).unbind("keydown");
+				$(document).off(".modal");
 				
 				// fit contents to dialog
 				qc_autosize(self);
@@ -213,7 +213,7 @@ function qc_dialog_init() {
 			},
 			close: function(event, ui) {
 				// re-enable normal keybindings
-				$(document).keydown(handle_keypress);
+				$(document).on("keydown.modal", handle_keypress);
 				// clean up bindings
 				$(this).dialog("widget").unbind("clickoutside");
 			},
@@ -421,7 +421,7 @@ $(document).ready(function() {
 	$("#quickcomment").bind("click", function(e){ $("#qc_dialog").dialog("open"); e.preventDefault(); });
 
 	// bind keyboard events
-	$(document).keydown(handle_keypress);
+	$(document).on("keydown.modal", handle_keypress);
 
 	// bind instructions link
 	$("#instruction_link a").click(function () {
