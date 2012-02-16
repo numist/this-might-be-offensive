@@ -78,7 +78,7 @@
 		<META NAME="ROBOTS" CONTENT="NOARCHIVE" />
 		<title>[<?= $upload->type() ?>] : <?= $upload->filename() ?> </title>
 		<link rel="stylesheet" type="text/css" href="/styles/jquery-ui-1.8.17.custom.css"/>
-		<link rel="stylesheet" type="text/css" href="/styles/pic.css?v=0.0.3"/>
+		<link rel="stylesheet" type="text/css" href="/styles/pic.css?v=0.0.4"/>
 		<!-- <? if($upload->next_filtered()) { ?>
 			<link rel="prefetch" href="<?= $_SERVER['PHP_SELF'] ?>?id=<?= $upload->next_filtered()->id() ?>"/>
 		<? } ?> -->
