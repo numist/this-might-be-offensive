@@ -153,6 +153,7 @@ function qc_dialog_init() {
 								// user-facing loading feedback
 								commentRows.text("loading…");
 							}
+							qc_autosize(self);
 						},
        	  	success: function(data) {
 							// call was not unsuccessful
