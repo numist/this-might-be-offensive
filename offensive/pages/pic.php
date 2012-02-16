@@ -199,14 +199,32 @@
 					// commentrows height = bottom of dialog(top of dialog + height of dialog) - top of comments
 					var commentRows = dialog.find("#qc_commentrows");
 					if(commentRows.children().length > 0) {
-						commentRows.height(dialog.offset().top + dialog.height() - commentRows.offset().top);
+						commentRows.height(dialog.height() - (commentRows.position().top
+						                                     +commentRows.css("padding-top").parseInt()
+						                                     +commentRows.css("padding-bottom").parseInt()));
+					}
+				}
+
+				function qc_headers(dialog) {
+					var dialog = $(dialog);
+				  if($("#qc_comments").hasAttr("loading")) {
+						return;
+					}
+					
+					if($("#qc_commentrows").children().length == 0) {
+						dialog.dialog("option", "title", "you're first on the scene");
+					} else {
+						dialog.dialog("option", "title", "let's hear it");
+						if($("#qc_comments").children("b").length == 0) {
+							$("#qc_comments").prepend("<b>the dorks who came before you said: </b>");
+						}
 					}
 				}
 				
 				// set up the quick comment box
 				$("#qc_dialog").dialog({
 					autoOpen: false,
-					title: "let's hear it",
+					title: "please stand by",
 					width: "500px",
 					open: function(event, ui) {
 						var self = this;
@@ -215,9 +233,69 @@
 						qc_fit(self);
 						// if we bind right away, the clickoutside event will fire immediately, cancelling the open
 						window.setTimeout(function(){$(self).parent(".ui-dialog").bind("clickoutside", function(){$(self).dialog("close");});},0);
-						// get comments
-							// add comments to qc_commentrows
-							// fit comments to dialog
+
+						var commentRows = $("#qc_commentrows");
+						var comments = $("#qc_comments");
+						
+						if(!comments.hasAttr("loading")) {
+							// get comments
+							$.ajax({
+		        	  type: 'GET',
+		        	  url: "/offensive/ui/api.php/getcomments.html?fileid="+getURLParam("id"),
+		        	  dataType: "html",
+								beforeSend: function() {
+									comments.attr("loading", "");
+									if(commentRows.children().length == 0) {
+										// user-facing loading feedback
+										commentRows.text("loading…");
+									}
+								},
+		        	  success: function(data) {
+									// call was not unsuccessful
+									if($(data).filter("div#comments").length != 1) {
+										return;
+									}
+									
+									// remove loading feedback
+									if(commentRows.children().length == 0) {
+										commentRows.text("");
+									}
+            	
+		        	    var filteredData = $(data).find("div.entry");
+									
+			      	    if(filteredData.length > 0) {
+										var thecount = commentRows.children().length;
+										comments.show();
+										if(thecount > 0) {
+											commentRows.children().remove();
+										}
+										commentRows.append(filteredData);
+										if(thecount == 0) {
+											// update headers
+											qc_headers(self);
+											// if we had no data before, initailize the quick box's size and position
+											$(self).height(Math.min($(self).height(), $(window).height() - 150))
+											// and re-center the qc box since it's now not properly centered
+											       .dialog("option", "position", "center");
+											// and re-fit the contents
+											qc_fit(self);
+										}
+			      	    } else if(commentRows.children().length == 0) {
+										qc_headers(self);
+										// there should never be a case where there were comments and then the API returns none, but plan for failure!
+										comments.hide();
+									}
+									comments.removeAttr("loading");
+		        	  },
+		        	  complete: function(jqXHR, textStatus) {
+									// failed API query
+									if(comments.hasAttr("loading")) {
+										commentRows.text("fuck. try again?");
+										comments.removeAttr("loading");
+									}
+		        	  }
+		        	});
+						}
 					},
 					close: function(event, ui) {
 						// re-enable normal keybindings
@@ -303,9 +381,8 @@
 						<input type="submit" name="submit" value="go">
 					</div>
 			</form>
-			<div id="qc_comments" loading>
+			<div id="qc_comments">
 			  <div id="qc_commentrows">
-					loading…
 			  </div>
 			</div>
 		</div>

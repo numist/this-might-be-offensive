@@ -48,11 +48,6 @@ audio {
 }
 
 /* comments */
-#qc_commentrows {
-  margin-top: 10px;
-  overflow: auto;
-}
-
 a,
 #pic a.userLink
 {
@@ -118,9 +113,18 @@ textarea#qc_comment {
   margin-bottom: 1em;
 }
 
-input[name="submit"] {
+#qc_commentrows {
+  margin-top: 10px;
+  overflow: auto;
+}
+
+#qc_comments {
+  margin-top: 10px;
+}
+
+#qc_dialog input[name="submit"] {
   margin-top: 1em;
-  margin-bottom: 1em;
+  margin-bottom: 0em;
 }
 
 #qc_dialog {
