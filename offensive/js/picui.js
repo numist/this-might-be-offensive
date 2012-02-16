@@ -188,8 +188,9 @@ function qc_dialog_init() {
 								// scroll down if user had already scrolled to bottom
 								if(atBottom) {
 									// don't scroll more than one window height
-									commentRows.scrollTop(Math.min(commentRows.scrollTop() + commentRows.height(),
-									                               commentRows.get(0).scrollHeight - commentRows.height()));
+									var scrollto = Math.min(commentRows.scrollTop() + commentRows.height(),
+									                        commentRows.get(0).scrollHeight - commentRows.height());
+									commentRows.animate({scrollTop : scrollto}, 500);
 								}
 	      		  } else if(commentRows.children().length == 0) {
 								// there should never be a case where there were comments and then the API returns none, but plan for failure!
