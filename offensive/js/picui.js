@@ -24,46 +24,42 @@ function qc_dialog_init() {
 			}
 		}
 
-		function qc_autosize(dialog) {
-			dialog = $(dialog);
-
+		function qc_autosize(self) {
 			// if dialog is not open, do not mess with it—its height is zero
-			if(!dialog.dialog("isOpen")) { return; }
+			if(!self.dialog("isOpen")) { return; }
 
 			// if dialog has been manipulated by the user, do not mess with the size
-			if(dialog.hasAttr("modified")) {
+			if(self.hasAttr("modified")) {
 				// Note: the contents of the box may still need a re-fit (eg: disable_voting).
-				qc_fit(dialog);
+				qc_fit(self);
 				return;
 			}
 
 			// scale to fit content
-			var commentRows = dialog.find("#qc_commentrows");
+			var commentRows = self.find("#qc_commentrows");
 			
-			dialog.height(commentRows.position().top + commentRows.get(0).scrollHeight);
+			self.height(commentRows.position().top + commentRows.get(0).scrollHeight);
 			// limit the maximum height
 			// Note: using .dialog("option", "maxHeight") would restrict the user from embiggening it further
-			if(dialog.height() > $(window).height() - 150) {
-				dialog.height($(window).height() - 150);
+			if(self.height() > $(window).height() - 150) {
+				self.height($(window).height() - 150);
 			}
 			// re-center the qc box since it's now not properly centered
-			dialog.dialog("option", "position", "center");
+			self.dialog("option", "position", "center");
 
 			// since we may have changed the height, re-fit the contents
-			qc_fit(dialog);
+			qc_fit(self);
 		}
 
-		function qc_fit(dialog) {
-			dialog = $(dialog);
-
+		function qc_fit(self) {
 			// since we're resizing elements in JS anyway, make the textarea fit correctly
-			var textarea = dialog.find("textarea#qc_comment");
-			textarea.width(dialog.width() - (textarea.outerWidth(true) - textarea.width()));
+			var textarea = self.find("textarea#qc_comment");
+			textarea.width(self.width() - (textarea.outerWidth(true) - textarea.width()));
 
 			// commentrows height = bottom of dialog(top of dialog + height of dialog) - top of comments
-			var commentRows = dialog.find("#qc_commentrows");
+			var commentRows = self.find("#qc_commentrows");
 			if(commentRows.children().length > 0) {
-				commentRows.height(dialog.height() - commentRows.position().top)
+				commentRows.height(self.height() - commentRows.position().top)
 			}
 		}
 
@@ -95,7 +91,7 @@ function qc_dialog_init() {
 		});
 		
 		// remember location of the caret
-		function saveCaret(e) {
+		function qc_save_caret(e) {
 			var self = $(this);
 			// Note: Capture the caret's position after the event has actually moved it
 			window.setTimeout(function(){
@@ -104,14 +100,45 @@ function qc_dialog_init() {
 				}
 			}, 0);
 		}
-		$("#qc_comment").on("keydown", saveCaret).on("click", saveCaret);
+		$("#qc_comment").on("keydown", qc_save_caret).on("click", qc_save_caret);
+
+		function qc_start_manipulation(self) {
+			// fade out
+			self.dialog("widget").fadeTo("fast", 0.7);
+			
+			// disable automatic size/position after the box has been manipulated
+			self.attr("modified", "");
+			
+			// this has to be done every time the box is moved/resized due to an issue with Internet Explorer
+			$(window).off("clickoutside.qc");
+		}
+		
+		function qc_done_manipulation(self) {
+			// fade in
+			self.dialog("widget").fadeTo("fast", 1);
+		  
+			// reflow contents/quick box
+			qc_autosize(self);
+
+			// this has to be done every time the box is moved/resized due to an issue with Internet Explorer
+			qc_bind_clickoutside(self);
+		}
+		
+		function qc_bind_clickoutside(self) {
+			window.setTimeout(
+				function(){
+					self.dialog("widget").on("clickoutside.qc", function(){
+						self.dialog("close");
+					});
+				}, 0);
+		}
 
 		return {
 			autoOpen: false,
 			title: "please stand by",
 			width: "500px",
 			open: function(event, ui) {
-				var self = this;
+				var self = $(this);
 
 				// restore scroll state
 				var commentRows = $("#qc_commentrows");
@@ -126,18 +153,12 @@ function qc_dialog_init() {
 
 				// disable normal events
 				unbind_default_events()
-				
+									
+				// window resize should trigger a reflow.
+				$(window).on("resize.qc", function(e,o){qc_autosize(self);});
+
 				// clicking outside the box closes it
-				// Note: if we bind right away, the clickoutside event will fire immediately, cancelling the open
-				window.setTimeout(
-					function(){
-						$(self).dialog("widget").on("clickoutside.qc", function(){
-							$(self).dialog("close");
-						});
-					}, 0);
-					
-				// window resize should trigger a reflow. so should opening.
-				$(window).on("resize.qc", function(e,o){qc_autosize(self);}).resize();
+				qc_bind_clickoutside(self);
 
 				// load comments into the quick window
 				var comments = $("#qc_comments");
@@ -165,7 +186,7 @@ function qc_dialog_init() {
           	
 							// remember how many comments we were displaying before
 							var thecount = commentRows.children().length;
-							var atBottom = $(self).height() > 0
+							var atBottom = self.height() > 0
 							            && commentRows.scrollTop() > 0
 							            && commentRows.scrollTop() == commentRows.get(0).scrollHeight - commentRows.height();
 							
@@ -217,32 +238,30 @@ function qc_dialog_init() {
 				// re-enable normal behaviour
 				bind_default_events();
 				
-				// clean up bindings. sure would be nice if .off could operate without a selector.
+				// clean up all qc bindings.
 				$(this).dialog("widget").off(".qc").find("*").off(".qc");
 				$(document).off(".qc");
 				$(window).off(".qc");
 			},
 			dragStart: function(event, ui) {
-			  $(this).dialog("widget").fadeTo("fast", 0.7);
-				// do not do any automatic resizing if the box has been manipulated
+				qc_start_manipulation($(this));
 			},
 			dragStop: function(event, ui) {
 				var self = $(this), widget = self.dialog("widget");
-			  widget.fadeTo("fast", 1);
+				
+				qc_done_manipulation(self);
+				
 				// remember the location of the box so it doesn't move itself next time it's opened
 				self.dialog("option", "position", [widget.offset().left, widget.offset().top]);
-				self.attr("modified", "");
 			},
 			resizeStart: function(event, ui) {
-			  $(this).dialog("widget").fadeTo("fast", 0.7);
-				// do not do any automatic resizing if the box has been manipulated
-				$(this).attr("modified", "");
+				qc_start_manipulation($(this));
 			},
 			resize: function(event, ui) {
-				qc_fit(this);
+				qc_fit($(this));
 			},
 			resizeStop: function(event, ui) {
-			  $(this).dialog("widget").fadeTo("fast", 1);
+				qc_done_manipulation($(this));
 			}
 		};
 };
