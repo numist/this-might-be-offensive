@@ -31,7 +31,7 @@ function qc_dialog_init() {
 			if(!dialog.dialog("isOpen")) { return; }
 
 			// if dialog has been manipulated by the user, do not mess with the size
-			if(dialog.attr("resized")) {
+			if(dialog.hasAttr("modified")) {
 				// Note: the contents of the box may still need a re-fit (eg: disable_voting).
 				qc_fit(dialog);
 				return;
@@ -225,18 +225,18 @@ function qc_dialog_init() {
 			dragStart: function(event, ui) {
 			  $(this).dialog("widget").fadeTo("fast", 0.7);
 				// do not do any automatic resizing if the box has been manipulated
-				$(this).attr("resized", "");
 			},
 			dragStop: function(event, ui) {
 				var self = $(this), widget = self.dialog("widget");
-			  self.dialog("widget").fadeTo("fast", 1);
+			  widget.fadeTo("fast", 1);
 				// remember the location of the box so it doesn't move itself next time it's opened
-				self.dialog("option", "position", [widget.offset().left, widget.offset().top])
+				self.dialog("option", "position", [widget.offset().left, widget.offset().top]);
+				self.attr("modified", "");
 			},
 			resizeStart: function(event, ui) {
 			  $(this).dialog("widget").fadeTo("fast", 0.7);
 				// do not do any automatic resizing if the box has been manipulated
-				$(this).attr("resized", "");
+				$(this).attr("modified", "");
 			},
 			resize: function(event, ui) {
 				qc_fit(this);
