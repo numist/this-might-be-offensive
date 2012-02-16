@@ -435,8 +435,7 @@ $(document).ready(function() {
 	});
 	
 	// set up image resizer
-	theimage().height(theimage().attr("max-height")).width(theimage().attr("max-width"));
-	var ypad = theimage().offset().top + $(document).height() - (theimage().offset().top + theimage().outerHeight(true));
+	var ypad = $("body").height() - theimage().outerHeight(true);
 	var xpad = $("div#content").outerWidth(true) - $("div#content").width();
 	theimage().irsz({
 		min_height: 40, min_width: 40,
