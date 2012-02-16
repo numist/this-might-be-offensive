@@ -68,7 +68,7 @@ function qc_dialog_init() {
 		}
 
 		// handle form submission from within comments box
-		$("form#qc_form").submit(function(e) {
+		$("form#qc_form").on("submit", function(e) {
 			e.preventDefault();
 			
 			var dialog = $("#qc_dialog");
@@ -85,7 +85,7 @@ function qc_dialog_init() {
 		});
 
 		// remember the scroll height
-		$("#qc_commentrows").scroll(function(){
+		$("#qc_commentrows").on("scroll", function(){
 			self = $(this);
 			if(self.scrollTop() > 0) {
 				self.attr("scrollTop", self.scrollTop());
@@ -124,20 +124,20 @@ function qc_dialog_init() {
 				var caret = comment.hasAttr("caret") ? comment.attr("caret") : 0;
 				comment.focus().setCaretPosition(caret);
 
-				// disable normal keybindings
-				$(document).off(".modal");
-				
-				// fit contents to dialog
-				qc_autosize(self);
+				// disable normal events
+				unbind_default_events()
 				
 				// clicking outside the box closes it
 				// Note: if we bind right away, the clickoutside event will fire immediately, cancelling the open
 				window.setTimeout(
 					function(){
-						$(self).dialog("widget").bind("clickoutside", function(){
+						$(self).dialog("widget").on("clickoutside.qc", function(){
 							$(self).dialog("close");
 						});
 					}, 0);
+					
+				// window resize should trigger a reflow. so should opening.
+				$(window).on("resize.qc", function(e,o){qc_autosize(self);}).resize();
 
 				// load comments into the quick window
 				var comments = $("#qc_comments");
@@ -207,15 +207,18 @@ function qc_dialog_init() {
 							
 							// resize quick window, if appropriate
 							qc_autosize(self);
-       	  }
+       	  	}
        		});
 				}
 			},
 			close: function(event, ui) {
-				// re-enable normal keybindings
-				$(document).on("keydown.modal", handle_keypress);
-				// clean up bindings
-				$(this).dialog("widget").unbind("clickoutside");
+				// re-enable normal behaviour
+				bind_default_events();
+				
+				// clean up bindings. sure would be nice if .off could operate without a selector.
+				$(this).dialog("widget").off(".qc").find("*").off(".qc");
+				$(document).off(".qc");
+				$(window).off(".qc");
 			},
 			dragStart: function(event, ui) {
 			  $(this).dialog("widget").fadeTo("fast", 0.7);
@@ -254,6 +257,14 @@ function qc_form_reset() {
 /******************************************************************************
  * global actions
  *****************************************************************************/
+
+function bind_default_events() {
+	$(document).on("keydown.default", handle_keypress);
+}
+
+function unbind_default_events() {
+	$(document).off(".default");
+}
 
 // perform a vote. The object here is the div that belongs to this vote link
 function do_vote(o) {
@@ -420,8 +431,8 @@ $(document).ready(function() {
 	// bind quick link
 	$("#quickcomment").bind("click", function(e){ $("#qc_dialog").dialog("open"); e.preventDefault(); });
 
-	// bind keyboard events
-	$(document).on("keydown.modal", handle_keypress);
+	// start reacting to events normally
+	bind_default_events();
 
 	// bind instructions link
 	$("#instruction_link a").click(function () {
