@@ -4,24 +4,25 @@
 
 function qc_dialog_init() {
 
-		function qc_headers(dialog) {
-			var dialog = $(dialog);
+		function qc_headers(self) {
 		  if($("#qc_comments").hasAttr("loading")) {
 				return;
 			}
 			
 			if($("#qc_commentrows").children().length == 0) {
 				if($("#qc_form:visible").length > 0) {
-					dialog.dialog("option", "title", "first post!");
+					self.dialog("option", "title", "first post!");
 				} else {
-					dialog.dialog("option", "title", "nothing to see here, move along");
+					self.dialog("option", "title", "nothing to see here, move along");
 				}
 			} else {
-				dialog.dialog("option", "title", "let's hear it");
+				self.dialog("option", "title", "let's hear it");
 				if($("#qc_comments").children("b").length == 0) {
 					$("#qc_comments").prepend("<b>the dorks who came before you said: </b>");
 				}
 			}
+			
+			qc_autosize(self);
 		}
 
 		function qc_autosize(self) {
@@ -37,12 +38,16 @@ function qc_dialog_init() {
 
 			// scale to fit content
 			var commentRows = self.find("#qc_commentrows");
-			
-			self.height(commentRows.position().top + commentRows.get(0).scrollHeight);
-			// limit the maximum height
-			// Note: using .dialog("option", "maxHeight") would restrict the user from embiggening it further
-			if(self.height() > $(window).height() - 150) {
-				self.height($(window).height() - 150);
+			if(commentRows.filter(":visible").length > 0) {
+				self.height(commentRows.position().top + commentRows.get(0).scrollHeight);
+				// limit the maximum height
+				// Note: using .dialog("option", "maxHeight") would restrict the user from embiggening it further
+				if(self.height() > $(window).height() - 150) {
+					self.height($(window).height() - 150);
+				}
+			} else {
+				// no comments to fit, no need to get fancy.
+				self.height("");
 			}
 			// re-center the qc box since it's now not properly centered
 			self.dialog("option", "position", "center");
@@ -57,7 +62,7 @@ function qc_dialog_init() {
 			textarea.width(self.width() - (textarea.outerWidth(true) - textarea.width()));
 
 			// commentrows height = bottom of dialog(top of dialog + height of dialog) - top of comments
-			var commentRows = self.find("#qc_commentrows");
+			var commentRows = self.find("#qc_commentrows:visible");
 			if(commentRows.children().length > 0) {
 				commentRows.height(self.height() - commentRows.position().top)
 			}
@@ -169,6 +174,9 @@ function qc_dialog_init() {
        	  	url: "/offensive/ui/api.php/getcomments.html?fileid="+getURLParam("id"),
        	  	dataType: "html",
 						beforeSend: function() {
+							if(comments.filter(":visible").length == 0) {
+								comments.show();
+							}
 							comments.attr("loading", "");
 							if(commentRows.children().length == 0) {
 								// user-facing loading feedback
@@ -226,10 +234,8 @@ function qc_dialog_init() {
 							if(comments.hasAttr("loading")) {
 								commentRows.text("fuck. try again?");
 								comments.removeAttr("loading");
+								qc_autosize(self);
 							}
-							
-							// resize quick window, if appropriate
-							qc_autosize(self);
        	  	}
        		});
 				}
