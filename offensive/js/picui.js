@@ -38,8 +38,10 @@ function qc_dialog_init() {
 			}
 
 			// scale to fit content
-			var commentRows = dialog.find("#qc_commentrows");
-			dialog.height(commentRows.position().top + commentRows.get(0).scrollHeight);
+			var commentRows = dialog.find("#qc_commentrows"),
+			    listOffset = commentRows.outerHeight(true) - commentRows.height();
+			
+			dialog.height(commentRows.position().top + commentRows.get(0).scrollHeight - listOffset);
 			// limit the maximum height
 			// Note: using .dialog("option", "maxHeight") would restrict the user from embiggening it further
 			if(dialog.height() > $(window).height() - 150) {
