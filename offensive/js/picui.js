@@ -5,20 +5,29 @@
 function qc_dialog_init() {
 
 		function qc_headers(self) {
-		  if($("#qc_comments").hasAttr("loading")) {
+			var comments = $("#qc_comments"), commentRows = $("#qc_commentrows"), form = $("#qc_form:visible");
+		  if(comments.hasAttr("loading")) {
 				return;
 			}
 			
-			if($("#qc_commentrows").children().length == 0) {
-				if($("#qc_form:visible").length > 0) {
+			if(commentRows.children().length == 0) {
+				comments.hide();
+				
+				if(form.length > 0) {
 					self.dialog("option", "title", "first post!");
 				} else {
 					self.dialog("option", "title", "nothing to see here, move along");
 				}
 			} else {
-				self.dialog("option", "title", "let's hear it");
-				if($("#qc_comments").children("b").length == 0) {
-					$("#qc_comments").prepend("<b>the dorks who came before you said: </b>");
+				comments.show();
+				
+				if(form.length > 0) {
+					self.dialog("option", "title", "let's hear it");
+					if(comments.children("b").length == 0) {
+						comments.prepend("<b>the dorks who came before you said: </b>");
+					}
+				} else {
+					self.dialog("option", "title", "the dorks who came before you said:");
 				}
 			}
 			
@@ -26,6 +35,14 @@ function qc_dialog_init() {
 		}
 
 		function qc_autosize(self) {
+			var commentRows = self.find("#qc_commentrows");
+			
+			if($("#qc_form:visible").length > 0) {
+				commentRows.css("margin-top", "");
+			} else {
+				commentRows.css("margin-top", "0px");
+			}
+			
 			// if dialog is not open, do not mess with it—its height is zero
 			if(!self.dialog("isOpen")) { return; }
 
@@ -37,9 +54,13 @@ function qc_dialog_init() {
 			}
 
 			// scale to fit content
-			var commentRows = self.find("#qc_commentrows");
-			if(commentRows.filter(":visible").length > 0) {
-				self.height(commentRows.position().top + commentRows.get(0).scrollHeight);
+			if(commentRows.filter(":visible").length > 0 && commentRows.children().length > 0) {
+				if(self.children(":visible").first().is("#qc_comments")) {
+					// there is no form. fill the dialog with commentRows.
+					self.height(commentRows.get(0).scrollHeight);
+				} else {
+					self.height(commentRows.position().top + commentRows.get(0).scrollHeight);
+				}
 				// limit the maximum height
 				// Note: using .dialog("option", "maxHeight") would restrict the user from embiggening it further
 				if(self.height() > $(window).height() - 150) {
@@ -61,10 +82,15 @@ function qc_dialog_init() {
 			var textarea = self.find("textarea#qc_comment");
 			textarea.width(self.width() - (textarea.outerWidth(true) - textarea.width()));
 
-			// commentrows height = bottom of dialog(top of dialog + height of dialog) - top of comments
 			var commentRows = self.find("#qc_commentrows:visible");
 			if(commentRows.children().length > 0) {
-				commentRows.height(self.height() - commentRows.position().top)
+				if(self.children(":visible").first().is("#qc_comments")) {
+					// there is no form. fill the dialog with commentRows.
+					commentRows.height(self.height());
+				} else {
+					// commentrows height = height of dialog - top of comments
+					commentRows.height(self.height() - commentRows.position().top);
+				}
 			}
 		}
 
@@ -83,6 +109,8 @@ function qc_dialog_init() {
 			dialog.dialog("close");
 
 			handle_comment_post(comment, vote, tmbo, repost, subscribe);
+			
+			return false;
 		});
 
 		// remember the scroll height
@@ -93,6 +121,7 @@ function qc_dialog_init() {
 			} else {
 				self.removeAttr("scrollTop");
 			}
+			return true;
 		});
 		
 		// remember location of the caret
@@ -104,6 +133,7 @@ function qc_dialog_init() {
 					self.attr("caret", self.getCaretPosition());
 				}
 			}, 0);
+			return true;
 		}
 		$("#qc_comment").on("keydown", qc_save_caret).on("click", qc_save_caret);
 
@@ -134,6 +164,7 @@ function qc_dialog_init() {
 				function(){
 					self.dialog("widget").on("clickoutside.qc", function(){
 						self.dialog("close");
+						return true;
 					});
 				}, 0);
 		}
@@ -142,28 +173,41 @@ function qc_dialog_init() {
 			autoOpen: false,
 			title: "please stand by",
 			width: "500px",
+			minHeight: "50px",
 			open: function(event, ui) {
 				var self = $(this);
-
+				
+				// memory
 				// restore scroll state
 				var commentRows = $("#qc_commentrows");
 				if(commentRows.hasAttr("scrollTop")) {
 					commentRows.scrollTop(commentRows.attr("scrollTop"));
 				}
-				
 				// restore caret position in comment box
-				var comment = $("#qc_comment");
-				var caret = comment.hasAttr("caret") ? comment.attr("caret") : 0;
-				comment.focus().setCaretPosition(caret);
-
+				var comment = $("#qc_comment:visible");
+				if(comment.length > 0) {
+					var caret = comment.hasAttr("caret") ? comment.attr("caret") : 0;
+					comment.focus().setCaretPosition(caret);
+				} else {
+					self.get(0).focus();
+				}
+				
+				// events:
 				// disable normal events
 				unbind_default_events()
-									
 				// window resize should trigger a reflow.
-				$(window).on("resize.qc", function(e,o){qc_autosize(self);});
-
+				$(window).on("resize.qc", function(e,o){qc_autosize(self); return true;});
 				// clicking outside the box closes it
 				qc_bind_clickoutside(self);
+				// escape key shouldn't have to come from within
+				$("body").on("keydown.qc", function(event) {
+					if(event.target != this) return true;
+					$(self.dialog("widget").data("events").keydown)
+					 .each(function(i, handlerObject) {
+					   handlerObject.handler(event);
+					 });
+					return true;
+				});
 
 				// load comments into the quick window
 				var comments = $("#qc_comments");
@@ -181,8 +225,8 @@ function qc_dialog_init() {
 							if(commentRows.children().length == 0) {
 								// user-facing loading feedback
 								commentRows.text("loading…");
+								qc_autosize(self);
 							}
-							qc_autosize(self);
 						},
        	  	success: function(data) {
 							// call was not unsuccessful
@@ -206,7 +250,6 @@ function qc_dialog_init() {
 							// get comments from result
        	  	  var filteredData = $(data).find("div.entry");
 	      		  if(filteredData.length > 0) {
-								comments.show();
 								if(thecount > 0) {
 									commentRows.children().remove();
 								}
@@ -222,10 +265,7 @@ function qc_dialog_init() {
 									                        commentRows.get(0).scrollHeight - commentRows.height());
 									commentRows.animate({scrollTop : scrollto}, 500);
 								}
-	      		  } else if(commentRows.children().length == 0) {
-								// there should never be a case where there were comments and then the API returns none, but plan for failure!
-								comments.hide();
-							}
+	      		  }
 							// update headers
 							qc_headers(self);
        	  	},
@@ -245,7 +285,7 @@ function qc_dialog_init() {
 				bind_default_events();
 				
 				// clean up all qc bindings.
-				$(this).dialog("widget").off(".qc").find("*").off(".qc");
+				$("*").off(".qc");
 				$(document).off(".qc");
 				$(window).off(".qc");
 			},
@@ -287,7 +327,6 @@ function qc_form_reset() {
 
 function bind_default_events() {
 	$(document).on("keydown.default", handle_keypress);
-	$(document).focus();
 }
 
 function unbind_default_events() {
@@ -301,7 +340,7 @@ function do_vote(o) {
   }
   
 	// make sure we can't vote again
-	$("#votelinks a").unbind();			// remove click event handler
+	$("#votelinks a").off();			// remove click event handler
 
 	vote = o.attr("id");				
 	imageid = getURLParam("id");
@@ -385,6 +424,7 @@ function handle_vote(o,e)
 {
 	e.preventDefault();		// prevent the link to continue
 	do_vote(o);
+	return false;
 }
 
 function increase_count(id) {
@@ -444,26 +484,26 @@ $(document).ready(function() {
   $("#qc_dialog").dialog(qc_dialog_init());
 
 	// bind vote links
-	$("#votelinks a").click(function(e) {
-		handle_vote($(this),e);
+	$("#votelinks a").on("click", function(e) {
+		return handle_vote($(this),e);
 	});
 
 	// bind subscribe link
-	$("#subscribeLink").click(function(e) {
-		handle_subscribe($(this),e,$("#good").attr("name"));
+	$("#subscribeLink").on("click", function(e) {
+		return handle_subscribe($(this),e,$("#good").attr("name"));
 	});
-	$("#unsubscribeLink").click(function(e) {
-		handle_subscribe($(this),e,$("#good").attr("name"));
+	$("#unsubscribeLink").on("click", function(e) {
+		return handle_subscribe($(this),e,$("#good").attr("name"));
 	});
 	
 	// bind quick link
-	$("#quickcomment").bind("click", function(e){ $("#qc_dialog").dialog("open"); e.preventDefault(); });
+	$("#quickcomment").on("click", function(e){ $("#qc_dialog").dialog("open"); e.preventDefault(); return false;});
 
 	// start reacting to events normally
 	bind_default_events();
 
 	// bind instructions link
-	$("#instruction_link a").click(function () {
+	$("#instruction_link a").on("click", function () {
 		$("#instructions").toggle();
 	});
 
@@ -480,9 +520,9 @@ $(document).ready(function() {
 		padding: [xpad, ypad],
 		cursor_zoom_in: "url(/offensive/graphics/zoom_in.cur),default", cursor_zoom_out: "url(/offensive/graphics/zoom_out.cur),default"
 	})
-	.resize(	function() {
-		if($("span#scaled").length == 0) { return; }
-    if(theimage().length == 0) { return; }
+	.on("resize", function() {
+		if($("span#scaled").length == 0) { return true; }
+    if(theimage().length == 0) { return true; }
 
 		var image = theimage();
 		var current_width = image.width(), current_height = image.height();
@@ -494,6 +534,7 @@ $(document).ready(function() {
 		    $("span#scaled").text("");
 		  }
 		})
+		return true;
 	})
 	.resize();
 });

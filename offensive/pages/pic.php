@@ -162,13 +162,13 @@
               
               e.preventDefault();
               <?= $action ?>();
-              return;
+              return false;
             }
         
         <?}
         }?>
 
-				return;
+				return true;
 			}
 		</script>
 		<script type="text/javascript" src="/offensive/js/irsz.js?v=0.0.14"></script>
