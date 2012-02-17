@@ -2,12 +2,6 @@
 
 require_once("offensive/assets/classes.inc");
 
-function updateSubscriptions( $fileid, $commentid ) {
-	$sql = "UPDATE offensive_subscriptions SET commentid = $commentid 
-	        WHERE fileid = $fileid AND commentid IS NULL";
-	$result = tmbo_query( $sql );
-}
-
 function updateCommentCount($fileid, $good, $bad, $repost, $tmbo, $comment) {
 	$good = $good ? 1 : 0;
 	$bad = $bad ? 1 : 0;
@@ -99,6 +93,9 @@ function postComment($fileid, $vote, $repost, $offensive, $comment, $subscribe=n
 	$commentid = mysql_insert_id();
 
 	if($comment) {
+		// update subscriptions
+		$upload->updateSubscriptions($commentid);
+		// the commenter doesn't need their subscription updated
 		$upload->clearSubscription();
 	}
 

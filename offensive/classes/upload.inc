@@ -228,6 +228,15 @@ class Upload {
 		return $user->clearSubscription($this);
 	}
 	
+	public function updateSubscriptions($comment) {
+		if(is_numeric($comment)) $comment = new Comment($comment);
+		if(!$comment || !$comment->exists()) trigger_error("invalid comment", E_USER_ERROR);
+		
+		$sql = "UPDATE offensive_subscriptions SET commentid = {$comment->id()}
+		        WHERE fileid = {$this->id()} AND commentid IS NULL";
+		$result = tmbo_query($sql);
+	}
+	
 	/*
 	 * User slinging code
 	 */
