@@ -2,29 +2,6 @@
 
 require_once("offensive/assets/classes.inc");
 
-
-/*
- * subscribes a user to a thread.  this done automatically in the code in a few cases:
- *  * the user commented on the file
- *  * the user voted "this is bad" on the file
- */
-function subscribe($fileid) {
-	$userid = me() ? me()->id() : null;
-	if($userid == null) return false;
-		
-	// check if the user is already subscribed
-	if(id(new Upload($fileid))->subscribed()) return true;
-
-	// ensure file exists
-	$sql = "SELECT * FROM offensive_uploads WHERE id = $fileid";
-	if(mysql_num_rows(tmbo_query($sql)) == 0) return false;
-
-    // finally, subscribe
-	$sql = "INSERT INTO offensive_subscriptions (userid, fileid) VALUES ( $userid, $fileid )";
-	tmbo_query( $sql );
-	return true;
-}
-
 /*
  * unsubscribes a user from a thread.
  */
@@ -106,7 +83,7 @@ function postComment($fileid, $vote, $repost, $offensive, $comment, $subscribe=n
 
 	// sometimes, subscribe the commenter.
 	if($comment || $vote == "this is bad" || $subscribe) {
-		subscribe($fileid);
+		id(new Upload($fileid))->subscribe();
 	}
 
 	// prevent empty comments from being inserted

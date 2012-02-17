@@ -4,6 +4,7 @@
 	require_once("offensive/assets/comments.inc");
 	// Include, and check we've got a connection to the database.
 	require_once( 'admin/mysqlConnectionInfo.inc' );
+	require_once("offensive/assets/classes.inc");
 	if(!isset($link) || !$link) $link = openDbConnection();
 
 	mustLogIn();
@@ -14,7 +15,7 @@
 		unsubscribe($fileid);
 	}
 	else {
-		subscribe($fileid);
+		id(new Upload($fileid))->subscribe();
 	}
 
 	if(array_key_exists("HTTP_REFERER", $_SERVER)) {

@@ -388,7 +388,7 @@
 		}
 		
 		if($subscribe == 1) {
-			subscribe($fileid);
+			id(new Upload($fileid))->subscribe();
 		}
 		send(true);
 	}
@@ -623,7 +623,7 @@
 		if($subscribe == 0) {
 			send(unsubscribe($threadid));
 		}
-		send(subscribe($threadid));
+		send(id(new Upload($threadid))->subscribe());
 	}
 	
 	/**

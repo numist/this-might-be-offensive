@@ -200,11 +200,18 @@ class Upload {
 		return ($last_active == null ? $this->timestamp() : $last_active);
 	}
 	
-	public function subscribed() {
+	public function subscribed($user=null) {
 		if($user == null) $user = me();
 		if(is_numeric($user)) $user = new User($user);
 		if(!$user || !$user->exists()) trigger_error("invalid user", E_USER_ERROR);
 		return $user->subscribed($this);
+	}
+
+	public function subscribe($user=null) {
+		if($user == null) $user = me();
+		if(is_numeric($user)) $user = new User($user);
+		if(!$user || !$user->exists()) trigger_error("invalid user", E_USER_ERROR);
+		return $user->subscribe($this);
 	}
 	
 	/*

@@ -375,13 +375,35 @@ class User {
 
 		// memoize self
 		if(me() && me()->id() == $this->id()) {
-			if(!array_key_exists(__FUNCTION__, $this->data)) {
-				$this->data[__FUNCTION__] = mysql_num_rows(tmbo_query($sql)) > 0 ? true : false;
+			if(!array_key_exists("subscribed:".$upload->id(), $this->data)) {
+				$this->data["subscribed:".$upload->id()] = mysql_num_rows(tmbo_query($sql)) > 0 ? true : false;
 			}
-			return (bool)$this->data[__FUNCTION__];
+			return (bool)$this->data["subscribed:".$upload->id()];
 		}
 		
 		return mysql_num_rows(tmbo_query($sql)) > 0 ? true : false;
+	}
+
+	public function subscribe($upload) {
+		if(is_numeric($upload)) $upload = new Upload($upload);
+		if(!$upload || !$upload->exists()) trigger_error("invalid upload", E_USER_ERROR);
+		
+		// check if the user is already subscribed
+		if($this->subscribed($upload)) return true;
+
+		// ensure file exists
+		if(!$upload->exists()) return false;
+
+    // finally, subscribe
+		$sql = "INSERT INTO offensive_subscriptions (userid, fileid) VALUES ( {$this->id()}, {$upload->id()} )";
+		tmbo_query($sql);
+		
+		// reset memoization
+		if(me() && me()->id() == $this->id()) {
+			$this->data["subscribed:".$upload->id()] = true;
+		}
+		
+		return true;
 	}
 
 	/*
@@ -396,10 +418,10 @@ class User {
 		
 		// memoize self
 		if(me() && me()->id() == $this->id()) {
-			if(!array_key_exists(__FUNCTION__, $this->data)) {
-				$this->data[__FUNCTION__] = (mysql_num_rows(tmbo_query($sql)) > 0);
+			if(!array_key_exists(__FUNCTION__.":".$upload->id(), $this->data)) {
+				$this->data[__FUNCTION__.":".$upload->id()] = (mysql_num_rows(tmbo_query($sql)) > 0);
 			}
-			return $this->data[__FUNCTION__];
+			return $this->data[__FUNCTION__.":".$upload->id()];
 		}
 		return (mysql_num_rows(tmbo_query($sql)) > 0);
 	}

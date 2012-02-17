@@ -13,7 +13,7 @@
 			if( strlen( $topic ) > 0 ) {
 				$tid = createTopic($topic);
 				
-				subscribe($tid);
+				id(new Upload($tid))->subscribe();
 				
 				if(array_key_exists("comment", $_REQUEST)) {
 					postComment($tid, "", 0, 0, $_REQUEST['comment'], true);
