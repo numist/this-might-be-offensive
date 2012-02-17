@@ -172,7 +172,7 @@
 			}
 		</script>
 		<script type="text/javascript" src="/offensive/js/irsz.js?v=0.0.14"></script>
-		<script type="text/javascript" src="/offensive/js/picui.js?v=0.0.16"></script>
+		<script type="text/javascript" src="/offensive/js/picui.js?v=0.0.17"></script>
 		<? include_once("analytics.inc"); ?>
 	</head>
 	<body id="pic">
@@ -193,7 +193,7 @@
 		<? } ?>
 		
 		<!-- quick comment box -->
-		<div id="qc_dialog">
+		<div id="qc_dialog" style="display: none;">
 			<a name="form"></a>
 			<form id="qc_form"<? if(!canComment($upload->id())) { ?> style="display: none;"<? } ?>>
 					<input type="hidden" value="329310" name="fileid" id="qc_fileid">

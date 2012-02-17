@@ -481,7 +481,7 @@ function theimage() { return $(document).find("a#imageLink img").last(); };
 
 $(document).ready(function() {
   // init quick comment box
-  $("#qc_dialog").dialog(qc_dialog_init());
+  $("#qc_dialog").show().dialog(qc_dialog_init());
 
 	// bind vote links
 	$("#votelinks a").on("click", function(e) {
