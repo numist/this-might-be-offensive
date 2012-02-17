@@ -4,19 +4,6 @@ require_once("offensive/assets/classes.inc");
 
 
 /*
- * return if a user is allowed to comment on a thread
- */
-function canComment($fileid, $userid=null) {
-	if($userid == null) $userid = me() ? me()->id() : null;
-	if($userid == null) return false;
-	
-	$file = new Upload($fileid);
-	if(me() && me()->status() != "admin" && $file->blocked()) return false;
-	
-	return true;
-}
-
-/*
  * subscribes a user to a thread.  this done automatically in the code in a few cases:
  *  * the user commented on the file
  *  * the user voted "this is bad" on the file
@@ -123,7 +110,7 @@ function postComment($fileid, $vote, $repost, $offensive, $comment, $subscribe=n
 		$offensive = 0;
 	}
 	
-	if(!canComment($fileid)) {
+	if(!id(new Upload($fileid))->canComment()) {
 		$comment = "";
 	}
 

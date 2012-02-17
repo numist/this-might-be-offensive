@@ -392,6 +392,16 @@ class User {
 		if(!$upload->file()) return false;							// can not vote if there is no file (topics, expired uploads)
 		return true;
 	}
+	
+	public function canComment($upload) {
+		if(is_numeric($upload)) $upload = new Upload($upload);
+		if(!$upload || !$upload->exists()) trigger_error("invalid upload", E_USER_ERROR);
+		
+		// no need to memoize, this method is not responsible for any new data
+		if($this->status() != "admin" && $upload->blocked()) return false;	// non-admin blocked
+		if($upload->id() == "211604" && me()->status() != "admin") return false; // changeblog
+		return true;
+	}
 
 	// API support
 	public function api_data() {

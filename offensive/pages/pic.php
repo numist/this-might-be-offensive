@@ -195,7 +195,7 @@
 		<!-- quick comment box -->
 		<div id="qc_dialog" style="display: none;">
 			<a name="form"></a>
-			<form id="qc_form"<? if(!canComment($upload->id())) { ?> style="display: none;"<? } ?>>
+			<form id="qc_form"<? if(!$upload->canComment()) { ?> style="display: none;"<? } ?>>
 					<input type="hidden" value="329310" name="fileid" id="qc_fileid">
 					<input type="hidden" name="c" value="comments">
 					<textarea cols="64" rows="6" name="comment" id="qc_comment"></textarea>

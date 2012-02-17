@@ -224,7 +224,7 @@
 
 <?php
     // changeblog shouldn't tease the users with a comment field
-    if(canComment($upload->id()) && ($upload->id() != "211604" || me()->status() == "admin")) {
+    if($upload->canComment()) {
 ?>
 
 	<div class="contentbox">
