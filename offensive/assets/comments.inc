@@ -2,19 +2,6 @@
 
 require_once("offensive/assets/classes.inc");
 
-/*
- * unsubscribes a user from a thread.
- */
-function unsubscribe($fileid) {
-	$userid = me() ? me()->id() : null;
-	if($userid == null) return false;
-		
-	$sql = "DELETE FROM offensive_subscriptions WHERE userid=$userid AND fileid=$fileid";
-	tmbo_query($sql);
-
-	return true;
-}
-
 function updateSubscriptions( $fileid, $commentid ) {
 	$sql = "UPDATE offensive_subscriptions SET commentid = $commentid 
 	        WHERE fileid = $fileid AND commentid IS NULL";

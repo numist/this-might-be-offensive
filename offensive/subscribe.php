@@ -11,11 +11,13 @@
 
 	$fileid = array_key_exists("fileid", $_REQUEST) ? $_REQUEST['fileid'] : "";
 	
+	$upload = new Upload($fileid);
+	
 	if( array_key_exists("un", $_REQUEST) && $_REQUEST['un'] == 1 ) {
-		unsubscribe($fileid);
+		$upload->unsubscribe();
 	}
 	else {
-		id(new Upload($fileid))->subscribe();
+		$upload->subscribe();
 	}
 
 	if(array_key_exists("HTTP_REFERER", $_SERVER)) {

@@ -620,10 +620,13 @@
 		$subscribe = check_arg("subscribe", "integer", null, array("1", "0"));
 		handle_errors();
 		
+		$upload = new Upload($threadid);
+		
 		if($subscribe == 0) {
-			send(unsubscribe($threadid));
+			send($upload->unsubscribe());
+			return;
 		}
-		send(id(new Upload($threadid))->subscribe());
+		send($upload->subscribe());
 	}
 	
 	/**

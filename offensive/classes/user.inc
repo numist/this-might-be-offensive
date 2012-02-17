@@ -405,6 +405,25 @@ class User {
 		
 		return true;
 	}
+	
+	public function unsubscribe($upload) {
+		if(is_numeric($upload)) $upload = new Upload($upload);
+		if(!$upload || !$upload->exists()) trigger_error("invalid upload", E_USER_ERROR);
+		
+		// check if the user is already unsubscribed
+		if(!$this->subscribed($upload)) return true;
+
+		// finally, unsubscribe
+		$sql = "DELETE FROM offensive_subscriptions WHERE userid={$this->id()} AND fileid={$upload->id()}";
+		tmbo_query($sql);
+		
+		// reset memoization
+		if(me() && me()->id() == $this->id()) {
+			$this->data["subscribed:".$upload->id()] = false;
+		}
+		
+		return true;
+	}
 
 	/*
 	 * permissions
