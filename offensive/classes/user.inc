@@ -95,15 +95,15 @@ class User {
 	}
 	
 	public function username() {
-		return $this->getUserRow("username");
+		return $this->getUserRow(__FUNCTION__);
 	}
 	
 	public function email() {
-		return $this->getUserRow("email");
+		return $this->getUserRow(__FUNCTION__);
 	}
 	
 	public function created() {
-		return $this->getUserRow("created");
+		return $this->getUserRow(__FUNCTION__);
 	}
 	
 	public function status() {
@@ -111,11 +111,11 @@ class User {
 	}
 	
 	public function timestamp() {
-		return $this->getUserRow("timestamp");
+		return $this->getUserRow(__FUNCTION__);
 	}
 	
 	public function last_login_ip() {
-		return $this->getUserRow("last_login_ip");
+		return $this->getUserRow(__FUNCTION__);
 	}
 	
 	public function referred_by() {

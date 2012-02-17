@@ -113,11 +113,11 @@ class Upload {
 	}
 	
 	public function filename() {
-		return $this->getUploadRow("filename");
+		return $this->getUploadRow(__FUNCTION__);
 	}
 	
 	public function timestamp() {
-		return $this->getUploadRow("timestamp");
+		return $this->getUploadRow(__FUNCTION__);
 	}
 	
 	public function is_tmbo() {
@@ -129,11 +129,11 @@ class Upload {
 	}
 	
 	public function type() {
-		return $this->getUploadRow("type");
+		return $this->getUploadRow(__FUNCTION__);
 	}
 	
 	public function status() {
-		return $this->getUploadRow("status");
+		return $this->getUploadRow(__FUNCTION__);
 	}
 	
 	/*
@@ -165,34 +165,30 @@ class Upload {
 		              E_USER_ERROR);
 	}
 	
-	public function goods() {
-		return is_intger($this->getCacheRow("goods")) 
-			? $this->getCacheRow("goods")
+	private function cacheCount($type) {
+		return is_intger($this->getCacheRow($type)) 
+			? $this->getCacheRow($type)
 			: 0;
+	}
+	
+	public function goods() {
+		return $this->cacheCount(__FUNCTION__);
 	}
 	
 	public function bads() {
-		return is_intger($this->getCacheRow("bads"))
-			? $this->getCacheRow("bads")
-			: 0;
+		return $this->cacheCount(__FUNCTION__);
 	}
 	
 	public function tmbos() {
-		return is_intger($this->getCacheRow("tmbos"))
-			? $this->getCacheRow("tmbos")
-			: 0;
+		return $this->cacheCount(__FUNCTION__);
 	}
 	
 	public function tiars() {
-		return is_intger($this->getCacheRow("tiars"))
-			? $this->getCacheRow("tiars")
-			: 0;
+		return $this->cacheCount(__FUNCTION__);
 	}
 	
 	public function comments() {
-		return is_intger($this->getCacheRow("comments"))
-			? $this->getCacheRow("comments")
-			: 0;
+		return $this->cacheCount(__FUNCTION__);
 	}
 	
 	public function last_active() {

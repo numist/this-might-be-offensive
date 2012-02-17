@@ -115,7 +115,7 @@ class Comment {
 	}
 	
 	public function vote() {
-		return $this->getCommentRow("vote");
+		return $this->getCommentRow(__FUNCTION__);
 	}
 	
 	public function tmbo() {
@@ -157,7 +157,7 @@ class Comment {
 	}
 	
 	public function timestamp() {
-		return $this->getCommentRow("timestamp");
+		return $this->getCommentRow(__FUNCTION__);
 	}
 	
 	public function text() {
