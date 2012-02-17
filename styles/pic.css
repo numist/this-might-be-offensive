@@ -19,30 +19,6 @@ body {
 	text-decoration:none;
 }
 
-.jqmWindow {
-    display: none;
-    position: fixed;
-    top: 50px;
-    left: 0px;
-    margin-left: 250px;
-    width: 500px;
-    background: #ccccff none repeat scroll 0 0;
-    color: #000033;
-    border: 2px solid black;
-}
-
-.jqmOverlay { background-color: #000; }
-
-/* Fixed posistioning emulation for IE6
-     Star selector used to hide definition from browsers other than IE6
-     For valid CSS, use a conditional include instead */
-/*
-* html .jqmWindow {
-     position: absolute;
-     top: expression((document.documentElement.scrollTop || document.body.scrollTop) + Math.round(17 * (document.documentElement.offsetHeight || document.body.clientHeight) / 100) + 'px');
-}
-*/
-
 .blackbar {
         background: #000000;
         height: 11px;
@@ -59,38 +35,6 @@ body {
         color: #ccccff;
 }
 
-.qc_close a:link, qc_close a:visited, qc_close a:active, .qc_close a {
-	color: #ccccff;
-}
-
-#qc_comments {
-	text-align: left;
-	/* margin: 25px 45px 25px 45px; */
-	margin: 10px;
-}
-
-#qc_commentrows {
-	margin-top: 10px;
-	height: 250px;
-	overflow: auto;
-}
-
-.qc_comment {
-	background: #ccccff;
-	padding: 10px;
-	font-size: 10px;
-	line-height:15px;
-}
-
-textarea#qc_comment {
-  width: 470px;
-}
-
-#qc_vote {
-}
-
-#qc_vote ul li {
-}
 
 .timestamp {
 	float: right;
@@ -103,25 +47,88 @@ audio {
 	width: 500px;
 }
 
-.bluebox,.entry {
+/* comments */
+#qc_dialog a,
+#qc_dialog #pic a.userLink
+{
+	text-decoration:underline;
+	color:#000099;
+}
+
+#qc_dialog a:visited,
+#qc_dialog #pic a.userLink {
+	color:#333366;
+}
+
+#qc_dialog a.userLink {
+	color:#666699;
+}
+
+#qc_dialog .bluebox,.entry {
 	background: #ccccff;
 	padding: 10px;
 	font-family: verdana;
 	font-size: 10px;
 }
 
-.entry {
+#qc_dialog .entry {
 	padding: 10px;
-	font-size: 10px;
-	line-height:15px;
+	font-size: 11px;
+	line-height:21px;
 	word-wrap: break-word;
 }
 
-.squelched, a.squelched {
+#qc_dialog .blocked, a.blocked {
+	color:#9999cc;
+}
+
+#qc_dialog .squelched, a.squelched {
 	color:#9999cc;
 	font-size:10px;
 }
 
-.entry .squelched {
+#qc_dialog .entry .squelched {
 	text-align:center;
+}
+
+#qc_dialog .timestamp, .votecount {
+	color:#9999cc;
+}
+
+#qc_dialog .timestamp {
+	font-size:10px;
+	padding-left:8px;
+	float:right;
+}
+
+#qc_dialog .timestamp a {
+	color:#9999cc;
+	text-decoration:none;
+}
+
+#qc_dialog #qc_form {
+  text-align: center;
+}
+
+#qc_dialog div#qc_vote {
+  margin-top: 1em;
+}
+
+#qc_dialog #qc_commentrows {
+  margin-top: 10px;
+  overflow: auto;
+}
+
+#qc_dialog #qc_comments {
+}
+
+#qc_dialog input[name="submit"] {
+  margin-top: 1em;
+  margin-bottom: 0em;
+}
+
+#qc_dialog {
+  padding-top: 10px;
+  padding-bottom: 10px;
+	overflow: hidden;
 }
