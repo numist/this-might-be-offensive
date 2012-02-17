@@ -49,7 +49,7 @@ function postComment($fileid, $vote, $repost, $offensive, $comment, $subscribe=n
 		$upload->subscribe();
 	}
 
-	if($upload->canComment()) {
+	if(!$upload->canComment()) {
 		return false;
 	}
 
