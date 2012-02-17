@@ -361,6 +361,22 @@
 		send(core_getcomments($_REQUEST));
 	}
 	
+	/**
+	 * @method postcomment
+	 * Post a comment to a thread.
+	 *
+	 * All parameters to this function are processed via the POST method, to prevent malicious votes via link shorteners.
+	 *
+	 * No examples yet pending doc system support for POST in examples. Sorry.
+	 *
+	 * @param fileid integer required Post comment to this thread.
+	 * @param comment string optional Comment text.
+	 * @param vote string optional {"this is good", "this is bad", "novote"} Default:"novote" The intended vote.
+	 * @param offensive integer optional {1, 0} Default: 0 Vote [this might be offensive].
+	 * @param repost integer optional {1, 0} Default: 0 Vote [this is a repost].
+	 * @param subscribe integer optional {1, 0} Default: 1 if vote is "this is bad" or comment is not empty, 0 otherwise. Setting to 1 ensures thread subscription, setting to 0 does nothing (the default will override argument of 0).
+	 * @return Boolean indicating if a comment was added to the database.
+	 */
 	function api_postcomment() {
 		$fileid = check_arg("fileid", "integer", $_POST);
 		$comment = check_arg("comment", "string", $_POST, false);
@@ -383,14 +399,7 @@
 		if($offensive === false) $offensive = 0;
 		if($repost === false) $repost = 0;
 
-		if($comment || $vote || $offensive || $repost) {
-			postComment($fileid, $vote, $repost, $offensive, $comment);
-		}
-		
-		if($subscribe == 1) {
-			id(new Upload($fileid))->subscribe();
-		}
-		send(true);
+		send(postComment($fileid, $vote, $repost, $offensive, $comment, $subscribe));
 	}
 
 	// XXX: unimplemented
