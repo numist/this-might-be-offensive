@@ -363,7 +363,30 @@ class User {
 		}
 	}
 
-	// permissions
+	/*
+	 * subscriptions
+	 */
+	public function subscribed($upload) {
+		if(is_numeric($upload)) $upload = new Upload($upload);
+		if(!$upload || !$upload->exists()) trigger_error("invalid upload", E_USER_ERROR);
+
+		$sql = "SELECT * FROM offensive_subscriptions
+						WHERE userid={$this->id()} AND fileid={$upload->id()}";
+
+		// memoize self
+		if(me() && me()->id() == $this->id()) {
+			if(!array_key_exists(__FUNCTION__, $this->data)) {
+				$this->data[__FUNCTION__] = mysql_num_rows(tmbo_query($sql)) > 0 ? true : false;
+			}
+			return (bool)$this->data[__FUNCTION__];
+		}
+		
+		return mysql_num_rows(tmbo_query($sql)) > 0 ? true : false;
+	}
+
+	/*
+	 * permissions
+	 */
 	public function alreadyVoted($upload) {
 		if(is_numeric($upload)) $upload = new Upload($upload);
 		if(!$upload || !$upload->exists()) trigger_error("invalid upload", E_USER_ERROR);
@@ -372,7 +395,7 @@ class User {
 		        WHERE fileid={$upload->id()} AND userid={$this->id()} AND vote LIKE 'this%'";
 		
 		// memoize self
-		if(me()->id() == $this->id()) {
+		if(me() && me()->id() == $this->id()) {
 			if(!array_key_exists(__FUNCTION__, $this->data)) {
 				$this->data[__FUNCTION__] = (mysql_num_rows(tmbo_query($sql)) > 0);
 			}

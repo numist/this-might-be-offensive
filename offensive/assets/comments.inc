@@ -13,8 +13,7 @@ function subscribe($fileid) {
 	if($userid == null) return false;
 		
 	// check if the user is already subscribed
-	$sql = "SELECT * FROM offensive_subscriptions WHERE userid = $userid AND fileid = $fileid";
-	if(mysql_num_rows(tmbo_query($sql)) > 0) return true;
+	if(id(new Upload($fileid))->subscribed()) return true;
 
 	// ensure file exists
 	$sql = "SELECT * FROM offensive_uploads WHERE id = $fileid";
@@ -72,15 +71,6 @@ function updateCommentCount($fileid, $good, $bad, $repost, $tmbo, $comment) {
 						comments = comments + $comment";
 	insertChange("comment", $fileid, "{$good}:{$bad}:{$repost}:{$tmbo}:$comment");
 	tmbo_query( $sql );
-}
-
-function subscribed($fileid, $userid=null) {
-	if($userid == null) $userid = me() ? me()->id() : null;
-	if($userid == null) return false;
-	
-	$sql = "SELECT * FROM offensive_subscriptions
-		WHERE userid=$userid AND fileid=$fileid";
-	return (mysql_num_rows(tmbo_query($sql)) > 0 ? true : false);
 }
 
 function getUnreadComments($userid) {

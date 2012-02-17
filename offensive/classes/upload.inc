@@ -201,13 +201,10 @@ class Upload {
 	}
 	
 	public function subscribed() {
-		if(!array_key_exists('subscribed', $this->data)) {
-			$sql = "SELECT * FROM offensive_subscriptions
-				WHERE userid=".me()->id()." AND fileid=".$this->id();
-			$this->data['subscribed'] = mysql_num_rows(tmbo_query($sql)) > 0 ? true : false;
-		}
-		
-		return (bool)$this->data['subscribed'];
+		if($user == null) $user = me();
+		if(is_numeric($user)) $user = new User($user);
+		if(!$user || !$user->exists()) trigger_error("invalid user", E_USER_ERROR);
+		return $user->subscribed($this);
 	}
 	
 	/*

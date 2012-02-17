@@ -103,8 +103,6 @@
 	function body() {
 		global $upload, $uploader;
 	
-		$subscribed = subscribed($upload->id());
-
 		$comments_exist = count($upload->getComments()) > 0;
 	
 		$comments_heading = "the dorks who came before you said:";
@@ -200,7 +198,7 @@
 			</div>
 			<div class="heading">
 				<div style="float:right">					
-					<? if( $subscribed ) { ?>
+					<? if( $upload->subscribed() ) { ?>
 						<b><a id="unsubscribeLink" href="subscribe.php?un=1&fileid=<?= $upload->id() ?>" title="take this thread off my 'unread comments' watch list." class="orange">unsubscribe</a></b>
 					<? }
 						else { ?>
