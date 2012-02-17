@@ -221,6 +221,13 @@ class Upload {
 		return $user->unsubscribe($this);
 	}
 	
+	public function clearSubscription($user=null) {
+		if($user == null) $user = me();
+		if(is_numeric($user)) $user = new User($user);
+		if(!$user || !$user->exists()) trigger_error("invalid user", E_USER_ERROR);
+		return $user->clearSubscription($this);
+	}
+	
 	/*
 	 * User slinging code
 	 */

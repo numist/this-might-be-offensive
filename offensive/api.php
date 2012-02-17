@@ -644,7 +644,7 @@
 		$threadid = check_arg("threadid", "integer");
 		handle_errors();
 		
-		send(clearSubscription($threadid, me()->id()));
+		send(id(new Upload($threadid))->clearSubscription());
 	}
 
 ?>

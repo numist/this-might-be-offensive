@@ -424,6 +424,19 @@ class User {
 		
 		return true;
 	}
+	
+	public function clearSubscription($upload) {
+		if(is_numeric($upload)) $upload = new Upload($upload);
+		if(!$upload || !$upload->exists()) trigger_error("invalid upload", E_USER_ERROR);
+		
+		$sql = "UPDATE offensive_subscriptions SET commentid = NULL WHERE userid={$this->id()} and fileid={$upload->id()}";
+		$result = tmbo_query( $sql );
+
+		if(mysql_affected_rows() < 1) {
+			return false;
+		}
+		return true;
+	}
 
 	/*
 	 * permissions
@@ -453,6 +466,7 @@ class User {
 		if($this->id() == me()->id()) return false; 		// can not vote on self
 		if($upload->blocked()) return false;						// can not vote if blocked
 		if($this->alreadyVoted($upload)) return false;	// can not vote again
+		if(!$this->canComment($upload)) return false;		// can not vote if can not comment
 		if(!$upload->file()) return false;							// can not vote if there is no file (topics, expired uploads)
 		return true;
 	}
@@ -463,7 +477,8 @@ class User {
 		
 		// no need to memoize, this method is not responsible for any new data
 		if($this->status() != "admin" && $upload->blocked()) return false;	// non-admin blocked
-		if($upload->id() == "211604" && me()->status() != "admin") return false; // changeblog
+		if($upload->id() == 211604 && me()->status() != "admin") return false; // changeblog
+		if($upload->id() == 197431 && me()->status() != "admin") return false; // rhi-rhi ipod
 		return true;
 	}
 

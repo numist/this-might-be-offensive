@@ -24,7 +24,7 @@
 		$upload = core_getupload($_REQUEST['fileid']);
 		$uploader = $upload->uploader();
 
-		clearSubscription($upload->id(), me()->id());
+		$upload->clearSubscription();
 
 		// update pickuplink for discussions
 		if($upload->type() == "topic") {

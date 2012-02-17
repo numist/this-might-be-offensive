@@ -8,16 +8,6 @@ function updateSubscriptions( $fileid, $commentid ) {
 	$result = tmbo_query( $sql );
 }
 
-function clearSubscription($fileid, $userid) {
-	$sql = "UPDATE offensive_subscriptions SET commentid = NULL WHERE userid=$userid and fileid=$fileid";
-	$result = tmbo_query( $sql );
-	
-	if(mysql_affected_rows() < 1) { 
-		return false;
-	}
-	return true;
-}
-
 function updateCommentCount($fileid, $good, $bad, $repost, $tmbo, $comment) {
 	$good = $good ? 1 : 0;
 	$bad = $bad ? 1 : 0;
@@ -37,11 +27,6 @@ function updateCommentCount($fileid, $good, $bad, $repost, $tmbo, $comment) {
 	tmbo_query( $sql );
 }
 
-function getUnreadComments($userid) {
-	// this will replace the functionality of api_unreadcomments() (api) and unread() (index)
-	// maybe.
-}
-
 function postComment($fileid, $vote, $repost, $offensive, $comment, $subscribe=null) {
 	$userid = me() ? me()->id() : null;
 	if($userid == null) return false;
@@ -52,40 +37,30 @@ function postComment($fileid, $vote, $repost, $offensive, $comment, $subscribe=n
 	
 	$comment = trim($comment);
 
-	// check to see if the fileid is valid
-	// XXX: this can be done better with an Upload object
-	$sql = "SELECT filename, nsfw, tmbo, timestamp, type FROM offensive_uploads WHERE id=$fileid";
-	if(mysql_num_rows(tmbo_query( $sql )) == 0) trigger_error("invalid fileid ($fileid)", E_USER_ERROR);
+	$upload = new Upload($fileid);
+	if(!$upload->exists()) trigger_error("invalid fileid ($fileid)", E_USER_ERROR);
 
-	// prevent double-votes and self-voting
-	if(!id(new Upload($fileid))->canVote()) {
+	// prevent double-votes, self-voting, and disallowed things
+	if(!$upload->canVote()) {
 		$vote = "";
 		$repost = 0;
 		$offensive = 0;
 	}
-	
-	if(!id(new Upload($fileid))->canComment()) {
+	if(!$upload->canComment()) {
 		$comment = "";
 	}
-
+	
 	// sometimes, subscribe the commenter.
 	if($comment || $vote == "this is bad" || $subscribe) {
-		id(new Upload($fileid))->subscribe();
+		$upload->subscribe();
+	}
+
+	if($upload->canComment()) {
+		return false;
 	}
 
 	// prevent empty comments from being inserted
 	if(!($comment || $vote || $offensive || $repost)) {
-		return false;
-	}
-
-	// changeblog
-	if($fileid == "211604" && me()->status() != "admin") {
-		trigger_error("user ".me()->username()." not allowed to post to changeblog", E_USER_NOTICE);
-		return false;
-	}
-
-	// rhi-rhi needs ipod
-	if($fileid == "197431") {
 		return false;
 	}
 
@@ -124,10 +99,7 @@ function postComment($fileid, $vote, $repost, $offensive, $comment, $subscribe=n
 	$commentid = mysql_insert_id();
 
 	if($comment) {
-		// update all subscriptions
-		updateSubscriptions($fileid, $commentid);
-		// mark your own as read
-		clearSubscription($fileid, me()->id());
+		$upload->clearSubscription();
 	}
 
 	return $commentid;
