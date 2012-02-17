@@ -2,25 +2,6 @@
 
 require_once("offensive/assets/classes.inc");
 
-/*
- * return if a user is capable of voting on a file
- * there are two reason a user would not be able to vote:
- *  1. the user uploaded the file
- *  2. the user has already voted
- *  3. the user is blocked by/to the uploader
- */
-function canVote($fileid, $userid=null) {
-	if($userid == null) $userid = me() ? me()->id() : null;
-	if($userid == null) return false;
-
-	$file = new Upload($fileid);
-	if($file->uploader()->id() == $userid) return false;
-	if(me() && $file->blocked()) return false;
-
-	if(id(new Upload($fileid))->alreadyVoted($userid)) return false;
-
-	return true;
-}
 
 /*
  * return if a user is allowed to comment on a thread
@@ -136,7 +117,7 @@ function postComment($fileid, $vote, $repost, $offensive, $comment, $subscribe=n
 	if(mysql_num_rows(tmbo_query( $sql )) == 0) trigger_error("invalid fileid ($fileid)", E_USER_ERROR);
 
 	// prevent double-votes and self-voting
-	if(!canVote($fileid)) {
+	if(!id(new Upload($fileid))->canVote()) {
 		$vote = "";
 	}
 

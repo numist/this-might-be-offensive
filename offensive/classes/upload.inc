@@ -658,6 +658,13 @@ class Upload {
 		if(!$user || !$user->exists()) trigger_error("invalid user", E_USER_ERROR);
 		return $user->alreadyVoted($this);
 	}
+	
+	public function canVote($user=null) {
+		if($user == null) $user = me();
+		if(is_numeric($user)) $user = new User($user);
+		if(!$user || !$user->exists()) trigger_error("invalid user", E_USER_ERROR);
+		return $user->canVote($this);
+	}
 
 	// API support
 	public function api_data() {

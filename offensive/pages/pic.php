@@ -200,7 +200,7 @@
 					<input type="hidden" name="c" value="comments">
 					<textarea cols="64" rows="6" name="comment" id="qc_comment"></textarea>
 
-					<? if(canVote($upload->id()) && $upload->file()) { ?>
+					<? if($upload->canVote()) { ?>
 						<div id="qc_vote" style="text-align:left;margin-left:14%">
 							<table><tbody><tr><td width="200px">
 							<input class="qc_tigtib" id="qc_novote" type="radio" value="novote" name="vote" checked="">
@@ -290,7 +290,7 @@
 				-->
 				<span id="voting_controls" style="margin-left:40px;">
 					<?
-					if(canVote($upload->id()) && $upload->file()) {
+					if($upload->canVote()) {
 						// TODO: clean up
 						$good_href = "href=\"/offensive/?c=comments&submit=submit&fileid=$id&vote=this%20is%20good&redirect=true\"";
 						$bad_href = "href=\"/offensive/?c=comments&submit=submit&fileid=$id&vote=this%20is%20bad&redirect=true\"";

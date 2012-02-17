@@ -381,6 +381,18 @@ class User {
 		return (mysql_num_rows(tmbo_query($sql)) > 0);
 	}
 
+	public function canVote($upload) {
+		if(is_numeric($upload)) $upload = new Upload($upload);
+		if(!$upload || !$upload->exists()) trigger_error("invalid upload", E_USER_ERROR);
+		
+		// no need to memoize, this method is not responsible for any new data
+		if($this->id() == me()->id()) return false; 		// can not vote on self
+		if($upload->blocked()) return false;						// can not vote if blocked
+		if($this->alreadyVoted($upload)) return false;	// can not vote again
+		if(!$upload->file()) return false;							// can not vote if there is no file (topics, expired uploads)
+		return true;
+	}
+
 	// API support
 	public function api_data() {
 		$ret = array(
