@@ -17,7 +17,7 @@ function canVote($fileid, $userid=null) {
 	if($file->uploader()->id() == $userid) return false;
 	if(me() && $file->blocked()) return false;
 
-	if(alreadyVoted($fileid, $userid)) return false;
+	if(id(new Upload($fileid))->alreadyVoted($userid)) return false;
 
 	return true;
 }
@@ -33,16 +33,6 @@ function canComment($fileid, $userid=null) {
 	if(me() && me()->status() != "admin" && $file->blocked()) return false;
 	
 	return true;
-}
-
-/*
- * if a user has already voted on the file in the arguments, this function
- * will return true.
- */
-function alreadyVoted($fileid, $userid) {
-	$sql = "SELECT vote AS thecount FROM offensive_comments 
-	        WHERE fileid=$fileid AND userid=$userid AND vote LIKE 'this%'";
-	return (mysql_num_rows(tmbo_query($sql)) > 0);
 }
 
 /*

@@ -495,8 +495,7 @@ class Upload {
 	public function URL() {
 		// uploads with files only
 		// if there's no file, why bother with a URL?
-		if($this->type() == 'topic'
-		   || $this->file() == '') {
+		if($this->type() == 'topic' || $this->file() == '') {
 			return '';
 		}
 
@@ -648,6 +647,16 @@ class Upload {
 		}
 		          // width  , height
 		return array($arr[0], $arr[1]);
+	}
+
+	/*
+	 * permissions code
+	 */
+	public function alreadyVoted($user=null) {
+		if($user == null) $user = me();
+		if(is_numeric($user)) $user = new User($user);
+		if(!$user || !$user->exists()) trigger_error("invalid user", E_USER_ERROR);
+		return $user->alreadyVoted($this);
 	}
 
 	// API support

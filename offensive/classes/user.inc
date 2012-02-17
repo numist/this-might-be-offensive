@@ -363,6 +363,25 @@ class User {
 		}
 	}
 
+	// permissions
+	public function alreadyVoted($upload) {
+		if(is_numeric($upload)) $upload = new Upload($upload);
+		if(!$upload || !$upload->exists()) trigger_error("invalid upload", E_USER_ERROR);
+		
+		$sql = "SELECT vote AS thecount FROM offensive_comments 
+		        WHERE fileid={$upload->id()} AND userid={$this->id()} AND vote LIKE 'this%'";
+		
+		// memoize self
+		if(me()->id() == $this->id()) {
+			if(!array_key_exists(__FUNCTION__, $this->data)) {
+				$this->data[__FUNCTION__] = (mysql_num_rows(tmbo_query($sql)) > 0);
+			}
+			return $this->data[__FUNCTION__];
+		}
+		return (mysql_num_rows(tmbo_query($sql)) > 0);
+	}
+
+	// API support
 	public function api_data() {
 		$ret = array(
 				"posse" => count($this->posse()),
