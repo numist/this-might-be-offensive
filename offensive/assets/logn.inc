@@ -96,7 +96,7 @@ function checkUser($myself) {
 }
 
 /*
- * logInUser sets up the session and enters the successful login into ip_history
+ * logInUser sets up the session
  * this function does not do any authentication, it is just a shared resource used by various 
  * authentication mechanisms to process a successful login attempt.
  */
@@ -114,9 +114,6 @@ function logInUser($myself, $session=true) {
 	   } else {
 			session_unset();
 	   }
-			
-		$sql = "INSERT INTO ip_history (userid, ip) VALUES ( ".$myself->id().", '".$_SERVER['REMOTE_ADDR']."' )";
-		tmbo_query( $sql );
 	}
 	
 	return checkUser($myself);

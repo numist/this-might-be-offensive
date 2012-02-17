@@ -1,5 +1,4 @@
 DELETE FROM failed_logins;
-DELETE FROM ip_history;
 UPDATE maxxer_locations SET x = RAND(3000), y = RAND(5000), timestamp = timestamp WHERE mapversion is NULL;
 UPDATE maxxer_locations SET x = RAND(180) - 90, y = RAND(360) - 180, timestamp = timestamp WHERE mapversion = "google";
 DELETE FROM merch_buyers;
