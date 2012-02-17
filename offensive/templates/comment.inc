@@ -32,7 +32,7 @@ global $numgood, $numbad;
 			$thevote = $comment->vote();
 			$numgood += ($thevote == 'this is good') ? 1 : 0;
 			$numbad += ($thevote == 'this is bad') ? 1 : 0;
-			echo "<span title=\"+$numgood -$numbad\" class='vote".(strpos($vote, 'good') > 0 ? " good" : " bad")."'> [ " . $thevote . " ]</span>";
+			echo "<span title=\"+$numgood -$numbad\" class='vote".(strpos($comment->vote(), 'good') > 0 ? " good" : " bad")."'> [ " . $thevote . " ]</span>";
 		}
 		
 		if( $comment->tmbo() == 1 ) {
