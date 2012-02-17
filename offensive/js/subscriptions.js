@@ -18,15 +18,25 @@ function toggle_subscribe(sub,imageid,o) {
 function handle_subscribe(o,e, imageid) {
 	e.preventDefault();
 	var sub = o.html();
+	
+	function twiddle() {
+		toggle_subscribe(sub, imageid, o);
+	}
 
 	// remove the href to prevent doubleclicks
 	o.removeAttr("href");
 	if(sub == "subscribe") {
-		$.get("/offensive/api.php/subscribe.php", { threadid: imageid, subscribe: 1 } );
+		$.get("/offensive/api.php/subscribe.php", { threadid: imageid, subscribe: 1 }, twiddle);
 	} else {
-		$.get("/offensive/api.php/subscribe.php", { threadid: imageid, subscribe: 0 } );
+		$.get("/offensive/api.php/subscribe.php", { threadid: imageid, subscribe: 0 }, twiddle);
 	}
-	
-	// switch ui to opposite view
-	toggle_subscribe(sub,imageid,o);
 }
+
+$(document).ready(function() {
+	$("#subscribeLink").click(function(e) {
+		handle_subscribe($(this),e,$("#fileid").attr("value"));
+	});
+	$("#unsubscribeLink").click(function(e) {
+		handle_subscribe($(this),e,$("#fileid").attr("value"));
+	});
+});

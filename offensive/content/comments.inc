@@ -7,12 +7,6 @@
 	require_once("offensive/assets/comments.inc");
 	require_once("offensive/assets/classes.inc");
 
-	function additionalCssFor($vote) {
-		if(strpos($vote, 'bad') > 0) return " bad";
-		if(strpos($vote, 'good') > 0) return " good";
-		return "";
-	}
-
 	function title() {
 		global $upload;
 		return "[discuss] : " . $upload->filename();
@@ -90,19 +84,7 @@
 
 	function head() {
 ?>
-	<script type="text/javascript" src="/offensive/js/subscriptions.js"></script>
-
-	<script type="text/javascript">
-		$(document).ready(function() {
-			$("#subscribeLink").click(function(e) {
-				handle_subscribe($(this),e,$("#fileid").attr("value"));
-			});
-			$("#unsubscribeLink").click(function(e) {
-				handle_subscribe($(this),e,$("#fileid").attr("value"));
-			});
-		});
-	</script>
-		
+	<script type="text/javascript" src="/offensive/js/subscriptions.js?v=0.0.1"></script>
 <?
 	}
 	
@@ -171,7 +153,6 @@
 			echo "<b>$comments_heading</b>";
         }
 
-		global $warudo;
 		$numgood = 0;
 		$numbad = 0;
 		foreach($upload->getComments() as $comment) {

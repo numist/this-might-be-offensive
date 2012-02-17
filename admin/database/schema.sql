@@ -35,23 +35,6 @@ CREATE TABLE `failed_logins` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `ip_history`
---
-
-DROP TABLE IF EXISTS `ip_history`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `ip_history` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `userid` int(11) NOT NULL DEFAULT '0',
-  `ip` varchar(15) NOT NULL DEFAULT '',
-  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `userid_ip` (`userid`,`ip`)
-) ENGINE=InnoDB AUTO_INCREMENT=4059355 DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Table structure for table `maxxer_locations`
 --
 
