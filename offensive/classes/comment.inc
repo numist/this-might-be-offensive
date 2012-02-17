@@ -79,7 +79,7 @@ class Comment {
 	private function getCommentRow($element=false) {
 		// if we haven't hit the db for this upload already, do it
 		if(($element == false || !array_key_exists($element, $this->data)) &&
-		   $this->data['exists'] === null) {
+		   (!array_key_exists('exists', $this->data) || $this->data['exists'] === null)) {
 			// get information we need from the database.
 			$sql = "SELECT * FROM offensive_comments WHERE id = ".$this->data["id"];
 			$result = tmbo_query($sql);

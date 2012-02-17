@@ -378,7 +378,7 @@ class User {
 			if(!array_key_exists("subscribed:".$upload->id(), $this->data)) {
 				$this->data["subscribed:".$upload->id()] = mysql_num_rows(tmbo_query($sql)) > 0 ? true : false;
 			}
-			return (bool)$this->data["subscribed:".$upload->id()];
+			return $this->data["subscribed:".$upload->id()];
 		}
 		
 		return mysql_num_rows(tmbo_query($sql)) > 0 ? true : false;
@@ -463,7 +463,7 @@ class User {
 		if(!$upload || !$upload->exists()) trigger_error("invalid upload", E_USER_ERROR);
 		
 		// no need to memoize, this method is not responsible for any new data
-		if($this->id() == me()->id()) return false; 		// can not vote on self
+		if($upload->uploader()->id() == $this->id()) return false; 		// can not vote on self
 		if($upload->blocked()) return false;						// can not vote if blocked
 		if($this->alreadyVoted($upload)) return false;	// can not vote again
 		if(!$this->canComment($upload)) return false;		// can not vote if can not comment

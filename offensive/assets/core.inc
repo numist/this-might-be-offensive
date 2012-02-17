@@ -38,7 +38,27 @@
 	          WHERE com.userid = u.userid AND up.id = com.fileid";
 	}
 	
-	require_once("offensive/assets/comments.inc");
+/**
+	common functions
+**/
+	function updateCommentCount($fileid, $good, $bad, $repost, $tmbo, $comment) {
+		$good = $good ? 1 : 0;
+		$bad = $bad ? 1 : 0;
+		$repost = $repost ? 1 : 0;
+		$tmbo = $tmbo ? 1 : 0;
+		$comment = $comment ? 1 : 0;
+	
+		$sql = "INSERT INTO offensive_count_cache ( threadid, good, bad, repost, tmbo, comments )
+					VALUES ( $fileid, $good, $bad, $repost, $tmbo, $comment )
+					ON DUPLICATE KEY UPDATE
+							good = good + $good,
+							bad = bad + $bad,
+							repost = repost + $repost,
+							tmbo = tmbo + $tmbo,
+							comments = comments + $comment";
+		insertChange("comment", $fileid, "{$good}:{$bad}:{$repost}:{$tmbo}:$comment");
+		tmbo_query( $sql );
+	}
 
 /**
 	core functions
@@ -435,6 +455,102 @@
 		}
 
 		return $singleton ? array_pop($ret) : $ret;
+	}
+
+	function core_postcomment($args) {
+		$fileid = check_arg("fileid", "integer", $args);
+		$comment = check_arg("comment", "string", $args, false);
+		$vote = check_arg("vote", "string", $args, false, array("this is good", "this is bad", "novote"));
+		$offensive = check_arg("offensive", "integer", $args, false, array("1", "0"));
+		$repost = check_arg("repost", "integer", $args, false, array("1", "0"));
+		$subscribe = check_arg("subscribe", "integer", $args, false, array("1", "0"));
+		handle_errors();
+		
+		$upload = new Upload($fileid);
+		if(!$upload->exists()) return false; // error
+
+		$userid = me() ? me()->id() : null;
+		if($userid == null) return false; // error
+		
+		if($vote == "novote") $vote = "";
+		if($comment === false) $comment = "";
+		if($vote === false) $vote = "";
+		if($offensive === false) $offensive = 0;
+		if($repost === false) $repost = 0;
+		
+		// if no comment, vote, offensive, or repost, then why are you here?
+		if(!($comment || $vote || $offensive || $repost || $subscribe)) {
+			send(false);
+		}
+
+		$comment = trim($comment);
+
+		// prevent double-votes, self-voting, and disallowed things
+		if(!$upload->canVote()) {
+			$vote = "";
+			$repost = 0;
+			$offensive = 0;
+		}
+		if(!$upload->canComment()) {
+			$comment = "";
+		}
+
+		// sometimes, subscribe the commenter.
+		if($comment || $vote == "this is bad" || $subscribe) {
+			$upload->subscribe();
+		}
+
+		if(!$upload->canComment()) {
+			return false; // error
+		}
+
+		// prevent empty comments from being inserted
+		if(!($comment || $vote || $offensive || $repost)) {
+			return false; // error
+		}
+
+		// prevent doubleposts, but only content doubleposts within 30 seconds
+		$sql = "SELECT id, fileid, timestamp, comment, NOW() as curtime 
+		        FROM offensive_comments 
+		        WHERE userid = $userid ORDER BY timestamp DESC LIMIT 1";
+		$res = tmbo_query($sql);
+		$row = mysql_fetch_assoc($res);
+		if($row['fileid'] == $fileid &&
+		   $row['comment'] == $comment && 
+		   $comment != "" &&
+		   strtotime($row['curtime']) - strtotime($row['timestamp']) < 60) {
+			trigger_error("caught doublepost", E_USER_NOTICE);
+			return false; // error
+		}
+
+		// sanitize the comment
+		if($comment) {
+			// escape it for sql if the comment is not empty
+			$comment = sqlEscape($comment);
+		}
+
+		// update the offensive_count_cache
+		$good_count = ($vote == "this is good") ? 1 : 0;
+		$bad_count = ($vote == "this is bad") ? 1 : 0;
+		$comment_count = (strlen( $comment ) > 0 ? 1 : 0 );
+		if(!$repost) $repost = 0;
+		if(!$offensive) $offensive = 0;
+		updateCommentCount($fileid, $good_count, $bad_count, $repost, $offensive, $comment_count);
+
+		// add the comment to the database
+		$sql = "INSERT INTO offensive_comments ( userid, fileid, comment, vote, offensive, repost, user_ip ) 
+		        VALUES ( $userid, $fileid, '$comment', '$vote', $offensive, $repost, '".sqlEscape($_SERVER['REMOTE_ADDR'])."')";
+		tmbo_query($sql);
+		$commentid = mysql_insert_id();
+
+		if($comment) {
+			// update subscriptions
+			$upload->updateSubscriptions($commentid);
+			// the commenter doesn't need their subscription updated
+			$upload->clearSubscription();
+		}
+
+		return new Comment($commentid);
 	}
 	
 	// XXX: unimplemented

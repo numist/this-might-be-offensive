@@ -1,7 +1,6 @@
 <?
 	set_include_path("..");
 	require_once("offensive/assets/header.inc");
-	require_once("offensive/assets/comments.inc");
 	// Include, and check we've got a connection to the database.
 	require_once( 'admin/mysqlConnectionInfo.inc' );
 	require_once("offensive/assets/classes.inc");

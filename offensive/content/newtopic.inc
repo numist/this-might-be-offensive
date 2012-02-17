@@ -3,7 +3,6 @@
 	require_once( 'admin/mysqlConnectionInfo.inc' );
 	if(!isset($link) || !$link) $link = openDbConnection();
 	require_once( 'offensive/assets/functions.inc' );
-	require_once( 'offensive/assets/comments.inc' );
 
 	function start() {
 		mustLogIn();
@@ -16,7 +15,7 @@
 				id(new Upload($tid))->subscribe();
 				
 				if(array_key_exists("comment", $_REQUEST)) {
-					postComment($tid, "", 0, 0, $_REQUEST['comment'], true);
+					core_postcomment(array("fileid" => $tid, "comment" => $_REQUEST['comment']));
 				}
 				
 				header("Location: ".Link::thread($tid));

@@ -9,7 +9,6 @@ if(!isset($link) || !$link) $link = openDbConnection();
 require_once("offensive/assets/functions.inc");
 require_once("offensive/assets/argvalidation.inc");
 require_once("offensive/assets/classes.inc");
-require_once("offensive/assets/comments.inc");
 
 mustLogIn(array("method" => "http",
                 "token" => null));
