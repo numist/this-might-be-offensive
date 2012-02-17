@@ -119,6 +119,12 @@ function postComment($fileid, $vote, $repost, $offensive, $comment, $subscribe=n
 	// prevent double-votes and self-voting
 	if(!id(new Upload($fileid))->canVote()) {
 		$vote = "";
+		$repost = 0;
+		$offensive = 0;
+	}
+	
+	if(!canComment($fileid)) {
+		$comment = "";
 	}
 
 	// sometimes, subscribe the commenter.
