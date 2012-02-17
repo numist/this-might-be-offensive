@@ -114,6 +114,7 @@ audio {
 	padding: 10px;
 	font-size: 10px;
 	line-height:15px;
+	word-wrap: break-word;
 }
 
 .squelched, a.squelched {

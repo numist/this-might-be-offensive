@@ -59,6 +59,7 @@ class Isk {
 	// create img blob
 	public function img_blob($path) {
 		$image = new Imagick($path);
+		$image->flattenImages();
 		
 		$max_dimension = 300;
 		if($image->getImageWidth() > $image->getImageHeight() && $image->getImageHeight() > $max_dimension) {
@@ -72,8 +73,39 @@ class Isk {
 		return $blob;
 	}
 	
+	// remove image from ISK
+	public function delete($id) {
+		$msg = new xmlrpcmsg('removeImg', 
+				array(	php_xmlrpc_encode(1), 					// dbID = 1
+					php_xmlrpc_encode($id)					// img id
+				));
+		$result = &$this->client->send($msg);
+		if(!$result->faultCode()) {
+			$this->errno = 0;
+			$this->errmsg = "";
+			return true;
+		} else {
+			$this->errno = $result->faultCode();
+			$this->errmsg = $result->faultString();
+		}
+	}
+	
 	// add image to ISK
-	public function add($image_path, $fileid) {
+	public function add($image_path, $fileid, $replace=false) {
+		
+		// check if ID exists. 
+		if($this->img_exists($fileid)) {
+			if($replace) {
+				$this->delete($fileid);
+			} else {
+				return false;
+			}
+		}
+		
+		if($this->error()) {
+			return false;
+		}
+		
 		$blob = $this->img_blob($image_path);
 		if($this->error()) {
 			return false;

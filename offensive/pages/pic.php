@@ -77,7 +77,7 @@
 		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 		<META NAME="ROBOTS" CONTENT="NOARCHIVE" />
 		<title>[<?= $upload->type() ?>] : <?= $upload->filename() ?> </title>
-		<link rel="stylesheet" type="text/css" href="/styles/pic.css?v=0.0.2"/>
+		<link rel="stylesheet" type="text/css" href="/styles/pic.css?v=0.0.3"/>
 		<!-- <? if($upload->next_filtered()) { ?>
 			<link rel="prefetch" href="<?= $_SERVER['PHP_SELF'] ?>?id=<?= $upload->next_filtered()->id() ?>"/>
 		<? } ?> -->
@@ -215,11 +215,16 @@
 				x.src=im;
 			}
 			
-			$(document).ready(function(){theimage().irsz({
-				min_height: 40, min_width: 40,
-				padding: [16, 114],
-				cursor_zoom_in: "url(/offensive/graphics/zoom_in.cur),default", cursor_zoom_out: "url(/offensive/graphics/zoom_out.cur),default"
-		 });});
+			$(document).ready(function(){
+				theimage().height(theimage().attr("max-height"));
+				var ypad = theimage().offset().top + $(document).height() - (theimage().offset().top + theimage().outerHeight(true));
+				var xpad = $("div#content").outerWidth(true) - $("div#content").width();
+				theimage().irsz({
+					min_height: 40, min_width: 40,
+					padding: [xpad, ypad],
+					cursor_zoom_in: "url(/offensive/graphics/zoom_in.cur),default", cursor_zoom_out: "url(/offensive/graphics/zoom_out.cur),default"
+		 		});
+			});
 
 		</script>
 		<script type="text/javascript" src="/offensive/js/irsz.js?v=0.0.13"></script>
