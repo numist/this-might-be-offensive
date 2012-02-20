@@ -652,7 +652,7 @@
 
 		$sql = str_replace("FROM offensive_comments com", 
 		                   "FROM offensive_subscriptions sub, offensive_comments com", $sql);
-		$sql .= " AND sub.userid = $userid AND up.id = sub.fileid AND sub.commentid IS NOT NULL ORDER BY ";
+		$sql .= " AND sub.userid = $userid AND up.id = sub.fileid AND sub.commentid = com.id ORDER BY ";
 
 		switch($sort) {
 			case "comment_desc":
@@ -679,7 +679,10 @@
 		$ret = array();
 
 		while($row = mysql_fetch_assoc($result)) {
-			$ret[] = new Comment($row);
+			$comment = new Comment($row);
+			if(!$comment->upload()->squelched()) {
+				$ret[] = $comment;
+			}
 		}
 
 		return $ret;
