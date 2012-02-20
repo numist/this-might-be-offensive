@@ -279,7 +279,7 @@
 					+<span id="count_good"><?= $upload->goods() ?></span>
 					-<span id="count_bad"><?= $upload->bads() ?></span><?
 					if($upload->tmbos() > 0) { ?>
-						x<span id="count_tmbo" style=\"color:#990000\"><?= $upload->tmbos() ?></span>
+						x<span id="count_tmbo" style="color:#990000"><?= $upload->tmbos() ?></span>
 					<? } ?>)
 					<span id="quicklink">&nbsp;(<a id="quickcomment" href="#">quick</a>)</span>
 				</span>
