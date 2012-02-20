@@ -327,6 +327,15 @@ function qc_form_reset() {
 
 function bind_default_events() {
 	$(document).on("keydown.default", handle_keypress);
+
+	/* Issue #51:
+	 * Workaround for Opera where key commands would not work if you had
+	 * opened/closed the quick box and navigated away from the previous page
+	 * using key commands.
+	 * The extra call to .blur() is to undecorate the link in browsers that
+	 * highlight focused elements (like Safari/Chrome).
+	 */
+	$("#comments").focus().blur();
 }
 
 function unbind_default_events() {
