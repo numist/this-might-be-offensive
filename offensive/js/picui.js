@@ -281,13 +281,13 @@ function qc_dialog_init() {
 				}
 			},
 			close: function(event, ui) {
-				// re-enable normal behaviour
-				bind_default_events();
-				
 				// clean up all qc bindings.
 				$("*").off(".qc");
 				$(document).off(".qc");
 				$(window).off(".qc");
+
+				// re-enable normal behaviour
+				bind_default_events();
 			},
 			dragStart: function(event, ui) {
 				qc_start_manipulation($(this));
