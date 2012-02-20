@@ -3,9 +3,6 @@
 // circular dependencies!
 require_once("offensive/assets/classes.inc");
 
-/* make TMBO read-only */
-$readonly = false;
-
 /* if tmbo is down, and you're working on it, set this variable to true.
  * this will display a fixing page to all users, and put a notice at the
  * top of all index pages to notify admins, helping to  prevent any
@@ -170,7 +167,7 @@ function time_end($time) {
 }
 
 function tmbo_query($sql, $timeout=2) {
-	global $link, $queries, $querytime, $readonly;
+	global $link, $queries, $querytime;
 	
 	if(!$link) {
 		trigger_error("MySQL link not pre-existent or invalid", E_USER_ERROR);
@@ -179,7 +176,7 @@ function tmbo_query($sql, $timeout=2) {
 	$trace = debug_backtrace();
 	$trace = $trace[0];
 
-	if($readonly && 
+	if(TMBO::readonly() && 
 	   ((strpos(strtolower(trim($sql)), "select") !== 0 && 
 	     strpos(strtolower(trim($sql)), "show") !== 0) || 
 	    strpos($sql, ";") !== false)) {

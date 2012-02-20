@@ -22,6 +22,7 @@ $filetypes = array("jpg", "jpeg", "gif", "png");
  */
 function uploading_file() {
 	if(!me()) return false;
+	if(TMBO::readonly()) return false;
 	if(array_key_exists("image", $_FILES) &&
 		is_array($_FILES['image']) &&
 		array_key_exists("name", $_FILES['image']) &&

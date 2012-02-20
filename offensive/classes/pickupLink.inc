@@ -66,6 +66,7 @@ class PickupLink {
 	// returns whether a (or both) pickuplink was updated
 	public static function update($upload) {
 		$ret = false;
+		if(TMBO::readonly()) return false;
 	
 		if(!is_object($upload)) {
 			$upload = new Upload($upload);

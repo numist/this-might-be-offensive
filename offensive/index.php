@@ -154,7 +154,7 @@ $timelimit = 10;
 	if($fixing) {
 		echo "someone's trying to fix the site.  if it's not you, try not to break anything.\n";
 	}
-	if($readonly) {
+	if(TMBO::readonly()) {
 		echo "tmbo is currently read-only.  don't try anything funny.\n";
 	}
 

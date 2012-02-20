@@ -249,6 +249,8 @@ class User {
 
 	// squelch a user
 	public function squelch($target) {
+		if(TMBO::readonly()) return;
+		
 		// sanity check
 		if(me()->id() != $this->id() && me()->status() != "admin") {
 			trigger_error(me()->username()." can not squelch on ".$this->username()."'s behalf!", E_USER_ERROR);
@@ -278,6 +280,8 @@ class User {
 	
 	// unsquelch a user
 	public function unsquelch($target) {
+		if(TMBO::readonly()) return;
+		
 		// sanity check
 		if(me()->id() != $this->id() && me()->status() != "admin") {
 			trigger_error(me()->username()." can not squelch on ".$this->username()."'s behalf!", E_USER_ERROR);
@@ -350,6 +354,9 @@ class User {
 	
 	public function setPref($name, $value) {
 		global $redis;
+		
+		if(TMBO::readonly()) return;
+		
 		require("offensive/data/preferences.inc");
 		if(!in_array($name, $prefnames))
 			trigger_error("$name is not a valid preference name!", E_USER_ERROR);
@@ -385,6 +392,8 @@ class User {
 	}
 
 	public function subscribe($upload) {
+		if(TMBO::readonly()) return;
+		
 		if(is_numeric($upload)) $upload = new Upload($upload);
 		if(!$upload || !$upload->exists()) trigger_error("invalid upload", E_USER_ERROR);
 		
@@ -407,6 +416,8 @@ class User {
 	}
 	
 	public function unsubscribe($upload) {
+		if(TMBO::readonly()) return;
+		
 		if(is_numeric($upload)) $upload = new Upload($upload);
 		if(!$upload || !$upload->exists()) trigger_error("invalid upload", E_USER_ERROR);
 		
@@ -426,6 +437,8 @@ class User {
 	}
 	
 	public function clearSubscription($upload) {
+		if(TMBO::readonly()) return;
+		
 		if(is_numeric($upload)) $upload = new Upload($upload);
 		if(!$upload || !$upload->exists()) trigger_error("invalid upload", E_USER_ERROR);
 		

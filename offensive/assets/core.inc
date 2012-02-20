@@ -466,6 +466,8 @@
 		$subscribe = check_arg("subscribe", "integer", $args, false, array("1", "0"));
 		handle_errors();
 		
+		if(TMBO::readonly()) return false;
+		
 		$upload = new Upload($fileid);
 		if(!$upload->exists()) return false; // error
 
@@ -699,6 +701,8 @@
 	}
 
 	function core_createtoken($issuee) {
+		if(TMBO::readonly()) return false;
+		
 		if(!is_string($issuee)) {
 			trigger_error("issuee is not a string", E_USER_ERROR);
 		}
@@ -755,6 +759,8 @@
 	}
 	
 	function core_destroytoken($token) {
+		if(TMBO::readonly()) return false;
+		
 		if(is_string($token)) {
 			$token = new Token($token);
 			if(!$token->exists()) {

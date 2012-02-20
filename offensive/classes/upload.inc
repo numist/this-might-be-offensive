@@ -225,6 +225,8 @@ class Upload {
 	}
 	
 	public function updateSubscriptions($comment) {
+		if(TMBO::readonly()) return;
+		
 		if(is_numeric($comment)) $comment = new Comment($comment);
 		if(!$comment || !$comment->exists()) trigger_error("invalid comment", E_USER_ERROR);
 		
