@@ -371,18 +371,10 @@ $timelimit = 10;
 	function unread() {
 		if(!me()) return;
 		$uid = me()->id();
-
-		$sql = "SELECT DISTINCT u.*, b.commentid
-					FROM offensive_uploads u, offensive_subscriptions b
-					WHERE b.userid = $uid 
-						AND u.id = b.fileid
-						AND b.commentid IS NOT NULL
-					ORDER BY b.commentid ASC
-					LIMIT 50";
-
-		$result = tmbo_query( $sql );
 		
-		if( mysql_num_rows( $result ) == 0 ) {
+		$comments = core_unreadcomments(array());
+
+		if(count($comments) == 0) {
 			$hidden = "none";
 		} else {
 			$hidden = "block";
@@ -392,11 +384,13 @@ $timelimit = 10;
 			<div class="blackbar"></div>
 			<div class="heading">unread comments:</div>
 			<div class="bluebox">
-				<? while( $row = mysql_fetch_assoc( $result ) ) {
+				<? foreach ($comments as $comment) {
+					$upload = $comment->upload();
+					if($upload->squelched()) continue;
+
 					$css = isset($css) && $css == "evenfile" ? "oddfile" : "evenfile"; 
-					$upload = new Upload($row);
 					// XXX: rejigger the query and use Link::comment ?>
-					<div class="clipper"><a class="<?= $css ?>" href="<?= Link::thread($upload) ?>#<?= $row['commentid']?>"><?= $upload->htmlFilename() ?></a></div>
+					<div class="clipper"><a class="<?= $css ?>" href="<?= Link::comment($comment) ?>"><?= $upload->htmlFilename() ?></a></div>
 				<? } ?>
 			</div>
 			<div class="heading" style="text-align:center">
