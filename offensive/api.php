@@ -25,6 +25,35 @@
 		return true;
 	}
 	
+	function _api_exception_handler($e) {
+		if(is_null($e)) return;
+		
+		$responses = array(
+			"400" => "HTTP/1/0 400 Bad Request",
+			"401" => "HTTP/1/0 401 Unauthorized",
+			"403" => "HTTP/1/0 403 Forbidden",
+			"404" => "HTTP/1/0 404 Not Found",
+			"500" => "HTTP/1/0 500 Internal Server Error",
+			"502" => "HTTP/1/0 502 Bad Gateway",
+			"503" => "HTTP/1/0 503 Service Unavailable"
+		);
+
+		$shortfile = (strlen($e->getFile()) > 25 ? 
+	         "...".substr($e->getFile(), -22) : $e->getFile());
+
+		error_log($shortfile.":".$e->getLine().":[".$e->getCode()."] ".$e->getMessage());
+
+		$code = array_key_exists("{$e->getCode()}", $responses) ? $e->getCode() : 500;
+		header($responses["$code"]);
+		if($code != 500) {
+			send(new Error($e->getMessage()));
+		} else {
+			send("kaboom.");
+		}
+		exit;
+	}
+	set_exception_handler("_api_exception_handler");
+	
 	require_once("offensive/assets/argvalidation.inc");
 		
 	// get function name and return type
@@ -51,9 +80,7 @@
 	
 	// validate the function call is valid
 	if(!is_callable("api_".$func)) {
-		header("HTTP/1.0 404 Not Found");
-		header("Content-type: text/plain");
-		echo "the function you requested ($func) was not found on this server.";
+		throw new Exception("the function you requested ($func) was not found on this server.", 404);
 	}
 	
 	// authentication
@@ -288,14 +315,10 @@
 		$loggedin = login(array("u/p" => array($username, $password)));
 		if($loggedin === false) {
 			global $login_message;
-			header("HTTP/1.0 401 Unauthorized");
-			send(new Error($login_message));
-			exit;
+			throw new Exception($login_message, 401);
 		} else if($loggedin === null) {
 			global $login_message;
-			header("HTTP/1.0 503 Forbidden");
-			send(new Error($login_message));
-			exit;
+			throw new Exception($login_message, 503);
 		}
 
 		// XXX: do not create a session if this is set!
@@ -397,7 +420,7 @@
 		
 		// XXX: this will have to call some uploader helper functions to cooperate with the upload page.
 		
-		trigger_error("unimplemented", E_USER_ERROR);
+		throw new Exception("unimplemented", 404);
 	}
 
 	// XXX: unimplemented
@@ -406,7 +429,7 @@
 		$comment = check_arg("comment", "string", $_POST, false);
 		handle_errors();
 		
-		trigger_error("unimplemented", E_USER_ERROR);
+		throw new Exception("unimplemented", 404);
 	}
 
 	function api_searchcomments() {
@@ -418,7 +441,7 @@
 	 *
 	 * Find a user by username.
 	 *
-	 * @param q string true Full or partial username.
+	 * @param q string required Full or partial username.
 	 * @param limit limit optional Default and maximum is 200.
 	 * @return Array of User objects matching query string.
 	 * @example q=max&limit=3
@@ -433,7 +456,7 @@
 	 *
 	 * Find an upload by filename.
 	 *
-	 * @param q string true Full or partial filename.
+	 * @param q string required Full or partial filename.
 	 * @param limit limit optional Default and maximum is 200.
 	 * @param type string optional {"image", "topic", "avatar", "audio"} Find only uploads of this type.
 	 * @return Array of Upload objects matching query string.
@@ -444,11 +467,12 @@
 		send(core_searchuploads($_REQUEST));
 	}
 
+	// XXX: unimplemented
 	function api_invite() {
 		$email = check_arg("email", "string", $_REQUEST);
 		handle_errors();
 		
-		trigger_error("unimplemented", E_USER_ERROR);
+		throw new Exception("unimplemented", 404);
 	}
 
 	/**
