@@ -118,17 +118,25 @@ function tmbo_error_handler($errno, $errstr, $errfile, $errline, $errcontext) {
 set_error_handler("tmbo_error_handler");
 error_reporting(E_STRICT | E_ALL);
 
-function tmbo_exception_handler($exception) {
-	if(is_null($exception)) return;
+function tmbo_exception_handler($e) {
+	if(is_null($e)) return;
 	
-	error_log("Uncaught exception: ".$exception->getMessage());
+	$shortfile = (strlen($e->getFile()) > 25 ? 
+         "...".substr($e->getFile(), -22) : $e->getFile());
+	
+	error_log($shortfile.":".$e->getLine().":[".$e->getCode()."] ".$e->getMessage());
 	
 	if((!me() || me()->status() != "admin") && ob_get_level() > 0) {
 		ob_end_clean();
+		if(file_exists("offensive/".$e->getCode().".php")) {
+			require("offensive/".$e->getCode().".php");
+			exit;
+		}
 		require("offensive/index.outoforder.php");
-	} else if (array_key_exists("status", $_SESSION) &&
-	           $_SESSION['status'] == "admin") {
-		echo "<br /><b>Uncaught exception</b>: ".$exception->getMessage()."<br /><br />";
+		exit;
+	} else {
+		echo "<br /><b>Exception(".$e->getCode().")</b>: ".nl2br(htmlentities($e->getMessage()))
+		    ." in <b>".$shortfile."</b> on line <b>".$e->getLine()."</b><br /><br />";
 		ob_start();
 		var_dump(debug_backtrace());
 		$trace = nl2br(ob_get_contents());
