@@ -150,7 +150,6 @@ $timelimit = 10;
 		echo "tmbo is currently read-only.  don't try anything funny.\n";
 	}
 
-	require( "includes/headerbuttons.txt" );
 ?>
 <br>
 

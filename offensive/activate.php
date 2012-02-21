@@ -71,9 +71,6 @@
 
 <body>
 
- <?php include( $DOCUMENT_ROOT . "/includes/headerbuttons.txt" );?>
-
-
 <div id="content">
 
 	<div id="titleimg"><a href="./"><img src="graphics/offensive.gif" alt="[ this might be offensive ]" id="this_might_be_offensive" width="285" height="37" border="0"></a></div>
