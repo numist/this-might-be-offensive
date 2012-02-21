@@ -391,7 +391,7 @@ class User {
 	}
 
 	public function subscribe($upload) {
-		if(TMBO::readonly()) return;
+		if(TMBO::readonly()) return false;
 		
 		if(is_numeric($upload)) $upload = new Upload($upload);
 		if(!$upload || !$upload->exists()) throw new Exception("invalid upload", 404);
@@ -415,7 +415,7 @@ class User {
 	}
 	
 	public function unsubscribe($upload) {
-		if(TMBO::readonly()) return;
+		if(TMBO::readonly()) return false;
 		
 		if(is_numeric($upload)) $upload = new Upload($upload);
 		if(!$upload || !$upload->exists()) throw new Exception("invalid upload", 404);
@@ -436,7 +436,7 @@ class User {
 	}
 	
 	public function clearSubscription($upload) {
-		if(TMBO::readonly()) return;
+		if(TMBO::readonly()) return false;
 		
 		if(is_numeric($upload)) $upload = new Upload($upload);
 		if(!$upload || !$upload->exists()) throw new Exception("invalid upload", 404);
