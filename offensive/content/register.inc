@@ -25,12 +25,6 @@
 		}
 	}
 	
-	function noLogin() {
-		// the existence of this function
-		// tells the template not to include
-		// the login form.
-	}
-
 	function handleAccountRequest($username, $password, $referral_code) {
 
 		$emailValidation = isValidEmail( $_REQUEST['email'] );
