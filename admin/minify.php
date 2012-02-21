@@ -16,7 +16,7 @@ require_once("offensive/classes/assets.inc");
 
 $jsSrc = get_include_path().DIRECTORY_SEPARATOR.JS::srcDir();
 $cssSrc = get_include_path().DIRECTORY_SEPARATOR.CSS::srcDir();
-$minDir = get_include_path().DIRECTORY_SEPARATOR.AssetManager::minDir();
+$minDir = get_include_path().DIRECTORY_SEPARATOR.Asset::minDir();
 assert('is_dir($jsSrc)');
 assert('is_dir($cssSrc)');
 assert('is_dir($minDir)');

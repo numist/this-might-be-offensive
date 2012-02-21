@@ -77,14 +77,14 @@
 		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 		<META NAME="ROBOTS" CONTENT="NOARCHIVE" />
 		<title>[<?= $upload->type() ?>] : <?= $upload->filename() ?> </title>
-		<link rel="stylesheet" type="text/css" href="/styles/jquery-ui-1.8.17.custom.css"/>
-		<link rel="stylesheet" type="text/css" href="/styles/pic.css?v=0.0.5"/>
 		<!-- <? if($upload->next_filtered()) { ?>
 			<link rel="prefetch" href="<?= $_SERVER['PHP_SELF'] ?>?id=<?= $upload->next_filtered()->id() ?>"/>
 		<? } ?> -->
 
 <?
-
+	CSS::add("/styles/jquery-ui-1.8.17.custom.css");
+	CSS::add("/styles/pic.css");
+	CSS::emit();
 	JS::add("/offensive/js/jquery-1.7.1.min.js");
 	JS::add("/offensive/js/tmbolib.js");
 	JS::add("/offensive/js/jquery-ui-1.8.17.custom.min.js");
