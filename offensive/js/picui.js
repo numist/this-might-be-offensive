@@ -332,10 +332,15 @@ function bind_default_events() {
 	 * Workaround for Opera where key commands would not work if you had
 	 * opened/closed the quick box and navigated away from the previous page
 	 * using key commands.
+	 */
+	$("#quickcomment").focus();
+	/*
 	 * The extra call to .blur() is to undecorate the link in browsers that
 	 * highlight focused elements (like Safari/Chrome).
 	 */
-	$("#comments").focus().blur();
+	if(!$.browser.opera) {
+	  $("#quickcomment").blur();
+	}
 }
 
 function unbind_default_events() {
