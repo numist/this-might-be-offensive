@@ -1,7 +1,7 @@
 <?
 
 function conditionalGet($timestamp) {
-	if(!is_intger($timestamp)) {
+	if(!(is_numeric($timestamp) && floor($timestamp) == ceil($timestamp))) {
 		$timestamp = strtotime($timestamp);
 		if($timestamp === false) return;
 	}
