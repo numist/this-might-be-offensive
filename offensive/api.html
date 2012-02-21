@@ -425,35 +425,37 @@ The token is named after the user-agent of the requesting application and can be
 <hr/>
 <a name="postcomment">
 <h3>postcomment</h3>
-<p>Post a comment to a thread.</p>
-
-<p>All parameters to this function are processed via the POST method, to prevent malicious votes via link shorteners.</p>
-
-<p>No examples yet pending doc system support for POST in examples. Sorry.</p>
+<p>Post a comment to a thread.<br />
+<br />
+All parameters to this function are processed via the POST method, to prevent malicious votes via link shorteners.<br />
+<br />
+No examples yet pending doc system support for POST in examples. Sorry.</p>
 
 <h4>Arguments:</h4>
 <ul>
-	 <li><b>fileid</b> (integer) - required.
-						Post comment to this thread.
-	 <li><b>comment</b> (string) optional.
-						Comment text.
-	 <li><b>vote</b> (string) optional. 
-						Can be any of {"this is good", "this is bad", "novote"}
-						Default:"novote" The intended vote.
-	 <li><b>offensive</b> (integer) optional.
-						Can be any of {1, 0}
-						Default: 0 Vote [this might be offensive].
-	 <li><b>repost</b> (integer) optional.
-						Can be any of {1, 0}
-						Default: 0 Vote [this is a repost].
-	 <li><b>subscribe</b> (integer) optional.
-						Can be any of {1, 0}
-						Default: 1 if vote is "this is bad" or comment is not empty, 0 otherwise. Setting to 1 ensures thread subscription, setting to 0 does nothing (the default will override argument of 0).
+	    <li><b>fileid</b> (integer) - required.
+						Post comment to this thread.</li>
+	    <li><b>comment</b> (string) - optional.
+						Comment text.</li>
+	    <li><b>vote</b> (string) - optional.
+							Can be any of {"thisisgood","thisisbad","novote"}.
+						Default:"novote" The intended vote.</li>
+	    <li><b>offensive</b> (integer) - optional.
+							Can be any of {1,0}.
+						Default: 0 Vote [this might be offensive].</li>
+	    <li><b>repost</b> (integer) - optional.
+							Can be any of {1,0}.
+						Default: 0 Vote [this is a repost].</li>
+	    <li><b>subscribe</b> (integer) - optional.
+							Can be any of {1,0}.
+						Default: 1 if vote is "this is bad" or comment is not empty, 0 otherwise. Setting to 1 ensures thread subscription, setting to 0 does nothing (the default will override argument of 0).</li>
 	</ul>
 
 
 <h4>Returns:</h4>
 <p>Comment object or false if nothing was added to the database.</p>
+
+
 
 <hr/>
 <a name="searchuser">
@@ -493,7 +495,7 @@ Get a user's metadata.
 
 <h4>Arguments:</h4>
 <ul>
-	    <li><b>q</b> (string) - true.
+	    <li><b>q</b> (string) - required.
 						Full or partial filename.</li>
 	    <li><b>limit</b> (limit) - optional.
 						Default and maximum is 200.</li>
@@ -836,7 +838,7 @@ Get a list of unchecked activity on subscribed threads.
 	<li>August 15, 2008 - searchuploads and searchcomments get more parameters ([limit, type], limit).</li>
 	<li>October 18, 2011 - Documentation is now generated/updated by script. Primary input is the documentation in the API code itself. See <a href="https://github.com/numist/this-might-be-offensive">github</a> for more detailed change information.</li>
 	
-	<li>October 24, 2011 - This page was generated.</li>
+	<li>February 21, 2012 - This page was generated.</li>
 </ul>
 </body>
 </html>
