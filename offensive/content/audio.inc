@@ -12,15 +12,19 @@
 	}
 
 	function head() {
+		CSS::add("/styles/grid.css");
+		JS::add("/offensive/js/pickuplink_visibility.js");
+		JS::add("/offensive/js/lazyload_bottom.js");
+		if(count($_GET) == 1 && array_key_exists("c", $_GET)) {
+			// lazyload_changes are only used if on a base page (?c=main not ?c=main&foo=bar)
+    	JS::add("/offensive/js/lazyload_changes.js");
+		} ?>
+		
 		?>
 		<link id="gallery" rel="alternate" href="<?= Link::rss("audio") ?>" type="application/rss+xml" title="audio stream" />
 		<link rel="alternate" type="application/rss+xml" title="daily archives" href="<?= Link::rss("zip") ?>" />
-		<link href="/styles/grid.css?v=1.0.4" type="text/css" rel="stylesheet">
-		<script type="text/javascript" src="/offensive/js/pickuplink_visibility.js?v=0.0.2"></script>
-		<? if(count($_GET) == 1 && array_key_exists("c", $_GET)) { ?>
-			<!-- lazyload_changes are only used if on a base page (?c=main not ?c=main&foo=bar) -->
-    	<script type="text/javascript" src="/offensive/js/lazyload_changes.js?v=0.0.12"></script>
-		<? } ?>
+
+		<!-- TODO: put this in a file? there's nothing dynamic here. -->
 		<script type="text/javascript">
 			function prep_item(item, neighbor) {
 				var color_class = (neighbor.find('.odd_row').length > 0) ? "even_row" : "odd_row";
@@ -28,7 +32,6 @@
 				return item;
 			}
 		</script>
-		<script type="text/javascript" src="/offensive/js/lazyload_bottom.js?v=0.0.5"></script>
 		<?
 	}
 

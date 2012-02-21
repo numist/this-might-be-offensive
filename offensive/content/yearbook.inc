@@ -20,12 +20,9 @@
 	}
 
 	function head() {
-		?>
-		<link href="/styles/grid.css?v=1.0.4" type="text/css" rel="stylesheet">
-		<script type="text/javascript" src="/offensive/js/pickuplink_visibility.js?v=0.0.2"></script>
-		<!-- lazyload_bottom -->
-		<script type="text/javascript" src="/offensive/js/lazyload_bottom.js?v=0.0.5"></script>
-		<?
+		CSS::add("/styles/grid.css");
+		JS::add("/offensive/js/pickuplink_visibility.js");
+		JS::add("/offensive/js/lazyload_bottom.js");
 	}
 
 	function body() {

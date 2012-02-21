@@ -11,17 +11,15 @@
 	}
 
 	function head()
-	{
-?>
+	{ ?>
 		<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAyBBXeWMcfhIUkB7pKzhc9xQjSqRAlqXjnjIvJJ9RLUDSqpvsZRTIaaZHx9vj_4c_8qVi_4wR2bZzqg" type="text/javascript"></script>
-		<script language="JavaScript1.2" src="/offensive/js/markermanager_packed.js" type="text/javascript"></script>
-		<script language="JavaScript1.2" src="/offensive/js/maps-0.1.js" type="text/javascript"></script>
 		<style type="text/css">
 			#sidebar a, #map_edit a {
 				text-decoration: none;
 			}
-		</style>
-<?php
+		</style><?
+		JS::add("/offensive/js/markermanager_packed.js");
+		JS::add("/offensive/js/maps-0.1.js");
 	}
 
 	function body()
