@@ -30,7 +30,7 @@
 			false
 		</subscribed>
 		<vote_good type="integer">
-			3
+			4
 		</vote_good>
 		<vote_bad type="integer">
 			0
@@ -47,6 +47,9 @@
 		<filtered type="boolean">
 			false
 		</filtered>
+		<last_active type="date">
+			2011-02-07 08:05:08
+		</last_active>
 
 	</upload>
 	<upload>
@@ -79,7 +82,7 @@
 			false
 		</subscribed>
 		<vote_good type="integer">
-			1
+			2
 		</vote_good>
 		<vote_bad type="integer">
 			1
@@ -96,6 +99,9 @@
 		<filtered type="boolean">
 			false
 		</filtered>
+		<last_active type="date">
+			2011-02-07 08:05:13
+		</last_active>
 
 	</upload>
 	<upload>
@@ -145,6 +151,9 @@
 		<filtered type="boolean">
 			false
 		</filtered>
+		<last_active type="date">
+			2010-08-07 18:06:05
+		</last_active>
 
 	</upload>
 	<upload>
@@ -177,7 +186,7 @@
 			false
 		</subscribed>
 		<vote_good type="integer">
-			7
+			9
 		</vote_good>
 		<vote_bad type="integer">
 			0
@@ -194,6 +203,9 @@
 		<filtered type="boolean">
 			false
 		</filtered>
+		<last_active type="date">
+			2011-03-25 10:55:46
+		</last_active>
 
 	</upload>
 	<upload>
@@ -226,7 +238,7 @@
 			false
 		</subscribed>
 		<vote_good type="integer">
-			0
+			1
 		</vote_good>
 		<vote_bad type="integer">
 			1
@@ -243,6 +255,9 @@
 		<filtered type="boolean">
 			false
 		</filtered>
+		<last_active type="date">
+			2011-11-12 10:26:37
+		</last_active>
 
 	</upload>
 	<upload>
@@ -275,7 +290,7 @@
 			false
 		</subscribed>
 		<vote_good type="integer">
-			1
+			2
 		</vote_good>
 		<vote_bad type="integer">
 			0
@@ -292,6 +307,9 @@
 		<filtered type="boolean">
 			false
 		</filtered>
+		<last_active type="date">
+			2011-09-05 20:21:18
+		</last_active>
 
 	</upload>
 	<upload>
@@ -330,7 +348,7 @@
 			1
 		</vote_bad>
 		<vote_tmbo type="integer">
-			2
+			3
 		</vote_tmbo>
 		<vote_repost type="integer">
 			1
@@ -341,6 +359,9 @@
 		<filtered type="boolean">
 			false
 		</filtered>
+		<last_active type="date">
+			2011-02-07 08:06:14
+		</last_active>
 
 	</upload>
 	<upload>
@@ -390,6 +411,9 @@
 		<filtered type="boolean">
 			false
 		</filtered>
+		<last_active type="date">
+			2010-08-07 18:06:21
+		</last_active>
 
 	</upload>
 	<upload>
@@ -439,6 +463,9 @@
 		<filtered type="boolean">
 			false
 		</filtered>
+		<last_active type="date">
+			2010-08-07 18:06:24
+		</last_active>
 
 	</upload>
 	<upload>
@@ -471,7 +498,7 @@
 			false
 		</subscribed>
 		<vote_good type="integer">
-			0
+			1
 		</vote_good>
 		<vote_bad type="integer">
 			0
@@ -488,6 +515,9 @@
 		<filtered type="boolean">
 			false
 		</filtered>
+		<last_active type="date">
+			2011-02-07 08:06:39
+		</last_active>
 
 	</upload>
 </array>

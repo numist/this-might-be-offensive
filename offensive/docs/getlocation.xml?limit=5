@@ -3,95 +3,95 @@
 	<dict>
 		
 	<latitude type="double">
-		-23.9406
+		-89.727
 	</latitude>
 	<longitude type="double">
-		-54.3241
+		-179.308
 	</longitude>
 	<timestamp type="date">
-		2011-10-16 02:18:53
+		2012-02-05 23:23:28
 	</timestamp>
 	<username type="string">
-		matt
+		jauricchio
 	</username>
 	<userid type="integer">
-		31
+		7912
 	</userid>
 
 	</dict>
 	<dict>
 		
 	<latitude type="double">
-		28.5565
+		-89.8851
 	</latitude>
 	<longitude type="double">
-		-74.6648
+		-179.312
 	</longitude>
 	<timestamp type="date">
-		2011-10-16 02:18:53
+		2012-02-05 23:13:48
 	</timestamp>
 	<username type="string">
-		punching_judy
+		Paulymer
 	</username>
 	<userid type="integer">
-		421
+		3714
 	</userid>
 
 	</dict>
 	<dict>
 		
 	<latitude type="double">
-		-6.96133
+		-89.8996
 	</latitude>
 	<longitude type="double">
-		-29.7138
+		-179.084
 	</longitude>
 	<timestamp type="date">
-		2011-10-16 02:18:53
+		2012-02-05 03:35:12
 	</timestamp>
 	<username type="string">
-		turska
+		Steeefan
 	</username>
 	<userid type="integer">
-		2157
+		4521
 	</userid>
 
 	</dict>
 	<dict>
 		
 	<latitude type="double">
-		35.7264
+		-89.5376
 	</latitude>
 	<longitude type="double">
-		-72.5795
+		-179.036
 	</longitude>
 	<timestamp type="date">
-		2011-10-16 02:18:53
+		2012-02-03 15:52:12
 	</timestamp>
 	<username type="string">
-		camaleonte
+		darks
 	</username>
 	<userid type="integer">
-		1616
+		7387
 	</userid>
 
 	</dict>
 	<dict>
 		
 	<latitude type="double">
-		-23.5473
+		-89.9294
 	</latitude>
 	<longitude type="double">
-		148.414
+		-179.033
 	</longitude>
 	<timestamp type="date">
-		2011-10-16 02:18:53
+		2012-01-31 21:35:06
 	</timestamp>
 	<username type="string">
-		Franiblector
+		KaosNKorruption
 	</username>
 	<userid type="integer">
-		1042
+		2727
 	</userid>
 
 	</dict>

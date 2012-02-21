@@ -21,7 +21,7 @@
 <key>subscribed</key>
 <false />
 <key>vote_good</key>
-<integer>17</integer>
+<integer>18</integer>
 <key>vote_bad</key>
 <integer>1</integer>
 <key>vote_tmbo</key>
@@ -29,8 +29,10 @@
 <key>vote_repost</key>
 <integer>0</integer>
 <key>comments</key>
-<integer>23</integer>
+<integer>24</integer>
 <key>filtered</key>
 <false />
+<key>last_active</key>
+<date>2011-11-07T02:43:58+00:00</date>
 </dict>
 </plist>

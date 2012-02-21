@@ -28,7 +28,7 @@
 			false
 		</subscribed>
 		<vote_good type="integer">
-			17
+			18
 		</vote_good>
 		<vote_bad type="integer">
 			1
@@ -40,9 +40,12 @@
 			0
 		</vote_repost>
 		<comments type="integer">
-			23
+			24
 		</comments>
 		<filtered type="boolean">
 			false
 		</filtered>
+		<last_active type="date">
+			2011-11-06 18:43:58
+		</last_active>
 </upload>

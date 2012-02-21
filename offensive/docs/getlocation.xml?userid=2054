@@ -3,13 +3,13 @@
 	<dict>
 		
 	<latitude type="double">
-		4.33391
+		-89.2143
 	</latitude>
 	<longitude type="double">
-		-114.051
+		-179.538
 	</longitude>
 	<timestamp type="date">
-		2011-10-16 02:18:53
+		2011-10-12 12:32:05
 	</timestamp>
 	<username type="string">
 		numist

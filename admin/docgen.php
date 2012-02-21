@@ -314,6 +314,7 @@ If you are developing an application, please <a href="#Errata">send an email or 
 } ?>
 <p><?= $data["return"] ?></p>
 
+<? if(count($data["examples"])) { ?>
 <h4>Examples:</h4>
 <? if(!count($data["examples"])) {
 	trigger_error("method $method does not have any examples", E_USER_ERROR);
@@ -324,7 +325,8 @@ foreach($data["examples"] as $example) { ?>
 		<a href="/offensive/docs/<?= urlencode("$method.$type?$example"); ?>"><?= $type ?></a>
 	<? } ?>
 </p>
-<? } ?>
+<? }
+}?>
 
 <? if(count($data["see"])) { ?>
 <h4>See Also:</h4>

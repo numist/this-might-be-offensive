@@ -847,4 +847,29 @@ See that girl, watch that scene, dig in the dancing queen
 		</comment>
 
 	</comment>
+	<comment>
+		
+		<fileid type="integer">
+			112
+		</fileid>
+		<id type="integer">
+			280248915
+		</id>
+		<timestamp type="date">
+			2011-11-06 18:43:58
+		</timestamp>
+		<userid type="integer">
+			216
+		</userid>
+		<username type="string">
+			pixel4e
+		</username>
+		<vote type="string">
+			this is good
+		</vote>
+		<comment type="string">
+			Primal zombie thread!
+		</comment>
+
+	</comment>
 </array>
