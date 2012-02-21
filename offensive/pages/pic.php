@@ -6,6 +6,7 @@
 	if(!isset($link) || !$link) $link = openDbConnection();
 	require_once("offensive/assets/classes.inc");
 	require_once("offensive/assets/core.inc");
+	require_once("offensive/classes/assets.inc");
 
 	mustLogIn();
 	time_start($ptime);
@@ -82,11 +83,18 @@
 			<link rel="prefetch" href="<?= $_SERVER['PHP_SELF'] ?>?id=<?= $upload->next_filtered()->id() ?>"/>
 		<? } ?> -->
 
-		<script type="text/javascript" src="/offensive/js/jquery-1.7.1.min.js"></script>
-		<script type="text/javascript" src="/offensive/js/tmbolib.js?v=0.0.6"></script>
-		<script type="text/javascript" src="/offensive/js/jquery-ui-1.8.17.custom.min.js"></script>
-		<script type="text/javascript" src="/offensive/js/jquery.ba-outside-events.min.js"></script>
-		<script type="text/javascript" src="/offensive/js/subscriptions.js?v=0.0.1"></script>
+<?
+
+	JS::add("/offensive/js/jquery-1.7.1.min.js");
+	JS::add("/offensive/js/tmbolib.js");
+	JS::add("/offensive/js/jquery-ui-1.8.17.custom.min.js");
+	JS::add("/offensive/js/jquery.ba-outside-events.min.js");
+	JS::add("/offensive/js/subscriptions.js");
+	JS::add("/offensive/js/irsz.js");
+	JS::add("/offensive/js/picui.js");
+	JS::emit();
+
+?>
 		<script type="text/javascript">
 			// handle a keybased event. this code was incorporated from offensive.js, which has now been deprecated
 			function handle_keypress(e)
@@ -170,8 +178,6 @@
 				return true;
 			}
 		</script>
-		<script type="text/javascript" src="/offensive/js/irsz.js?v=0.0.14"></script>
-		<script type="text/javascript" src="/offensive/js/picui.js?v=0.0.18"></script>
 		<? include_once("analytics.inc"); ?>
 	</head>
 	<body id="pic">

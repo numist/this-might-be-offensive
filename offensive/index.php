@@ -102,7 +102,6 @@ $timelimit = 10;
 	<link rel="shortcut icon" href="/favicon.ico" />
 	<link rel="stylesheet" type="text/css" href="/offensive/filepilestyle.css" />
 	<link rel="stylesheet" type="text/css" href="/styles/oldskool.css?v=0.0.3"/>
-
 	
 <style type="text/css">
 
@@ -124,20 +123,13 @@ $timelimit = 10;
 	}
 	
 </style>
-
-<script type="text/javascript">
-	/* image rollover stuff */
-	function changesrc(a,im)
-	{
-		x = eval("document."+a);
-		x.src=im;
-	}
-</script>
-<script type="text/javascript" src="/offensive/js/jquery-1.7.1.min.js"></script>
-<script type="text/javascript" src="/offensive/js/tmbolib.js?v=0.0.6"></script>
-
 <?
-	if( function_exists( 'head' ) ) {
+
+	JS::add("/offensive/js/jquery-1.7.1.min.js");
+	JS::add("/offensive/js/tmbolib.js?v=0.0.6");
+	JS::emit();
+	
+	if(function_exists('head')) {
 		head();
 	}
 

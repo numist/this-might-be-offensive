@@ -417,13 +417,6 @@ function greyout_voting() {
 	$("#qc_vote").remove();
 }
 
-/* image rollover stuff */
-function changesrc(a,im)
-{
-	x = eval("document."+a);
-	x.src=im;
-}
-
 /******************************************************************************
  * bound actions
  *****************************************************************************/
