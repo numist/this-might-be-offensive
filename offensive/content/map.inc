@@ -18,8 +18,8 @@
 				text-decoration: none;
 			}
 		</style><?
-		JS::add("/offensive/js/markermanager_packed.js");
-		JS::add("/offensive/js/maps-0.1.js");
+		JS::add("/offensive/js/markermanager.js");
+		JS::add("/offensive/js/maps.js");
 	}
 
 	function body()

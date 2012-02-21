@@ -14,26 +14,51 @@ abstract class Asset {
 
 class AssetFile extends Asset {
 	private $filename;
+	private $minifile;
 	private $timestamp;
+	private $useminifile = false;
 	
 	public function __construct($filename) {
 		if(!file_exists(get_include_path().$filename)) {
-			$this->filename = "";
+			$this->filename = $this->minifile = "";
 			$this->timestamp = 0;
 			return;
 		}
 		// guarantees:
 		$this->filename = $filename;
 		$this->timestamp = filemtime(get_include_path().$filename);
+		$this->minifile = "";
+		
+		// get minifile, if possible
+		if(AssetManager::idFor($this->filename) !== false) {
+			$minifile = "/".AssetManager::minDir()."/"
+			            .base_convert(AssetManager::idFor($this->filename), 10, 36)."."
+			            .base_convert(filesize(get_include_path().$filename), 10, 36);
+			$this->minifile = $minifile;
+
+			if(file_exists(get_include_path().$minifile)) {
+				$ministamp = filemtime(get_include_path().$minifile);
+				if($ministamp >= $this->timestamp) {
+					$this->timestamp = $ministamp;
+					$this->useminifile = true;
+				}
+			}
+		}
 	}
 	
-	public function file() { return $this->filename; }
+	public function file() { return $this->useminifile ? $this->minifile : $this->filename; }
 	public function timestamp() { return $this->timestamp; }
 	public function minifile() { return $this->minifile; }
 	public function useminifile() { return $this->useminifile; }
 }
 
 abstract class AssetManager {
+	public static function mindir() { return "offensive/data/assets"; }
+
+	private static $ids = null;
+	private static function initIds() { self::$ids = require self::mindir()."/ids.inc"; }
+	public static function idFor($filename){ if(is_null(self::$ids)) self::initIds(); foreach(self::$ids as $id => $file) { if($file == $filename) return $id; } return false; }
+
 	protected $assets;
 	protected function _add(AssetFile $asset) {
 		if($asset->file() != "") {
@@ -75,7 +100,7 @@ class JS extends AssetManager {
 	}
 	
 	// JS-specific info
-	static public function srcDir() { return "/offensive/js"; }
+	static public function srcDir() { return "offensive/js"; }
 	protected function tagFor(Asset $asset) {
 		if($asset->url() == "") { return ""; }
 		return '<script type="text/javascript" src="'.$asset->url()."\"></script>\n";
@@ -103,7 +128,7 @@ class CSS extends AssetManager {
 	}
 	
 	// CSS-specific info
-	static public function srcDir() { return "/styles"; }
+	static public function srcDir() { return "styles"; }
 	protected function tagFor(Asset $asset) {
 		if($asset->url() == "") { return ""; }
 		return '<link href="'.$asset->url().'" type="text/css" rel="stylesheet" />'."\n";

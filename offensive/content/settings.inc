@@ -56,7 +56,7 @@
 	function head()
 	{
 		// TODO: this won't minify! solve dynamic problem.
-		JS::add("/offensive/js/settings.php");
+		JS::add("/offensive/js/settings.js");
 	}
 
 	function body()
