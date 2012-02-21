@@ -1,6 +1,5 @@
 <?php ob_start();
 set_include_path("..");
-require_once("offensive/assets/header.inc");
 
 // Attempt to defend against header injections:
 $badStrings = array("Content-Type:",
@@ -33,12 +32,10 @@ function logBadRequest() {
 			"From: themaxx.com contact form" );	
 }
 
-	$body = $_POST['body'];
-	$head = $_POST['head'];
-	$from = $_POST['from'];
-	$email = $_POST['email'];
-	
-	if( isset($body) && $body != "" ) {
+	if( isset($_POST['body']) && "" != ($body = $_POST['body'])) {
+		$head = $_POST['head'];
+		$from = $_POST['from'];
+		$email = $_POST['email'];
 
 		if(ini_get("magic_quotes_gpc")) {
 			// replace \' with '
@@ -62,8 +59,6 @@ function logBadRequest() {
 		ob_end_clean();
 		return $string;
 	}
-
-		
 ?>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
@@ -71,16 +66,12 @@ function logBadRequest() {
 <html>
 <head>
 	<title>freakin' contact form.</title>
-	<link rel="stylesheet" type="text/css" href="/includes/style.css">
-	
 </head>
 
 
 <body bgcolor="#333366" link="#000066" vlink="#000033">
 
 <div align="center">
-
-<?php require( "includes/headerbuttons.txt" ); ?>
 
 <table border="0" cellpadding="0" cellspacing="12">
 	<tr>
@@ -105,7 +96,7 @@ function logBadRequest() {
 									
 									<table border="0" cellpadding="0" cellspacing="0" width="171">
 										<tr>
-											<td><img src="/graphics/hbar.gif" width="171" height="11" alt=""></td>
+											<td><!--<img src="/graphics/hbar.gif" width="171" height="11" alt="">--></td>
 										</tr>
 
 										<tr>
@@ -145,7 +136,7 @@ will be stapled to a pigeon and flown directly to me.
 											</td>
 										</tr>
 										<tr>
-											<td><img src="/graphics/hbar.gif" width="171" height="11" alt=""></td>
+											<td><!--<img src="/graphics/hbar.gif" width="171" height="11" alt="">--></td>
 										</tr>
 									</table>
 
@@ -176,7 +167,7 @@ will be stapled to a pigeon and flown directly to me.
 					<td bgcolor="#000000">
 						<table border="0" cellpadding="0" cellspacing="0" width="346">
 							<tr>
-								<td bgcolor="#ccccff"><img src="/graphics/maincolumntopbar.gif" width="346" height="12"></td>
+								<td bgcolor="#ccccff"><!--<img src="/graphics/maincolumntopbar.gif" width="346" height="12">--></td>
 							</tr>
 							<tr>
 								<td bgcolor="#ccccff">
@@ -230,7 +221,7 @@ will be stapled to a pigeon and flown directly to me.
 								</td>
 							</tr>
 							<tr>
-								<td bgcolor="#ccccff"><img src="/graphics/maincolumntopbar.gif" width="346" height="12"></td>
+								<td bgcolor="#ccccff"><!--<img src="/graphics/maincolumntopbar.gif" width="346" height="12">--></td>
 							</tr>
 						</table>
 
