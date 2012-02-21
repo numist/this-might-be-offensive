@@ -38,8 +38,9 @@ abstract class AssetManager {
 	protected function _add(AssetFile $asset) {
 		if($asset->file() != "") {
 			$this->assets[] = $asset;
+			return true;
 		} else {
-			trigger_error("asset does not exist and can not be added", E_USER_WARNING);
+			return false;
 		}
 	}
 	
@@ -64,7 +65,9 @@ class JS extends AssetManager {
 	// can't do abstract things with static methods, so quietly use a concrete class in the background.
 	public static function add($filename) {
 		if(is_null(static::$self)) static::$self = new JS();
-		static::$self->_add(new AssetFile($filename));
+		if(!static::$self->_add(new AssetFile($filename))) {
+			trigger_error("Asset \"$filename\" does not exist and cannot be added", E_USER_WARNING);
+		}
 	}
 	public static function emit() {
 		if(is_null(static::$self)) static::$self = new JS();
@@ -76,6 +79,34 @@ class JS extends AssetManager {
 	protected function tagFor(Asset $asset) {
 		if($asset->url() == "") { return ""; }
 		return '<script type="text/javascript" src="'.$asset->url()."\"></script>\n";
+	}
+}
+
+class CSS extends AssetManager {
+	static $self = null;
+	
+	public function __construct() {
+		$this->assets = array();
+		static::$self = $this;
+	}
+	
+	// can't do abstract things with static methods, so quietly use a concrete class in the background.
+	public static function add($filename) {
+		if(is_null(static::$self)) static::$self = new CSS();
+		if(!static::$self->_add(new AssetFile($filename))) {
+			trigger_error("Asset \"$filename\" does not exist and cannot be added", E_USER_WARNING);
+		}
+	}
+	public static function emit() {
+		if(is_null(static::$self)) static::$self = new CSS();
+		static::$self->_emit();
+	}
+	
+	// CSS-specific info
+	static public function srcDir() { return "/styles"; }
+	protected function tagFor(Asset $asset) {
+		if($asset->url() == "") { return ""; }
+		return '<link href="'.$asset->url().'" type="text/css" rel="stylesheet" />'."\n";
 	}
 }
 
