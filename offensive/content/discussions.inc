@@ -17,8 +17,7 @@
 		if(count($_GET) == 1 && array_key_exists("c", $_GET)) {
 			// lazyload_changes are only used if on a base page (?c=main not ?c=main&foo=bar)
     	JS::add("/offensive/js/lazyload_changes.js");
-		} ?>
-		?>
+		}?>
 		<link rel="alternate" type="application/rss+xml" title="discussions" href="<?= Link::rss("discuss") ?>" />
 		<!-- TODO: put this in a file? there's nothing dynamic here. -->
 		<script type="text/javascript">

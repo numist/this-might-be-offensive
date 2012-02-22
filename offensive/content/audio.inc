@@ -19,8 +19,6 @@
 			// lazyload_changes are only used if on a base page (?c=main not ?c=main&foo=bar)
     	JS::add("/offensive/js/lazyload_changes.js");
 		} ?>
-		
-		?>
 		<link id="gallery" rel="alternate" href="<?= Link::rss("audio") ?>" type="application/rss+xml" title="audio stream" />
 		<link rel="alternate" type="application/rss+xml" title="daily archives" href="<?= Link::rss("zip") ?>" />
 
