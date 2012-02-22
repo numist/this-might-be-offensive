@@ -81,20 +81,6 @@
 			<link rel="prefetch" href="<?= $_SERVER['PHP_SELF'] ?>?id=<?= $upload->next_filtered()->id() ?>"/>
 		<? } ?> -->
 
-<?
-	CSS::add("/styles/jquery-ui-1.8.17.custom.css");
-	CSS::add("/styles/pic.css");
-	CSS::emit();
-	JS::add("/offensive/js/jquery-1.7.1.min.js");
-	JS::add("/offensive/js/tmbolib.js");
-	JS::add("/offensive/js/jquery-ui-1.8.17.custom.min.js");
-	JS::add("/offensive/js/jquery.ba-outside-events.min.js");
-	JS::add("/offensive/js/subscriptions.js");
-	JS::add("/offensive/js/irsz.js");
-	JS::add("/offensive/js/picui.js");
-	JS::emit();
-
-?>
 		<script type="text/javascript">
 			// handle a keybased event. this code was incorporated from offensive.js, which has now been deprecated
 			function handle_keypress(e)
@@ -178,7 +164,20 @@
 				return true;
 			}
 		</script>
-		<? include_once("analytics.inc"); ?>
+<?
+	CSS::add("/styles/jquery-ui-1.8.17.custom.css");
+	CSS::add("/styles/pic.css");
+	CSS::emit();
+	JS::add("/offensive/js/jquery-1.7.1.min.js");
+	JS::add("/offensive/js/tmbolib.js");
+	JS::add("/offensive/js/jquery-ui-1.8.17.custom.min.js");
+	JS::add("/offensive/js/jquery.ba-outside-events.min.js");
+	JS::add("/offensive/js/subscriptions.js");
+	JS::add("/offensive/js/irsz.js");
+	JS::add("/offensive/js/picui.js");
+	JS::add("/offensive/js/analytics.js");
+	JS::emit();
+?>
 	</head>
 	<body id="pic">
 		<!-- message -->

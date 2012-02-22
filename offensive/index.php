@@ -110,9 +110,9 @@ $timelimit = 10;
 	if(function_exists('head')) {
 		head();
 	}
+	JS::add("/offensive/js/analytics.js");
 	CSS::emit();
 	JS::emit();
-	include_once("analytics.inc");
 ?>
 </head>
 
