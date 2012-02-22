@@ -6,6 +6,7 @@
 	if(!isset($link) || !$link) $link = openDbConnection();
 	require_once("offensive/assets/classes.inc");
 	require_once("offensive/assets/core.inc");
+	require_once("offensive/classes/assets.inc");
 
 	mustLogIn();
 	time_start($ptime);
@@ -76,17 +77,10 @@
 		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 		<META NAME="ROBOTS" CONTENT="NOARCHIVE" />
 		<title>[<?= $upload->type() ?>] : <?= $upload->filename() ?> </title>
-		<link rel="stylesheet" type="text/css" href="/styles/jquery-ui-1.8.17.custom.css"/>
-		<link rel="stylesheet" type="text/css" href="/styles/pic.css?v=0.0.5"/>
 		<!-- <? if($upload->next_filtered()) { ?>
 			<link rel="prefetch" href="<?= $_SERVER['PHP_SELF'] ?>?id=<?= $upload->next_filtered()->id() ?>"/>
 		<? } ?> -->
 
-		<script type="text/javascript" src="/offensive/js/jquery-1.7.1.min.js"></script>
-		<script type="text/javascript" src="/offensive/js/tmbolib.js?v=0.0.6"></script>
-		<script type="text/javascript" src="/offensive/js/jquery-ui-1.8.17.custom.min.js"></script>
-		<script type="text/javascript" src="/offensive/js/jquery.ba-outside-events.min.js"></script>
-		<script type="text/javascript" src="/offensive/js/subscriptions.js?v=0.0.1"></script>
 		<script type="text/javascript">
 			// handle a keybased event. this code was incorporated from offensive.js, which has now been deprecated
 			function handle_keypress(e)
@@ -170,9 +164,20 @@
 				return true;
 			}
 		</script>
-		<script type="text/javascript" src="/offensive/js/irsz.js?v=0.0.14"></script>
-		<script type="text/javascript" src="/offensive/js/picui.js?v=0.0.18"></script>
-		<? include_once("analytics.inc"); ?>
+<?
+	CSS::add("/styles/jquery-ui-1.8.17.custom.css");
+	CSS::add("/styles/pic.css");
+	CSS::emit();
+	JS::add("/offensive/js/jquery-1.7.1.min.js");
+	JS::add("/offensive/js/tmbolib.js");
+	JS::add("/offensive/js/jquery-ui-1.8.17.custom.min.js");
+	JS::add("/offensive/js/jquery.ba-outside-events.min.js");
+	JS::add("/offensive/js/subscriptions.js");
+	JS::add("/offensive/js/irsz.js");
+	JS::add("/offensive/js/picui.js");
+	JS::add("/offensive/js/analytics.js");
+	JS::emit();
+?>
 	</head>
 	<body id="pic">
 		<!-- message -->

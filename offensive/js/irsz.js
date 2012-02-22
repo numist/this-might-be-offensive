@@ -1,4 +1,4 @@
-// ©/info: https://github.com/numist/jslib/blob/master/irsz.js
+/*! ©/info: https://github.com/numist/jslib/blob/master/irsz.js */
 (function($) {
   var self,
   methods = {

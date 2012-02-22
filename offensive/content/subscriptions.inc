@@ -15,18 +15,9 @@
 	}
 
 	function head() {
-		?>
-		<link href="/styles/grid.css?v=1.0.4" type="text/css" rel="stylesheet">
-		<!-- lazyload_bottom -->
-		<script type="text/javascript">
-			function prep_item(item, neighbor) {
-				var color_class = (neighbor.find('.odd_row').length > 0) ? "even_row" : "odd_row";
-				$(item).find('div.col').removeClass("odd_row even_row").addClass(color_class);
-				return item;
-			}
-		</script>
-		<script type="text/javascript" src="/offensive/js/lazyload_bottom.js?v=0.0.5"></script>
-		<?
+		CSS::add("/styles/grid.css");
+		JS::add("/offensive/js/prep_evenodd.js");
+		JS::add("/offensive/js/lazyload_bottom.js");
 	}
 
 	function body() {

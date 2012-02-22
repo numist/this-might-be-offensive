@@ -1,5 +1,5 @@
-/* 
- * MarkerManager, v1.0
+/*! © 2007 Google Inc. Released under http://www.apache.org/licenses/LICENSE-2.0 */
+/* MarkerManager, v1.0
  * Copyright (c) 2007 Google Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");

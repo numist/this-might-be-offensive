@@ -1,0 +1,16 @@
+/* override definitions in oldskool.css to make main content area wider */	
+
+#content {
+	margin-left:auto;
+	margin-right:auto;
+	text-align:left;
+	line-height: 15px;
+	width:771px;
+}
+
+#rightcol {
+	width:584px;
+	float:left;
+	margin-right: auto;
+	margin-left: 0px;
+}

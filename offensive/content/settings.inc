@@ -55,9 +55,7 @@
 
 	function head()
 	{
-?>
-	<script type="text/javascript" src="/offensive/js/settings.php"></script>
-<?php
+		JS::add("/offensive/js/settings.js");
 	}
 
 	function body()

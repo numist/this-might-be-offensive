@@ -89,3 +89,10 @@ function getURLParam(param) {
   }
   return false;
 }
+
+/* image rollover stuff */
+function changesrc(a,im)
+{
+	x = eval("document."+a);
+	x.src=im;
+}

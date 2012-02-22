@@ -12,6 +12,7 @@ $timelimit = 10;
 	$defaultpath = ini_get('include_path');
 	set_include_path("..");
 	require_once("offensive/assets/header.inc");
+	require_once("offensive/classes/assets.inc");
 
 	time_start($ptime);
 
@@ -100,48 +101,18 @@ $timelimit = 10;
 	<META NAME="ROBOTS" CONTENT="NOARCHIVE">
 	<link rel="icon" href="/favicon.ico" />
 	<link rel="shortcut icon" href="/favicon.ico" />
-	<link rel="stylesheet" type="text/css" href="/offensive/filepilestyle.css" />
-	<link rel="stylesheet" type="text/css" href="/styles/oldskool.css?v=0.0.3"/>
-
-	
-<style type="text/css">
-
-	/* override definitions in oldskool.css to make main content area wider */	
-
-	#content {
-		margin-left:auto;
-		margin-right:auto;
-		text-align:left;
-		line-height: 15px;
-		width:771px;
-	}
-	
-	#rightcol {
-		width:584px;
-		float:left;
-		margin-right: auto;
-		margin-left: 0px;
-	}
-	
-</style>
-
-<script type="text/javascript">
-	/* image rollover stuff */
-	function changesrc(a,im)
-	{
-		x = eval("document."+a);
-		x.src=im;
-	}
-</script>
-<script type="text/javascript" src="/offensive/js/jquery-1.7.1.min.js"></script>
-<script type="text/javascript" src="/offensive/js/tmbolib.js?v=0.0.6"></script>
-
-<?
-	if( function_exists( 'head' ) ) {
+	<?
+	CSS::add("/styles/filepilestyle.css");
+	CSS::add("/styles/oldskool.css");
+	CSS::add("/styles/index.css");
+	JS::add("/offensive/js/jquery-1.7.1.min.js");
+	JS::add("/offensive/js/tmbolib.js");
+	if(function_exists('head')) {
 		head();
 	}
-
-	include_once("analytics.inc");
+	JS::add("/offensive/js/analytics.js");
+	CSS::emit();
+	JS::emit();
 ?>
 </head>
 
