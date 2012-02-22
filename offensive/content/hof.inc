@@ -15,17 +15,7 @@
 
 	function head() {
 		CSS::add("/styles/grid.css");
-		?>
-		<!-- lazyload_bottom -->
-		<!-- TODO: put this in a file? there's nothing dynamic here. -->
-		<script type="text/javascript">
-			function prep_item(item, neighbor) {
-				var color_class = (neighbor.find('.odd_row').length > 0) ? "even_row" : "odd_row";
-				$(item).find('div.col').removeClass("odd_row even_row").addClass(color_class);
-				return item;
-			}
-		</script>
-		<?
+		JS::add("/offensive/js/prep_evenodd.js");
 		JS::add("/offensive/js/lazyload_bottom.js");
 	}
 	function body() {
