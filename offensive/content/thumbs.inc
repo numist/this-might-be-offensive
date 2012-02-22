@@ -34,6 +34,28 @@
 <?}
 
 	function body() {
+		// TODO: remove in a couple of months, to give people a chance to re-set their keybindings.
+		require("offensive/data/keynav.inc");
+		$keysNeedUpdate = false;
+		foreach($key_options as $option => $foo) {
+			if($option == "noselect") continue;
+			$val = me()->getPref($option);
+			if($val) {
+				$keys = unserialize($val);
+				foreach($keys as $key) {
+					if($key & KEY_META_AWARE == 0) {
+						$keysNeedUpdate = true;
+						break;
+					}
+				}
+			}
+			if($keysNeedUpdate) break;
+		}
+		if($keysNeedUpdate) {
+			box("You're using custom key shortcuts which should be updated to be modifier-key-aware.<br />
+			Please update them in your <a href=\"".Link::content("settings")."\">settings</a>.", "It'll only take a few seconds…");
+		}
+		
 		$numPerPage = 100;
 
 		$args = $_REQUEST;

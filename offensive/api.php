@@ -8,7 +8,6 @@
 	require_once("offensive/assets/functions.inc");
 	require_once("offensive/assets/classes.inc");
 	require_once("offensive/assets/core.inc");
-	require_once("offensive/assets/comments.inc");
 		
 	class Error {
 		private $msg;
@@ -134,12 +133,6 @@
 		exit;
 	}
 	
-	/* XXX upload rows returned by API should include:
-	 * subscribed, nsfw, tmbo, filename, file link, file dims (if image),
-	 * thumb link (if image), thumb dims (if image), id, type, next?!, prev?! (of same type).
-	 */	
-	require_once("offensive/assets/comments.inc");
-
 /**
 	API functions
 */	
@@ -361,36 +354,34 @@
 		send(core_getcomments($_REQUEST));
 	}
 	
+	/**
+	 * @method postcomment
+	 * Post a comment to a thread.
+	 *
+	 * All parameters to this function are processed via the POST method, to prevent malicious votes via link shorteners.
+	 *
+	 * No examples yet pending doc system support for POST in examples. Sorry.
+	 *
+	 * @param fileid integer required Post comment to this thread.
+	 * @param comment string optional Comment text.
+	 * @param vote string optional {"this is good", "this is bad", "novote"} Default:"novote" The intended vote.
+	 * @param offensive integer optional {1, 0} Default: 0 Vote [this might be offensive].
+	 * @param repost integer optional {1, 0} Default: 0 Vote [this is a repost].
+	 * @param subscribe integer optional {1, 0} Default: 1 if vote is "this is bad" or comment is not empty, 0 otherwise. Setting to 1 ensures thread subscription, setting to 0 does nothing (the default will override argument of 0).
+	 * @return Comment object or false if nothing was added to the database.
+	 */
 	function api_postcomment() {
-		$fileid = check_arg("fileid", "integer", $_POST);
-		$comment = check_arg("comment", "string", $_POST, false);
-		$vote = check_arg("vote", "string", $_POST, false, array("this is good", "this is bad", "novote"));
-		$offensive = check_arg("offensive", "integer", $_POST, false, array("1", "0"));
-		$repost = check_arg("repost", "integer", $_POST, false, array("1", "0"));
-		$subscribe = check_arg("subscribe", "integer", $_POST, false, array("1", "0"));
+		check_arg("fileid", "integer", $_POST);
+		check_arg("comment", "string", $_POST, false);
+		check_arg("vote", "string", $_POST, false, array("this is good", "this is bad", "novote"));
+		check_arg("offensive", "integer", $_POST, false, array("1", "0"));
+		check_arg("repost", "integer", $_POST, false, array("1", "0"));
+		check_arg("subscribe", "integer", $_POST, false, array("1", "0"));
 		handle_errors();
 		assert('me()');
+		assert('id(new Upload($_POST["fileid"]))->exists()');
 		
-		// if no comment, vote, offensive, or repost, then why are you here?
-		if(!($comment || $vote || $offensive || $repost || $subscribe)) {
-			trigger_error("no comment, vote, tmbo, or tiar set -- nothing to do!", E_USER_WARNING);
-			send(false);
-		}
-		
-		if($vote == "novote") $vote = "";
-		if($comment === false) $comment = "";
-		if($vote === false) $vote = "";
-		if($offensive === false) $offensive = 0;
-		if($repost === false) $repost = 0;
-
-		if($comment || $vote || $offensive || $repost) {
-			postComment($fileid, $vote, $repost, $offensive, $comment);
-		}
-		
-		if($subscribe == 1) {
-			subscribe($fileid);
-		}
-		send(true);
+		send(core_postcomment($_POST));
 	}
 
 	// XXX: unimplemented
@@ -620,10 +611,13 @@
 		$subscribe = check_arg("subscribe", "integer", null, array("1", "0"));
 		handle_errors();
 		
+		$upload = new Upload($threadid);
+		
 		if($subscribe == 0) {
-			send(unsubscribe($threadid));
+			send($upload->unsubscribe());
+			return;
 		}
-		send(subscribe($threadid));
+		send($upload->subscribe());
 	}
 	
 	/**
@@ -641,7 +635,7 @@
 		$threadid = check_arg("threadid", "integer");
 		handle_errors();
 		
-		send(clearSubscription($threadid, me()->id()));
+		send(id(new Upload($threadid))->clearSubscription());
 	}
 
 ?>

@@ -94,6 +94,7 @@ If you are developing an application, please <a href="#Errata">send an email or 
 	<li><a href="#login">login</a></li>
 	<li><a href="#logout">logout</a></li>
 	<li><a href="#getcomments">getcomments</a></li>
+	<li><a href="#postcomment">postcomment</a></li>
 	<li><a href="#searchuser">searchuser</a></li>
 	<li><a href="#searchuploads">searchuploads</a></li>
 	<li><a href="#getlocation">getlocation</a></li>
@@ -422,13 +423,46 @@ The token is named after the user-agent of the requesting application and can be
 
 
 <hr/>
+<a name="postcomment">
+<h3>postcomment</h3>
+<p>Post a comment to a thread.</p>
+
+<p>All parameters to this function are processed via the POST method, to prevent malicious votes via link shorteners.</p>
+
+<p>No examples yet pending doc system support for POST in examples. Sorry.</p>
+
+<h4>Arguments:</h4>
+<ul>
+	 <li><b>fileid</b> (integer) - required.
+						Post comment to this thread.
+	 <li><b>comment</b> (string) optional.
+						Comment text.
+	 <li><b>vote</b> (string) optional. 
+						Can be any of {"this is good", "this is bad", "novote"}
+						Default:"novote" The intended vote.
+	 <li><b>offensive</b> (integer) optional.
+						Can be any of {1, 0}
+						Default: 0 Vote [this might be offensive].
+	 <li><b>repost</b> (integer) optional.
+						Can be any of {1, 0}
+						Default: 0 Vote [this is a repost].
+	 <li><b>subscribe</b> (integer) optional.
+						Can be any of {1, 0}
+						Default: 1 if vote is "this is bad" or comment is not empty, 0 otherwise. Setting to 1 ensures thread subscription, setting to 0 does nothing (the default will override argument of 0).
+	</ul>
+
+
+<h4>Returns:</h4>
+<p>Comment object or false if nothing was added to the database.</p>
+
+<hr/>
 <a name="searchuser">
 <h3>searchuser</h3>
 <p>Find a user by username.</p>
 
 <h4>Arguments:</h4>
 <ul>
-	    <li><b>q</b> (string) - true.
+	    <li><b>q</b> (string) - required.
 						Full or partial username.</li>
 	    <li><b>limit</b> (limit) - optional.
 						Default and maximum is 200.</li>

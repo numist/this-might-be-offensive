@@ -113,11 +113,11 @@ class Upload {
 	}
 	
 	public function filename() {
-		return $this->getUploadRow("filename");
+		return $this->getUploadRow(__FUNCTION__);
 	}
 	
 	public function timestamp() {
-		return $this->getUploadRow("timestamp");
+		return $this->getUploadRow(__FUNCTION__);
 	}
 	
 	public function is_tmbo() {
@@ -129,11 +129,11 @@ class Upload {
 	}
 	
 	public function type() {
-		return $this->getUploadRow("type");
+		return $this->getUploadRow(__FUNCTION__);
 	}
 	
 	public function status() {
-		return $this->getUploadRow("status");
+		return $this->getUploadRow(__FUNCTION__);
 	}
 	
 	/*
@@ -165,34 +165,30 @@ class Upload {
 		              E_USER_ERROR);
 	}
 	
-	public function goods() {
-		return is_intger($this->getCacheRow("goods")) 
-			? $this->getCacheRow("goods")
+	private function cacheCount($type) {
+		return is_intger($this->getCacheRow($type)) 
+			? $this->getCacheRow($type)
 			: 0;
+	}
+	
+	public function goods() {
+		return $this->cacheCount(__FUNCTION__);
 	}
 	
 	public function bads() {
-		return is_intger($this->getCacheRow("bads"))
-			? $this->getCacheRow("bads")
-			: 0;
+		return $this->cacheCount(__FUNCTION__);
 	}
 	
 	public function tmbos() {
-		return is_intger($this->getCacheRow("tmbos"))
-			? $this->getCacheRow("tmbos")
-			: 0;
+		return $this->cacheCount(__FUNCTION__);
 	}
 	
 	public function tiars() {
-		return is_intger($this->getCacheRow("tiars"))
-			? $this->getCacheRow("tiars")
-			: 0;
+		return $this->cacheCount(__FUNCTION__);
 	}
 	
 	public function comments() {
-		return is_intger($this->getCacheRow("comments"))
-			? $this->getCacheRow("comments")
-			: 0;
+		return $this->cacheCount(__FUNCTION__);
 	}
 	
 	public function last_active() {
@@ -200,14 +196,41 @@ class Upload {
 		return ($last_active == null ? $this->timestamp() : $last_active);
 	}
 	
-	public function subscribed() {
-		if(!array_key_exists('subscribed', $this->data)) {
-			$sql = "SELECT * FROM offensive_subscriptions
-				WHERE userid=".me()->id()." AND fileid=".$this->id();
-			$this->data['subscribed'] = mysql_num_rows(tmbo_query($sql)) > 0 ? true : false;
-		}
+	public function subscribed($user=null) {
+		if($user == null) $user = me();
+		if(is_numeric($user)) $user = new User($user);
+		if(!$user || !$user->exists()) trigger_error("invalid user", E_USER_ERROR);
+		return $user->subscribed($this);
+	}
+
+	public function subscribe($user=null) {
+		if($user == null) $user = me();
+		if(is_numeric($user)) $user = new User($user);
+		if(!$user || !$user->exists()) trigger_error("invalid user", E_USER_ERROR);
+		return $user->subscribe($this);
+	}
+	
+	public function unsubscribe($user=null) {
+		if($user == null) $user = me();
+		if(is_numeric($user)) $user = new User($user);
+		if(!$user || !$user->exists()) trigger_error("invalid user", E_USER_ERROR);
+		return $user->unsubscribe($this);
+	}
+	
+	public function clearSubscription($user=null) {
+		if($user == null) $user = me();
+		if(is_numeric($user)) $user = new User($user);
+		if(!$user || !$user->exists()) trigger_error("invalid user", E_USER_ERROR);
+		return $user->clearSubscription($this);
+	}
+	
+	public function updateSubscriptions($comment) {
+		if(is_numeric($comment)) $comment = new Comment($comment);
+		if(!$comment || !$comment->exists()) trigger_error("invalid comment", E_USER_ERROR);
 		
-		return (bool)$this->data['subscribed'];
+		$sql = "UPDATE offensive_subscriptions SET commentid = {$comment->id()}
+		        WHERE fileid = {$this->id()} AND commentid IS NULL";
+		$result = tmbo_query($sql);
 	}
 	
 	/*
@@ -495,8 +518,7 @@ class Upload {
 	public function URL() {
 		// uploads with files only
 		// if there's no file, why bother with a URL?
-		if($this->type() == 'topic'
-		   || $this->file() == '') {
+		if($this->type() == 'topic' || $this->file() == '') {
 			return '';
 		}
 
@@ -648,6 +670,30 @@ class Upload {
 		}
 		          // width  , height
 		return array($arr[0], $arr[1]);
+	}
+
+	/*
+	 * permissions code
+	 */
+	public function alreadyVoted($user=null) {
+		if($user == null) $user = me();
+		if(is_numeric($user)) $user = new User($user);
+		if(!$user || !$user->exists()) trigger_error("invalid user", E_USER_ERROR);
+		return $user->alreadyVoted($this);
+	}
+	
+	public function canVote($user=null) {
+		if($user == null) $user = me();
+		if(is_numeric($user)) $user = new User($user);
+		if(!$user || !$user->exists()) trigger_error("invalid user", E_USER_ERROR);
+		return $user->canVote($this);
+	}
+
+	public function canComment($user=null) {
+		if($user == null) $user = me();
+		if(is_numeric($user)) $user = new User($user);
+		if(!$user || !$user->exists()) trigger_error("invalid user", E_USER_ERROR);
+		return $user->canComment($this);
 	}
 
 	// API support

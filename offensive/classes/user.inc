@@ -95,15 +95,15 @@ class User {
 	}
 	
 	public function username() {
-		return $this->getUserRow("username");
+		return $this->getUserRow(__FUNCTION__);
 	}
 	
 	public function email() {
-		return $this->getUserRow("email");
+		return $this->getUserRow(__FUNCTION__);
 	}
 	
 	public function created() {
-		return $this->getUserRow("created");
+		return $this->getUserRow(__FUNCTION__);
 	}
 	
 	public function status() {
@@ -111,11 +111,11 @@ class User {
 	}
 	
 	public function timestamp() {
-		return $this->getUserRow("timestamp");
+		return $this->getUserRow(__FUNCTION__);
 	}
 	
 	public function last_login_ip() {
-		return $this->getUserRow("last_login_ip");
+		return $this->getUserRow(__FUNCTION__);
 	}
 	
 	public function referred_by() {
@@ -363,6 +363,126 @@ class User {
 		}
 	}
 
+	/*
+	 * subscriptions
+	 */
+	public function subscribed($upload) {
+		if(is_numeric($upload)) $upload = new Upload($upload);
+		if(!$upload || !$upload->exists()) trigger_error("invalid upload", E_USER_ERROR);
+
+		$sql = "SELECT * FROM offensive_subscriptions
+						WHERE userid={$this->id()} AND fileid={$upload->id()}";
+
+		// memoize self
+		if(me() && me()->id() == $this->id()) {
+			if(!array_key_exists("subscribed:".$upload->id(), $this->data)) {
+				$this->data["subscribed:".$upload->id()] = mysql_num_rows(tmbo_query($sql)) > 0 ? true : false;
+			}
+			return $this->data["subscribed:".$upload->id()];
+		}
+		
+		return mysql_num_rows(tmbo_query($sql)) > 0 ? true : false;
+	}
+
+	public function subscribe($upload) {
+		if(is_numeric($upload)) $upload = new Upload($upload);
+		if(!$upload || !$upload->exists()) trigger_error("invalid upload", E_USER_ERROR);
+		
+		// check if the user is already subscribed
+		if($this->subscribed($upload)) return true;
+
+		// ensure file exists
+		if(!$upload->exists()) return false;
+
+    // finally, subscribe
+		$sql = "INSERT INTO offensive_subscriptions (userid, fileid) VALUES ( {$this->id()}, {$upload->id()} )";
+		tmbo_query($sql);
+		
+		// reset memoization
+		if(me() && me()->id() == $this->id()) {
+			$this->data["subscribed:".$upload->id()] = true;
+		}
+		
+		return true;
+	}
+	
+	public function unsubscribe($upload) {
+		if(is_numeric($upload)) $upload = new Upload($upload);
+		if(!$upload || !$upload->exists()) trigger_error("invalid upload", E_USER_ERROR);
+		
+		// check if the user is already unsubscribed
+		if(!$this->subscribed($upload)) return true;
+
+		// finally, unsubscribe
+		$sql = "DELETE FROM offensive_subscriptions WHERE userid={$this->id()} AND fileid={$upload->id()}";
+		tmbo_query($sql);
+		
+		// reset memoization
+		if(me() && me()->id() == $this->id()) {
+			$this->data["subscribed:".$upload->id()] = false;
+		}
+		
+		return true;
+	}
+	
+	public function clearSubscription($upload) {
+		if(is_numeric($upload)) $upload = new Upload($upload);
+		if(!$upload || !$upload->exists()) trigger_error("invalid upload", E_USER_ERROR);
+		
+		$sql = "UPDATE offensive_subscriptions SET commentid = NULL WHERE userid={$this->id()} and fileid={$upload->id()}";
+		$result = tmbo_query( $sql );
+
+		if(mysql_affected_rows() < 1) {
+			return false;
+		}
+		return true;
+	}
+
+	/*
+	 * permissions
+	 */
+	public function alreadyVoted($upload) {
+		if(is_numeric($upload)) $upload = new Upload($upload);
+		if(!$upload || !$upload->exists()) trigger_error("invalid upload", E_USER_ERROR);
+		
+		$sql = "SELECT vote AS thecount FROM offensive_comments 
+		        WHERE fileid={$upload->id()} AND userid={$this->id()} AND vote LIKE 'this%'";
+		
+		// memoize self
+		if(me() && me()->id() == $this->id()) {
+			if(!array_key_exists(__FUNCTION__.":".$upload->id(), $this->data)) {
+				$this->data[__FUNCTION__.":".$upload->id()] = (mysql_num_rows(tmbo_query($sql)) > 0);
+			}
+			return $this->data[__FUNCTION__.":".$upload->id()];
+		}
+		return (mysql_num_rows(tmbo_query($sql)) > 0);
+	}
+
+	public function canVote($upload) {
+		if(is_numeric($upload)) $upload = new Upload($upload);
+		if(!$upload || !$upload->exists()) trigger_error("invalid upload", E_USER_ERROR);
+		
+		// no need to memoize, this method is not responsible for any new data
+		if($upload->uploader()->id() == $this->id()) return false; 		// can not vote on self
+		if($upload->blocked()) return false;						// can not vote if blocked
+		if($this->alreadyVoted($upload)) return false;	// can not vote again
+		if(!$this->canComment($upload)) return false;		// can not vote if can not comment
+		if(!$upload->file()) return false;							// can not vote if there is no file (topics, expired uploads)
+		return true;
+	}
+	
+	public function canComment($upload) {
+		if(is_numeric($upload)) $upload = new Upload($upload);
+		if(!$upload || !$upload->exists()) trigger_error("invalid upload", E_USER_ERROR);
+		
+		// no need to memoize, this method is not responsible for any new data
+		if($this->status() != "admin" && $upload->blocked()) return false;	// non-admin blocked
+		if($upload->id() == 211604 && me()->status() != "admin") return false; // changeblog
+		if($upload->id() == 197431 && me()->status() != "admin") return false; // rhi-rhi ipod
+		return true;
+	}
+
+	// API support
 	public function api_data() {
 		$ret = array(
 				"posse" => count($this->posse()),

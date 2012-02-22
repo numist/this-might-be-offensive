@@ -4,7 +4,6 @@
 	if(!isset($link) || !$link) $link = openDbConnection();
 	require_once("offensive/assets/functions.inc");
 	require_once("offensive/assets/tabs.inc");
-	require_once("offensive/assets/comments.inc");
 	require_once("offensive/assets/classes.inc");
 
 	function title() {
@@ -24,7 +23,7 @@
 		$upload = core_getupload($_REQUEST['fileid']);
 		$uploader = $upload->uploader();
 
-		clearSubscription($upload->id(), me()->id());
+		$upload->clearSubscription();
 
 		// update pickuplink for discussions
 		if($upload->type() == "topic") {
@@ -51,23 +50,13 @@
 	  }
 	  
 		if( array_key_exists("submit", $_POST)) {
-			$fileid		 = array_key_exists("fileid", $_POST) ?
-							$_POST['fileid'] : '';
-			$comment	 = array_key_exists("comment", $_POST) ?
-							trim($_POST['comment']) : "";
-			$vote		 = array_key_exists("vote", $_POST) ?
-							$_POST['vote'] : "";
-			$offensive	 = array_key_exists("offensive", $_POST) && $_POST['offensive'] != "" ?
-							1 : 0;
-			$repost		 = array_key_exists("repost", $_POST) 	&& $_POST['repost'] != "" ?
-							1 : 0;
-			$subscribe	 = array_key_exists("subscribe", $_POST) && $_POST['subscribe'] != "" ?
-							1 : 0;
-			
-			$commentid = postComment($fileid, $vote, $repost, $offensive, $comment, $subscribe);
+			$args = $_POST;
+			if(array_key_exists("offensive", $args) && $args["offensive"] != "") $args["offensive"] = 1;
+			if(array_key_exists("repost", $args) && $args["repost"] != "") $args["repost"] = 1;
+			if(array_key_exists("subscribe", $args) && $args["subscribe"] != "") $args["subscribe"] = 1;
+			$comment = core_postcomment($args);
 
-			if($commentid === false) {
-				echo "you've been had.";
+			if(!is_object($comment)) {
 				return;
 			}
 
@@ -77,7 +66,7 @@
 			}
 			
 			// redirecting to the same place prevents 'reload' from reposting the comment.
-			header("Location: ".(is_numeric($commentid) ? Link::comment($commentid) : Link::thread($_REQUEST['fileid'])));
+			header("Location: ".Link::comment($comment));
 			exit;
 		}
 	}
@@ -103,8 +92,6 @@
 	function body() {
 		global $upload, $uploader;
 	
-		$subscribed = subscribed($upload->id());
-
 		$comments_exist = count($upload->getComments()) > 0;
 	
 		$comments_heading = "the dorks who came before you said:";
@@ -200,7 +187,7 @@
 			</div>
 			<div class="heading">
 				<div style="float:right">					
-					<? if( $subscribed ) { ?>
+					<? if( $upload->subscribed() ) { ?>
 						<b><a id="unsubscribeLink" href="subscribe.php?un=1&fileid=<?= $upload->id() ?>" title="take this thread off my 'unread comments' watch list." class="orange">unsubscribe</a></b>
 					<? }
 						else { ?>
@@ -224,7 +211,7 @@
 
 <?php
     // changeblog shouldn't tease the users with a comment field
-    if(canComment($upload->id()) && ($upload->id() != "211604" || me()->status() == "admin")) {
+    if($upload->canComment()) {
 ?>
 
 	<div class="contentbox">
@@ -245,7 +232,7 @@
 
 <?php 
 
-	if( canVote($upload->id()) && $upload->file() && $upload->type() != 'topic' ) {
+	if($upload->canVote()) {
 	
 	?>	<div style="text-align:left;margin-left:10%">
 			<input type="radio" name="vote" value="" checked="checked" id="novote"/>

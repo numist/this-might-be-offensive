@@ -281,13 +281,13 @@ function qc_dialog_init() {
 				}
 			},
 			close: function(event, ui) {
-				// re-enable normal behaviour
-				bind_default_events();
-				
 				// clean up all qc bindings.
 				$("*").off(".qc");
 				$(document).off(".qc");
 				$(window).off(".qc");
+
+				// re-enable normal behaviour
+				bind_default_events();
 			},
 			dragStart: function(event, ui) {
 				qc_start_manipulation($(this));
@@ -327,6 +327,20 @@ function qc_form_reset() {
 
 function bind_default_events() {
 	$(document).on("keydown.default", handle_keypress);
+
+	/* Issue #51:
+	 * Workaround for Opera where key commands would not work if you had
+	 * opened/closed the quick box and navigated away from the previous page
+	 * using key commands.
+	 */
+	$("#quickcomment").focus();
+	/*
+	 * The extra call to .blur() is to undecorate the link in browsers that
+	 * highlight focused elements (like Safari/Chrome).
+	 */
+	if(!$.browser.opera) {
+	  $("#quickcomment").blur();
+	}
 }
 
 function unbind_default_events() {

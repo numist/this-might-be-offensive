@@ -6,7 +6,6 @@
 	if(!isset($link) || !$link) $link = openDbConnection();
 	require_once("offensive/assets/classes.inc");
 	require_once("offensive/assets/core.inc");
-	require_once("offensive/assets/comments.inc");
 
 	mustLogIn();
 	time_start($ptime);
@@ -172,7 +171,7 @@
 			}
 		</script>
 		<script type="text/javascript" src="/offensive/js/irsz.js?v=0.0.14"></script>
-		<script type="text/javascript" src="/offensive/js/picui.js?v=0.0.17"></script>
+		<script type="text/javascript" src="/offensive/js/picui.js?v=0.0.18"></script>
 		<? include_once("analytics.inc"); ?>
 	</head>
 	<body id="pic">
@@ -195,12 +194,12 @@
 		<!-- quick comment box -->
 		<div id="qc_dialog" style="display: none;">
 			<a name="form"></a>
-			<form id="qc_form"<? if(!canComment($upload->id())) { ?> style="display: none;"<? } ?>>
+			<form id="qc_form"<? if(!$upload->canComment()) { ?> style="display: none;"<? } ?>>
 					<input type="hidden" value="329310" name="fileid" id="qc_fileid">
 					<input type="hidden" name="c" value="comments">
 					<textarea cols="64" rows="6" name="comment" id="qc_comment"></textarea>
 
-					<? if(canVote($upload->id()) && $upload->file()) { ?>
+					<? if($upload->canVote()) { ?>
 						<div id="qc_vote" style="text-align:left;margin-left:14%">
 							<table><tbody><tr><td width="200px">
 							<input class="qc_tigtib" id="qc_novote" type="radio" value="novote" name="vote" checked="">
@@ -280,7 +279,7 @@
 					+<span id="count_good"><?= $upload->goods() ?></span>
 					-<span id="count_bad"><?= $upload->bads() ?></span><?
 					if($upload->tmbos() > 0) { ?>
-						x<span id="count_tmbo" style=\"color:#990000\"><?= $upload->tmbos() ?></span>
+						x<span id="count_tmbo" style="color:#990000"><?= $upload->tmbos() ?></span>
 					<? } ?>)
 					<span id="quicklink">&nbsp;(<a id="quickcomment" href="#">quick</a>)</span>
 				</span>
@@ -290,7 +289,7 @@
 				-->
 				<span id="voting_controls" style="margin-left:40px;">
 					<?
-					if(canVote($upload->id()) && $upload->file()) {
+					if($upload->canVote()) {
 						// TODO: clean up
 						$good_href = "href=\"/offensive/?c=comments&submit=submit&fileid=$id&vote=this%20is%20good&redirect=true\"";
 						$bad_href = "href=\"/offensive/?c=comments&submit=submit&fileid=$id&vote=this%20is%20bad&redirect=true\"";
