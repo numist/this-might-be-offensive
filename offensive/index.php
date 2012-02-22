@@ -439,10 +439,18 @@ $timelimit = 10;
 	<? }
 
 	function whosubscribed($upload) {
-		$sql = "SELECT DISTINCT u.userid, u.username, u.account_status FROM offensive_subscriptions sub JOIN users u ON sub.userid = u.userid WHERE fileid = ".$upload->id()." ORDER BY u.username ASC";
+		$sql = "SELECT DISTINCT u.* FROM offensive_subscriptions sub JOIN users u ON sub.userid = u.userid WHERE fileid = ".$upload->id()." ORDER BY u.username ASC";
 		$result = tmbo_query($sql);
+		
+		$watchers = array();
+		while(false !== ($row = mysql_fetch_array($result))) {
+			$watcher = new User($row);
+			if(!me()->squelched($watcher)) {
+				$watchers[] = $watcher;
+			}
+		}
 
-		if(mysql_num_rows($result) == 0) { ?>
+		if(count($watchers) == 0) { ?>
 			<div class="heading">no watchers :(</div>
 			<? return;
 		}
@@ -453,10 +461,9 @@ $timelimit = 10;
 		<div class="heading">subscribers:</div>
 		<div class="bluebox">
 			<table style="width:100%">
-				<? while(false !== ($row = mysql_fetch_array($result))) {
-					$user = new User($row);
+				<? foreach($watchers as $user) {
 					$css = (!isset($css) || $css == "odd") ? "even" : "odd"; ?>
-					<tr class="<?= $css?>_row"><td class="<?= $css ?>file"><?= id(new User($row))->htmlUsername() ?></td></tr>
+					<tr class="<?= $css?>_row"><td class="<?= $css ?>file"><?= $user->htmlUsername() ?></td></tr>
 				<? } ?>
 			</table>
 		</div>
