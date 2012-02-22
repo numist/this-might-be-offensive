@@ -725,11 +725,16 @@ function upload_checkdims(&$postdata) {
 	if (array_key_exists("resize", $postdata)) {		
 		$image = new Imagick("$tmpdir/{$postdata['tmpname']}");
 
-		// XXX maybe use a specific filter. Gotta play with it for best results.
-		$image->resizeImage(1024, 1024, imagick::FILTER_UNDEFINED, 1, true);
-				
-		if(!$image->writeImage("$tmpdir/{$postdata['tmpname']}")) {  
-			trigger_error("ImageMagick/writeImage failed", E_USER_ERROR);
+		if(image_is_animated($image)) {
+			// animated GIF. fuck it.
+			$postdata['noresize'] = $postdata['resize'];
+			unset($postdata['resize']);
+			return false;
+		} else {
+			$image->resizeImage(1024, 1024, imagick::FILTER_UNDEFINED, 1, true);
+			if(!$image->writeImage("$tmpdir/{$postdata['tmpname']}")) {  
+				trigger_error("ImageMagick/writeImage failed", E_USER_ERROR);
+			}
 		}
 		
 		if(needCompression("$tmpdir/{$postdata['tmpname']}")) {
@@ -795,6 +800,14 @@ function upload_checksize(&$postdata) {
 		$newfilename = substr($postdata['filename'], 0, 0 - strlen($postdata['file_extension'])).".jpg";
 		
 		$image = new Imagick("$tmpdir/{$postdata['tmpname']}");
+		
+		if(image_is_animated($image)) {
+			// animated GIF. fuck it.
+			$postdata['noresample'] = $postdata['resample'];
+			unset($postdata['resample']);
+			return false;
+		}
+		
 		$image->setImageCompression(imagick::COMPRESSION_JPEG); 
 		$image->setImageCompressionQuality(90); 
 		if(!$image->writeImage("$tmpdir/$newtmp")) {  
@@ -1139,8 +1152,13 @@ function upload_insert_file($postdata) {
 		$thfile  = $tmpdir . '/th' . $postdata['tmpname'] . $postdata['file_extension'];
 
 		$image = new Imagick("$tmpdir/{$postdata['tmpname']}");
+
+		if(image_is_animated($image)) {
+			$image->flattenImages();
+		}
+		
 		$image->setGravity(imagick::GRAVITY_CENTER);
-		$image->flattenImages();
+		
 		if(!$image->cropThumbnailImage(133,100)) {
 			trigger_error("ImageMagick/cropThumbnailImage failed", E_USER_ERROR);
 		}
@@ -1184,8 +1202,12 @@ function upload_insert_file($postdata) {
 				if($width > 100 || $height > 100) {
 					
 					$image = new Imagick($thumbname);
+
+					if(image_is_animated($image)) {
+						$image->flattenImages();
+					}
+
 					$image->setGravity(imagick::GRAVITY_CENTER);
-					$image->flattenImages();
 					if(!$image->cropThumbnailImage(100,100)) {
 						trigger_error("ImageMagick/cropThumbnailImage failed", E_USER_ERROR);
 					}
@@ -1246,4 +1268,16 @@ function upload_insert_topic() {
 	// TODO
 }
 
+###############################################################################
+function image_is_animated() {
+	/*
+	 * other than actually *using* foreach, PHP doesn't have a way to expose how
+	 * many elements a Traversable object contains.
+	 * Animated GIFs are Traversable and have more than one element.
+	 */
+	if(!($image instanceof Traversable)) {return false;}
+	$frames = 0;
+	foreach($image as $frame) { $frames++; }
+	return $frames > 1;
+}
 ?>
