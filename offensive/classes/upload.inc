@@ -583,10 +583,22 @@ class Upload {
 			return '';
 		}
 		
-		// XXX: create a real thumbnail from $bigfile
 		$retname = $this->basePath().$thumbpath;
+		$image = new Imagick($bigfile);
+		$image->setGravity(imagick::GRAVITY_CENTER);
+		$image->flattenImages();
+		if(!$image->cropThumbnailImage(133,100)) {
+			trigger_error("ImageMagick/cropThumbnailImage failed", E_USER_WARNING);
+			return "";
+		}
+		$image->setImagePage(0, 0, 0, 0);
+
 		ensureDirExists(dirname($retname));
-        
+		if(!$image->writeImage($retname)) {
+			trigger_error("ImageMagick/writeImage failed", E_USER_WARNING);
+			return "";
+		}
+		$image->destroy();
 		trigger_error("CONFORM: resized $bigfile to $retname", E_USER_NOTICE);
         
 		return $retname;
