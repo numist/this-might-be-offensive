@@ -1,0 +1,2 @@
+/*! original file: thismight.be/offensive/js/prep_evenodd.js */
+function prep_item(b,c){var a=(c.find(".odd_row").length>0)?"even_row":"odd_row";$(b).find("div.col").removeClass("odd_row even_row").addClass(a);return b};
