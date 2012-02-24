@@ -26,7 +26,7 @@ function check_arg($key, $type, $method=null, $required=true, $set=null) {
 	global $validation_errors;
 
 	// make sure a valid method is being used.
-	if($method == null) $method = $_REQUEST;
+	if($method === null) $method = $_REQUEST;
 	
 	// if this is triggered, there is a code problem.  kaboom.
 	if(!is_array($method)) {
