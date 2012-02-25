@@ -49,6 +49,25 @@ if (typeof String.prototype.parseInt != 'function') {
     }
 		return this;
   };
+	$.fn.hideFilteredThumbnails = function() {
+		var hide_filter = [];
+		$.each(['nsfw', 'tmbo', 'bad'], function(idx, filter) {
+			if(me['hide_' + filter])
+				hide_filter.push('.thumbcontainer img.' + filter);
+		});
+		$(hide_filter.join(',')).each(function() {
+			var self = $(this);
+			if(self.data('original_src') === undefined) {
+				self.data('original_src', self.attr('src'));
+				self.attr('src', '/offensive/graphics/th-filtered.gif');
+				self.hover(function() {
+					self.attr('src', self.data('original_src'));
+				}, function() {
+					self.attr('src','/offensive/graphics/th-filtered.gif');
+				});
+			}
+		});
+	};
 	$.fn.getCaretPosition = function() {
 		if(this.length == 0) return undefined;
 		if(this.filter(":focus").length == 0) return undefined;

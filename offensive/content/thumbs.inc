@@ -33,6 +33,11 @@
 	function head_post_js() {
 		?>
 		<script type="text/javascript">
+			$(function() {
+				$().hideFilteredThumbnails();
+				$(document).bind('lazyload_complete', function() {$().hideFilteredThumbnails();});
+			});
+
 			getSocket("<?php $t = new Token("realtime"); echo $t->tokenid(); ?>", function(socket) {
 				socket.on('comment', function(comment) {
 					var old_row = $("li[fileid=" + comment.fileid +"]");
@@ -62,6 +67,7 @@
 				});
 				socket.on('image', function(image) {
 					$('#thumbnails > ul').prepend(image.html.thumb);
+					$().hideFilteredThumbnails();
 				});
 				socket.emit('subscribe', '/uploads/*');
 			});

@@ -426,10 +426,12 @@ class Upload {
 	
 	public function filtered_bad() {
 		return (me() != false
-			? me()->getPref("hide_bad") == 1
-			  && $this->bads() > 10
-			  && $this->bads() / 9 > $this->goods()
+			? me()->getPref("hide_bad") == 1 && $this->is_bad()
 			: false);
+	}
+
+	public function is_bad() {
+		return ($this->bads() > 10 && $this->bads() / 9 > $this->goods());
 	}
 	
 	/*

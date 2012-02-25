@@ -118,6 +118,13 @@ $timelimit = 10;
 		head_post_js();
 	}
 ?>
+<script type="text/javascript">
+	var me = {
+		hide_nsfw: <?= me()->getPref("hide_nsfw") == 1 ? 'true' : 'false' ?>,
+		hide_tmbo: <?= me()->getPref("hide_tmbo") == 1 ? 'true' : 'false' ?>,
+		hide_bad: <?= me()->getPref("hide_bad") == 1 ? 'true' : 'false' ?>
+	}
+</script>
 </head>
 
 <body bgcolor="#333366" link="#000066" vlink="#000033">
