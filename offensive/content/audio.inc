@@ -60,8 +60,10 @@
 					}
 				});
 				socket.on('audio', function(audio) {
-					$('#main > ul').prepend(audio.html.list);
-					recolorRows();
+					if($.inArray(image.userid, me.squleched) == -1) {
+						$('#main > ul').prepend(audio.html.list);
+						recolorRows();
+					}
 				});
 				socket.emit('subscribe', '/uploads/*');
 			});

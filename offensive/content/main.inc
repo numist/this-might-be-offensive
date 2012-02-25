@@ -68,8 +68,10 @@
 					}
 				});
 				socket.on('image', function(image) {
-					$('#main > ul').prepend(image.html.list);
-					recolorRows();
+					if($.inArray(image.userid, me.squleched) == -1) {
+						$('#main > ul').prepend(image.html.list);
+						recolorRows();
+					}
 				});
 				socket.emit('subscribe', '/uploads/*');
 			});

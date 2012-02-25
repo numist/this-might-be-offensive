@@ -66,8 +66,10 @@
 					}
 				});
 				socket.on('image', function(image) {
-					$('#thumbnails > ul').prepend(image.html.thumb);
-					$().hideFilteredThumbnails();
+					if($.inArray(image.userid, me.squleched) == -1) {
+						$('#thumbnails > ul').prepend(image.html.thumb);
+						$().hideFilteredThumbnails();
+					}
 				});
 				socket.emit('subscribe', '/uploads/*');
 			});

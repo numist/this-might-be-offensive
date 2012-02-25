@@ -84,6 +84,8 @@
 					var color = ($("#commentList .entry").length % 2) == 0 ? "#ccccff" : "#bbbbee";
 					var html = $(comment.html);
 					$(html[2]).css({'background': color});
+					if($.inArray(comment.userid, me.squelched) != -1)
+						$(html[2]).find('.comment_body').html('<div class="squelched">[ squelched ]</div>');
 					if ($('#thumbnail').length > 0)
 						$('#thumbnail').before(html);
 					else

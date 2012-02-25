@@ -122,7 +122,8 @@ $timelimit = 10;
 	var me = {
 		hide_nsfw: <?= me()->getPref("hide_nsfw") == 1 ? 'true' : 'false' ?>,
 		hide_tmbo: <?= me()->getPref("hide_tmbo") == 1 ? 'true' : 'false' ?>,
-		hide_bad: <?= me()->getPref("hide_bad") == 1 ? 'true' : 'false' ?>
+		hide_bad: <?= me()->getPref("hide_bad") == 1 ? 'true' : 'false' ?>,
+		squelched: <?= json_encode(me()->squelched_list()) ?>
 	}
 </script>
 </head>
