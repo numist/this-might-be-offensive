@@ -59,7 +59,7 @@ You'll also want to put the following lines in your crontab:
 Realtime Data
 -------------------------
 
-The realtime data system uses a redis and node.js to push data to connected clients.  The server is located in /realtime.  To start it, simply run "node app.js".  There is also an example upstart script in /admin.
+The realtime data system uses a redis and node.js to push data to connected clients.  The server is located in /realtime.  To start it, simply run "node app.js".  There is also an example init script in /admin.
 
 
 Content Protection Configuration

@@ -5,7 +5,7 @@ var util = require("util"),
   mysql = require("mysql"),
   redis = require("redis").createClient();
 
-var db_config = iniparser.parseSync('../admin/.config').tmbo;
+var db_config = iniparser.parseSync(path.normalize(path.join(__dirname, '../admin/.config'))).tmbo;
 
 // iniparser returns everything as a literal, so we need to eval strings if they are literal strings
 function checkIniString(data) {
