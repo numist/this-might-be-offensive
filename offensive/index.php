@@ -101,6 +101,7 @@ $timelimit = 10;
 	<META NAME="ROBOTS" CONTENT="NOARCHIVE">
 	<link rel="icon" href="/favicon.ico" />
 	<link rel="shortcut icon" href="/favicon.ico" />
+	<script type="text/javascript" src="/socket.io/socket.io.js"></script>
 	<?
 	CSS::add("/styles/filepilestyle.css");
 	CSS::add("/styles/oldskool.css");
@@ -113,6 +114,9 @@ $timelimit = 10;
 	JS::add("/offensive/js/analytics.js");
 	CSS::emit();
 	JS::emit();
+	if(function_exists('head_post_js')) {
+		head_post_js();
+	}
 ?>
 </head>
 

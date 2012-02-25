@@ -56,7 +56,6 @@
 							repost = repost + $repost,
 							tmbo = tmbo + $tmbo,
 							comments = comments + $comment";
-		insertChange("comment", $fileid, "{$good}:{$bad}:{$repost}:{$tmbo}:$comment");
 		tmbo_query( $sql );
 	}
 
@@ -552,7 +551,9 @@
 			$upload->clearSubscription();
 		}
 
-		return new Comment($commentid);
+		$ret = new Comment($commentid);
+		publishChange("comment", $ret->channels(), $ret->api_data(true));
+		return $ret;
 	}
 	
 	// XXX: unimplemented

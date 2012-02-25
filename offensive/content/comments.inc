@@ -74,6 +74,26 @@
 	function head() {
 		JS::add("/offensive/js/subscriptions.js");
 	}
+
+	function head_post_js() {
+		global $upload;
+		?>
+		<script type="text/javascript">
+			getSocket("<?php $t = new Token("realtime"); echo $t->tokenid(); ?>", function(socket) {
+				socket.on('comment', function(comment) {
+					var color = ($("#commentList .entry").length % 2) == 0 ? "#ccccff" : "#bbbbee";
+					var html = $(comment.html);
+					$(html[2]).css({'background': color});
+					if ($('#thumbnail').length > 0)
+						$('#thumbnail').before(html);
+					else
+						$("#commentList").append(html);
+				});
+				socket.emit('subscribe', '/uploads/<?= $upload->id() ?>');
+			});
+		</script>
+		<?php
+	}
 	
 	function toggleThumbnailLink() {
 		?><div style="margin:4px;font-weight:bold"><?
@@ -151,7 +171,7 @@
 		// thumbnail
 		if( $upload->type() != 'topic' && ($upload->type() != "audio" || $upload->thumb())) {
 			?>
-				<div style="background:#ccccff; border-top:1px solid #000033">
+				<div id="thumbnail" style="background:#ccccff; border-top:1px solid #000033">
 					<div style="float:right"><? toggleThumbnailLink() ?></div>
 					<?
 						if(me()->getPref("thumbnails_in_comments") == 1) {

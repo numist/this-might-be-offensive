@@ -1234,14 +1234,15 @@ function upload_insert_file($postdata) {
 	// all set, let's go
 	$sql = "UPDATE offensive_uploads SET status = 'normal' where id = $fileid";
 	tmbo_query($sql);
-	insertChange("upload", $fileid, upload_type($postdata) . ":" . me()->username() . ":" . $postdata['filename']);
 
 	$sql = "INSERT INTO offensive_subscriptions (userid, fileid )
 	        VALUES ( " . $_SESSION['userid'] . ", $fileid ) ";
 	tmbo_query( $sql );
 
 	$upload = new Upload($fileid);
-	
+
+	publishChange($upload->type(), $upload->channels(), $upload->api_data(true));
+
 	if($upload->type() == "image") {
 		$isk = new Isk();
 		if($isk->add($upload->file(), $upload->id())) {

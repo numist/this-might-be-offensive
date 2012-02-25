@@ -90,6 +90,18 @@ function getURLParam(param) {
   return false;
 }
 
+function getSocket(token, callback) {
+	$(function() {
+		var host = location.host;
+		// Randomize the host name if we can
+		if (!(/(\d{1,3}\.){3}\d{1,3}/.test(host))) {
+			host = 'realtime' + Math.floor(Math.random() * 1000000) + '.' + host
+		}
+		var socket = io.connect(host + '?token=' + token);
+		callback(socket);
+	});
+}
+
 /* image rollover stuff */
 function changesrc(a,im)
 {
