@@ -60,7 +60,7 @@
 					}
 				});
 				socket.on('audio', function(audio) {
-					if($.inArray(image.userid, me.squleched) == -1) {
+					if($.inArray(audio.userid, me.squleched) == -1) {
 						$('#main > ul').prepend(audio.html.list);
 						recolorRows();
 					}

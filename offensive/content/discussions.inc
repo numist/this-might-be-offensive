@@ -56,7 +56,7 @@
 					}
 				});
 				socket.on('topic', function(topic) {
-					if(sortOrder() != 1 && $.inArray(image.userid, me.squleched) == -1) {
+					if(sortOrder() != 1 && $.inArray(topic.userid, me.squleched) == -1) {
 						$('#discussions .header').after(topic.html);
 						recolorRows();
 					}
