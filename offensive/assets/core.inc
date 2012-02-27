@@ -482,7 +482,7 @@
 		
 		// if no comment, vote, offensive, or repost, then why are you here?
 		if(!($comment || $vote || $offensive || $repost || $subscribe)) {
-			send(false);
+			return false;
 		}
 
 		$comment = trim($comment);
