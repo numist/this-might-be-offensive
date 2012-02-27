@@ -90,6 +90,26 @@
 						$('#thumbnail').before(html);
 					else
 						$("#commentList").append(html);
+					$(html[2]).hide();
+					var currentScroll = $(window).scrollTop();
+					var slideUp = $('textarea').is(':focus');
+					var propTotals = {};
+					$(html[2]).animate({
+    				"height": "show",
+    				"marginTop": "show",
+    				"marginBottom": "show",
+    				"paddingTop": "show",
+    				"paddingBottom": "show"
+					}, {
+						step: function(now, fx) {
+							if (slideUp) {
+								propTotals[fx.prop] = now;
+								var scrollTo = currentScroll;
+								$.each(propTotals, function(idx, change) { scrollTo += change; });
+								$(window).scrollTop(scrollTo);
+							}
+						}
+					});
 				});
 				socket.emit('subscribe', '/uploads/<?= $upload->id() ?>');
 			});
