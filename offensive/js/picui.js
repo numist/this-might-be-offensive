@@ -55,17 +55,20 @@ function qc_dialog_init() {
 
 			// scale to fit content
 			if(commentRows.filter(":visible").length > 0 && commentRows.children().length > 0) {
+  			var newheight;
 				if(self.children(":visible").first().is("#qc_comments")) {
 					// there is no form. fill the dialog with commentRows.
-					self.height(commentRows.get(0).scrollHeight);
+					newheight = commentRows.get(0).scrollHeight;
 				} else {
-					self.height(commentRows.position().top + commentRows.get(0).scrollHeight);
+					newheight = commentRows.position().top + commentRows.get(0).scrollHeight;
 				}
 				// limit the maximum height
-				// Note: using .dialog("option", "maxHeight") would restrict the user from embiggening it further
-				if(self.height() > $(window).height() - 150) {
-					self.height($(window).height() - 150);
+				if(newheight > $(window).height() - 150) {
+					newheight = $(window).height() - 150;
 				}
+				if(self.height() != newheight) {
+				  self.height(newheight);
+			  }
 			} else {
 				// no comments to fit, no need to get fancy.
 				self.height("");
