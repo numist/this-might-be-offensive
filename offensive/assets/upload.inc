@@ -1269,7 +1269,7 @@ function upload_insert_topic() {
 }
 
 ###############################################################################
-function image_is_animated() {
+function image_is_animated($image) {
 	/*
 	 * other than actually *using* foreach, PHP doesn't have a way to expose how
 	 * many elements a Traversable object contains.
