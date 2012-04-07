@@ -101,6 +101,7 @@ $timelimit = 10;
 	<META NAME="ROBOTS" CONTENT="NOARCHIVE">
 	<link rel="icon" href="/favicon.ico" />
 	<link rel="shortcut icon" href="/favicon.ico" />
+	<script type="text/javascript" src="/socket.io/socket.io.js"></script>
 	<?
 	CSS::add("/styles/filepilestyle.css");
 	CSS::add("/styles/oldskool.css");
@@ -113,7 +114,18 @@ $timelimit = 10;
 	JS::add("/offensive/js/analytics.js");
 	CSS::emit();
 	JS::emit();
+	if(function_exists('head_post_js')) {
+		head_post_js();
+	}
 ?>
+<script type="text/javascript">
+	var me = {
+		hide_nsfw: <?= me()->getPref("hide_nsfw") == 1 ? 'true' : 'false' ?>,
+		hide_tmbo: <?= me()->getPref("hide_tmbo") == 1 ? 'true' : 'false' ?>,
+		hide_bad: <?= me()->getPref("hide_bad") == 1 ? 'true' : 'false' ?>,
+		squelched: <?= json_encode(me()->squelched_list()) ?>
+	}
+</script>
 </head>
 
 <body bgcolor="#333366" link="#000066" vlink="#000033">
