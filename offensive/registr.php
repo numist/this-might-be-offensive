@@ -1,6 +1,7 @@
 <?php
 	set_include_path("..");
 	require_once( 'offensive/assets/header.inc' );
+	require_once( 'offensive/assets/functions.inc' );
 
 	if(login()) {
 		header( "Location: ./" );
@@ -63,7 +64,7 @@
 	
 	function getReferrerId( $refcode ) {
 
-		$sql = "SELECT * FROM referrals WHERE referral_code = '$refcode' LIMIT 1";
+		$sql = "SELECT * FROM referrals WHERE referral_code = '".sqlEscape($refcode)."' LIMIT 1";
 		$result = tmbo_query( $sql );
 		if( mysql_num_rows( $result ) == 1 ) {
 			$row = mysql_fetch_assoc( $result );
