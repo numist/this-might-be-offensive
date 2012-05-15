@@ -26,7 +26,7 @@ var click_id;
 function myclick(i)
 {
 	map.setCenter(gmarkers[i].getPoint(), 8);
-	// XXX: eventually this should use the API, once the SSL issues with the lib are sorted.
+	// TODO: eventually this should use the API, once the SSL issues with the lib are sorted.
 	GDownloadUrl("/offensive/map/get_userinfo.php?user=" + gmarkers[i].id, function(data) {
 		 map.openInfoWindow(gmarkers[i].getLatLng(), data, {pixelOffset: new GSize(5,-20)});
 	});

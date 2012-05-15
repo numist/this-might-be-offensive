@@ -1,0 +1,2 @@
+/*! original file: thismight.be/styles/map.css */
+#sidebar a,#map_edit a{text-decoration:none}

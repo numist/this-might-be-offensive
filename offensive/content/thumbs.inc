@@ -24,14 +24,15 @@
 		<link id="gallery" rel="alternate" href="<?= Link::rss("pic") ?>&gallery=true" type="application/rss+xml" title="PicLens feed" />
 		<link rel="alternate" type="application/rss+xml" title="image stream" href="<?= Link::rss("pic") ?>" />
 		<link rel="alternate" type="application/rss+xml" title="daily archives" href="<?= Link::rss("zip") ?>" />
-		<link href="/styles/grid.css?v=1.0.4" type="text/css" rel="stylesheet">
-		<script type="text/javascript" src="/offensive/js/pickuplink_visibility.js?v=0.0.2"></script>
-		<? if(count($_GET) == 1 && array_key_exists("c", $_GET)) { ?>
-			<!-- lazyload_changes are only used if on a base page (?c=main not ?c=main&foo=bar) -->
-    	<script type="text/javascript" src="/offensive/js/lazyload_changes.js?v=0.0.12"></script>
-		<? } ?>
-		<script type="text/javascript" src="/offensive/js/lazyload_bottom.js?v=0.0.5"></script>
-<?}
+		<?
+		CSS::add("/styles/grid.css");
+		JS::add("/offensive/js/pickuplink_visibility.js");
+		JS::add("/offensive/js/lazyload_bottom.js");
+		if(count($_GET) == 1 && array_key_exists("c", $_GET)) {
+			// lazyload_changes are only used if on a base page (?c=main not ?c=main&foo=bar)
+    	JS::add("/offensive/js/lazyload_changes.js");
+		}
+	}
 
 	function body() {
 		// TODO: remove in a couple of months, to give people a chance to re-set their keybindings.

@@ -72,9 +72,7 @@
 	}
 
 	function head() {
-?>
-	<script type="text/javascript" src="/offensive/js/subscriptions.js?v=0.0.1"></script>
-<?
+		JS::add("/offensive/js/subscriptions.js");
 	}
 	
 	function toggleThumbnailLink() {

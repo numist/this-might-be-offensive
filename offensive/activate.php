@@ -1,7 +1,7 @@
 <?
 	set_include_path("..");
 	require_once( 'offensive/assets/header.inc' );
-
+	require_once( 'offensive/classes/assets.inc' );
 	require_once( "offensive/assets/activationFunctions.inc" );
 	require_once( 'admin/mysqlConnectionInfo.inc' );
 	if(!isset($link) || !$link) $link = openDbConnection();
@@ -40,8 +40,11 @@
 <html>
 <head>
 	<title></title>
-	<link rel="stylesheet" type="text/css" href="filepilestyle.css" />
-	<link rel="stylesheet" type="text/css" href="/styles/oldskool.css?v=0.0.3"/>
+	<?
+	CSS::add("/styles/filepilestyle.css");
+	CSS::add("/styles/oldskool.css");
+	CSS::emit();
+	?>
 
 	<style type="text/css">
 		.vote, label {
@@ -70,9 +73,6 @@
 
 
 <body>
-
- <?php include( $DOCUMENT_ROOT . "/includes/headerbuttons.txt" );?>
-
 
 <div id="content">
 

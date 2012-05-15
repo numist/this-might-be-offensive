@@ -13,7 +13,7 @@ class Upload {
 		 */
 		if(is_array($info)) {
 			if(!array_key_exists("id", $info))
-				trigger_error("cannot prepopulate an Upload object without an id", E_USER_ERROR);
+				throw new Exception("cannot prepopulate an Upload object without an id");
 
 			// set up the object alias for this object's data in the global data structure
 			if(!array_key_exists($info['id'], self::$gdata)) {
@@ -60,7 +60,7 @@ class Upload {
 			$this->data =& self::$gdata[$info];
 			$this->data['id'] = $info;
 		} else {
-			trigger_error("type mismatch: constructor argument must be an integer or array", E_USER_ERROR);
+			throw new Exception("type mismatch: constructor argument must be an integer or array");
 		}
 	}
 
@@ -88,8 +88,7 @@ class Upload {
 			if(array_key_exists($element, $this->data))
 				return $this->data[$element];
 			// if not, register an error.
-			trigger_error("$element requested from offensive_uploads table, but was not available",
-			              E_USER_ERROR);
+			throw new Exception("$element requested from offensive_uploads table, but was not available");
 		}
 		return $this->data['exists'];
 	}
@@ -161,8 +160,7 @@ class Upload {
 		if(array_key_exists($element, $this->data))
 			return $this->data[$element];
 		// if not, register an error.
-		trigger_error("$element requested from offensive_count_cache table, but was not available",
-		              E_USER_ERROR);
+		throw new Exception("$element requested from offensive_count_cache table, but was not available");
 	}
 	
 	private function cacheCount($type) {
@@ -199,34 +197,36 @@ class Upload {
 	public function subscribed($user=null) {
 		if($user == null) $user = me();
 		if(is_numeric($user)) $user = new User($user);
-		if(!$user || !$user->exists()) trigger_error("invalid user", E_USER_ERROR);
+		if(!$user || !$user->exists()) throw new Exception("invalid user", 404);
 		return $user->subscribed($this);
 	}
 
 	public function subscribe($user=null) {
 		if($user == null) $user = me();
 		if(is_numeric($user)) $user = new User($user);
-		if(!$user || !$user->exists()) trigger_error("invalid user", E_USER_ERROR);
+		if(!$user || !$user->exists()) throw new Exception("invalid user", 404);
 		return $user->subscribe($this);
 	}
 	
 	public function unsubscribe($user=null) {
 		if($user == null) $user = me();
 		if(is_numeric($user)) $user = new User($user);
-		if(!$user || !$user->exists()) trigger_error("invalid user", E_USER_ERROR);
+		if(!$user || !$user->exists()) throw new Exception("invalid user", 404);
 		return $user->unsubscribe($this);
 	}
 	
 	public function clearSubscription($user=null) {
 		if($user == null) $user = me();
 		if(is_numeric($user)) $user = new User($user);
-		if(!$user || !$user->exists()) trigger_error("invalid user", E_USER_ERROR);
+		if(!$user || !$user->exists()) throw new Exception("invalid user", 404);
 		return $user->clearSubscription($this);
 	}
 	
 	public function updateSubscriptions($comment) {
+		if(TMBO::readonly()) return;
+		
 		if(is_numeric($comment)) $comment = new Comment($comment);
-		if(!$comment || !$comment->exists()) trigger_error("invalid comment", E_USER_ERROR);
+		if(!$comment || !$comment->exists()) throw new Exception("invalid comment", 404);
 		
 		$sql = "UPDATE offensive_subscriptions SET commentid = {$comment->id()}
 		        WHERE fileid = {$this->id()} AND commentid IS NULL";
@@ -260,7 +260,7 @@ class Upload {
 				/* this error should be impossible.  if we ever hit it, we have a
 				 * datastore inconsistency problem on our hands. */
 				if(mysql_num_rows($result) !== 1) {
-					trigger_error("user failure, user for this upload does not exist?", E_USER_ERROR);
+					throw new Exception("user failure, user for this upload does not exist?");
 				}
 				
 				$this->data["uploader"] = new User(mysql_fetch_assoc($result));
@@ -584,21 +584,21 @@ class Upload {
 		}
 		
 		$retname = $this->basePath().$thumbpath;
-		
-		// man, I sure hope this doesn't happen often.
-		// this will probably hurt if we get dogpiled, but this is a pretty uncommon code path
-		$tmpfile = get_include_path()."/offensive/quarantine/$id".rand().$ext;
-		copy($bigfile, $tmpfile);
-        
-		$cmd = "convert -resize 100x100 $tmpfile $tmpfile";
-		$err = shell_exec($cmd);
-		if(strlen($err > 0)) {
-			trigger_error("ImageMagick failed: $err", E_USER_WARNING);
-			return '';
+		$image = new Imagick($bigfile);
+		$image->setGravity(imagick::GRAVITY_CENTER);
+		$image->flattenImages();
+		if(!$image->cropThumbnailImage(133,100)) {
+			trigger_error("ImageMagick/cropThumbnailImage failed", E_USER_WARNING);
+			return "";
 		}
+		$image->setImagePage(0, 0, 0, 0);
+
 		ensureDirExists(dirname($retname));
-		rename($tmpfile, $retname);
-        
+		if(!$image->writeImage($retname)) {
+			trigger_error("ImageMagick/writeImage failed", E_USER_WARNING);
+			return "";
+		}
+		$image->destroy();
 		trigger_error("CONFORM: resized $bigfile to $retname", E_USER_NOTICE);
         
 		return $retname;
@@ -678,21 +678,21 @@ class Upload {
 	public function alreadyVoted($user=null) {
 		if($user == null) $user = me();
 		if(is_numeric($user)) $user = new User($user);
-		if(!$user || !$user->exists()) trigger_error("invalid user", E_USER_ERROR);
+		if(!$user || !$user->exists()) throw new Exception("invalid user", 404);
 		return $user->alreadyVoted($this);
 	}
 	
 	public function canVote($user=null) {
 		if($user == null) $user = me();
 		if(is_numeric($user)) $user = new User($user);
-		if(!$user || !$user->exists()) trigger_error("invalid user", E_USER_ERROR);
+		if(!$user || !$user->exists()) throw new Exception("invalid user", 404);
 		return $user->canVote($this);
 	}
 
 	public function canComment($user=null) {
 		if($user == null) $user = me();
 		if(is_numeric($user)) $user = new User($user);
-		if(!$user || !$user->exists()) trigger_error("invalid user", E_USER_ERROR);
+		if(!$user || !$user->exists()) throw new Exception("invalid user", 404);
 		return $user->canComment($this);
 	}
 
@@ -723,7 +723,7 @@ class Upload {
 		if(($this->type() == "image" || $this->type() == "avatar")
 		   && $this->file() != "") {
 			$arr = getimagesize($this->file());
-			if($arr === false) { trigger_error($this->file()." is not a valid image!?", E_USER_ERROR); }
+			if($arr === false) { throw new Exception($this->file()." is not a valid image!?"); }
 			
 			$ret["width"] = $arr[0];
 			$ret["height"] = $arr[1];

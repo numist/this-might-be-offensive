@@ -1,7 +1,3 @@
-<?
-  set_include_path("../..");
-  require("offensive/data/keynav.inc");
-?>
 var template;
 var old_key;
 $(document).ready(function() {
@@ -112,19 +108,19 @@ function record_key(o,e) {
 		}
 		
 		if(i.shiftKey) {
-		  keycode |= <?= KEY_SHIFT ?>;
+		  keycode |= 256;
 		}
 		if(i.altKey) {
-		  keycode |= <?= KEY_ALT ?>;
+		  keycode |= 512;
 		}
 		if(i.ctrlKey) {
-		  keycode |= <?= KEY_CTRL ?>;
+		  keycode |= 1024;
 		}
 		if(i.metaKey) {
-		  keycode |= <?= KEY_META ?>;
+		  keycode |= 2048;
 		}
 		// TODO: remove key-agnosticism
-		keycode |= <?= KEY_META_AWARE ?>;
+		keycode |= 4096;
 		
 		keyval = key_value(keycode);
 		o.blur();
@@ -143,16 +139,16 @@ function key_value(keycode) {
   if(keycode <= 255) {
     // TODO: remove key-agnosticism
     meta += "(agnostic) ";
-  } else if(keycode & <?= KEY_SHIFT ?>) {
+  } else if(keycode & 256) {
     meta += "(shift) ";
-  } else if(keycode & <?= KEY_ALT ?>) {
+  } else if(keycode & 512) {
     meta += "(alt) ";
-  } else if(keycode & <?= KEY_CTRL ?>) {
+  } else if(keycode & 1024) {
     meta += "(ctrl) ";
-  } else if(keycode & <?= KEY_META ?>) {
+  } else if(keycode & 2048) {
     meta += "(meta) ";
   }
-  keycode &= <?= KEY_CODE_MASK ?>;
+  keycode &= 255;
   
 	// digits
 	if(keycode >= 48 && keycode <= 57) {

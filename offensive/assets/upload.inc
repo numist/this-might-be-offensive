@@ -22,6 +22,7 @@ $filetypes = array("jpg", "jpeg", "gif", "png");
  */
 function uploading_file() {
 	if(!me()) return false;
+	if(TMBO::readonly()) return false;
 	if(array_key_exists("image", $_FILES) &&
 		is_array($_FILES['image']) &&
 		array_key_exists("name", $_FILES['image']) &&
@@ -62,6 +63,7 @@ function numUploadsToday() {
 }
 
 function needCompression($filename) {
+	global $filesize, $expectedFileSize;
 	$filesize = filesize($filename);	
 	list($width, $height, $type, $attr) = getimagesize($filename);
 
@@ -830,10 +832,10 @@ function upload_checksize(&$postdata) {
 		return false;
 	}
 
+	global $filesize, $expectedFileSize;
 	if(!needCompression($tmpdir."/".$postdata['tmpname'])) 
 		return false;
-
-	$filesize = round(filesize($filename) / 1024);
+	
 	$message = "This image has a pretty big filesize for its dimensions. Expected file size: ${expectedFileSize}k. Your file: ${filesize}k.<br />If you want, I can resample it as an 90% quality JPG image.<br /><br />
 		<form action=\"{$_SERVER['PHP_SELF']}\" method=\"POST\">
 			<input type=\"hidden\" name=\"c\" value=\"upload\">

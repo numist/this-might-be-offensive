@@ -13,7 +13,7 @@ class User {
 	public function __construct($info) {
 		if(is_array($info)) {
 			if(!array_key_exists("userid", $info))
-				trigger_error("cannot prepopulate a User object without a userid", E_USER_ERROR);
+				throw new Exception("cannot prepopulate a User object without a userid");
 			/*
 			 * prepopulate with everything.
 			 * this trusts other portions of the code to DO THE RIGHT THING
@@ -36,7 +36,7 @@ class User {
 			$this->data =& self::$gdata[$info];
 			$this->data['userid'] = $info;
 		} else {
-			trigger_error("type mismatch: constructor argument must be an integer or array", E_USER_ERROR);
+			throw new Exception("type mismatch: constructor argument must be an integer or array");
 		}
 	}
 	
@@ -68,8 +68,7 @@ class User {
 			if(array_key_exists($element, $this->data))
 				return $this->data[$element];
 			// if not, register an error.
-			trigger_error("$element requested from offensive_comments table, but was not available",
-			              E_USER_ERROR);
+			throw new Exception("$element requested from offensive_comments table, but was not available");
 		}
 		return $this->data['exists'];
 	}
@@ -212,7 +211,7 @@ class User {
 		if(is_object($target)) {
 			$target = $target->id();
 		} else if(!is_intger($target)) {
-			trigger_error("target must be a userid or User object", E_USER_ERROR);
+			throw new Exception("target must be a userid or User object");
 		}
 		
 		if(!array_key_exists("squelched", $this->data)
@@ -249,9 +248,11 @@ class User {
 
 	// squelch a user
 	public function squelch($target) {
+		if(TMBO::readonly()) return;
+		
 		// sanity check
 		if(me()->id() != $this->id() && me()->status() != "admin") {
-			trigger_error(me()->username()." can not squelch on ".$this->username()."'s behalf!", E_USER_ERROR);
+			throw new Exception(me()->username()." can not squelch on ".$this->username()."'s behalf!");
 		}
 		
 		// is this redundant?
@@ -263,11 +264,11 @@ class User {
 		if(is_object($target)) {
 			$target = $target->id();
 		} else if(!is_intger($target)) {
-			trigger_error("target must be a userid or User object", E_USER_ERROR);
+			throw new Exception("target must be a userid or User object");
 		} else {
 			$obj = new User($target);
 			if(!$obj->exists()) {
-				trigger_error("target($target) does not exist", E_USER_ERROR);
+				throw new Exception("target($target) does not exist", 404);
 			}
 		}
 		
@@ -278,9 +279,11 @@ class User {
 	
 	// unsquelch a user
 	public function unsquelch($target) {
+		if(TMBO::readonly()) return;
+		
 		// sanity check
 		if(me()->id() != $this->id() && me()->status() != "admin") {
-			trigger_error(me()->username()." can not squelch on ".$this->username()."'s behalf!", E_USER_ERROR);
+			throw new Exception(me()->username()." can not squelch on ".$this->username()."'s behalf!");
 		}
 		
 		// is this redundant?
@@ -292,11 +295,11 @@ class User {
 		if(is_object($target)) {
 			$target = $target->id();
 		} else if(!is_intger($target)) {
-			trigger_error("target must be a userid or User object", E_USER_ERROR);
+			throw new Exception("target must be a userid or User object");
 		} else {
 			$obj = new User($target);
 			if(!$obj->exists()) {
-				trigger_error("target($target) does not exist", E_USER_ERROR);
+				throw new Exception("target($target) does not exist", 404);
 			}
 		}
 		
@@ -337,7 +340,7 @@ class User {
 		
 		require("offensive/data/preferences.inc");
 		if(!in_array($name, $prefnames))
-			trigger_error("$name is not a valid preference name!", E_USER_ERROR);
+			throw new Exception("$name is not a valid preference name!", 400);
 		
 		$value = $redis->get($this->id().':'.$name);
 		
@@ -350,11 +353,14 @@ class User {
 	
 	public function setPref($name, $value) {
 		global $redis;
+		
+		if(TMBO::readonly()) return;
+		
 		require("offensive/data/preferences.inc");
 		if(!in_array($name, $prefnames))
-			trigger_error("$name is not a valid preference name!", E_USER_ERROR);
+			throw new Exception("$name is not a valid preference name!", 400);
 		if(!$this->exists())
-			trigger_error("user(".$this->id().") does not exist", E_USER_ERROR);
+			throw new Exception("user(".$this->id().") does not exist", 404);
 		
 		if(strlen($value) > 0) {
 			$redis->set($this->id().':'.$name, $value);
@@ -368,7 +374,7 @@ class User {
 	 */
 	public function subscribed($upload) {
 		if(is_numeric($upload)) $upload = new Upload($upload);
-		if(!$upload || !$upload->exists()) trigger_error("invalid upload", E_USER_ERROR);
+		if(!$upload || !$upload->exists()) throw new Exception("invalid upload", 404);
 
 		$sql = "SELECT * FROM offensive_subscriptions
 						WHERE userid={$this->id()} AND fileid={$upload->id()}";
@@ -385,8 +391,10 @@ class User {
 	}
 
 	public function subscribe($upload) {
+		if(TMBO::readonly()) return false;
+		
 		if(is_numeric($upload)) $upload = new Upload($upload);
-		if(!$upload || !$upload->exists()) trigger_error("invalid upload", E_USER_ERROR);
+		if(!$upload || !$upload->exists()) throw new Exception("invalid upload", 404);
 		
 		// check if the user is already subscribed
 		if($this->subscribed($upload)) return true;
@@ -407,8 +415,10 @@ class User {
 	}
 	
 	public function unsubscribe($upload) {
+		if(TMBO::readonly()) return false;
+		
 		if(is_numeric($upload)) $upload = new Upload($upload);
-		if(!$upload || !$upload->exists()) trigger_error("invalid upload", E_USER_ERROR);
+		if(!$upload || !$upload->exists()) throw new Exception("invalid upload", 404);
 		
 		// check if the user is already unsubscribed
 		if(!$this->subscribed($upload)) return true;
@@ -426,8 +436,10 @@ class User {
 	}
 	
 	public function clearSubscription($upload) {
+		if(TMBO::readonly()) return false;
+		
 		if(is_numeric($upload)) $upload = new Upload($upload);
-		if(!$upload || !$upload->exists()) trigger_error("invalid upload", E_USER_ERROR);
+		if(!$upload || !$upload->exists()) throw new Exception("invalid upload", 404);
 		
 		$sql = "UPDATE offensive_subscriptions SET commentid = NULL WHERE userid={$this->id()} and fileid={$upload->id()}";
 		$result = tmbo_query( $sql );
@@ -443,7 +455,7 @@ class User {
 	 */
 	public function alreadyVoted($upload) {
 		if(is_numeric($upload)) $upload = new Upload($upload);
-		if(!$upload || !$upload->exists()) trigger_error("invalid upload", E_USER_ERROR);
+		if(!$upload || !$upload->exists()) throw new Exception("invalid upload", 404);
 		
 		$sql = "SELECT vote AS thecount FROM offensive_comments 
 		        WHERE fileid={$upload->id()} AND userid={$this->id()} AND vote LIKE 'this%'";
@@ -460,7 +472,7 @@ class User {
 
 	public function canVote($upload) {
 		if(is_numeric($upload)) $upload = new Upload($upload);
-		if(!$upload || !$upload->exists()) trigger_error("invalid upload", E_USER_ERROR);
+		if(!$upload || !$upload->exists()) throw new Exception("invalid upload", 404);
 		
 		// no need to memoize, this method is not responsible for any new data
 		if($upload->uploader()->id() == $this->id()) return false; 		// can not vote on self
@@ -473,7 +485,7 @@ class User {
 	
 	public function canComment($upload) {
 		if(is_numeric($upload)) $upload = new Upload($upload);
-		if(!$upload || !$upload->exists()) trigger_error("invalid upload", E_USER_ERROR);
+		if(!$upload || !$upload->exists()) throw new Exception("invalid upload", 404);
 		
 		// no need to memoize, this method is not responsible for any new data
 		if($this->status() != "admin" && $upload->blocked()) return false;	// non-admin blocked

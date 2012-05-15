@@ -22,15 +22,6 @@
 					</div>
 					<? tabs(); ?>
 					<div class="bluebox">
-						<style type="text/css">
-							.normal {
-							
-							}
-							
-							.locked {
-								color:#999999;
-							}
-						</style>
 						<div class="piletitle">
 							<?= $them->htmlUsername() ?> has a posse.
 						</div>

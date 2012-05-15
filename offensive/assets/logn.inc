@@ -66,11 +66,13 @@ function mustLogIn($methods=array()) {
 function checkUser($myself) {
 	global $login_message, $prompt;
 
+	if(!$myself->exists()) return false;
+
 	if($myself->status() == "normal" || $myself->status() == "admin") {
 		// don't update the user's row unless the IP has changed or it's been a minute since the last update.
-
 		if(strtotime($myself->timestamp()) < time() - 60 ||
 		   $myself->last_login_ip() != $_SERVER['REMOTE_ADDR']) {
+			
 			$sql = "UPDATE users SET last_login_ip='" . $_SERVER['REMOTE_ADDR'] . "', timestamp=NOW() WHERE userid=".$myself->id();
 			tmbo_query( $sql );
 			
@@ -317,10 +319,8 @@ function loginWithToken($nothing) {
 			tmbo_query($sql);
 		}
 		
-		if($token->readonly()) {
-			global $readonly;
-			$readonly = true;
-		}
+		TMBO::readonly($token->readonly());
+		
 		return logInUser(new User(array("userid" => $token->userid())), false);
 	}
 	return null;

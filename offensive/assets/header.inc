@@ -3,9 +3,6 @@
 // circular dependencies!
 require_once("offensive/assets/classes.inc");
 
-/* make TMBO read-only */
-$readonly = false;
-
 /* if tmbo is down, and you're working on it, set this variable to true.
  * this will display a fixing page to all users, and put a notice at the
  * top of all index pages to notify admins, helping to  prevent any
@@ -121,17 +118,25 @@ function tmbo_error_handler($errno, $errstr, $errfile, $errline, $errcontext) {
 set_error_handler("tmbo_error_handler");
 error_reporting(E_STRICT | E_ALL);
 
-function tmbo_exception_handler($exception) {
-	if(is_null($exception)) return;
+function tmbo_exception_handler($e) {
+	if(is_null($e)) return;
 	
-	error_log("Uncaught exception: ".$exception->getMessage());
+	$shortfile = (strlen($e->getFile()) > 25 ? 
+         "...".substr($e->getFile(), -22) : $e->getFile());
+	
+	error_log($shortfile.":".$e->getLine().":[".$e->getCode()."] ".$e->getMessage());
 	
 	if((!me() || me()->status() != "admin") && ob_get_level() > 0) {
 		ob_end_clean();
+		if(file_exists("offensive/".$e->getCode().".php")) {
+			require("offensive/".$e->getCode().".php");
+			exit;
+		}
 		require("offensive/index.outoforder.php");
-	} else if (array_key_exists("status", $_SESSION) &&
-	           $_SESSION['status'] == "admin") {
-		echo "<br /><b>Uncaught exception</b>: ".$exception->getMessage()."<br /><br />";
+		exit;
+	} else {
+		echo "<br /><b>Exception(".$e->getCode().")</b>: ".nl2br(htmlentities($e->getMessage()))
+		    ." in <b>".$shortfile."</b> on line <b>".$e->getLine()."</b><br /><br />";
 		ob_start();
 		var_dump(debug_backtrace());
 		$trace = nl2br(ob_get_contents());
@@ -170,7 +175,7 @@ function time_end($time) {
 }
 
 function tmbo_query($sql, $timeout=2) {
-	global $link, $queries, $querytime, $readonly;
+	global $link, $queries, $querytime;
 	
 	if(!$link) {
 		trigger_error("MySQL link not pre-existent or invalid", E_USER_ERROR);
@@ -179,7 +184,7 @@ function tmbo_query($sql, $timeout=2) {
 	$trace = debug_backtrace();
 	$trace = $trace[0];
 
-	if($readonly && 
+	if(TMBO::readonly() && 
 	   ((strpos(strtolower(trim($sql)), "select") !== 0 && 
 	     strpos(strtolower(trim($sql)), "show") !== 0) || 
 	    strpos($sql, ";") !== false)) {

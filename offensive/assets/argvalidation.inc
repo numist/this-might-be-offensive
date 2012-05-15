@@ -175,8 +175,7 @@ function handle_errors() {
 	if(count($validation_errors) == 0) return true;
 	
 	if(called_by_api()) {
-		header("400 Bad Request");
-		header("Content-type: text/plain");
+		header("HTTP/1.0 400 Bad Request");
 			
 		$errors = array();
 		foreach($validation_errors as $error) {

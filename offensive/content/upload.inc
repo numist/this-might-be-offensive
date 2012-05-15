@@ -8,10 +8,9 @@
 	if(!isset($link) || !$link) $link = openDbConnection();
 
 	function start() {
-		global $readonly;
 		mustLogIn();
 
-		if($readonly) {
+		if(TMBO::readonly()) {
 			header("Location: ./");
 		}
 		

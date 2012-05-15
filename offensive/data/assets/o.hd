@@ -1,0 +1,2 @@
+/*! original file: thismight.be/styles/thumbs.css */
+#pickupbox{float:left}#textlink{text-align:right}#thumbnails *{margin:0;padding:0}#thumbnails{margin-bottom:10px}#thumbnails li{text-align:center;vertical-align:bottom;width:135px;display:-moz-inline-stack;display:inline-block;zoom:1;*display:inline;font-weight:bold}#thumbnails li *{position:relative}#thumbnails img{display:block;margin:9px auto 0;border:0}#nextpage{text-align:right;float:right}#prevpage{text-align:left}

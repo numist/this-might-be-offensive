@@ -31,6 +31,7 @@ store, for cases like the comments page, where an upload, its comments, and the 
 all must be loaded from the database.
 */
 
+require_once("offensive/classes/tmbo.inc");
 require_once("offensive/classes/pickupLink.inc");
 require_once("offensive/classes/upload.inc");
 require_once("offensive/classes/comment.inc");

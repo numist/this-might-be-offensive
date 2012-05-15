@@ -425,13 +425,6 @@ function greyout_voting() {
 	$("#qc_vote").remove();
 }
 
-/* image rollover stuff */
-function changesrc(a,im)
-{
-	x = eval("document."+a);
-	x.src=im;
-}
-
 /******************************************************************************
  * bound actions
  *****************************************************************************/
@@ -449,7 +442,7 @@ function increase_count(id) {
 	$(id).html(count);
 }
 
-// from: https://github.com/numist/jslib/blob/master/irsz.js
+/*! from: https://github.com/numist/jslib/blob/master/irsz.js */
 function image_dimensions(image, func) {
   var attr_width = "max-width", attr_height = "max-height", units = "px", image_width, image_height;
   image = $(image);

@@ -1,0 +1,2 @@
+/*! original file: thismight.be/styles/main.css */
+#pickupbox{float:left}#textlink{text-align:right}#main *{margin:0}#main{margin:5px 0}#main ul{padding:0}#main li{display:inline;line-height:15px}#main a{padding:2px}.title{width:400px;float:left;overflow:hidden;white-space:nowrap;padding:2px}.score{width:150px;float:left;text-align:right;overflow:hidden;white-space:nowrap;padding:2px;border-left:2px solid #ccf}#nextpage{text-align:right;float:right}#prevpage{text-align:left}

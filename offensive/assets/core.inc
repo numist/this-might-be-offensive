@@ -70,7 +70,7 @@
 		global $types;
 		
 		if(!is_array($args)) {
-			trigger_error("args is not an array", E_USER_ERROR);
+			throw new Exception("args is not an array", 500);
 		}
 
 		$type =   check_arg("type",   "string",  $args, false, $types);
@@ -173,7 +173,7 @@
 				$sql = str_replace("offensive_count_cache ca", "offensive_count_cache ca USE KEY (ca_timestamp)", $sql);
 				break;
 			default:
-				trigger_error("impossible order: $sort", E_USER_ERROR);
+				throw new Exception("unsupported/impossible sort order: $sort", 400);
 				exit;
 		}
 
@@ -221,7 +221,7 @@
 		$result = tmbo_query($sql);
 		if(mysql_num_rows($result) == 0) {
 			if(!$upload->exists()) {
-				require("offensive/404.php");
+				throw new Exception("that upload doesn't exist", 404);
 			} else {
 				updateCommentCount($id, 0, 0, 0, 0, 0);
 			}
@@ -232,7 +232,7 @@
 		
 		
 		if($upload->squelched()) {
-			require("offensive/403.php");
+			throw new Exception("you have squelched that user", 403);
 		}
 		
 		$done[] = $upload->id();
@@ -242,7 +242,7 @@
 
 	function core_getyearbook($args) {
 		if(!is_array($args)) {
-			trigger_error("args is not an array", E_USER_ERROR);
+			throw new Exception("args is not an array");
 		}
 		
 		$userid = check_arg("userid", "integer", $args, false);
@@ -257,13 +257,13 @@
 		
 		if($userid !== false) {
 			if(me()->squelched($userid)) {
-				require("offensive/403.php");
+				throw new Exception("you have squelched that user", 403);
 			}
 			
 			$sql .= " AND u.userid = $userid";
 			$result = tmbo_query($sql);
 			if(mysql_num_rows($result) == 0) {
-				require("offensive/404.php");
+				throw new Exception("that user has no yearbook photo", 404);
 			}
 			
 			return new Upload(mysql_fetch_assoc($result));
@@ -288,7 +288,7 @@
 			case false:
 				break;
 			default:
-				trigger_error("ASSERT: impossible order!", E_USER_ERROR);
+				throw new Exception("ASSERT: impossible order!");
 				exit;
 		}
 		
@@ -319,7 +319,7 @@
 
 	function core_getcomments($args) {
 		if(!is_array($args)) {
-			trigger_error("args is not an array", E_USER_ERROR);
+			throw new Exception("args is not an array");
 		}
 		
 		$votefilter = check_arg("votefilter", "string", $args, false);
@@ -399,7 +399,7 @@
 					$sql .= " ORDER BY id ASC";
 					break;
 				default:
-					trigger_error("ASSERT: impossible order!", E_USER_ERROR);
+					throw new Exception("ASSERT: impossible order!");
 					exit;
 			}
 		}
@@ -443,7 +443,7 @@
 
 		$result = tmbo_query($sql);
 		if(mysql_num_rows($result) == 0 && $singleton) {
-			require("offensive/404.php");
+			throw new Exception("that comment doesn't exist", 404);
 		}
 
 		$ret = array();
@@ -466,6 +466,8 @@
 		$subscribe = check_arg("subscribe", "integer", $args, false, array("1", "0"));
 		handle_errors();
 		
+		if(TMBO::readonly()) return false;
+		
 		$upload = new Upload($fileid);
 		if(!$upload->exists()) return false; // error
 
@@ -480,7 +482,7 @@
 		
 		// if no comment, vote, offensive, or repost, then why are you here?
 		if(!($comment || $vote || $offensive || $repost || $subscribe)) {
-			send(false);
+			return false;
 		}
 
 		$comment = trim($comment);
@@ -556,7 +558,7 @@
 	// XXX: unimplemented
 	function core_posttopic($args) {
 		if(!is_array($args)) {
-			trigger_error("args is not an array", E_USER_ERROR);
+			throw new Exception("args is not an array");
 		}
 			
 		$title = check_arg("title", "string", $args);
@@ -564,25 +566,25 @@
 		handle_errors();
 		
 		// XXX: c'moon :(
-		trigger_error("unimplemented", E_USER_ERROR);
+		throw new Exception("unimplemented", 404);
 	}
 
 	// XXX: unimplemented (broken)
 	function core_searchcomments($args) {
 		if(!is_array($args)) {
-			trigger_error("args is not an array", E_USER_ERROR);
+			throw new Exception("args is not an array");
 		}
 			
 		$q = check_arg("q", "string", $method);
 		$limit = check_arg("limit", "limit", $method, false);
 		handle_errors();
 		
-		trigger_error("not implemented :(", E_USER_ERROR);
+		throw new Exception("not implemented :(", 404);
 	}
 
 	function core_searchuser($args) {
 		if(!is_array($args)) {
-			trigger_error("args is not an array", E_USER_ERROR);
+			throw new Exception("args is not an array");
 		}
 
 		$limit = check_arg("limit", "limit", $args, false);
@@ -604,7 +606,7 @@
 
 	function core_searchuploads($args) {
 		if(!is_array($args)) {
-			trigger_error("args is not an array", E_USER_ERROR);
+			throw new Exception("args is not an array");
 		}
 					
 		$q = check_arg("q", "string", $args);
@@ -634,7 +636,7 @@
 
 	function core_unreadcomments($args) {
 		if(!is_array($args)) {
-			trigger_error("args is not an array", E_USER_ERROR);
+			throw new Exception("args is not an array");
 		}
 
 		$sort = check_arg("sort", "string", $args, false, array("comment_desc", "comment_asc", "file_asc", "file_desc"));
@@ -646,7 +648,7 @@
 		$sql = commentsql();
 
 		if(!me()) {
-			trigger_error("must be logged in to use this function", E_USER_ERROR);
+			throw new Exception("must be logged in to use this function", 401);
 		}
 		$userid = me()->id();
 
@@ -668,7 +670,7 @@
 				$sql .= "up.id ASC";
 				break;
 			default:
-				trigger_error("ASSERT: impossible order!", E_USER_ERROR);
+				throw new Exception("ASSERT: impossible order!");
 				exit;
 		}
 
@@ -699,8 +701,10 @@
 	}
 
 	function core_createtoken($issuee) {
+		if(TMBO::readonly()) return false;
+		
 		if(!is_string($issuee)) {
-			trigger_error("issuee is not a string", E_USER_ERROR);
+			throw new Exception("issuee is not a string");
 		}
 		
 		if($issuee == " tmbo") {
@@ -755,18 +759,20 @@
 	}
 	
 	function core_destroytoken($token) {
+		if(TMBO::readonly()) return false;
+		
 		if(is_string($token)) {
 			$token = new Token($token);
 			if(!$token->exists()) {
-				trigger_error("token is not valid", E_USER_ERROR);
+				throw new Exception("token is not valid", 400);
 			}
 		}
 		
 		if(!is_object($token) || $token->exists() == false) {
-			trigger_error("token is not valid", E_USER_ERROR);
+			throw new Exception("token is not valid", 400);
 		}
 		if($token->userid() != me()->id()) {
-			trigger_error("token does not belong to the current user", E_USER_ERROR);
+			throw new Exception("that token does not belong to the current user", 403);
 		}
 		
 		$sql = "DELETE FROM tokens WHERE tokenid = \"".$token->id()."\"";
@@ -775,7 +781,7 @@
 
 	function core_getlocation($args) {
 		if(!is_array($args)) {
-			trigger_error("args is not an array", E_USER_ERROR);
+			throw new Exception("args is not an array");
 		}
 		if(!me()) array();
 		
