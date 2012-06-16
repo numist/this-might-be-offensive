@@ -48,7 +48,7 @@ if(!ssl()) {
 
 // if we are not an admin, buffer output until the end in case of fatal errors.
 session_start();
-ob_start("ob_gzhandler", 0);
+//ob_start("ob_gzhandler", 0);
 
 // in tmbo, the include path should be a singleton path to the webroot.
 if(false !== strpos(get_include_path(), PATH_SEPARATOR)) {
