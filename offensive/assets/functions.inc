@@ -33,15 +33,19 @@ function ensureDirExists( $path ) {
 	}
 }
 
-function publishChange($type, $channels, $data) {
+function insertChange($command, $id, $data = null) {
 	global $redis;
-	$payload = json_encode(array(
-		'type' => $type,
-		'data' => $data
-	));
-	foreach($channels as $channel) {
-	 	$redis->publish($channel, $payload);
-	}
+	$count = $redis->incr("changelog:counter");
+	$time = microtime(true);
+	$insert = $time . ':' . $count . ':' . $command . ':' . $id;
+	$insert .= $data != null ? ':'.$data : '';
+	$redis->lpush("changelog", $insert);
+	$redis->ltrim("changelog", 0, 100);
+}
+
+function currentChange() {
+	global $redis;
+	return $redis->get("changelog:counter");
 }
 
 function box($message, $title="hmm:") {

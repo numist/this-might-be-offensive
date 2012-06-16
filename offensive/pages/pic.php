@@ -164,7 +164,6 @@
 				return true;
 			}
 		</script>
-		<script type="text/javascript" src="/socket.io/socket.io.js"></script>
 <?
 	CSS::add("/styles/jquery-ui-1.8.17.custom.css");
 	CSS::add("/styles/pic.css");
@@ -179,39 +178,6 @@
 	JS::add("/offensive/js/analytics.js");
 	JS::emit();
 ?>
-		<script type="text/javascript">
-			var me = {
-				hide_nsfw: <?= me()->getPref("hide_nsfw") == 1 ? 'true' : 'false' ?>,
-				hide_tmbo: <?= me()->getPref("hide_tmbo") == 1 ? 'true' : 'false' ?>,
-				hide_bad: <?= me()->getPref("hide_bad") == 1 ? 'true' : 'false' ?>,
-				squelched: <?= json_encode(me()->squelched_list()) ?>
-			}
-			getSocket("<?php $t = new Token("realtime"); echo $t->tokenid(); ?>", function(socket) {
-				socket.on('comment', function(comment) {
-					var stats_row = $("#voting_stats");
-					if (comment.comment) {
-						var comments_count = parseInt(stats_row.find('#count_comment').text()) + 1;
-						stats_row.find('#count_comment').text(comments_count);
-					}
-					if (comment.vote) {
-						var replace = comment.vote == 'this is good' ? '#count_good' : '#count_bad';
-						var vote_count = parseInt(stats_row.find(replace).text()) + 1;
-						stats_row.find(replace).text(vote_count);
-					}
-					if (comment.tmbo) {
-						var tmbo_span = stats_row.find('#count_tmbo');
-						if (tmbo_span.length == 0) {
-							stats_row.find("#count_bad").after(' x<span id="count_tmbo" style="color:#990000">0</span>');
-							tmbo_span = stats_row.find('#count_tmbo');
-						}
-						var tmbo_count = parseInt(tmbo_span.text()) + 1;
-						tmbo_span.text(tmbo_count);
-					}
-				});
-				socket.emit('subscribe', '/uploads/<?= $upload->id() ?>');
-			});
-
-		</script>
 	</head>
 	<body id="pic">
 		<!-- message -->

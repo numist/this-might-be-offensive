@@ -21,7 +21,7 @@ global $numgood, $numbad;
 	if($comment->tmbo()) echo " tmbo";
 	if(strlen($comment->text())) echo " comment"; ?>"
 	style="<?= $css ?>">
-		<span class='comment_body'><?= $comment->HTMLcomment(); ?></span>
+		<?= $comment->HTMLcomment(); ?>
 		<br />
 		<div class="timestamp"><a href="<?= Link::comment($comment) ?>"><?= $comment->timestamp() ?></a></div>
 		
