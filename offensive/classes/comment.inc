@@ -274,17 +274,9 @@ class Comment {
 		return me()->squelched($this->commenter());
 	}
 
-	public function channels() {
-		return array(
-			"/uploads/" . $this->upload()->id(),
-			"/users/" . $this->commenter()->id()
-		);
-	}
-
-	public function api_data($include_html = false) {
+	public function api_data() {
 		$ret = array(
 			"fileid" => $this->upload()->id(),
-			"filename" => $this->upload()->filename(),
 			"id" => $this->id(),
 			"timestamp" => $this->timestamp(),
 			"userid" => $this->commenter()->id(),
@@ -302,14 +294,6 @@ class Comment {
 		}
 		if($this->text()) {
 			$ret["comment"] = $this->text();
-		}
-
-		if($include_html) {
-			ob_start();
-			$comment = $this;
-			require('offensive/templates/comment.inc');
-			$ret["html"] = ob_get_contents();
-			ob_end_clean();
 		}
 
 		return $ret;

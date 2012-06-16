@@ -28,53 +28,10 @@
 		CSS::add("/styles/grid.css");
 		JS::add("/offensive/js/pickuplink_visibility.js");
 		JS::add("/offensive/js/lazyload_bottom.js");
-	}
-
-	function head_post_js() {
-		?>
-		<script type="text/javascript">
-			$(function() {
-				$().hideFilteredThumbnails();
-				$(document).bind('lazyload_complete', function() {$().hideFilteredThumbnails();});
-			});
-
-			getSocket("<?php $t = new Token("realtime"); echo $t->tokenid(); ?>", function(socket) {
-				socket.on('comment', function(comment) {
-					var old_row = $("li[fileid=" + comment.fileid +"]");
-					if (old_row.length > 0) {
-						if (comment.comment) {
-							var comments_count = parseInt(old_row.find('.comments').text()) + 1;
-							var label = comments_count == 1 ? 'comment' : 'comments';
-							old_row.find('.comments').text(comments_count);
-							old_row.find('.commentlabel').text(label);
-							old_row.find('.score a').attr('title', comment.timestamp);
-						}
-						if (comment.vote) {
-							var replace = comment.vote == 'this is good' ? '.goods' : '.bads';
-							var vote_count = parseInt(old_row.find(replace).text()) + 1;
-							old_row.find(replace).text(vote_count);
-						}
-						if (comment.tmbo) {
-							var tmbo_span = old_row.find('.tmbos');
-							if (tmbo_span.length == 0) {
-								old_row.find('.score a').append(' x<span class="tmbos">0</span>');
-								tmbo_span = old_row.find('.tmbos');
-							}
-							var tmbo_count = parseInt(tmbo_span.text()) + 1;
-							tmbo_span.text(tmbo_count);
-						}
-					}
-				});
-				socket.on('image', function(image) {
-					if($.inArray(image.userid, me.squleched) == -1) {
-						$('#thumbnails > ul').prepend(image.html.thumb);
-						$().hideFilteredThumbnails();
-					}
-				});
-				socket.emit('subscribe', '/uploads/*');
-			});
-		</script>
-		<?php
+		if(count($_GET) == 1 && array_key_exists("c", $_GET)) {
+			// lazyload_changes are only used if on a base page (?c=main not ?c=main&foo=bar)
+    	JS::add("/offensive/js/lazyload_changes.js");
+		}
 	}
 
 	function body() {
@@ -147,6 +104,7 @@
 				<ul>
 				<?php
 					$result = core_getuploads($args);
+					$revision = currentChange();
 					$output = 0;
 	
 					foreach( $result as $upload ) {
@@ -170,6 +128,9 @@
 	</div>
 	<div class="blackbar"></div>
 </div>
+<script>
+	var update_index = <?= $revision ?>;
+</script>
 <?
 }
 ?>

@@ -74,48 +74,6 @@
 	function head() {
 		JS::add("/offensive/js/subscriptions.js");
 	}
-
-	function head_post_js() {
-		global $upload;
-		?>
-		<script type="text/javascript">
-			getSocket("<?php $t = new Token("realtime"); echo $t->tokenid(); ?>", function(socket) {
-				socket.on('comment', function(comment) {
-					var color = ($("#commentList .entry").length % 2) == 0 ? "#ccccff" : "#bbbbee";
-					var html = $(comment.html);
-					$(html[2]).css({'background': color});
-					if($.inArray(comment.userid, me.squelched) != -1)
-						$(html[2]).find('.comment_body').html('<div class="squelched">[ squelched ]</div>');
-					if ($('#thumbnail').length > 0)
-						$('#thumbnail').before(html);
-					else
-						$("#commentList").append(html);
-					$(html[2]).hide();
-					var currentScroll = $(window).scrollTop();
-					var slideUp = $('textarea').is(':focus');
-					var propTotals = {};
-					$(html[2]).animate({
-    				"height": "show",
-    				"marginTop": "show",
-    				"marginBottom": "show",
-    				"paddingTop": "show",
-    				"paddingBottom": "show"
-					}, {
-						step: function(now, fx) {
-							if (slideUp) {
-								propTotals[fx.prop] = now;
-								var scrollTo = currentScroll;
-								$.each(propTotals, function(idx, change) { scrollTo += change; });
-								$(window).scrollTop(scrollTo);
-							}
-						}
-					});
-				});
-				socket.emit('subscribe', '/uploads/<?= $upload->id() ?>');
-			});
-		</script>
-		<?php
-	}
 	
 	function toggleThumbnailLink() {
 		?><div style="margin:4px;font-weight:bold"><?
@@ -193,7 +151,7 @@
 		// thumbnail
 		if( $upload->type() != 'topic' && ($upload->type() != "audio" || $upload->thumb())) {
 			?>
-				<div id="thumbnail" style="background:#ccccff; border-top:1px solid #000033">
+				<div style="background:#ccccff; border-top:1px solid #000033">
 					<div style="float:right"><? toggleThumbnailLink() ?></div>
 					<?
 						if(me()->getPref("thumbnails_in_comments") == 1) {
