@@ -394,12 +394,6 @@ function handle_comment_post(comment, vote, tmbo, repost, subscribe) {
 		  repost: repost,
 		  subscribe: subscribe
 		}, function(data) {
-			// increment counts
-			if(vote == "this is good") increase_count("#count_good");
-			else if(vote == "this is bad") increase_count("#count_bad");
-			if(comment != "") increase_count("#count_comment");
-			if(tmbo != 0 && $("#count_tmbo").length > 0) increase_count("#count_tmbo");
-			
 			// if you made a comment or you voted 'this is bad', you have auto-subscribed to the thread
 			if(comment != '' || vote == "this is bad" || subscribe != "0") {
 				toggle_subscribe("subscribe", fileid, $("#subscribeLink"));
@@ -435,11 +429,6 @@ function handle_vote(o,e)
 	e.preventDefault();		// prevent the link to continue
 	do_vote(o);
 	return false;
-}
-
-function increase_count(id) {
-	count = parseInt($(id).html()) + 1;
-	$(id).html(count);
 }
 
 /*! from: https://github.com/numist/jslib/blob/master/irsz.js */
