@@ -214,6 +214,10 @@ class User {
 			throw new Exception("target must be a userid or User object");
 		}
 		
+		return in_array($target, $this->squelched_list());
+	}
+	
+	private function populate_squelched() {
 		if(!array_key_exists("squelched", $this->data)
 		|| !array_key_exists("squelched_by", $this->data)) {
 			
@@ -234,16 +238,24 @@ class User {
 				}
 			}
 		}
-		
-		return in_array($target, $this->data["squelched"]);
 	}
-	
+
+	public function squelched_list() {
+		$this->populate_squelched();
+		return $this->data["squelched"];
+	}
+		
+	public function squelched_by_list() {
+		$this->populate_squelched();
+		return $this->data["squelched_by"];
+	}
+
 	public function blocked($target) {
 		if(is_object($target)) {
 			$target = $target->id();
 		}
 		
-		return $this->squelched($target) || in_array($target, $this->data["squelched_by"]);
+		return $this->squelched($target) || in_array($target, $this->squelched_by_list());
 	}
 
 	// squelch a user

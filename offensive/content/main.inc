@@ -28,10 +28,55 @@
 		JS::add("/offensive/js/pickuplink_visibility.js");
 		JS::add("/offensive/js/prep_evenodd.js");
 		JS::add("/offensive/js/lazyload_bottom.js");
-		if(count($_GET) == 1 && array_key_exists("c", $_GET)) {
-			// lazyload_changes are only used if on a base page (?c=main not ?c=main&foo=bar)
-    	JS::add("/offensive/js/lazyload_changes.js");
-		}
+	}
+
+	function head_post_js() {
+		?>
+		<script type="text/javascript">
+			getSocket("<?php $t = new Token("realtime"); echo $t->tokenid(); ?>", function(socket) {
+				function recolorRows() {
+					$('#main li').not('.header').each( function(idx) {
+						// Apparently main is 1-index based
+						$(this).find('.col').removeClass('odd_row even_row').addClass( (idx % 2 == 0) ? 'odd_row' : 'even_row');
+					});
+				}
+				
+				socket.on('comment', function(comment) {
+					var old_row = $("li[fileid=" + comment.fileid +"]");
+					if (old_row.length > 0) {
+						if (comment.comment) {
+							var comments_count = parseInt(old_row.find('.comments').text()) + 1;
+							var label = comments_count == 1 ? 'comment' : 'comments';
+							old_row.find('.comments').text(comments_count);
+							old_row.find('.commentlabel').text(label);
+							old_row.find('.score a').attr('title', comment.timestamp);
+						}
+						if (comment.vote) {
+							var replace = comment.vote == 'this is good' ? '.goods' : '.bads';
+							var vote_count = parseInt(old_row.find(replace).text()) + 1;
+							old_row.find(replace).text(vote_count);
+						}
+						if (comment.tmbo) {
+							var tmbo_span = old_row.find('.tmbos');
+							if (tmbo_span.length == 0) {
+								old_row.find('.score a').append(' x<span class="tmbos">0</span>');
+								tmbo_span = old_row.find('.tmbos');
+							}
+							var tmbo_count = parseInt(tmbo_span.text()) + 1;
+							tmbo_span.text(tmbo_count);
+						}
+					}
+				});
+				socket.on('image', function(image) {
+					if($.inArray(image.userid, me.squleched) == -1) {
+						$('#main > ul').prepend(image.html.list);
+						recolorRows();
+					}
+				});
+				socket.emit('subscribe', '/uploads/*');
+			});
+		</script>
+		<?php
 	}
 
 	function body() {
@@ -102,7 +147,6 @@
 			<ul>
 			<?php
 				$result = core_getuploads($args);
-				$revision = currentChange();
 				foreach( $result as $upload ) {
 					$css = (isset($css) && strpos($css, "odd_row") !== false) ? "even_row" : "odd_row";
 					require("offensive/templates/listitem_file.inc");
@@ -126,10 +170,6 @@
 </div>
 <div class="blackbar"></div>
 </div>
-
-<script>
-	var update_index = <?= $revision ?>;
-</script>
 <?
 }
 ?>

@@ -426,10 +426,12 @@ class Upload {
 	
 	public function filtered_bad() {
 		return (me() != false
-			? me()->getPref("hide_bad") == 1
-			  && $this->bads() > 10
-			  && $this->bads() / 9 > $this->goods()
+			? me()->getPref("hide_bad") == 1 && $this->is_bad()
 			: false);
+	}
+
+	public function is_bad() {
+		return ($this->bads() > 10 && $this->bads() / 9 > $this->goods());
 	}
 	
 	/*
@@ -696,8 +698,15 @@ class Upload {
 		return $user->canComment($this);
 	}
 
+	public function channels() {
+		return array(
+			"/uploads/" . $this->id(),
+			"/users/" . $this->uploader()->id()
+		);
+	}
+
 	// API support
-	public function api_data() {
+	public function api_data($include_html = false) {
 
 		$ret = array(
 				"id" => $this->id(),
@@ -717,8 +726,22 @@ class Upload {
 				"filtered" => $this->filtered(),
 				"last_active" => $this->last_active()
 			);
+		if($this->type() == "topic" && $include_html) {
+			$upload = $this;
+			ob_start();
+			require("offensive/templates/listitem_topic.inc");
+			$ret["html"] = ob_get_contents();
+			ob_end_clean();
+		}
 		if($this->type() != "topic" && $this->file() != '') {
 			$ret["link_file"] = $this->URL();
+			if($include_html) {
+				$upload = $this;
+				ob_start();
+				require("offensive/templates/listitem_file.inc");
+				$ret["html"]["list"] = ob_get_contents();
+				ob_end_clean();
+			}
 		}
 		if(($this->type() == "image" || $this->type() == "avatar")
 		   && $this->file() != "") {
@@ -734,6 +757,12 @@ class Upload {
 			
 			$ret["thumb_width"] = $arr[0];
 			$ret["thumb_height"] = $arr[1];
+			if($include_html) {
+				ob_start();
+				require("offensive/templates/thumbitem_file.inc");
+				$ret["html"]["thumb"] = ob_get_contents();
+				ob_end_clean();
+			}
 		}
 		
 		return $ret;
