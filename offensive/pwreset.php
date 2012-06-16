@@ -72,7 +72,7 @@ https://".$_SERVER['SERVER_NAME']."/offensive/pwreset.php?x=$code
 				<input type="hidden" name="x" value="<?= $code ?>"/>
 				<table>
 					<tr>
-						<td colspan="2"><?php echo $login_message ?></td>
+						<td colspan="2"><?php echo isset($login_message) ? $login_message : ""; ?></td>
 					</tr>
 					<tr>
 						<td class="label">new password:</td>
