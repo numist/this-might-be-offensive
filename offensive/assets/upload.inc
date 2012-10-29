@@ -242,7 +242,7 @@ function upload() {
 		// having the file extension helps ImageMagick do its thing.
 		$postdata['file_extension'] = getFileExtension($_FILES['image']['name']);
 		$postdata['tmpname'] = $postdata['tmpname'].$postdata['file_extension'];
-		//Rename filename if filename field is submitted on the form. 
+		// rename filename if filename field is submitted on the form. 
 		if(array_key_exists('filename', $_POST) && !empty($_POST['filename']))
 		{
 			$postdata['filename'] = $_POST['filename'];
