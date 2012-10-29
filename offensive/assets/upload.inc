@@ -243,8 +243,7 @@ function upload() {
 		$postdata['file_extension'] = getFileExtension($_FILES['image']['name']);
 		$postdata['tmpname'] = $postdata['tmpname'].$postdata['file_extension'];
 		// rename filename if filename field is submitted on the form. 
-		if(array_key_exists('filename', $_POST) && !empty($_POST['filename']))
-		{
+		if(array_key_exists('filename', $_POST) && !empty($_POST['filename'])) {
 			$postdata['filename'] = $_POST['filename'];
 		} else {
 			$postdata['filename'] = $_FILES['image']['name'];
