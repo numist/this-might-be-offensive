@@ -4,7 +4,7 @@ set_include_path("../..");
 require_once("offensive/classes/assets.inc");
 require_once("offensive/assets/conditionalGet.inc");
 
-ob_start("ob_gzhandler");
+//ob_start("ob_gzhandler");
 
 assert('array_key_exists("f", $_GET)');
 assert('array_key_exists("type", $_GET)');
