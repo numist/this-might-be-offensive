@@ -153,6 +153,8 @@
 		// send the data back
 		if(in_array($rtype, array("plist", "xml"))) {
 			header("Content-type: text/xml");
+		} else if($rtype == "json") {
+			header("Content-type: text/json");
 		} else {
 			header("Content-type: text/plain");
 		}
