@@ -700,8 +700,8 @@ class Upload {
 	public function api_data() {
 
 		$ret = array(
-				"id" => $this->id(),
-				"userid" => $this->uploader()->id(),
+				"id" => (int)$this->id(),
+				"userid" => (int)$this->uploader()->id(),
 				"filename" => $this->filename(),
 				"timestamp" => $this->timestamp(),
 				"nsfw" => $this->is_nsfw(),
@@ -709,11 +709,11 @@ class Upload {
 				"type" => $this->type(),
 				"username" => $this->uploader()->username(),
 				"subscribed" => $this->subscribed(),
-				"vote_good" => $this->goods(),
-				"vote_bad" => $this->bads(),
-				"vote_tmbo" => $this->tmbos(),
-				"vote_repost" => $this->tiars(),
-				"comments" => $this->comments(),
+				"vote_good" => (int)$this->goods(),
+				"vote_bad" => (int)$this->bads(),
+				"vote_tmbo" => (int)$this->tmbos(),
+				"vote_repost" => (int)$this->tiars(),
+				"comments" => (int)$this->comments(),
 				"filtered" => $this->filtered(),
 				"last_active" => $this->last_active()
 			);
