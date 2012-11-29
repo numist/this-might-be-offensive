@@ -1,0 +1,20 @@
+{
+  "name": "tmbo_realtime",
+  "version": "0.1.0",
+  "description": "Backend for realtime services in TMBO",
+  "main": "app.js",
+  "dependencies": {
+    "iniparser": "~1.0.5",
+    "mysql": "~2.0.0-alpha4",
+    "redis": "~0.8.2",
+    "cookies": "~0.3.6",
+    "socket.io": "~0.9.11"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": "",
+  "author": "",
+  "license": "BSD"
+}

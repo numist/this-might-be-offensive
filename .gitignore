@@ -2,6 +2,7 @@ offensive/data/comments.db*
 offensive/quarantine
 offensive/uploads
 offensive/zips
+realtime/node_modules
 .DS_Store
 admin/.config
 *.swp
