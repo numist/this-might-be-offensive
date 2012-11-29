@@ -15,12 +15,34 @@ function checkIniString(data) {
     return data;
 }
 
-var db = mysql.createClient({
+var db = mysql.createConnection({
   user: checkIniString(db_config.database_user),
   password: checkIniString(db_config.database_pass),
   host: checkIniString(db_config.database_host),
   database: checkIniString(db_config.database_name)
 });
+
+
+function handleDisconnect(connection) {
+  connection.on('error', function(err) {
+    if (!err.fatal) {
+      return;
+    }
+
+    if (err.code !== 'PROTOCOL_CONNECTION_LOST') {
+      throw err;
+    }
+
+    console.log('Re-connecting lost connection: ' + err.stack);
+
+    connection = mysql.createConnection(connection.config);
+    handleDisconnect(connection);
+    connection.connect();
+  });
+}
+
+handleDisconnect(db);
+db.connect();
 
 // Authorize by the token
 function checkToken(token, callback) {
