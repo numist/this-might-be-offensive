@@ -80,6 +80,33 @@
 		?>
 		<script type="text/javascript">
 			getSocket("<?php $t = new Token("realtime"); echo $t->tokenid(); ?>", function(socket) {
+				var latest_comment;
+
+				function isLatestCommentVisible() {
+					var docViewTop = $(window).scrollTop();
+					var docViewBottom = docViewTop + $(window).height();
+					
+					var elemTop = $(latest_comment).offset().top;
+					var elemBottom = elemTop + $(latest_comment).height();
+					
+					return ((elemBottom >= docViewTop) && (elemTop <= docViewBottom)
+					&& (elemBottom <= docViewBottom) &&  (elemTop >= docViewTop) );
+				}
+
+				function handleEvent() {
+					if (latest_comment && isLatestCommentVisible()) {
+						latest_comment = null;
+						$.ajax("/offensive/api.php/resetsubscription.json", {
+							data: {
+								threadid: '<?= $upload->id() ?>'
+							}
+						});
+					}
+					return true;
+				}
+
+				$(document).on('mousemove keydown DOMMouseScroll mousewheel mousedown touchstart touchmove', handleEvent);
+
 				socket.on('comment', function(comment) {
 					var color = ($("#commentList .entry").length % 2) == 0 ? "#ccccff" : "#bbbbee";
 					var html = $(comment.html);
@@ -94,6 +121,7 @@
 					var currentScroll = $(window).scrollTop();
 					var slideUp = $('textarea').is(':focus');
 					var propTotals = {};
+					latest_comment = $(html[2]);
 					$(html[2]).animate({
     				"height": "show",
     				"marginTop": "show",

@@ -459,6 +459,8 @@ class User {
 		if(mysql_affected_rows() < 1) {
 			return false;
 		}
+
+		publishChange("reset_subscription", array("/private/users/{$this->id()}"), $upload->api_data());
 		return true;
 	}
 

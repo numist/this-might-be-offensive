@@ -128,17 +128,43 @@ $timelimit = 10;
 
 	$(function() {
 		getSocket("<?php $t = new Token("realtime"); echo $t->tokenid(); ?>", function(socket) {
+			socket.on('reset_subscription', function(upload) {
+				var existing = $('#unread' + upload.id);
+				if (existing.length > 0) {
+					existing.remove();
+					if ($("#unread-container a").length === 0)
+						$("#unread").hide();
+				}
+			});
+
 			socket.on('subscription', function(comment) {
 				var link = '/offensive/?c=comments&fileid=' + comment.fileid + '#' + comment.id;
 				var existing = $('#unread' + comment.fileid);
 				if (existing.length > 0) {
-					// We should probably remove clicked links if we're going to do something like this
-					// existing.attr('href', link);
+					existing.attr('href', link);
 				} else {
 					var element = $('<div class="clipper" />');
 					var anchor = $('<a id="unread' + comment.fileid + '" href="' + link + '"></a>').text(comment.filename);
-					anchor.addClass(($("#unread-container a").length % 2 == 0 ? 'evenfile' : 'oddfile'));
-					$("#unread-container").append(element.append(anchor));
+					element.append(anchor);
+					var prev_id = 0;
+					var fileid_int = parseInt(comment.fileid);
+					var inserted = false;
+					$("#unread-container a").each(function(idx, el) {
+						var this_id = parseInt($(el).attr('id').match(/\d+/)[0]);
+						if (this_id > fileid_int && prev_id < fileid_int && !inserted) {
+							element.insertBefore($(el).parent());
+							anchor.addClass(idx % 2 == 0 ? 'evenfile' : 'oddfile');
+							inserted = true;
+						}
+						if (inserted) {
+							$(el).addClass(idx % 2 != 0 ? 'evenfile' : 'oddfile').removeClass(idx % 2 == 0 ? 'evenfile' : 'oddfile');
+						}
+						prev_id = this_id;
+					});
+					if (element.parent().length === 0) {
+						$("#unread-container").append(element);
+					  anchor.addClass(($("#unread-container a").length % 2 != 0 ? 'evenfile' : 'oddfile'));
+					}
 					$("#unread").show();
 				}
 			});
