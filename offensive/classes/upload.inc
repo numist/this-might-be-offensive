@@ -232,14 +232,20 @@ class Upload {
 		$sql = "SELECT userid FROM offensive_subscriptions
             WHERE fileid = {$this->id()} AND commentid IS NULL";
 		$result = tmbo_query($sql);
+		$user_ids = array();
     while($row = mysql_fetch_assoc($result)) {
-		  publishChange("subscription", array("/private/users/{$row['userid']}"), $comment->api_data());
+			$user_ids[] = $row['userid'];
 		}
 
+		$user_ids_string = implode($user_ids, ',');
 		// Do the DB stuff
 		$sql = "UPDATE offensive_subscriptions SET commentid = {$comment->id()}
-		        WHERE fileid = {$this->id()} AND commentid IS NULL";
+		        WHERE fileid = {$this->id()} AND userid IN ({$user_ids_string})";
 		$result = tmbo_query($sql);
+		
+		foreach($user_ids as $user_id) {
+			publishChange("subscription", array("/private/users/{$user_id}"), $comment->api_data());
+		}
 	}
 	
 	/*
