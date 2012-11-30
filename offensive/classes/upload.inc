@@ -228,6 +228,15 @@ class Upload {
 		if(is_numeric($comment)) $comment = new Comment($comment);
 		if(!$comment || !$comment->exists()) throw new Exception("invalid comment", 404);
 		
+		// Send realtime alert to all subscribed users
+		$sql = "SELECT userid FROM offensive_subscriptions
+            WHERE fileid = {$this->id()} AND commentid IS NULL";
+		$result = tmbo_query($sql);
+    while($row = mysql_fetch_assoc($result)) {
+		  publishChange("subscription", array("/private/users/{$row['userid']}"), $comment->api_data());
+		}
+
+		// Do the DB stuff
 		$sql = "UPDATE offensive_subscriptions SET commentid = {$comment->id()}
 		        WHERE fileid = {$this->id()} AND commentid IS NULL";
 		$result = tmbo_query($sql);

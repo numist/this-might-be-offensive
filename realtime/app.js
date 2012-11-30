@@ -46,15 +46,22 @@ db.connect();
 
 // Authorize by the token
 function checkToken(token, callback) {
-  db.query('SELECT * FROM tokens WHERE tokenid = ?;', [token], function(err, results, fields) {
-    callback(null, (results.length > 0));
+  db.query('SELECT userid FROM tokens WHERE tokenid = ?;', [token], function(err, results, fields) {
+		if (results.length > 0) {
+		  callback(results[0].userid);
+		} else {
+      callback(null);
+		}
   });
 }
 
 io.configure(function() {
   io.set('authorization', function(handshakeData, callback) {
     if(handshakeData.query && handshakeData.query.token) {
-      checkToken(handshakeData.query.token, callback);
+      checkToken(handshakeData.query.token, function(userid) {
+				handshakeData.userid = userid;
+			  callback(null, (userid != null));
+		  });
     } else {
       callback(null, false);
     }
@@ -89,7 +96,10 @@ var subs = {};
 io.sockets.on('connection', function(socket) {
   var _channel;
 
+	socket.join('/private/users/' + socket.handshake.userid);
   socket.on('subscribe', function(channel) {
+		if (channel.match(/^\/private\//))
+		  return;
     if(_channel && --subs[_channel] == 0)
       redis.punsubscribe(_channel);
     socket.join(channel);
@@ -105,7 +115,12 @@ io.sockets.on('connection', function(socket) {
   });
 });
 
+redis.psubscribe('/private/*');
+
 redis.on('pmessage', function(pattern, channel, message) {
   message = JSON.parse(message);
-  io.sockets.in(pattern).emit(message.type, message.data);
+  if (channel.match(/^\/private\//))
+		io.sockets.in(channel).emit(message.type, message.data);
+	else
+		io.sockets.in(pattern).emit(message.type, message.data);
 });

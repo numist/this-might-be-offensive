@@ -125,6 +125,25 @@ $timelimit = 10;
 		hide_bad: <?= me()->getPref("hide_bad") == 1 ? 'true' : 'false' ?>,
 		squelched: <?= json_encode(me()->squelched_list()) ?>
 	}
+
+	$(function() {
+		getSocket("<?php $t = new Token("realtime"); echo $t->tokenid(); ?>", function(socket) {
+			socket.on('subscription', function(comment) {
+				var link = '/offensive/?c=comments&fileid=' + comment.fileid + '#' + comment.id;
+				var existing = $('#unread' + comment.fileid);
+				if (existing.length > 0) {
+					// We should probably remove clicked links if we're going to do something like this
+					// existing.attr('href', link);
+				} else {
+					var element = $('<div class="clipper" />');
+					var anchor = $('<a id="unread' + comment.fileid + '" href="' + link + '"></a>').text(comment.filename);
+					anchor.addClass(($("#unread-container a").length % 2 == 0 ? 'evenfile' : 'oddfile'));
+					$("#unread-container").append(element.append(anchor));
+					$("#unread").show();
+				}
+			});
+		});
+	});
 </script>
 </head>
 
@@ -365,14 +384,14 @@ $timelimit = 10;
 		<div id="unread" class="contentbox" style="display: <?= $hidden ?>;">
 			<div class="blackbar"></div>
 			<div class="heading">unread comments:</div>
-			<div class="bluebox">
+			<div id="unread-container" class="bluebox">
 				<? foreach ($comments as $comment) {
 					$upload = $comment->upload();
 					if($upload->squelched()) continue;
 
 					$css = isset($css) && $css == "evenfile" ? "oddfile" : "evenfile"; 
 					// XXX: rejigger the query and use Link::comment ?>
-					<div class="clipper"><a class="<?= $css ?>" href="<?= Link::comment($comment) ?>"><?= $upload->htmlFilename() ?></a></div>
+					<div class="clipper"><a id="unread<?= $comment->upload()->id()?>" class="<?= $css ?>" href="<?= Link::comment($comment) ?>"><?= $upload->htmlFilename() ?></a></div>
 				<? } ?>
 			</div>
 			<div class="heading" style="text-align:center">

@@ -109,15 +109,21 @@ function getURLParam(param) {
   return false;
 }
 
+var _TMBOsocket;
+
 function getSocket(token, callback) {
 	$(function() {
+		if (_TMBOsocket) {
+			callback(_TMBOsocket);
+			return;
+		}
 		var host = location.host;
 		// Randomize the host name if we can
 		if (!(/(\d{1,3}\.){3}\d{1,3}/.test(host))) {
 			host = 'realtime' + Math.floor(Math.random() * 1000000) + '.' + host
 		}
-		var socket = io.connect(host + '?token=' + token);
-		callback(socket);
+		_TMBOsocket = io.connect(host + '?token=' + token);
+		callback(_TMBOsocket);
 	});
 }
 
