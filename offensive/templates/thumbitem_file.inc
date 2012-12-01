@@ -14,13 +14,14 @@ if(!defined("TMBO") || !isset($upload)) {
   <div class="thumbcontainer">
 		<div>
 			<a href="<?= Link::upload($upload) ?>"
-			<?php if($upload->filtered()) { ?>
-				onMouseOver='changesrc("th<?= $upload->id()?>","<?= $upload->thumbURL() ?>")'
-				onMouseOut='changesrc("th<?= $upload->id() ?>","/offensive/graphics/th-filtered.gif")'
-			<? } ?>
 				title="uploaded by <?= htmlEscape($upload->uploader()->username()) ?>">
 				<img name="th<?= $upload->id()?>"
-						 src="<?= $upload->filtered() ? "/offensive/graphics/th-filtered.gif" : $upload->thumbURL() ?>">
+						 class="<?php
+						 if ($upload->is_nsfw()) echo "nsfw ";
+						 if ($upload->is_tmbo()) echo "tmbo ";
+						 if ($upload->is_bad()) echo "bad ";
+						 ?>"
+						 src="<?= $upload->thumbURL() ?>">
 			</a>
 		</div>
 		<div>

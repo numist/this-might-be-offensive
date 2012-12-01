@@ -35,7 +35,8 @@
 		$sql = "INSERT INTO offensive_count_cache(threadid, good, bad, tmbo, comments, repost) VALUES($threadid, 0, 0, 0, 0, 0)";
 		tmbo_query($sql);
 		
-		insertChange("upload", $threadid, "topic" . ":" . me()->username() . ":" . $topic);
+		$upload = new Upload($threadid);
+		publishChange("topic", $upload->channels(), $upload->api_data(true));
 
 		return $threadid;
 

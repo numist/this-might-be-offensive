@@ -32,7 +32,7 @@ conditionalGet($lastBuildTime);
 	<channel>
 		<? if( ! isset($_GET['gallery']) ) { ?>
 			<title>[ this might be offensive ] : images</title>
-			<link>https://<?= $_SERVER['SERVER_NAME'] ?>/offensive/</link>
+			<link>https://<?= $_SERVER['HTTP_HOST'] ?>/offensive/</link>
 			<description>[ this might be offensive ]</description>
 			<lastBuildDate><?= gmdate('r', $lastBuildTime);	?></lastBuildDate>
 		<? } 
@@ -52,8 +52,8 @@ conditionalGet($lastBuildTime);
 		$filename = $upload->is_nsfw() == 1 && strpos(strtolower($filename), "[nsfw]") === false ?
 				'[nsfw] '.$filename : $filename;
 
-		$fileURL = "https://". $_SERVER['SERVER_NAME'] . $upload->URL();
-		$thumbURL = "https://". $_SERVER['SERVER_NAME'] . $upload->thumbURL();
+		$fileURL = "https://". $_SERVER['HTTP_HOST'] . $upload->URL();
+		$thumbURL = "https://". $_SERVER['HTTP_HOST'] . $upload->thumbURL();
 		
 		if($upload->URL() == "") continue;
 ?>
@@ -64,7 +64,7 @@ conditionalGet($lastBuildTime);
 				<guid isPermaLink="false">tmbo-<?= $upload->id() ?></guid>
 			<? } else { ?>
 				<title><![CDATA[<?= $filename ?> (uploaded by <?= $upload->uploader()->username() ?>)]]></title>
-				<link>https://<?= $_SERVER['SERVER_NAME'] ?><?= Link::upload($upload) ?></link>
+				<link>https://<?= $_SERVER['HTTP_HOST'] ?><?= Link::upload($upload) ?></link>
 				<description><![CDATA[<? // TODO: pretty this up like audio
 					if($fileURL != '') { 
 						?><img src="<?= $fileURL ?>"/><?
@@ -73,7 +73,7 @@ conditionalGet($lastBuildTime);
 					}
 				?>]]></description>
 				<pubDate><? echo gmdate( "r", strtotime( $upload->timestamp() ) ) ?></pubDate>			
-				<comments><![CDATA[https://<?= $_SERVER['SERVER_NAME'].Link::thread($upload) ?>]]></comments>
+				<comments><![CDATA[https://<?= $_SERVER['HTTP_HOST'].Link::thread($upload) ?>]]></comments>
 			<? } ?>
 		</item>
 <?

@@ -48,9 +48,9 @@ function mustLogIn($methods=array()) {
 		// build the redirect link
 		$redirect = (isset($_REQUEST['redirect']) ?
 		            $_REQUEST['redirect'] :
-		            "https://".$_SERVER["SERVER_NAME"].urlencode($_SERVER['REQUEST_URI']));
+		            "https://".$_SERVER["HTTP_HOST"].urlencode($_SERVER['REQUEST_URI']));
 
-		header("Location: https://".$_SERVER["SERVER_NAME"]."/offensive/logn.php?redirect=".$redirect);
+		header("Location: https://".$_SERVER["HTTP_HOST"]."/offensive/logn.php?redirect=".$redirect);
 	}
 	exit;
 }

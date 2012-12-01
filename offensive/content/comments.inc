@@ -38,7 +38,7 @@
 	   */
 	  if($upload->type() != 'topic' &&
 		 array_key_exists("submit", $_REQUEST) && array_key_exists("HTTP_REFERER", $_SERVER) &&
-	     $_SERVER['HTTP_REFERER'] !== "" && strpos($_SERVER['HTTP_REFERER'], $_SERVER['SERVER_NAME']) === false) {
+	     $_SERVER['HTTP_REFERER'] !== "" && strpos($_SERVER['HTTP_REFERER'], $_SERVER['HTTP_HOST']) === false) {
 		echo "you've been had.";
 		trigger_error("off-site tried to vote on non-topic upload, referer: ".$_SERVER['HTTP_REFERER'], E_USER_WARNING);
 		return;
@@ -73,6 +73,76 @@
 
 	function head() {
 		JS::add("/offensive/js/subscriptions.js");
+	}
+
+	function head_post_js() {
+		global $upload;
+		?>
+		<script type="text/javascript">
+			getSocket("<?php $t = new Token("realtime"); echo $t->tokenid(); ?>", function(socket) {
+				var latest_comment;
+
+				function isLatestCommentVisible() {
+					var docViewTop = $(window).scrollTop();
+					var docViewBottom = docViewTop + $(window).height();
+					
+					var elemTop = $(latest_comment).offset().top;
+					var elemBottom = elemTop + $(latest_comment).height();
+					
+					return ((elemBottom >= docViewTop) && (elemTop <= docViewBottom)
+					&& (elemBottom <= docViewBottom) &&  (elemTop >= docViewTop) );
+				}
+
+				function handleEvent() {
+					if (latest_comment && isLatestCommentVisible()) {
+						latest_comment = null;
+						$.ajax("/offensive/api.php/resetsubscription.json", {
+							data: {
+								threadid: '<?= $upload->id() ?>'
+							}
+						});
+					}
+					return true;
+				}
+
+				$(document).on('mousemove keydown DOMMouseScroll mousewheel mousedown touchstart touchmove', handleEvent);
+
+				socket.on('comment', function(comment) {
+					var color = ($("#commentList .entry").length % 2) == 0 ? "#ccccff" : "#bbbbee";
+					var html = $(comment.html);
+					$(html[2]).css({'background': color});
+					if($.inArray(comment.userid, me.squelched) != -1)
+						$(html[2]).find('.comment_body').html('<div class="squelched">[ squelched ]</div>');
+					if ($('#thumbnail').length > 0)
+						$('#thumbnail').before(html);
+					else
+						$("#commentList").append(html);
+					$(html[2]).hide();
+					var currentScroll = $(window).scrollTop();
+					var slideUp = $('textarea').is(':focus');
+					var propTotals = {};
+					latest_comment = $(html[2]);
+					$(html[2]).animate({
+    				"height": "show",
+    				"marginTop": "show",
+    				"marginBottom": "show",
+    				"paddingTop": "show",
+    				"paddingBottom": "show"
+					}, {
+						step: function(now, fx) {
+							if (slideUp) {
+								propTotals[fx.prop] = now;
+								var scrollTo = currentScroll;
+								$.each(propTotals, function(idx, change) { scrollTo += change; });
+								$(window).scrollTop(scrollTo);
+							}
+						}
+					});
+				});
+				socket.emit('subscribe', '/uploads/<?= $upload->id() ?>');
+			});
+		</script>
+		<?php
 	}
 	
 	function toggleThumbnailLink() {
@@ -151,7 +221,7 @@
 		// thumbnail
 		if( $upload->type() != 'topic' && ($upload->type() != "audio" || $upload->thumb())) {
 			?>
-				<div style="background:#ccccff; border-top:1px solid #000033">
+				<div id="thumbnail" style="background:#ccccff; border-top:1px solid #000033">
 					<div style="float:right"><? toggleThumbnailLink() ?></div>
 					<?
 						if(me()->getPref("thumbnails_in_comments") == 1) {

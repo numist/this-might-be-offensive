@@ -102,6 +102,7 @@ var infScrLoadingFeedback = 'loading…';
               moreNode.remove();
             }
   
+						$(document).trigger('lazyload_complete');
             infScrState = infScrStates.idle;
           }
         });

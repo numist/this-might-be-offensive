@@ -8,7 +8,7 @@
 	 */
 	if(array_key_exists("redirect", $_REQUEST) && strlen($_REQUEST["redirect"]) > 0) {
 		if(strpos($_REQUEST['redirect'], "//") === false) {
-			$redirect = "https://".$_SERVER["SERVER_NAME"].$_REQUEST['redirect'];
+			$redirect = "https://".$_SERVER["HTTP_HOST"].$_REQUEST['redirect'];
 		} else {
 			$redirect = $_REQUEST['redirect'];
 		}
@@ -57,7 +57,7 @@
 
 <html>
 <head>
-	<title><?= $_SERVER['SERVER_NAME'] ?> : do we know you?</title>
+	<title><?= $_SERVER['HTTP_HOST'] ?> : do we know you?</title>
 	<link rel="stylesheet" type="text/css" href="/styles/sparse.css"/>
 	<? include_once("analytics.inc"); ?>
 </head>

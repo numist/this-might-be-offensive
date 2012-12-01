@@ -10,7 +10,7 @@ require_once("offensive/assets/core.inc");
 require_once("offensive/assets/id3.inc");
 
 function fail() {
-	header("Location: http://{$_SERVER['SERVER_NAME']}/offensive/404.php", true, 301);
+	header("Location: http://{$_SERVER['HTTP_HOST']}/offensive/404.php", true, 301);
 	exit;
 }
 

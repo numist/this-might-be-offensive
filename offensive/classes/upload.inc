@@ -228,9 +228,24 @@ class Upload {
 		if(is_numeric($comment)) $comment = new Comment($comment);
 		if(!$comment || !$comment->exists()) throw new Exception("invalid comment", 404);
 		
-		$sql = "UPDATE offensive_subscriptions SET commentid = {$comment->id()}
-		        WHERE fileid = {$this->id()} AND commentid IS NULL";
+		// Send realtime alert to all subscribed users
+		$sql = "SELECT userid FROM offensive_subscriptions
+            WHERE fileid = {$this->id()} AND commentid IS NULL";
 		$result = tmbo_query($sql);
+		$user_ids = array();
+    while($row = mysql_fetch_assoc($result)) {
+			$user_ids[] = $row['userid'];
+		}
+
+		$user_ids_string = implode($user_ids, ',');
+		// Do the DB stuff
+		$sql = "UPDATE offensive_subscriptions SET commentid = {$comment->id()}
+		        WHERE fileid = {$this->id()} AND userid IN ({$user_ids_string})";
+		$result = tmbo_query($sql);
+		
+		foreach($user_ids as $user_id) {
+			publishChange("subscription", array("/private/users/{$user_id}"), $comment->api_data());
+		}
 	}
 	
 	/*
@@ -426,10 +441,12 @@ class Upload {
 	
 	public function filtered_bad() {
 		return (me() != false
-			? me()->getPref("hide_bad") == 1
-			  && $this->bads() > 10
-			  && $this->bads() / 9 > $this->goods()
+			? me()->getPref("hide_bad") == 1 && $this->is_bad()
 			: false);
+	}
+
+	public function is_bad() {
+		return ($this->bads() > 10 && $this->bads() / 9 > $this->goods());
 	}
 	
 	/*
@@ -696,8 +713,15 @@ class Upload {
 		return $user->canComment($this);
 	}
 
+	public function channels() {
+		return array(
+			"/uploads/" . $this->id(),
+			"/users/" . $this->uploader()->id()
+		);
+	}
+
 	// API support
-	public function api_data() {
+	public function api_data($include_html = false) {
 
 		$ret = array(
 				"id" => (int)$this->id(),
@@ -717,8 +741,22 @@ class Upload {
 				"filtered" => $this->filtered(),
 				"last_active" => $this->last_active()
 			);
+		if($this->type() == "topic" && $include_html) {
+			$upload = $this;
+			ob_start();
+			require("offensive/templates/listitem_topic.inc");
+			$ret["html"] = ob_get_contents();
+			ob_end_clean();
+		}
 		if($this->type() != "topic" && $this->file() != '') {
 			$ret["link_file"] = $this->URL();
+			if($include_html) {
+				$upload = $this;
+				ob_start();
+				require("offensive/templates/listitem_file.inc");
+				$ret["html"]["list"] = ob_get_contents();
+				ob_end_clean();
+			}
 		}
 		if(($this->type() == "image" || $this->type() == "avatar")
 		   && $this->file() != "") {
@@ -734,6 +772,12 @@ class Upload {
 			
 			$ret["thumb_width"] = $arr[0];
 			$ret["thumb_height"] = $arr[1];
+			if($include_html) {
+				ob_start();
+				require("offensive/templates/thumbitem_file.inc");
+				$ret["html"]["thumb"] = ob_get_contents();
+				ob_end_clean();
+			}
 		}
 		
 		return $ret;
