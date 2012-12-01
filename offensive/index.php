@@ -415,8 +415,7 @@ $timelimit = 10;
 					$upload = $comment->upload();
 					if($upload->squelched()) continue;
 
-					$css = isset($css) && $css == "evenfile" ? "oddfile" : "evenfile"; 
-					// XXX: rejigger the query and use Link::comment ?>
+					$css = isset($css) && $css == "evenfile" ? "oddfile" : "evenfile";  ?>
 					<div class="clipper"><a id="unread<?= $comment->upload()->id()?>" class="<?= $css ?>" href="<?= Link::comment($comment) ?>"><?= $upload->htmlFilename() ?></a></div>
 				<? } ?>
 			</div>
