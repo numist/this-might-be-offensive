@@ -183,7 +183,7 @@ class Comment {
 		           "/http[s]?:\\/\\/([a-zA-z0-9]*\\.)*tmbo\\.org/i",
 		           "/http[s]?:\\/\\/([a-zA-z0-9]*\\.)*thismight\\.be/i",
 		          );
-		$r = "https://".$_SERVER['SERVER_NAME'];
+		$r = "https://".$_SERVER['HTTP_HOST'];
 		$comment = preg_replace( $p, $r, $comment );
 
 

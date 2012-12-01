@@ -38,7 +38,7 @@
 	   */
 	  if($upload->type() != 'topic' &&
 		 array_key_exists("submit", $_REQUEST) && array_key_exists("HTTP_REFERER", $_SERVER) &&
-	     $_SERVER['HTTP_REFERER'] !== "" && strpos($_SERVER['HTTP_REFERER'], $_SERVER['SERVER_NAME']) === false) {
+	     $_SERVER['HTTP_REFERER'] !== "" && strpos($_SERVER['HTTP_REFERER'], $_SERVER['HTTP_HOST']) === false) {
 		echo "you've been had.";
 		trigger_error("off-site tried to vote on non-topic upload, referer: ".$_SERVER['HTTP_REFERER'], E_USER_WARNING);
 		return;

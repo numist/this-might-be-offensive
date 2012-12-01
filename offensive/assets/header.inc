@@ -25,16 +25,16 @@ if(isset($downtime) && time() > $downtime) {
 /*****************************************************************************/
 
 // force not www.
-if(substr($_SERVER["SERVER_NAME"], 0, 4) == "www.") {
+if(substr($_SERVER["HTTP_HOST"], 0, 4) == "www.") {
 	// TODO: if a token was present in the URI, it should be invalidated.
-	header("Location: https://".substr($_SERVER["SERVER_NAME"], 4).$_SERVER["REQUEST_URI"], 301);
+	header("Location: https://".substr($_SERVER["HTTP_HOST"], 4).$_SERVER["REQUEST_URI"], 301);
 	exit;
 }
 
 // force ssl.
 if(!ssl()) {
 	// TODO: if a token was present in the URI, it should be invalidated.
-	header("Location: https://".$_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"], 301);
+	header("Location: https://".$_SERVER["HTTP_HOST"].$_SERVER["REQUEST_URI"], 301);
 	exit;
 }
 
