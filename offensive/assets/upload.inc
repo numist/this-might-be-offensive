@@ -242,7 +242,12 @@ function upload() {
 		// having the file extension helps ImageMagick do its thing.
 		$postdata['file_extension'] = getFileExtension($_FILES['image']['name']);
 		$postdata['tmpname'] = $postdata['tmpname'].$postdata['file_extension'];
-		$postdata['filename'] = $_FILES['image']['name'];
+		// rename filename if filename field is submitted on the form. 
+		if(array_key_exists('filename', $_POST) && !empty($_POST['filename'])) {
+			$postdata['filename'] = $_POST['filename'];
+		} else {
+			$postdata['filename'] = $_FILES['image']['name'];
+		}				
 		if(array_key_exists('nsfw', $_POST) || strpos(strtolower($postdata['filename']), "[nsfw]") !== false)
 			$postdata['nsfw'] = $_POST['nsfw'];
 		if(array_key_exists('tmbo', $_POST) || strpos(strtolower($postdata['filename']), "[tmbo]") !== false)
@@ -1235,14 +1240,15 @@ function upload_insert_file($postdata) {
 	// all set, let's go
 	$sql = "UPDATE offensive_uploads SET status = 'normal' where id = $fileid";
 	tmbo_query($sql);
-	insertChange("upload", $fileid, upload_type($postdata) . ":" . me()->username() . ":" . $postdata['filename']);
 
 	$sql = "INSERT INTO offensive_subscriptions (userid, fileid )
 	        VALUES ( " . $_SESSION['userid'] . ", $fileid ) ";
 	tmbo_query( $sql );
 
 	$upload = new Upload($fileid);
-	
+
+	publishChange($upload->type(), $upload->channels(), $upload->api_data(true));
+
 	if($upload->type() == "image") {
 		$isk = new Isk();
 		if($isk->add($upload->file(), $upload->id())) {

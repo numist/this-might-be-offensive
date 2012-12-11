@@ -1,5 +1,7 @@
 <?
 
+error_reporting(E_ERROR | E_USER_ERROR | E_USER_WARNING);
+
 // before we set our tmbo environment, we're going to need to include the php5 class wrapper
 require_once("xapian.php");
 

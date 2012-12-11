@@ -8,7 +8,7 @@
 	 */
 	if(array_key_exists("redirect", $_REQUEST) && strlen($_REQUEST["redirect"]) > 0) {
 		if(strpos($_REQUEST['redirect'], "//") === false) {
-			$redirect = "https://".$_SERVER["SERVER_NAME"].$_REQUEST['redirect'];
+			$redirect = "https://".$_SERVER["HTTP_HOST"].$_REQUEST['redirect'];
 		} else {
 			$redirect = $_REQUEST['redirect'];
 		}
@@ -31,7 +31,7 @@
 
 	$success = false;
 	
-	$name = isset($_REQUEST['username']) ? $_REQUEST['username'] : null;
+	$name = isset($_REQUEST['howsername']) ? $_REQUEST['howsername'] : null;
 	$pw = isset($_REQUEST['password']) ? $_REQUEST['password'] : null;
 	if(login(array("u/p" => array($name, $pw)))) {
 		/*
@@ -57,13 +57,13 @@
 
 <html>
 <head>
-	<title><?= $_SERVER['SERVER_NAME'] ?> : do we know you?</title>
+	<title><?= $_SERVER['HTTP_HOST'] ?> : do we know you?</title>
 	<link rel="stylesheet" type="text/css" href="/styles/sparse.css"/>
 	<? include_once("analytics.inc"); ?>
 </head>
 
 
-<body bgcolor="#ffffff" onLoad="document.forms[0].username.focus();">
+<body bgcolor="#ffffff" onLoad="document.forms[0].howsername.focus();">
 
 	<table border="0" cellpadding="0" cellspacing="0" height="400" width="100%">
 		<tr>
@@ -81,7 +81,7 @@
 							<? if($prompt) { ?>
 							<tr>
 								<td class="label"><p>user name:</p></td>
-								<td><input type="text" name="username" size="12"/></td>
+								<td><input type="text" name="howsername" size="12"/></td>
 							</tr>
 							<tr>
 								<td class="label"><p>password:</p></td>

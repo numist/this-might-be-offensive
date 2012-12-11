@@ -18,14 +18,15 @@ If you want to build your own server, it won't take more than an hour or few, an
 
 * redis-server
 * mysql-server
-* apache2
-* apache2-mod-php5
+* nginx-full
+* php5-fpm
 * php5-mysql
 * imagemagick
 * perl
 * xapian
+* node.js (if available, very easy to build from source)
 
-You'll want to enable mod_rewrite and mod_ssl and configure them as appropriate. You'll also want to install the following perl modules from CPAN:
+You'll want to look at the example nginx config file in admin. You'll also want to install the following perl modules from CPAN:
 
 * DBI
 * File::Copy
@@ -55,12 +56,16 @@ You'll also want to put the following lines in your crontab:
     3 1 * * * $THEMAXX/offensive/deleteOldFiles.pl 2 quarantine > /dev/null
     0 * * * * /usr/bin/nice /usr/bin/php5 $THEMAXX/admin/commentIndexer.php
 
-Client-side Configuration
+Realtime Data
 -------------------------
 
-tmbo's content protection is the same in development as it is in production, which means if you browse to your instance by IP, you're not going to see any images. Putting a thismight.be subdomain in your hosts file will work around this problem. For example:
+The realtime data system uses a redis and node.js to push data to connected clients.  The server is located in /realtime.  First install the dependencies with "npm install .", then start it with "node app.js".  There is also an example init script in /admin.
 
-    192.168.231.128 dev.thismight.be
+
+Content Protection Configuration
+-------------------------
+
+tmbo's content protection is the same in development as it is in production, which means if you browse to your instance by IP, you're not going to see any images. You should either disable the relevant section in the nginx config, or add the ip address you use to the allowed hosts. 
 
 Developing using GitHub
 -----------------------

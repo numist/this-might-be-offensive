@@ -15,12 +15,56 @@
 		CSS::add("/styles/grid.css");
 		JS::add("/offensive/js/prep_evenodd.js");
 		JS::add("/offensive/js/lazyload_bottom.js");
-		if(count($_GET) == 1 && array_key_exists("c", $_GET)) {
-			// lazyload_changes are only used if on a base page (?c=main not ?c=main&foo=bar)
-    	JS::add("/offensive/js/lazyload_changes.js");
-		}?>
+		?>
 		<link rel="alternate" type="application/rss+xml" title="discussions" href="<?= Link::rss("discuss") ?>" />
 		<?
+	}
+
+	function head_post_js() {
+		?>
+		<script type="text/javascript">
+			getSocket("<?php $t = new Token("realtime"); echo $t->tokenid(); ?>", function(socket) {
+				function recolorRows() {
+					$('#discussions li').not('.header').each( function(idx) {
+						$(this).find('.col').removeClass('odd_row even_row').addClass( (idx % 2 == 0) ? 'even_row' : 'odd_row');
+					});
+				}
+				
+				var _sortOrder;
+				function sortOrder() {
+					if(!_sortOrder) {
+						$('#discussions .header .col').each(function(idx) {
+							if ($(this).find('a').length == 0)
+								_sortOrder = idx;
+						});
+					}
+					return _sortOrder;
+				}
+
+				socket.on('comment', function(comment) {
+					var old_row = $("li[fileid=" + comment.fileid +"]");
+					if (old_row.length > 0) {
+						var count = parseInt(old_row.find('.comments').text()) + 1;
+						var label = count == 1 ? 'comment' : 'comments';
+						old_row.find('.comments').text(count);
+						old_row.find('.commentlabel').text(label);
+						old_row.find('.col3').text(comment.timestamp);
+						// if (sortOrder() == 2) {
+						//   $('#discussions .header').after(old_row);
+						//   recolorRows();
+						// }
+					}
+				});
+				socket.on('topic', function(topic) {
+					if(sortOrder() != 1 && $.inArray(topic.userid, me.squleched) == -1) {
+						$('#discussions .header').after(topic.html);
+						recolorRows();
+					}
+				});
+				socket.emit('subscribe', '/uploads/*');
+			});
+		</script>
+		<?php
 	}
 
 	function body() {
@@ -61,7 +105,6 @@
 
 			// if any of the args have incorrect values, core_getuploads will kill us here
 			$result = core_getuploads($args);
-			$revision = currentChange();
 
 			// if we made it this far, sort is valid, so we don't have to check it
 			if($args["sort"] != me()->getPref("sortorder_discussions")) {
@@ -118,9 +161,6 @@
 		</div>
 		<div class="blackbar"></div>
 	</div>
-	<script>
-		var update_index = <?= $revision ?>;
-	</script>
 <?
 	}
 	

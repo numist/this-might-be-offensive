@@ -34,7 +34,7 @@ header( "Content-type: text/xml" );
 >
 	<channel>
 		<title>[ this might be offensive ] : audio</title>
-		<link>https://<?= $_SERVER['SERVER_NAME'] ?>/offensive/</link>
+		<link>https://<?= $_SERVER['HTTP_HOST'] ?>/offensive/</link>
 		<description>[ this might be offensive ]</description>
 		<lastBuildDate><? echo date("r"); ?></lastBuildDate>
 
@@ -54,7 +54,7 @@ header( "Content-type: text/xml" );
 		$filename = $upload->is_nsfw() == 1 && strpos(strtolower($filename), "[nsfw]") === false ?
 				'[nsfw] '.$filename : $filename;
 
-		$server = "https://". $_SERVER['SERVER_NAME'];
+		$server = "https://". $_SERVER['HTTP_HOST'];
 		$fileURL = $server . $upload->URL();
 		$thumbURL = $server . $upload->thumbURL();
 		
@@ -62,7 +62,7 @@ header( "Content-type: text/xml" );
 ?>
 		<item>
 			<title><![CDATA[<?= $filename ?> (uploaded by <?= $upload->uploader()->username() ?>)]]></title>
-			<link>https://<?= $_SERVER['SERVER_NAME'] ?><?= Link::upload($upload) ?></link>
+			<link>https://<?= $_SERVER['HTTP_HOST'] ?><?= Link::upload($upload) ?></link>
 			<enclosure url="<?= $fileURL ?>" length="<?= filesize( $upload->file() ) ?>" type="audio/mpeg"/>
 			<description><?
 			
@@ -135,7 +135,7 @@ header( "Content-type: text/xml" );
 			?>
 			</description>
 			<pubDate><? echo date( "r", strtotime( $upload->timestamp() ) ) ?></pubDate>			
-			<comments><![CDATA[https://<?= $_SERVER['SERVER_NAME'].Link::thread($upload) ?>]]></comments>
+			<comments><![CDATA[https://<?= $_SERVER['HTTP_HOST'].Link::thread($upload) ?>]]></comments>
 		</item>
 <?
 	}
