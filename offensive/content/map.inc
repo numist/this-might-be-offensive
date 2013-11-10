@@ -12,7 +12,7 @@
 
 	function head()
 	{ 	?>
-		<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false" type="text/javascript"></script>
+		<script src="https://maps.googleapis.com/maps/api/js?sensor=false" type="text/javascript"></script>
 		<?
 		CSS::add("/styles/map.css");
 		JS::add("/offensive/js/markermanager-1.2.js");
