@@ -37,7 +37,7 @@ $refer = "";
 
 if($referer) {
 	if($referer->location()) {
-		$refer = $user->username()." was invited by <a href='javascript:posse_click(".$referer->id().");'>"
+		$refer = $user->username()." was invited by <a href='javascript:maxxerMap.posseClick(".$referer->id().");'>"
 		         .$referer->username()."</a>";
 	} else {
 		$refer = $user->username()." was invited by ".$referer->username();
@@ -56,7 +56,7 @@ if(count($possearr) == 0) {
 	foreach($possearr as $posser) {
 		if($posser->location()) {
 			$posse_markers++;
-			$posse_list .= "<li><a href='javascript:posse_click(".$posser->id().");'>".$posser->username()."</a></li>";
+			$posse_list .= "<li><a href='javascript:maxxerMap.posseClick(".$posser->id().");'>".$posser->username()."</a></li>";
 		}
 	}
 	
