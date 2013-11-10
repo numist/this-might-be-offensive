@@ -22,7 +22,7 @@ function map() {
     var clusterIcon  = "/offensive/graphics/map_cluster.png";   // cluster icon
     var sidebarHtml  = "";                                      // sidebar html
     var gmarkers     = [];                                      // marker array 
-    var infowindow   = false;                                   // infowindow object
+    var infoWindow   = false;                                   // infowindow object
     var markerIndex  = 0;
  
     /**
@@ -243,12 +243,13 @@ function map() {
         // get the user info from the server
         $.get("/offensive/map/get_userinfo.php?user=" + marker.id, function(data) {
             if(!me.infoWindow) {
-                me.infoWindow = new google.maps.InfoWindow();
+                me.infoWindow = new google.maps.InfoWindow({ maxWidth: 300});
             }
             //me.infoWindow.close();
             
             me.infoWindow.setOptions({
                 content: data,
+                maxWidth: 300
             });
 
             me.infoWindow.open(map, marker);

@@ -69,7 +69,8 @@ if(count($possearr) == 0) {
 }
 
 // we have all the info, render.
-?><div>
+?>
+<div style="overflow: hidden;">
 	<div style='<?= $posse_markers == 0 ?'': "border-bottom: 1px solid black; " ?>height: auto;'>
 		<table>
 			<tr>
@@ -78,13 +79,13 @@ if(count($possearr) == 0) {
 			</tr>
 		</table>
 		<?= $refer ?>
-		<? if($posse != "") {
-			echo $posse; ?>
+		<? if($posse != "") echo $posse; ?>
 	</div>
+	<? if(count($possearr)) : ?>
 	<div style="margin: 5px 0 0 0; font-size: 10px; line-height: 18px; text-decoration: none; <?= $overflow ?>">
 		<ul>
 		<?= $posse_list ?>
 		</ul>
-		<? } ?>
 	</div>
+	<? endif; ?>
 </div>
