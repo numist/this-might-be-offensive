@@ -57,61 +57,62 @@ for($i = $max_marker_level; $i >= 0; $i--) {
                 'lat'   =>  $marker['lat'],
                 'lon'   =>  $marker['lon'],
                 'level' =>  $i,				// level of this cluster
-								'num_users' => $marker['num_users'],	// number of markers
-								'swx' => $marker['swx'],
-								'swy' => $marker['swy'],		
-								'nex' => $marker['nex'],
-								'ney' => $marker['ney']	
+				'num_users' => $marker['num_users'],	// number of markers
+				'swx' => $marker['swx'],
+				'swy' => $marker['swy'],		
+				'nex' => $marker['nex'],
+				'ney' => $marker['ney']	
             ); 
             array_push($clusters,$cluster);
         }
     }
 }
 
-// now create the XML file
-header("Content-type: text/xml");
-echo '<markers>';
+// now create the JSON file
+header("Content-type: application/json");
+$data = array(
+	'markers'  => array(),
+	'members'  => 0,
+	'clusters' => array()
+);
 
 $num_users = 0;
-// Iterate through the rows, printing XML nodes for each
+// Iterate through the rows
 foreach($sort_markers as $index => $marker) {
-    echo '<marker ';
-    echo 'user="' . htmlEscape($marker['username']) . '" ';
-    echo 'userid="' . htmlEscape($marker['userid']) . '" ';
-    echo 'lat="' . $marker['x'] . '" ';
-    echo 'lon="' . $marker['y'] . '" ';
+	$m = array(
+		'user'  	=> htmlEscape($marker['username']),
+		'userid' 	=> htmlEscape($marker['userid']), 
+		'lat' 		=> $marker['x'],
+		'lon' 		=> $marker['y'],
+	);
+
     $id = $marker['userid'];
 
     if(isset($min_zoom[$id])) {
-	echo 'minzoom="' . $min_zoom[$id] . '" ';
+    	$m['minzoom'] = $min_zoom[$id];
     } else {
-	echo 'minzoom="' . ($max_marker_level+1) . '" ';
+    	$m['minzoom'] = $max_marker_level+1;
     }
-
-    echo '/>';
+    $data['markers'][] = $m;
 }
-echo '<members num="' . sizeof($sort_markers) . '"/>';
+$data['members'] = sizeof($sort_markers);
 
 // add all the cluster icons
 foreach($clusters as $index => $cluster) {
-    echo '<cluster ';
-    echo 'lat="' . $cluster['lat'] . '" ';
-    echo 'lon="' . $cluster['lon'] . '" ';
-    echo 'num_users="' . $cluster['num_users'] . '" ';
-
-    // these 4 points create a rectangle that holds all markers for this cluster
-    // this allows you to click on the marker and zoom in nicely
-    echo 'swx="' . $cluster['swx'] . '" ';
-    echo 'swy="' . $cluster['swy'] . '" ';
-    echo 'nex="' . $cluster['nex'] . '" ';
-    echo 'ney="' . $cluster['ney'] . '" ';
-
-    echo 'level="' . $cluster['level'] . '" ';
-    echo '/>';
+	$c = array(
+		'lat' => $cluster['lat'],
+		'lon' => $cluster['lon'],
+		'num_users' => $cluster['num_users'],
+		'swx' => $cluster['swx'],
+		'swy' => $cluster['swy'],
+		'nex' => $cluster['nex'],
+		'ney' => $cluster['ney'],
+		'level' => $cluster['level']
+	);
+    $data['clusters'][] = $c;
 }
 
-// End XML file
-echo '</markers>';
+echo json_encode($data);
 
 function sql_get_markers($max_marker_level) {
 	global $filter;
@@ -129,10 +130,10 @@ function sql_get_markers($max_marker_level) {
 	}
 
 	while ($row = @mysql_fetch_assoc($result)) {
-	  if(!me()->squelched($row["userid"])) {
-	    $row['min_zoom'] = $max_marker_level+1;
-	    array_push($markers, $row);
-    }
+	  	if(!me()->squelched($row["userid"])) {
+		    $row['min_zoom'] = $max_marker_level+1;
+		    array_push($markers, $row);
+    	}
 	}
 	return($markers);
 }
