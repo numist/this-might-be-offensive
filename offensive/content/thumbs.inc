@@ -69,6 +69,7 @@
 					if($.inArray(image.userid, me.squleched) == -1) {
 						$('#thumbnails > ul').prepend(image.html.thumb);
 						$().hideFilteredThumbnails();
+						pickuplink_set_visibility();
 					}
 				});
 				socket.emit('subscribe', '/uploads/*');
