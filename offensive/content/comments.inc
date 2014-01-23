@@ -73,6 +73,7 @@
 
 	function head() {
 		JS::add("/offensive/js/subscriptions.js");
+		JS::add("/offensive/js/favico.js");
 	}
 
 	function head_post_js() {
@@ -93,9 +94,19 @@
 					&& (elemBottom <= docViewBottom) &&  (elemTop >= docViewTop) );
 				}
 
+				var favicon = new Favico({
+					animation: 'slide',
+					bgColor: '#000033',
+					textColor: '#ccccff'
+				});
+
+				var unread = 0;
+
 				function handleEvent() {
 					if (latest_comment && isLatestCommentVisible()) {
 						latest_comment = null;
+						unread = 0;
+						favicon.badge(unread);
 						$.ajax("/offensive/api.php/resetsubscription.json", {
 							data: {
 								threadid: '<?= $upload->id() ?>'
@@ -107,7 +118,14 @@
 
 				$(document).on('mousemove keydown DOMMouseScroll mousewheel mousedown touchstart touchmove', handleEvent);
 
-				socket.on('comment', function(comment) {
+
+				function commentExists(comment) {
+					return $('a[name='+comment.id+']').length > 0;
+				}
+
+				function addComment(comment) {
+					if(commentExists(comment))
+						return;
 					var color = ($("#commentList .entry").length % 2) == 0 ? "#ccccff" : "#bbbbee";
 					var html = $(comment.html);
 					$(html[2]).css({'background': color});
@@ -138,8 +156,34 @@
 							}
 						}
 					});
+				}
+
+				var heldComments = [];
+				var handleRealtimeComment = function(comment) {
+					heldComments.push(comment);
+				}
+
+				socket.on('comment', function(comment) {
+					handleRealtimeComment(comment);
 				});
+
 				socket.emit('subscribe', '/uploads/<?= $upload->id() ?>');
+
+				$.getJSON('/offensive/api.php/getcomments.json', {
+					thread: <?= $upload->id() ?>,
+					idmin: lastcomment,
+					html: 1
+				}, function(data) {
+					data.forEach(addComment);
+					heldComments.forEach(addComment);
+					handleRealtimeComment = function(comment) {
+						addComment(comment);
+						if(comment.comment) {
+							unread += 1;
+							favicon.badge(unread);
+						}
+					}
+				});
 			});
 		</script>
 		<?php
@@ -202,6 +246,7 @@
 <?php 
 
 	$commentnum = 0;
+	$lastcomment = 0;
 	if( $comments_exist > 0) { 
         // changeblog doesn't say anything demeaning about the people who posted.
         if($upload->id() != "211604") { 
@@ -212,11 +257,16 @@
 		$numbad = 0;
 		foreach($upload->getComments() as $comment) {
 			$css = nextStyle($commentnum++);
+			$lastcomment = $comment->id();
 			require("offensive/templates/comment.inc");
 		}
-	
 	// end of "are there any comments"
 	}
+	?>
+	<script>
+		lastcomment = <? echo $lastcomment ?>;
+	</script>
+	<?php
 	
 		// thumbnail
 		if( $upload->type() != 'topic' && ($upload->type() != "audio" || $upload->thumb())) {
@@ -256,7 +306,7 @@
 			<div class="heading">
 				<div style="float:right">					
 					<? if( $upload->subscribed() ) { ?>
-						<b><a id="unsubscribeLink" href="subscribe.php?un=1&fileid=<?= $upload->id() ?>" title="take this thread off my 'unread comments' watch list." class="orange">unsubscribe</a></b>
+						<b><a id="subscribeLink" href="subscribe.php?un=1&fileid=<?= $upload->id() ?>" title="take this thread off my 'unread comments' watch list." class="orange">unsubscribe</a></b>
 					<? }
 						else { ?>
 						<b><a id="subscribeLink" href="subscribe.php?fileid=<?= $upload->id() ?>" title="watch this thread for new comments." class="orange">subscribe</a></b>
@@ -281,13 +331,43 @@
     // changeblog shouldn't tease the users with a comment field
     if($upload->canComment()) {
 ?>
+<script>
+	$(function() {
+		$("#comment_form").submit(function(e) {
+			e.preventDefault();
+			e.stopPropagation();
+			var data = {
+				vote: $('#comment_form input[name=vote]:checked').val() || "novote",
+				comment: $("#comment_form textarea[name=comment]").val() || "",
+				tmbo: $("#comment_form #tmbo").attr("checked") ? "1" : "0",
+				repost: $("#comment_form #repost").attr("checked") ? "1" : "0",
+				subscribe: $("#comment_form #subscribe").attr("checked") ? "1" : "0",
+				fileid: $("#comment_form #fileid").val()
+			};
+
+			$("#comment_form input:submit").prop('disabled', true);
+
+			var request = $.post('/offensive/api.php/postcomment.php', data);
+			request.done(function() {
+				if(data.vote != "novote")
+					$("#vote_controls").remove();
+			  if(data.comment != '' || data.vote == "this is bad" || data.subscribe != "0")
+					toggle_subscribe("subscribe", data.fileid, $("#subscribeLink"));
+				$("#comment_form")[0].reset();
+			});
+			request.always(function() {
+				$("#comment_form input:submit").prop('disabled', false);
+			});
+		});
+	});
+</script>
 
 	<div class="contentbox">
 		<div class="blackbar"></div>
 			<div class="heading"><?= $add_comment_heading?></div>
 			<div class="bluebox" style="text-align:center">			
 			<a name="form"></a>
-			<form method="POST" action="<?php echo $_SERVER['PHP_SELF']?>">
+			<form method="POST" id="comment_form" action="<?php echo $_SERVER['PHP_SELF']?>">
 
 			
 				<p>
@@ -302,28 +382,14 @@
 
 	if($upload->canVote()) {
 	
-	?>	<div style="text-align:left;margin-left:10%">
-			<input type="radio" name="vote" value="" checked="checked" id="novote"/>
+	?>	
+	    <div id="vote_controls" style="text-align:left;margin-left:10%">
+			<input type="radio" name="vote" value="novote" checked="checked" id="novote"/>
 			<br/>			
-	<?php
-
-		// show vote options	
-		// oh jesus why are we doing this /o\
-		$sql = "SHOW COLUMNS FROM offensive_comments LIKE 'vote'";
-		$result = tmbo_query( $sql );
-		$row = mysql_fetch_row($result);
-		$options = explode("','",preg_replace("/(enum|set)\('(.+?)'\)/","\\2",$row[1]));
-		
-		
-		foreach( $options as $option ) {
-			?>
-				<input type="radio" name="vote" value="<?php echo $option ?>" id="<?php echo $option?>"/>
-				<label for="<?php echo $option?>">[ <?php echo $option?> ]</label><br/>
-			
-			<?php
-		}
-	?>
-	
+			<input type="radio" name="vote" value="this is good" id="this_is_good"/>
+			<label for="this_is_good">[ this is good ]</label><br/>
+			<input type="radio" name="vote" value="this is bad" id="this_is_bad"/>
+			<label for="this_is_bad">[ this is bad ]</label><br/>
 		<br/>
 
 		<input type="checkbox" name="offensive" value="omg" id="tmbo"/>

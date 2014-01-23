@@ -17,25 +17,23 @@ require_once("offensive/assets/core.inc");
 mustLogIn(array("prompt" => "http",
                 "token" => null));
 
-$user = (isset($_GET['user']) && is_intger($_GET['user'])) ? $_GET['user'] : "";
+$user = me()->id();
 if($user == "") trigger_error("no user argument", E_USER_ERROR);
 
 $locations = core_getlocation(array("userid" => $user));
 
-if(count($locations) == 0) {
-	exit;
-}
 
-header("Content-type: text/xml");
-echo '<markers>';
+header("Content-type: application/json");
+$data = array(
+	'markers'  => array()
+);
 foreach ($locations as $location){
-	// ADD TO XML DOCUMENT NODE
-	echo '<marker ';
-	echo 'userid="' . $location['userid'] . '" ';
-	echo 'lat="' . $location['latitude'] . '" ';
-	echo 'lon="' . $location['longitude'] . '" ';
-	echo '/>';
+	$data['markers'][] = array(
+		'userid' => $location['userid'],
+		'lat'    => $location['latitude'],
+		'lon'    => $location['longitude']
+	);
 }
-echo '</markers>';
+echo json_encode($data);
 
 ?>

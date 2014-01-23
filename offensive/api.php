@@ -150,6 +150,8 @@
 			}
 		}
 		
+		$send_html = $_REQUEST['html'] == '1';
+
 		// send the data back
 		if(in_array($rtype, array("plist", "xml"))) {
 			header("Content-type: text/xml");
@@ -158,7 +160,7 @@
 		} else {
 			header("Content-type: text/plain");
 		}
-		echo call_user_func("tmbo_".$rtype."_encode", $ret);
+		echo call_user_func("tmbo_".$rtype."_encode", $ret, $send_html);
 		exit;
 	}
 	

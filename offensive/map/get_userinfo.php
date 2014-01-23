@@ -37,7 +37,7 @@ $refer = "";
 
 if($referer) {
 	if($referer->location()) {
-		$refer = $user->username()." was invited by <a href='javascript:posse_click(".$referer->id().");'>"
+		$refer = $user->username()." was invited by <a href='javascript:maxxerMap.posseClick(".$referer->id().");'>"
 		         .$referer->username()."</a>";
 	} else {
 		$refer = $user->username()." was invited by ".$referer->username();
@@ -56,7 +56,7 @@ if(count($possearr) == 0) {
 	foreach($possearr as $posser) {
 		if($posser->location()) {
 			$posse_markers++;
-			$posse_list .= "<li><a href='javascript:posse_click(".$posser->id().");'>".$posser->username()."</a></li>";
+			$posse_list .= "<li><a href='javascript:maxxerMap.posseClick(".$posser->id().");'>".$posser->username()."</a></li>";
 		}
 	}
 	
@@ -69,7 +69,8 @@ if(count($possearr) == 0) {
 }
 
 // we have all the info, render.
-?><div>
+?>
+<div style="overflow: hidden;">
 	<div style='<?= $posse_markers == 0 ?'': "border-bottom: 1px solid black; " ?>height: auto;'>
 		<table>
 			<tr>
@@ -78,13 +79,13 @@ if(count($possearr) == 0) {
 			</tr>
 		</table>
 		<?= $refer ?>
-		<? if($posse != "") {
-			echo $posse; ?>
+		<? if($posse != "") echo $posse; ?>
 	</div>
+	<? if(count($possearr)) : ?>
 	<div style="margin: 5px 0 0 0; font-size: 10px; line-height: 18px; text-decoration: none; <?= $overflow ?>">
 		<ul>
 		<?= $posse_list ?>
 		</ul>
-		<? } ?>
 	</div>
+	<? endif; ?>
 </div>
