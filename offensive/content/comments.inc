@@ -73,6 +73,7 @@
 
 	function head() {
 		JS::add("/offensive/js/subscriptions.js");
+		JS::add("/offensive/js/favico.js");
 	}
 
 	function head_post_js() {
@@ -93,9 +94,19 @@
 					&& (elemBottom <= docViewBottom) &&  (elemTop >= docViewTop) );
 				}
 
+				var favicon = new Favico({
+					animation: 'slide',
+					bgColor: '#ccc',
+					textColor: '#fff'
+				});
+
+				var unread = 0;
+
 				function handleEvent() {
 					if (latest_comment && isLatestCommentVisible()) {
 						latest_comment = null;
+						unread = 0;
+						favicon.badge(unread);
 						$.ajax("/offensive/api.php/resetsubscription.json", {
 							data: {
 								threadid: '<?= $upload->id() ?>'
@@ -106,6 +117,7 @@
 				}
 
 				$(document).on('mousemove keydown DOMMouseScroll mousewheel mousedown touchstart touchmove', handleEvent);
+
 
 				socket.on('comment', function(comment) {
 					var color = ($("#commentList .entry").length % 2) == 0 ? "#ccccff" : "#bbbbee";
@@ -122,6 +134,10 @@
 					var slideUp = $('textarea').is(':focus');
 					var propTotals = {};
 					latest_comment = $(html[2]);
+					if(comment.comment) {
+						unread += 1;
+						favicon.badge(unread);
+					}
 					$(html[2]).animate({
     				"height": "show",
     				"marginTop": "show",
