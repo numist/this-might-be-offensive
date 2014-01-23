@@ -96,8 +96,8 @@
 
 				var favicon = new Favico({
 					animation: 'slide',
-					bgColor: '#ccc',
-					textColor: '#fff'
+					bgColor: '#000033',
+					textColor: '#ccccff'
 				});
 
 				var unread = 0;
@@ -119,7 +119,13 @@
 				$(document).on('mousemove keydown DOMMouseScroll mousewheel mousedown touchstart touchmove', handleEvent);
 
 
-				socket.on('comment', function(comment) {
+				function commentExists(comment) {
+					return $('a[name='+comment.id+']').length > 0;
+				}
+
+				function addComment(comment) {
+					if(commentExists(comment))
+						return;
 					var color = ($("#commentList .entry").length % 2) == 0 ? "#ccccff" : "#bbbbee";
 					var html = $(comment.html);
 					$(html[2]).css({'background': color});
@@ -134,10 +140,6 @@
 					var slideUp = $('textarea').is(':focus');
 					var propTotals = {};
 					latest_comment = $(html[2]);
-					if(comment.comment) {
-						unread += 1;
-						favicon.badge(unread);
-					}
 					$(html[2]).animate({
     				"height": "show",
     				"marginTop": "show",
@@ -154,8 +156,34 @@
 							}
 						}
 					});
+				}
+
+				var heldComments = [];
+				var handleRealtimeComment = function(comment) {
+					heldComments.push(comment);
+				}
+
+				socket.on('comment', function(comment) {
+					handleRealtimeComment(comment);
 				});
+
 				socket.emit('subscribe', '/uploads/<?= $upload->id() ?>');
+
+				$.getJSON('/offensive/api.php/getcomments.json', {
+					thread: <?= $upload->id() ?>,
+					idmin: lastcomment,
+					html: 1
+				}, function(data) {
+					data.forEach(addComment);
+					heldComments.forEach(addComment);
+					handleRealtimeComment = function(comment) {
+						addComment(comment);
+						if(comment.comment) {
+							unread += 1;
+							favicon.badge(unread);
+						}
+					}
+				});
 			});
 		</script>
 		<?php
@@ -218,6 +246,7 @@
 <?php 
 
 	$commentnum = 0;
+	$lastcomment = 0;
 	if( $comments_exist > 0) { 
         // changeblog doesn't say anything demeaning about the people who posted.
         if($upload->id() != "211604") { 
@@ -228,11 +257,16 @@
 		$numbad = 0;
 		foreach($upload->getComments() as $comment) {
 			$css = nextStyle($commentnum++);
+			$lastcomment = $comment->id();
 			require("offensive/templates/comment.inc");
 		}
-	
 	// end of "are there any comments"
 	}
+	?>
+	<script>
+		lastcomment = <? echo $lastcomment ?>;
+	</script>
+	<?php
 	
 		// thumbnail
 		if( $upload->type() != 'topic' && ($upload->type() != "audio" || $upload->thumb())) {
