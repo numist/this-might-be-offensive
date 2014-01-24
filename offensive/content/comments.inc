@@ -163,6 +163,39 @@
 					heldComments.push(comment);
 				}
 
+				socket.on('disconnect', function() {
+	      	$("#comment_form").off('submit.realtime');
+				});
+					
+	      socket.on('connect', function() {
+	      	$("#comment_form").on('submit.realtime', function(e) {
+	      		e.preventDefault();
+	      		e.stopPropagation();
+	      		var data = {
+	      			vote: $('#comment_form input[name=vote]:checked').val() || "novote",
+	      			comment: $("#comment_form textarea[name=comment]").val() || "",
+	      			tmbo: $("#comment_form #tmbo").attr("checked") ? "1" : "0",
+	      			repost: $("#comment_form #repost").attr("checked") ? "1" : "0",
+	      			subscribe: $("#comment_form #subscribe").attr("checked") ? "1" : "0",
+	      			fileid: $("#comment_form #fileid").val()
+	      		};
+
+	      		$("#comment_form input:submit").prop('disabled', true);
+
+	      		var request = $.post('/offensive/api.php/postcomment.php', data);
+	      		request.done(function() {
+	      			if(data.vote != "novote")
+	      				$("#vote_controls").remove();
+	      		  if(data.comment != '' || data.vote == "this is bad" || data.subscribe != "0")
+	      				toggle_subscribe("subscribe", data.fileid, $("#subscribeLink"));
+	      			$("#comment_form")[0].reset();
+	      		});
+	      		request.always(function() {
+	      			$("#comment_form input:submit").prop('disabled', false);
+	      		});
+	      	});
+	      });
+
 				socket.on('comment', function(comment) {
 					handleRealtimeComment(comment);
 				});
@@ -331,36 +364,6 @@
     // changeblog shouldn't tease the users with a comment field
     if($upload->canComment()) {
 ?>
-<script>
-	$(function() {
-		$("#comment_form").submit(function(e) {
-			e.preventDefault();
-			e.stopPropagation();
-			var data = {
-				vote: $('#comment_form input[name=vote]:checked').val() || "novote",
-				comment: $("#comment_form textarea[name=comment]").val() || "",
-				tmbo: $("#comment_form #tmbo").attr("checked") ? "1" : "0",
-				repost: $("#comment_form #repost").attr("checked") ? "1" : "0",
-				subscribe: $("#comment_form #subscribe").attr("checked") ? "1" : "0",
-				fileid: $("#comment_form #fileid").val()
-			};
-
-			$("#comment_form input:submit").prop('disabled', true);
-
-			var request = $.post('/offensive/api.php/postcomment.php', data);
-			request.done(function() {
-				if(data.vote != "novote")
-					$("#vote_controls").remove();
-			  if(data.comment != '' || data.vote == "this is bad" || data.subscribe != "0")
-					toggle_subscribe("subscribe", data.fileid, $("#subscribeLink"));
-				$("#comment_form")[0].reset();
-			});
-			request.always(function() {
-				$("#comment_form input:submit").prop('disabled', false);
-			});
-		});
-	});
-</script>
 
 	<div class="contentbox">
 		<div class="blackbar"></div>
