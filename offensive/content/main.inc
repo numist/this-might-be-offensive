@@ -71,6 +71,7 @@
 					if($.inArray(image.userid, me.squleched) == -1) {
 						$('#main > ul').prepend(image.html.list);
 						recolorRows();
+						pickuplink_set_visibility();
 					}
 				});
 				socket.emit('subscribe', '/uploads/*');

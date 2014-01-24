@@ -16,24 +16,24 @@
  * not intended to be called from external code.
  */
 
-function tmbo_plist_encode($data) {
+function tmbo_plist_encode($data, $send_html) {
 	if(is_array($data)) {
 		foreach($data as $key => $var) {
 			if(is_object($var)) {
 				if(get_class($var) == "Error") {
 					if(!array_key_exists("errors", $data)) $data["errors"] = array();
-					$data["errors"][] = "ERROR: ".$var->api_data();
+					$data["errors"][] = "ERROR: ".$var->api_data($send_html);
 					unset($data[$key]);
 				} else {
-					$data[$key] = $var->api_data();
+					$data[$key] = $var->api_data($send_html);
 				}
 			}
 		}
 	} else if(is_object($data)) {
 		if(get_class($data) == "Error") {
-			$data = array("errors" => $data->api_data());
+			$data = array("errors" => $data->api_data($send_html));
 		} else {
-			$data = $data->api_data();
+			$data = $data->api_data($send_html);
 		}
 	}
 	format_data($data);
