@@ -127,10 +127,6 @@ function getSocket(token, callback) {
 	});
 }
 
-oldGetSocket = getSocket;
-
-getSocket = function(a,b){};
-
 /* image rollover stuff */
 function changesrc(a,im)
 {
