@@ -174,7 +174,7 @@
 	      		var data = {
 	      			vote: $('#comment_form input[name=vote]:checked').val() || "novote",
 	      			comment: $("#comment_form textarea[name=comment]").val() || "",
-	      			tmbo: $("#comment_form #tmbo").attr("checked") ? "1" : "0",
+	      			offensive: $("#comment_form #tmbo").attr("checked") ? "1" : "0",
 	      			repost: $("#comment_form #repost").attr("checked") ? "1" : "0",
 	      			subscribe: $("#comment_form #subscribe").attr("checked") ? "1" : "0",
 	      			fileid: $("#comment_form #fileid").val()
