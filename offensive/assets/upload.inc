@@ -248,6 +248,7 @@ function upload() {
 		} else {
 			$postdata['filename'] = $_FILES['image']['name'];
 		}				
+		$postdata['filename'] = str_replace(array("&", "/", "\\", "?", "#", '"', "'"), '_', $postdata['filename']);
 		if(array_key_exists('nsfw', $_POST) || strpos(strtolower($postdata['filename']), "[nsfw]") !== false)
 			$postdata['nsfw'] = $_POST['nsfw'];
 		if(array_key_exists('tmbo', $_POST) || strpos(strtolower($postdata['filename']), "[tmbo]") !== false)

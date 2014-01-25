@@ -46,9 +46,9 @@ db.connect();
 
 // Authorize by the token
 function checkToken(token, callback) {
-  db.query('SELECT userid FROM tokens WHERE tokenid = ?;', [token], function(err, results, fields) {
+	db.query('SELECT users.userid, users.username FROM tokens, users WHERE tokens.tokenid = ? AND users.userid = tokens.userid;', [token], function(err, results, fields) {
 		if (results.length > 0) {
-		  callback(results[0].userid);
+		  callback(results[0]);
 		} else {
       callback(null);
 		}
@@ -58,9 +58,12 @@ function checkToken(token, callback) {
 io.configure(function() {
   io.set('authorization', function(handshakeData, callback) {
     if(handshakeData.query && handshakeData.query.token) {
-      checkToken(handshakeData.query.token, function(userid) {
-				handshakeData.userid = userid;
-			  callback(null, (userid != null));
+			checkToken(handshakeData.query.token, function(result) {
+      	if (result) {
+      		handshakeData.userid = result.userid;
+          handshakeData.username = result.username;
+        }
+        callback(null, (result != null));
 		  });
     } else {
       callback(null, false);
