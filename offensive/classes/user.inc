@@ -255,7 +255,7 @@ class User {
 			$target = $target->id();
 		}
 		
-		return $this->squelched($target) || in_array($target, $this->squelched_by_list());
+		return $this->squelched($target);
 	}
 
 	// squelch a user
