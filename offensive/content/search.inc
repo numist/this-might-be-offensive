@@ -54,7 +54,7 @@
 		    $qp->set_stemmer($stemmer);
 		    $qp->set_database($database);
 		    $qp->set_stemming_strategy(XapianQueryParser::STEM_SOME);
-		    $query = $qp->parse_query($query_string, XapianQueryParser::FLAG_SPELLING_CORRECTION);
+		    $query = $qp->parse_query($query_string, XapianQueryParser::FLAG_DEFAULT | XapianQueryParser::FLAG_SPELLING_CORRECTION);
 		    echo "<!-- Parsed query is: {$query->get_description()} -->\n";
 		
 			$corrected = $qp->get_corrected_query_string();
@@ -203,14 +203,13 @@
 	<div class="bluebox">
 
 <?
-		$find = trim(sqlEscape(
-		        array_key_exists("find", $_REQUEST) ? $_REQUEST['find'] : ""));
+		$find = trim(array_key_exists("find", $_REQUEST) ? $_REQUEST['find'] : "");
 
 		?>
 		<div class="entry" style="background:#bbbbee">
 				<form action="./">
 					<input type="hidden" name="c" value="search"/>
-					<input type="text" name="find" value="<?= $find ?>"/>
+					<input type="text" name="find" value="<?= htmlspecialchars($find) ?>"/>
 					<input type="submit" value="search comments"/>				
 				</form>
 		</div>
