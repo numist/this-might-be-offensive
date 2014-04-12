@@ -125,6 +125,8 @@ $timelimit = 10;
 		hide_bad: <?= me()->getPref("hide_bad") == 1 ? 'true' : 'false' ?>,
 		squelched: <?= json_encode(me()->squelched_list()) ?>
 	}
+	
+	getSocket("<?php $t = new Token("realtime"); echo $t->tokenid(); ?>", function(){});
 
 	$(function() {
 		getSocket("<?php $t = new Token("realtime"); echo $t->tokenid(); ?>", function(socket) {
