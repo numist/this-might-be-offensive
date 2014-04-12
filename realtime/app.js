@@ -66,8 +66,6 @@ io.configure(function() {
       callback(null, false);
     }
   });
-
-  io.set('transports', ['htmlfile', 'xhr-polling', 'jsonp-polling']);
 });
 
 io.configure("production", function() {
