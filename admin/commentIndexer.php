@@ -7,7 +7,22 @@ require_once("xapian.php");
 
 // set up the normal TMBO environment
 set_include_path("/home/thismightbe/sites/tmbo");
-require_once( 'offensive/assets/header.inc' );
+
+/***********
+ * HEADER.INC IS BREAKS CLI
+ * These are some shims for it
+ ***********/
+function tmbo_query($sql, $timeout=2) {
+    global $link;
+    return mysql_query($sql, $link);
+}
+function is_intger($arg) {
+       return (is_numeric($arg) && floor($arg) == ceil($arg));
+}
+/***********
+ * End Shims
+ ***********/
+
 require_once( 'admin/mysqlConnectionInfo.inc' );
 if(!isset($link) || !$link) $link = openDbConnection();
 
