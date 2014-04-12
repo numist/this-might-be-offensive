@@ -65,12 +65,6 @@
 			// get results for the query.
 		    $enquire->set_query($query);
 		    $matches = $enquire->get_mset($start, $numperpage);
-
-			// end top head with some infos
-
-		    // Display the results.
-		    //echo "<br/>".($start + 1)." - ".min($start + $numperpage ,$matches->get_matches_estimated()).
-			     " of about {$matches->get_matches_estimated()}.\n\n";
 		    
 			// XXX: end end end yadda
 			?>
@@ -84,9 +78,13 @@
 					</td>
 					<td style="text-align:center">
 						<?
-							// pagination
-							echo ($start + 1)." - ".min($start + $numperpage ,$matches->get_matches_estimated()).
-							     " of about {$matches->get_matches_estimated()}.\n\n";
+							if ($matches->get_matches_estimated() > 0) {
+								// pagination
+								echo ($start + 1)." - ".min($start + $numperpage ,$matches->get_matches_estimated()).
+									 " of about {$matches->get_matches_estimated()}.\n\n";
+							 } else {
+								echo "No Results";
+							}
 						?>
 					</td>
 					<td style="text-align:right" width="200px">
@@ -116,7 +114,9 @@
 			}
 			
 			// load the class cache
-			$comments = core_getcomment($comments);
+			if (count($comments) > 0) {
+				$comments = core_getcomment($comments);
+			}
 			
 			foreach($comments as $comment) {
 				$upload = $comment->upload(); ?>
