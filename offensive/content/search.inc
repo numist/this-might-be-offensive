@@ -54,7 +54,7 @@
 		    $qp->set_stemmer($stemmer);
 		    $qp->set_database($database);
 		    $qp->set_stemming_strategy(XapianQueryParser::STEM_SOME);
-		    $query = $qp->parse_query($query_string, XapianQueryParser::FLAG_SPELLING_CORRECTION);
+		    $query = $qp->parse_query($query_string, XapianQueryParser::FLAG_DEFAULT | XapianQueryParser::FLAG_SPELLING_CORRECTION);
 		    echo "<!-- Parsed query is: {$query->get_description()} -->\n";
 		
 			$corrected = $qp->get_corrected_query_string();
@@ -65,12 +65,6 @@
 			// get results for the query.
 		    $enquire->set_query($query);
 		    $matches = $enquire->get_mset($start, $numperpage);
-
-			// end top head with some infos
-
-		    // Display the results.
-		    //echo "<br/>".($start + 1)." - ".min($start + $numperpage ,$matches->get_matches_estimated()).
-			     " of about {$matches->get_matches_estimated()}.\n\n";
 		    
 			// XXX: end end end yadda
 			?>
@@ -84,9 +78,13 @@
 					</td>
 					<td style="text-align:center">
 						<?
-							// pagination
-							echo ($start + 1)." - ".min($start + $numperpage ,$matches->get_matches_estimated()).
-							     " of about {$matches->get_matches_estimated()}.\n\n";
+							if ($matches->get_matches_estimated() > 0) {
+								// pagination
+								echo ($start + 1)." - ".min($start + $numperpage ,$matches->get_matches_estimated()).
+									 " of about {$matches->get_matches_estimated()}.\n\n";
+							 } else {
+								echo "No Results";
+							}
 						?>
 					</td>
 					<td style="text-align:right" width="200px">
@@ -116,7 +114,9 @@
 			}
 			
 			// load the class cache
-			$comments = core_getcomment($comments);
+			if (count($comments) > 0) {
+				$comments = core_getcomment($comments);
+			}
 			
 			foreach($comments as $comment) {
 				$upload = $comment->upload(); ?>
@@ -203,14 +203,13 @@
 	<div class="bluebox">
 
 <?
-		$find = trim(sqlEscape(
-		        array_key_exists("find", $_REQUEST) ? $_REQUEST['find'] : ""));
+		$find = trim(array_key_exists("find", $_REQUEST) ? $_REQUEST['find'] : "");
 
 		?>
 		<div class="entry" style="background:#bbbbee">
 				<form action="./">
 					<input type="hidden" name="c" value="search"/>
-					<input type="text" name="find" value="<?= $find ?>"/>
+					<input type="text" name="find" value="<?= htmlspecialchars($find) ?>"/>
 					<input type="submit" value="search comments"/>				
 				</form>
 		</div>

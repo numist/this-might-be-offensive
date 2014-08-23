@@ -19,11 +19,70 @@ body {
 	text-decoration:none;
 }
 
+#count_tmbo {
+	color:#990000;
+}
+
 .blackbar {
         background: #000000;
         height: 11px;
         border-top: 1px solid #666699;
         border-left: 1px solid #333333;
+}
+
+#pic_header {
+	white-space: nowrap;
+	overflow: hidden;
+	padding: 3px;
+	margin-bottom: 0px;
+	background: #000033;
+	color: #ff6600;
+	font-size: 10px;
+	font-weight: bold;
+	padding-left: 4px;
+}
+
+#instruction_link {
+	float: right;
+}
+
+#instruction_link a {
+	color: #ff6600;
+}
+
+#instructions {
+	display: none;
+	white-space: nowrap;
+	overflow: hidden;
+	padding: 3px;
+	margin-bottom: 6px;
+	background: #cccccc;
+	color: #333333;
+}
+
+.info {
+	color: #999999;
+}
+
+.ghost {
+	color: #ccc;
+}
+
+.warning_link {
+	font-style: italic; 
+	color: #990000;
+}
+
+.warning_tags {
+	margin-right: 0.3em;
+}
+
+.warning_tags a {
+	color: #990000;
+}
+
+.title_link {
+	margin-right: 0.3em;
 }
 
 .heading {
