@@ -215,14 +215,14 @@
 	</head>
 	<body id="pic">
 		<!-- message -->
-		<div style="white-space:nowrap;overflow:hidden;padding:3px;margin-bottom:0px;background:#000033;color:#ff6600;font-size:10px;font-weight:bold;padding-left:4px;">
+		<div id="pic_header">
 			<? if(count($prefs) == 0) { ?>
-				<div id="instruction_link" style="float:right;"><a href="#" style="color:#ff6600">?</a></div>
+				<div id="instruction_link"><a href="#">?</a></div>
 			<? } ?>
 			<div>consciousness doesn't really exist. it's just another one of our ideas.</div>
 		</div>
 		<? if(count($prefs) == 0) { ?>
-			<div id="instructions" style="display:none;white-space:nowrap;overflow:hidden;padding:3px;margin-bottom:6px;background:#cccccc;color:#333333">
+			<div id="instructions">
 				keyboard commands:<br />
 				← = newer. ↑ = index. → = older. ↓ = comments . + or = votes [ this is good ]. - votes [ this is bad ] .<br />
 				q = quick comment, Esc closes quick comment box, ? = random image.<br />
@@ -293,14 +293,14 @@
 				}
 
 				if($upload->next_filtered()) {
-					$style = ($upload->next_filtered()->is_nsfw() || $upload->next_filtered()->is_tmbo() ? 'style="font-style:italic; color: #990000"' : "") ?>
+					$style = ($upload->next_filtered()->is_nsfw() || $upload->next_filtered()->is_tmbo() ? 'class="warning_link"' : "") ?>
 					<a id="next" <?= $style ?> href="<?= Link::upload($upload->next_filtered()) ?>" title="<?= str_replace('"', '\\"', $upload->next_filtered()->filename()) ?>">newer</a>
 				<? } else { ?>
 					<a href="<?= Link::content($index) ?>" id="next" style="visibility:hidden">newer</a>
 				<? } ?>
 				. <a id="index" href="<?= Link::content($index) ?>">index</a> .
 				<? if($upload->prev_filtered()) {
-					$style = ($upload->prev_filtered()->is_nsfw() || $upload->prev_filtered()->is_tmbo() ? 'style="font-style:italic; color: #990000"' : "") ?>
+					$style = ($upload->prev_filtered()->is_nsfw() || $upload->prev_filtered()->is_tmbo() ? 'class="warning_link"' : "") ?>
 					<a id="previous" <?= $style ?> href="<?= Link::upload($upload->prev_filtered()) ?>" title="<?= str_replace('"', '\\"', $upload->prev_filtered()->filename()) ?>">older</a>
 				<? } else { ?>
 					<a id="previous" href="<?= Link::content($index) ?>" style="visibility:hidden">older</a>
@@ -318,7 +318,7 @@
 					+<span id="count_good"><?= $upload->goods() ?></span>
 					-<span id="count_bad"><?= $upload->bads() ?></span><?
 					if($upload->tmbos() > 0) { ?>
-						x<span id="count_tmbo" style="color:#990000"><?= $upload->tmbos() ?></span>
+						x<span id="count_tmbo"><?= $upload->tmbos() ?></span>
 					<? } ?>)
 					<span id="quicklink">&nbsp;(<a id="quickcomment" href="#">quick</a>)</span>
 				</span>
@@ -386,20 +386,23 @@
 				filename/size block
 			-->
 			<br />
-			<?
-				if($upload->is_nsfw()) { ?>
-					<a style="color:#990000;" href="<?= Link::setPref("hide_nsfw", (me()->getPref("hide_nsfw") == 1 ? "" : "1")) ?>" title="<?= me()->getPref("hide_nsfw") == 1 ? "show" : "hide" ?> images that are not safe for work">[nsfw]</a><?
-				}
-				if($upload->is_tmbo()) { ?>
-					<a style="color:#990000;" href="<?= Link::setPref("hide_tmbo", (me()->getPref("hide_tmbo") == 1 ? "" : "1")) ?>" title="<?= me()->getPref("hide_tmbo") == 1 ? "show" : "hide" ?> images that might be offensive">[tmbo]</a><?
-				}
+			<?php if($upload->is_nsfw() || $upload->is_tmbo()) { ?>
+			  <span class="warning_tags">
+			  <?
+			  	if($upload->is_nsfw()) { ?>
+			  		<a href="<?= Link::setPref("hide_nsfw", (me()->getPref("hide_nsfw") == 1 ? "" : "1")) ?>" title="<?= me()->getPref("hide_nsfw") == 1 ? "show" : "hide" ?> images that are not safe for work">[nsfw]</a><?
+			  	}
+			  	if($upload->is_tmbo()) { ?>
+			  		<a href="<?= Link::setPref("hide_tmbo", (me()->getPref("hide_tmbo") == 1 ? "" : "1")) ?>" title="<?= me()->getPref("hide_tmbo") == 1 ? "show" : "hide" ?> images that might be offensive">[tmbo]</a><?
+			  	}
+			  	?>
+			  </span>
+			<? }
 
-				$style = ($upload->is_tmbo() || $upload->is_nsfw()) ? "style=\"margin-left:.3em\"" : "";
-
-				echo "<a href=\"".$upload->URL()."\" target=\"_blank\"><span $style>" . htmlEscape($upload->filename()) . "</span></a>";
+				echo "<a href=\"".$upload->URL()."\" target=\"_blank\">" . htmlEscape($upload->filename()) . "</a>";
 
 			?>
-			<span id="dimensions" style="color:#999999"><?
+			<span id="dimensions" class="info"><?
 				if($upload->file() != "")
 					echo getFileSize($upload->file());
 			?></span>
@@ -408,7 +411,7 @@
 			<!--
 				username/time block
 			-->
-			<span style="color:#999999">
+			<span id="upload_info" class="info">
 				uploaded by <?= $upload->uploader()->htmlUsername() ?> @ <?= $upload->timestamp() ?>
 			</span>
 			<br/><br/>
@@ -559,7 +562,7 @@
 			-->
 			<br />
 		
-			<center><div style="color:#ccc;"><?= number_format(time_end($ptime), 3)."s php, ".number_format($querytime, 3)."s sql, ".count($queries)." queries\n\n <!--\n\n";
+			<center><div class="ghost"><?= number_format(time_end($ptime), 3)."s php, ".number_format($querytime, 3)."s sql, ".count($queries)." queries\n\n <!--\n\n";
 				var_dump($queries);
 				echo "\n\n-->\n\n"; ?></div>
 			<?
@@ -567,7 +570,7 @@
 			if(file_exists($loadavg) && is_readable($loadavg)) {
 				$load = file_get_contents($loadavg);
 				?>
-				<div style="color:#ccc;"><?= $load ?></div>
+				<div class="ghost"><?= $load ?></div>
 				<?
 			}
 ?>			</center>
