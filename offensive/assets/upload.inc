@@ -84,7 +84,7 @@ function numAllowedUploads() {
 				WHERE vote
 					AND offensive_comments.fileid = offensive_uploads.id
 					AND offensive_uploads.userid = ".me()->id()."
-					AND offensive_uploads.timestamp > DATE_SUB( NOW(), INTERVAL 6 MONTH )
+					AND offensive_uploads.timestamp > DATE_SUB( NOW(), INTERVAL 30 DAYS )
 				GROUP  BY vote";
 
 	$result = tmbo_query( $sql );
