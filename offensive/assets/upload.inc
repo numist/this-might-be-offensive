@@ -1259,8 +1259,12 @@ function upload_insert_file($postdata) {
 
 	unset($_SESSION['postdata']);
 
+  $numUploadsLeft = numUploadsRemaining();
 	$message = "<p>
 		Thanks. Your upload can be viewed <a href=\"".Link::upload($upload)."\">here</a>.
+	</p>
+	<p>
+			You have ".$numUploadsLeft." uploads remaining.
 	</p>
 	<p>
 			You may <a href=\"".Link::thread($upload)."\">comment on this file here</a>.
