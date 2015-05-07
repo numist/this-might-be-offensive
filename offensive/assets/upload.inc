@@ -94,11 +94,11 @@ function numAllowedUploads() {
 	while( $row = mysql_fetch_assoc( $result ) ) {
 		switch( $row['vote'] ) {
 			case "this is good":
-				$good = $row['thecount'];
+				$good += $row['thecount'];
 			break;
 
 			case "this is bad":
-				$bad = $row['thecount'];
+				$bad += $row['thecount'];
 			break;
 		}
 	}
