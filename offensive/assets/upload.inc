@@ -94,11 +94,11 @@ function numAllowedUploads() {
 	while( $row = mysql_fetch_assoc( $result ) ) {
 		switch( $row['vote'] ) {
 			case "this is good":
-				$good = $row['thecount'];
+				$good += $row['thecount'];
 			break;
 
 			case "this is bad":
-				$bad = $row['thecount'];
+				$bad += $row['thecount'];
 			break;
 		}
 	}
@@ -841,8 +841,10 @@ function upload_checksize(&$postdata) {
 	global $filesize, $expectedFileSize;
 	if(!needCompression($tmpdir."/".$postdata['tmpname'])) 
 		return false;
-	
-	$message = "This image has a pretty big filesize for its dimensions. Expected file size: ${expectedFileSize}k. Your file: ${filesize}k.<br />If you want, I can resample it as an 90% quality JPG image.<br /><br />
+
+	$filesize_k = round($filesize / 1024);
+
+	$message = "This image has a pretty big filesize for its dimensions. Expected file size: ${expectedFileSize}k. Your file: ${filesize_k}k.<br />If you want, I can resample it as an 90% quality JPG image.<br /><br />
 		<form action=\"{$_SERVER['PHP_SELF']}\" method=\"POST\">
 			<input type=\"hidden\" name=\"c\" value=\"upload\">
 			<input type=\"submit\" name=\"killit\" value=\"Cancel this upload.\"/>
