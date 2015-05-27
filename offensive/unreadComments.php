@@ -43,10 +43,5 @@
 	?>
 
 					</div>
-
-					<div class="heading" style="text-align:center">
-						<a class="orange" href="markallread.php">mark all read</a>
-					</div>
-
 				<div class="blackbar"></div>
 			</div>
