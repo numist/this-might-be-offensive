@@ -545,25 +545,23 @@
 		tmbo_query($sql);
 		$commentid = mysql_insert_id();
 
-    preg_match_all('/(?<=@)[a-z0-9_\-\.]+(\s|$)/i', $comment, $userNames, PREG_PATTERN_ORDER);
-    $numUsers = count($userNames[0]);
-    $i = 0;
-    $sql = "SELECT * FROM users WHERE username in (";
-    foreach($userNames[0] as $userName){
-      $sql .= "'" . sqlEscape($userName) . "'";
-      if(++$i != $numUsers){
-        $sql .= ", ";
-      }
-    }
-    $sql .= ")";
-
-    $result = tmbo_query($sql);
-    while(false !== ($row = mysql_fetch_array($result))) {
-      $subscriber = new User($row);
-      $upload->subscribe($subscriber);
-    }
-
 		if($comment) {
+	    preg_match_all('/(?<=@)[a-z0-9_\-\.]+(\s|$)/i', $comment, $userNames, PREG_PATTERN_ORDER);
+	    if(count($userNames[0]) > 0 && count($userNames[0]) <= 5) {
+		    $userList = implode(
+				  array_map(
+				    function($username){ return "'".sqlEscape($username)."'"; },
+				    $userNames[0]
+				  ), ',');
+				$sql = "SELECT * FROM users WHERE username in (".$userList.")";
+
+		    $result = tmbo_query($sql);
+		    while(false !== ($row = mysql_fetch_array($result))) {
+		      $subscriber = new User($row);
+		      $upload->subscribe($subscriber);
+		    }
+		  }
+
 			// update subscriptions
 			$upload->updateSubscriptions($commentid);
 			// the commenter doesn't need their subscription updated
