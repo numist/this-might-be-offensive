@@ -3,10 +3,26 @@ SRCROOT=/home/vagrant/sites/tmbo
 # XXX: dev-only
 debconf-set-selections <<< 'mysql-server mysql-server/root_password password shortbus'
 debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password shortbus'
-# INSTALL!
-aptitude -y install mysql-client mysql-server nginx php5 redis-server redis-tools apt-xapian-index php5-fpm php5-imagick
+
+aptitude remove apache2 libapache2-mod-php5
+aptitude -y install \
+  apt-xapian-index \
+  mysql-client \
+  mysql-server \
+  nginx \
+  php5 \
+  php5-fpm \
+  php5-imagick \
+  php5-mysql \
+  redis-server \
+  redis-tools
+
 service nginx stop
 service php5-fpm stop
+
+mysql --password=shortbus < $SRCROOT/admin/database/dbinit.sql
+mysql --password=shortbus tmbo < $SRCROOT/admin/database/schema.sql
+mysql --password=shortbus tmbo < $SRCROOT/admin/database/populate.sql
 
 mkdir -p /home/vagrant/logs
 chown -R vagrant:www-data /home/vagrant

@@ -61,7 +61,7 @@ server {
     }
     
     location ~* \.(jpe?g|gif|png)$ {
-        valid_referers none blocked *.tmbo.org tmbo.og *.thismight.be thismight.be rocketsheep.com mysocalled.com *.filepile.org filepile.org *.finalmeasure.com numist.net *.numist.net;
+        valid_referers none blocked *.tmbo.org tmbo.og *.thismight.be thismight.be rocketsheep.com mysocalled.com *.filepile.org filepile.org *.finalmeasure.com numist.net *.numist.net localhost;
         if ($invalid_referer) {
             rewrite ^ http://thismight.be/tmbologo.gif;
         }

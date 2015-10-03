@@ -21,7 +21,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
     # Share SSH and http
     tmbodev.vm.network :forwarded_port, guest: 22, host: ssh_port, id: "ssh", auto_correct: true
-    tmbodev.vm.network :forwarded_port, guest: 80, host: 8080
+    tmbodev.vm.network :forwarded_port, guest: 443, host: 8080
     # XXX: Share HTTPS eventually
     # tmbodev.vm.network :forwarded_port, guest: 80, host: 8080
 
