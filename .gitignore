@@ -7,3 +7,4 @@ realtime/node_modules
 admin/.config
 *.swp
 todo.txt
+.vagrant/
