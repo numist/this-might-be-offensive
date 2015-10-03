@@ -45,7 +45,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       vb.memory = "512"
 
       # Display the VirtualBox GUI when booting the machine
-      vb.gui = true
+      # vb.gui = true
 
     #   # Use VBoxManage to customize the VM. For example to change memory:
     #   vb.customize ["modifyvm", :id, "--memory", "1024"]
