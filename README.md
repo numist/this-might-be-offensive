@@ -13,13 +13,13 @@ Getting Started
 
 The codebase is installed in the vm at `~/sites/tmbo`
 
-Some common gotchas:
+### Common Gotchas ###
 
-### Realtime Data ###
+#### Realtime Data ####
 
 Self-signed certs can pose a problem for realtime, but launching Chrome with `--ignore-certificate-errors` will get it working.
 
-### Hotlinking Restrictions ###
+#### Hotlinking Restrictions ####
 
 tmbo's content protection is the same in development as it is in production, which means if you browse to your instance by IP, you're not going to see any images. You should either disable the relevant section in the nginx config, or add the ip address you use to the allowed hosts. 
 
