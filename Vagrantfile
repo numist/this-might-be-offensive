@@ -30,7 +30,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     # the path on the host to the actual folder. The second argument is
     # the path on the guest to mount the folder. And the optional third
     # argument is a set of non-required options.
-    tmbodev.vm.synced_folder ".", "/home/vagrant/sites/tmbo"
+    tmbodev.vm.synced_folder ".", "/home/vagrant/sites/tmbo", owner: "www-data", group: "www-data"
     # tmbodev.vm.synced_folder ".", "/vagrant", disabled: true
 
     # Provision using a shell script
