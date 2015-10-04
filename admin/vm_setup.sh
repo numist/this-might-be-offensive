@@ -47,8 +47,6 @@ aptitude -y install \
   redis-server \
   redis-tools
 
-# TODO: test redis
-# TODO: set up realtime
 # TODO: comment indexer
 
 service nginx stop
@@ -77,7 +75,6 @@ npm install -g \
 2> /dev/null
 
 # XXX: dev-only
-# TODO: idempotence
 echo "Generating SSL certificate"
 openssl req -nodes -x509 -subj "/C=US/ST=OK/L=Okie/O=tmbo/CN=*.localhost" -newkey rsa:2048 -keyout /etc/ssl/private/thismight.be.key -out /etc/ssl/certs/thismight.be.pem -days 365 2> /dev/null
 
