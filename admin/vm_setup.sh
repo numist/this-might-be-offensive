@@ -14,6 +14,7 @@ function backup_if_exists {
 function config_file {
   backup_if_exists "$1"
   echo "Installing $1"
+  [ -f "$SRCROOT/admin/configroot$1" ] || ( echo "Missing file $SRCROOT/admin/configroot$1"; exit 1 )
   cp "$SRCROOT/admin/configroot$1" "$1"
 }
 
@@ -68,6 +69,7 @@ cpanm --notest \
 
 echo "Installing realtime dependencies"
 npm install -g \
+  cookies \
   iniparser \
   mysql \
   redis \
@@ -100,7 +102,6 @@ config_file /etc/php5/fpm/pool.d/www.conf
 service php5-fpm start
 
 config_file /etc/nginx/sites-available/default
-ls -l /etc/nginx/sites-enabled/default
 unlink /etc/nginx/sites-enabled/default
 ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 service nginx start
