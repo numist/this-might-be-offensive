@@ -1,19 +1,21 @@
 SRCROOT=/home/vagrant/sites/tmbo
 
-function remove_if_exists {
-  [ -f "$1" ] && rm -r "$1"
-}
-
-function backup_if_exists {
+# System configuration files are backed up before the new file is copied into place
+function system_config_file {
   if [ -f "$1" -a ! -f "$1.backup" ]; then
     echo "Backing up $1 -> $1.backup"
     cp "$1" "$1.backup"
   fi
+
+  echo "Installing $1"
+  [ -f "$SRCROOT/admin/configroot$1" ] || ( echo "Missing file $SRCROOT/admin/configroot$1"; exit 1 )
+  cp "$SRCROOT/admin/configroot$1" "$1"
 }
 
-function config_file {
-  backup_if_exists "$1"
+# Site configuration files are replaced if they already exist
+function site_config_file {
   echo "Installing $1"
+  [ -f "$1" ] && rm -r "$1"
   [ -f "$SRCROOT/admin/configroot$1" ] || ( echo "Missing file $SRCROOT/admin/configroot$1"; exit 1 )
   cp "$SRCROOT/admin/configroot$1" "$1"
 }
@@ -82,23 +84,20 @@ redis-cli FLUSHALL
 mysql --password=shortbus < $SRCROOT/admin/database/dbinit.sql
 mysql --password=shortbus tmbo < $SRCROOT/admin/database/schema.sql
 mysql --password=shortbus tmbo < $SRCROOT/admin/database/populate.sql
-remove_if_exists /home/vagrant/sites/tmbo/admin/.config
-config_file /home/vagrant/sites/tmbo/admin/.config
+site_config_file /home/vagrant/sites/tmbo/admin/.config
 
-config_file /etc/php5/cli/php.ini
-remove_if_exists /etc/cron.d/tmbo
-config_file /etc/cron.d/tmbo
+system_config_file /etc/php5/cli/php.ini
+site_config_file /etc/cron.d/tmbo
 
-remove_if_exists /etc/init.d/tmbo-realtime
-config_file /etc/init.d/tmbo-realtime
+site_config_file /etc/init.d/tmbo-realtime
 update-rc.d tmbo-realtime defaults 98 02
 service tmbo-realtime start
 
-config_file /etc/php5/fpm/php.ini
-config_file /etc/php5/fpm/pool.d/www.conf
+system_config_file /etc/php5/fpm/php.ini
+system_config_file /etc/php5/fpm/pool.d/www.conf
 service php5-fpm start
 
-config_file /etc/nginx/sites-available/default
+system_config_file /etc/nginx/sites-available/default
 unlink /etc/nginx/sites-enabled/default
 ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 service nginx start
