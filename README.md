@@ -8,7 +8,7 @@ Getting Started
 2. `git clone git@github.com:numist/this-might-be-offensive.git`
 3. `cd this-might-be-offensive`
 4. `vagrant up`
-5. Point your browser to [`localhost:8080/offensive`](https://localhost:8080/offensive/)
+5. Point your browser to [`https://localhost:8080/offensive`](https://localhost:8080/offensive/)
 6. Log in as either `admin`/`[nsfw]` or `asdf`/`[tmbo]`.
 
 The codebase is installed in the vm at `~/sites/tmbo`
