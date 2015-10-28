@@ -421,9 +421,6 @@ $timelimit = 10;
 					<div class="clipper"><a id="unread<?= $comment->upload()->id()?>" class="<?= $css ?>" href="<?= Link::comment($comment) ?>"><?= $upload->htmlFilename() ?></a></div>
 				<? } ?>
 			</div>
-			<div class="heading" style="text-align:center">
-				<a class="orange" href="markallread.php">mark all read</a>
-			</div>
 			<div class="blackbar"></div>
 		</div>
 	<? }
