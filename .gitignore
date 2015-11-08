@@ -5,6 +5,7 @@ offensive/zips
 realtime/node_modules
 .DS_Store
 admin/.config
+admin/certificates
 *.swp
 todo.txt
 .vagrant/
