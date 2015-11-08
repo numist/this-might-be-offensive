@@ -77,8 +77,30 @@ npm install -g \
 2> /dev/null
 
 # XXX: dev-only
-echo "Generating SSL certificate"
-openssl req -nodes -x509 -subj "/C=US/ST=OK/L=Okie/O=tmbo/CN=*.localhost" -newkey rsa:2048 -keyout /etc/ssl/private/thismight.be.key -out /etc/ssl/certs/thismight.be.pem -days 365 2> /dev/null
+if [ ! -d $SRCROOT/admin/certificates ]; then
+  mkdir -p $SRCROOT/admin/certificates
+  pushd $SRCROOT/admin/certificates
+  echo 'Generating CA private key'
+  openssl genrsa -out rootCA.key 2048 &> /dev/null
+  openssl req -x509 -new -subj "/C=US/ST=OK/L=Okie/O=tmbo/CN=TMBODevCA" -nodes -key rootCA.key -days 22995 -out rootCA.crt
+  popd
+  
+  echo ' ________________________________________ '
+  echo '/ To avoid SSL issues, install and trust \'
+  echo '\ admin/certificates/rootCA.crt          /'
+  echo ' ---------------------------------------- '
+  echo '        \   ^__^                          '
+  echo '         \  (oo)\_______                  '
+  echo '            (__)\       )\/\              '
+  echo '                ||----w |                 '
+  echo '                ||     ||                 '
+  echo ' ________________________________________ '
+fi
+
+echo 'Generating host private key'
+openssl genrsa -out /etc/ssl/private/thismight.be.key 2048 &> /dev/null
+openssl req -new -subj "/C=US/ST=OK/L=Okie/O=tmbo/CN=*.localhost" -key /etc/ssl/private/thismight.be.key -out /etc/ssl/certs/thismight.be.csr
+openssl x509 -req -in /etc/ssl/certs/thismight.be.csr -CA $SRCROOT/admin/certificates/rootCA.crt -CAkey $SRCROOT/admin/certificates/rootCA.key -CAcreateserial -out /etc/ssl/certs/thismight.be.pem -days 365
 
 redis-cli FLUSHALL
 mysql --password=shortbus < $SRCROOT/admin/database/dbinit.sql
