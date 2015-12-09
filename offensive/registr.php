@@ -64,6 +64,9 @@
 	
 	function getReferrerId( $refcode ) {
 
+    // open up registration
+    return 1;
+
 		$sql = "SELECT * FROM referrals WHERE referral_code = '".sqlEscape($refcode)."' LIMIT 1";
 		$result = tmbo_query( $sql );
 		if( mysql_num_rows( $result ) == 1 ) {
@@ -186,7 +189,7 @@
 								<td class="label">email:</td>
 								<td><input type="text" name="email" size="20" value="<?= isset($email) ? $email : "" ?>"/></td>
 							</tr>
-							<tr>
+							<tr style="display: none;">
 								<td class="label">referral code:</td>
 								<td><input type="text" name="referralcode" size="20" value="<?php echo $referralcode?>"/></td>
 							</tr>
