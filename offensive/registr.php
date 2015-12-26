@@ -84,7 +84,7 @@
 		if( $referral != "" ) {
 			$referrerId = getReferrerId( $referral );
 		} else if( isOpenRegistration() ) {
-			$referrerId = 1;
+			$referrerId = 0;
 		}
 	
 		if( $referrerId == -1 ) {
