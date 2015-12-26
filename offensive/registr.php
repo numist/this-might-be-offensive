@@ -102,7 +102,7 @@
 			
             $encrypted_pw = sha1( $pw );
 		
-			$query = "INSERT INTO users (username,password,email,created,ip,referred_by) VALUES ( '" . $uName . "','" . $encrypted_pw . "', '" . $_POST['email'] . "', now(), '" . $_SERVER['REMOTE_ADDR']. "', $referrerId )";
+			$query = "INSERT INTO users (username,password,email,created,ip,referred_by) VALUES ( '" . $uName . "','" . $encrypted_pw . "', '" . sqlEscape($_POST['email']) . "', now(), '" . $_SERVER['REMOTE_ADDR']. "', $referrerId )";
 			tmbo_query($query); 
 
 			$result = tmbo_query("SELECT userid,account_status from users where username = '$uName'"); 
