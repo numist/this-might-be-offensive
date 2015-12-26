@@ -24,6 +24,14 @@
 		return $id;
 	}
 
+	function isOpenRegistration() {
+		// users table doens't have an index on created, so grab the highest userid in a subquery since it must be the most recently registered
+		$sql = "SELECT COUNT(*) FROM (SELECT * FROM users ORDER BY userid DESC LIMIT 1) AS t WHERE created > DATE_SUB(NOW(), INTERVAL 1 DAY)";
+		$result = tmbo_query( $sql );
+		$count = mysql_fetch_array( $result )[0];
+		return $count == 0;
+	}
+
 	function activationMessageFor( $id, $email ) {
 		global $hash_param_key, $salt;
 

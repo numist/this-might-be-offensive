@@ -80,7 +80,12 @@
 	
 		$returnMessage = "OK";
 		
-		$referrerId = getReferrerId( $referral );
+		$referrerId = -1;
+		if( $referral != "" ) {
+			$referrerId = getReferrerId( $referral );
+		} else if( isOpenRegistration() ) {
+			$referrerId = 1;
+		}
 	
 		if( $referrerId == -1 ) {
 			return "Invalid referral code.";
@@ -187,7 +192,7 @@
 								<td><input type="text" name="email" size="20" value="<?= isset($email) ? $email : "" ?>"/></td>
 							</tr>
 							<tr>
-								<td class="label">referral code:</td>
+								<td class="label">referral code<?= isOpenRegistration() ? " (if you have one)" : "" ?>:</td>
 								<td><input type="text" name="referralcode" size="20" value="<?php echo $referralcode?>"/></td>
 							</tr>
 							<tr>
