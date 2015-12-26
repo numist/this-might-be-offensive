@@ -300,8 +300,15 @@ class Comment {
 		if($this->tiar()) {
 			$ret["tiar"] = $this->tiar();
 		}
-		if($this->text()) {
-			$ret["comment"] = $this->text();
+		
+		$text = $this->text();
+		if($text) {
+			// This dance is to fix old encoding issues (issue #89)
+			if( json_encode($text) === false ) {
+				$ret["comment"] = utf8_encode($text);
+			} else {
+				$ret["comment"] = $text;
+			}
 		}
 
 		if($include_html) {
