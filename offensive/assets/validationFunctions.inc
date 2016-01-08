@@ -23,11 +23,12 @@
 	}
 	
 	function isValidUsername( $uName ) {
+		// This function must not allow any strings that can be used for SQL injection!
 		return preg_match( "/^[a-z0-9_\-\.]+$/i", $uName );
 	}
 	
 	function isValidPassword( $pw ) {
-		return preg_match( "/[a-z0-9_\-\.]{5}/i", $pw );
+		return strlen($pw) >= 8;
 	}
 
 ?>

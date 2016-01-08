@@ -7,7 +7,7 @@ require_once('offensive/assets/activationFunctions.inc');
 
 global $prompt, $login_message, $login_called;
 $prompt = true;
-$login_message = "";
+$login_message = isOpenRegistration() ? "<a href=\"/offensive/registr.php\">don't have an account?</a>" : "";
 $login_called = false;
 
 /* 
