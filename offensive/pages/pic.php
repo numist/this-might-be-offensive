@@ -42,7 +42,9 @@
 	// update pickuplinks
 	global $autoplay;
 
-	$autoplay = PickupLink::update($upload);
+	if(array_key_exists("updatePickupLink", $_REQUEST)) {
+		$autoplay = PickupLink::update($upload);
+	}
 
 	if(array_key_exists('loop', $_REQUEST)) {
 		$autoplay = true;
@@ -294,14 +296,14 @@
 
 				if($upload->next_filtered()) {
 					$style = ($upload->next_filtered()->is_nsfw() || $upload->next_filtered()->is_tmbo() ? 'class="warning_link"' : "") ?>
-					<a id="next" <?= $style ?> href="<?= Link::upload($upload->next_filtered()) ?>" title="<?= str_replace('"', '\\"', $upload->next_filtered()->filename()) ?>">newer</a>
+					<a id="next" <?= $style ?> href="<?= Link::upload($upload->next_filtered()) ?>&updatePickupLink" title="<?= str_replace('"', '\\"', $upload->next_filtered()->filename()) ?>">newer</a>
 				<? } else { ?>
 					<a href="<?= Link::content($index) ?>" id="next" style="visibility:hidden">newer</a>
 				<? } ?>
 				. <a id="index" href="<?= Link::content($index) ?>">index</a> .
 				<? if($upload->prev_filtered()) {
 					$style = ($upload->prev_filtered()->is_nsfw() || $upload->prev_filtered()->is_tmbo() ? 'class="warning_link"' : "") ?>
-					<a id="previous" <?= $style ?> href="<?= Link::upload($upload->prev_filtered()) ?>" title="<?= str_replace('"', '\\"', $upload->prev_filtered()->filename()) ?>">older</a>
+					<a id="previous" <?= $style ?> href="<?= Link::upload($upload->prev_filtered()) ?>&updatePickupLink" title="<?= str_replace('"', '\\"', $upload->prev_filtered()->filename()) ?>">older</a>
 				<? } else { ?>
 					<a id="previous" href="<?= Link::content($index) ?>" style="visibility:hidden">older</a>
 				<? } ?>
