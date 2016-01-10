@@ -107,7 +107,7 @@
 						<? if (isOpenRegistration()) { ?>
 							<p id="signup_link" style="text-align: center; opacity: 0;">
 								new here? it's your lucky day.<br />
-								<a href=\"/offensive/registr.php\">create an account.</a>
+								<a href="/offensive/registr.php">create an account</a>
 							</p>
 						<? } ?>
 						<? if($redirect) { ?>
@@ -130,17 +130,25 @@
 <? 
    // If the non-referred registration of the day hasn't been
    // taken yet, fade the registration link in after 3 seconds
-   // (unless they start typing first).
+   // of non-activity.
 
    if (isOpenRegistration()) { ?>
 	<script>
-		var timeoutId = setTimeout(function() {
-			$("#signup_link").animate({opacity: 1}, 'slow');
-		}, 3000);
+		var timeoutId = -1;
+		resetLinkTimeout();
 
 		$('html').keydown(function(e) {
-			clearTimeout(timeoutId);
-		})
+			resetLinkTimeout();
+		});
+
+		function resetLinkTimeout() {
+			if (timeoutId != -1)
+				clearTimeout(timeoutId);
+
+			timeoutId = setTimeout(function() {
+				$("#signup_link").animate({opacity: 1}, 'slow');
+			}, 3000);
+		}
 	</script>
 <? } ?>
 
