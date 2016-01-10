@@ -2,6 +2,7 @@
 	set_include_path("..");
 	require_once('offensive/assets/header.inc');
 	require_once("offensive/assets/classes.inc");
+	require_once("offensive/classes/assets.inc");
 
 	/* the user can specify the redirect in the $_REQUEST['redirect'] variable.
 	 * the location the redirect defaults to is /offensive/?c=main
@@ -59,7 +60,12 @@
 <head>
 	<title><?= $_SERVER['HTTP_HOST'] ?> : do we know you?</title>
 	<link rel="stylesheet" type="text/css" href="/styles/sparse.css"/>
-	<? include_once("analytics.inc"); ?>
+	<?
+		include_once("analytics.inc");
+		JS::add("/offensive/js/jquery-1.7.1.min.js");
+		JS::emit();
+	?>
+
 </head>
 
 
@@ -98,6 +104,12 @@
 							</tr>
 							<? } ?>
 						</table>
+						<? if (isOpenRegistration()) { ?>
+							<p id="signup_link" style="text-align: center; opacity: 0;">
+								new here? it's your lucky day.<br />
+								<a href=\"/offensive/registr.php\">create an account.</a>
+							</p>
+						<? } ?>
 						<? if($redirect) { ?>
 							<input type="hidden" name="redirect" value="<?= $redirect ?>" />
 						<? } ?>
@@ -110,8 +122,27 @@
 			</td>
 		</tr>
 	</table>
+
+	
 	
 <? include 'includes/footer.txt' ?>
+
+<? 
+   // If the non-referred registration of the day hasn't been
+   // taken yet, fade the registration link in after 3 seconds
+   // (unless they start typing first).
+
+   if (isOpenRegistration()) { ?>
+	<script>
+		var timeoutId = setTimeout(function() {
+			$("#signup_link").animate({opacity: 1}, 'slow');
+		}, 3000);
+
+		$('html').keydown(function(e) {
+			clearTimeout(timeoutId);
+		})
+	</script>
+<? } ?>
 
 </body>
 </html>
