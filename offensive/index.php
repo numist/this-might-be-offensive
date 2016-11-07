@@ -303,8 +303,7 @@ $timelimit = 10;
 					<div class="blackbar"></div>
 					<div class="heading">contact:</div>
 					<div class="bluebox">
-						<a href="/contact/">email</a><br>
-						aim: <a href="aim:goim?screenname=themaxxcom">themaxxcom</a><br>
+						<a href="mailto:ray.hatfield@gmail.com?subject=[tmbo]">ray.hatfield@gmail.com</a>
 					</div>
 					<div class="blackbar"></div>
 				</div><?
