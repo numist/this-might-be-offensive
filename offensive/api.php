@@ -160,6 +160,10 @@
 		} else {
 			header("Content-type: text/plain");
 		}
+		
+		// allow XHR/Fetch requests (CORS)
+		header("Access-Control-Allow-Origin: *");
+		
 		echo call_user_func("tmbo_".$rtype."_encode", $ret, $send_html);
 		exit;
 	}
