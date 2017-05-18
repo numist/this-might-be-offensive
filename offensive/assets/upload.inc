@@ -50,13 +50,13 @@ function exceededUploadLimit() {
 function numUploadsRemaining() {
 	if(!me()) return 0;
 	$limit = numAllowedUploads();
-	$used = numUploadsToday();
+	$used = numUploadsLastHalfDay();
 	return ($limit - $used ) > 0 ? ($limit - $used ) : 0;
 }
 
-function numUploadsToday() {
+function numUploadsLastHalfDay() {
 	if(!me()) return 0;
-	$sql = "SELECT count( id ) as thecount FROM offensive_uploads WHERE userid = ".me()->id()." AND timestamp > DATE_SUB( NOW(), INTERVAL 1 DAY ) AND type='image'";
+	$sql = "SELECT count( id ) as thecount FROM offensive_uploads WHERE userid = ".me()->id()." AND timestamp > DATE_SUB( NOW(), INTERVAL 12 HOURS ) AND type='image'";
 	$result = tmbo_query( $sql );
 	$row = mysql_fetch_assoc( $result );
 	return $row[ 'thecount' ];
@@ -103,7 +103,7 @@ function numAllowedUploads() {
 		}
 	}
 
-	return min( ($bad > 0) ? round( 1 + ($good/$bad) * 2 ) : round(1 + ($good/20) * 2), 40 );
+	return min( ($bad > 0) ? round( 1 + ($good/$bad) * 2 ) : round(1 + ($good/20) * 2), 20 );
 
 }
 
