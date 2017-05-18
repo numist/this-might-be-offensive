@@ -1,6 +1,7 @@
 <?
 
 	$quips = array(
+		"Each day's a gift!",
 		"By the hairy taint of DarkStalker, I curse you all.",
 		"hug me and descend into madness",
 		"welcome back. we missed you. oh, and don't use apostrophes for plurals. ever.",
