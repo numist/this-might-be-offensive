@@ -1,5 +1,5 @@
 server {
-    listen   80 default; 
+    listen   80 default;
     listen   [::]:80 default ipv6only=on; ## listen for ipv6
     listen   443 default ssl;
     listen   [::]:443 default ssl ipv6only=on; ## listen for ipv6
@@ -39,7 +39,7 @@ server {
         error_page 404 /offensive/404.php;
         error_page 403 /offensive/403.php;
     }
-    
+
     location /admin {
         return 403;
     }
@@ -51,13 +51,13 @@ server {
         if (!-f $document_root$fastcgi_script_name) {
             return 404;
         }
-    
+
         fastcgi_pass unix:/var/run/php5-fpm.sock;
         fastcgi_index index.php;
         include fastcgi_params;
     }
-    
-    location ~* \.(jpe?g|gif|png)$ {
+
+    location ~* [^(tmbologo)]\.(jpe?g|gif|png)$ {
         valid_referers none blocked *.tmbo.org tmbo.org tmbo.wtf tmbo.io tmbo.dev *.thismight.be thismight.be rocketsheep.com mysocalled.com *.filepile.org filepile.org *.finalmeasure.com localhost;
         if ($invalid_referer) {
             rewrite ^ http://thismight.be/tmbologo.gif;
