@@ -17,5 +17,5 @@ ErrorDocument 403 /offensive/403.php
 
 RewriteEngine on 
 RewriteCond %{HTTP_REFERER} !^$ 
-RewriteCond %{HTTP_REFERER} !^https?://[w\.]*(.*netvibes\.com|tmbo\.org|.*thismight\.be|rocketsheep\.com|mysocalled\.com|.*filepile\.org|208\.85\.243\.229).*$ [NC] 
+RewriteCond %{HTTP_REFERER} !^https?://[w\.]*(.*netvibes\.com|tmbo\.org|.*thismight\.be|tmbo\.wtf|tmbo\.io|tmbo\.dev|rocketsheep\.com|mysocalled\.com|.*filepile\.org|208\.85\.243\.229).*$ [NC] 
 RewriteRule .*(jpg|JPG|jpeg|JPEG|gif|GIF)$ http://thismight.be/tmbologo.gif
