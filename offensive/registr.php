@@ -17,7 +17,7 @@
 	require_once( "offensive/classes/statusMessage.inc" );
 
 	$message = null;
-	$username = isset($_POST['username']) ? trim( $_POST['username'] ) : "";
+	$username = isset($_POST['howsername']) ? trim( $_POST['howsername'] ) : "";
 	$password = isset($_POST['password']) ? trim( $_POST['password'] ) : "";
 	$referralcode = isset($_POST['referralcode']) ? trim( $_POST['referralcode'] ) : "";
 	
@@ -80,7 +80,12 @@
 	
 		$returnMessage = "OK";
 		
-		$referrerId = getReferrerId( $referral );
+		$referrerId = -1;
+		if( $referral != "" ) {
+			$referrerId = getReferrerId( $referral );
+		} else if( isOpenRegistration() ) {
+			$referrerId = 0;
+		}
 	
 		if( $referrerId == -1 ) {
 			return "Invalid referral code.";
@@ -97,7 +102,7 @@
 			
             $encrypted_pw = sha1( $pw );
 		
-			$query = "INSERT INTO users (username,password,email,created,ip,referred_by) VALUES ( '" . $uName . "','" . $encrypted_pw . "', '" . $_POST['email'] . "', now(), '" . $_SERVER['REMOTE_ADDR']. "', $referrerId )";
+			$query = "INSERT INTO users (username,password,email,created,ip,referred_by) VALUES ( '" . $uName . "','" . $encrypted_pw . "', '" . sqlEscape($_POST['email']) . "', now(), '" . $_SERVER['REMOTE_ADDR']. "', $referrerId )";
 			tmbo_query($query); 
 
 			$result = tmbo_query("SELECT userid,account_status from users where username = '$uName'"); 
@@ -172,7 +177,7 @@
 						<table>
 							<tr>
 								<td class="label">desired username:</td>
-								<td><input type="text" name="username" size="20" value="<?php echo $username?>"/></td>
+								<td><input type="text" name="howsername" size="20" value="<?php echo $username?>"/></td>
 							</tr>
 							<tr>
 								<td class="label">password:</td>
@@ -187,7 +192,7 @@
 								<td><input type="text" name="email" size="20" value="<?= isset($email) ? $email : "" ?>"/></td>
 							</tr>
 							<tr>
-								<td class="label">referral code:</td>
+								<td class="label">referral code<?= isOpenRegistration() ? " (if you have one)" : "" ?>:</td>
 								<td><input type="text" name="referralcode" size="20" value="<?php echo $referralcode?>"/></td>
 							</tr>
 							<tr>

@@ -303,8 +303,7 @@ $timelimit = 10;
 					<div class="blackbar"></div>
 					<div class="heading">contact:</div>
 					<div class="bluebox">
-						<a href="/contact/">email</a><br>
-						aim: <a href="aim:goim?screenname=themaxxcom">themaxxcom</a><br>
+						<a href="mailto:ray.hatfield@gmail.com?subject=[tmbo]">ray.hatfield@gmail.com</a>
 					</div>
 					<div class="blackbar"></div>
 				</div><?
@@ -420,9 +419,6 @@ $timelimit = 10;
 					$css = isset($css) && $css == "evenfile" ? "oddfile" : "evenfile";  ?>
 					<div class="clipper"><a id="unread<?= $comment->upload()->id()?>" class="<?= $css ?>" href="<?= Link::comment($comment) ?>"><?= $upload->htmlFilename() ?></a></div>
 				<? } ?>
-			</div>
-			<div class="heading" style="text-align:center">
-				<a class="orange" href="markallread.php">mark all read</a>
 			</div>
 			<div class="blackbar"></div>
 		</div>

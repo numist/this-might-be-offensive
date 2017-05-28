@@ -20,13 +20,13 @@ global $numgood, $numbad;
 	if($comment->tiar()) echo " tiar";
 	if($comment->tmbo()) echo " tmbo";
 	if(strlen($comment->text())) echo " comment"; ?>"
-	style="<?= $css ?>">
+	style="<?= isset($css) ? $css : '' ?>">
 		<span class='comment_body'><?= $comment->HTMLcomment(); ?></span>
 		<br />
 		<div class="timestamp"><a href="<?= Link::comment($comment) ?>"><?= $comment->timestamp() ?></a></div>
-		
+
 		&raquo; <?= $commenter->htmlUsername() ?>
-		
+
 		<?
 		if( $comment->vote() ) {
 			$thevote = $comment->vote();
@@ -34,14 +34,14 @@ global $numgood, $numbad;
 			$numbad += ($thevote == 'this is bad') ? 1 : 0;
 			echo "<span title=\"+$numgood -$numbad\" class='vote".(strpos($comment->vote(), 'good') > 0 ? " good" : " bad")."'> [ " . $thevote . " ]</span>";
 		}
-		
+
 		if( $comment->tmbo() == 1 ) {
 			?><span class="vote"> [ this might be offensive ]</span><?php
 		}
-		
+
 		if( $comment->tiar() == 1 ) {
 			?><span class="vote"> [ this is a repost ]</span><?php
 		}
-	
+
 		?>
 </div>

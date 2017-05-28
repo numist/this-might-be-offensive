@@ -41,7 +41,13 @@ class Link {
 
 	static function upload($upload) {
 		if(!is_object($upload)) {
-			$upload = new Upload($upload);
+			$uploadid = $upload;
+			$upload = new Upload($uploadid);
+
+			if(!$upload->exists()) {
+				trigger_error("\"$uploadid\" refers to nonexistent upload", E_USER_WARNING);
+				return;
+			}
 		}
 
 		if($upload->type() == "topic") {

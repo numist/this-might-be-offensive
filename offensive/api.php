@@ -150,7 +150,7 @@
 			}
 		}
 
-		$send_html = $_REQUEST['html'] == '1';
+		$send_html = isset($_REQUEST['html']) && $_REQUEST['html'] == '1';
 
 		// send the data back
 		if(in_array($rtype, array("plist", "xml"))) {
