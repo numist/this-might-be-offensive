@@ -8,7 +8,7 @@
 	require_once("offensive/assets/functions.inc");
 	require_once("offensive/assets/classes.inc");
 	require_once("offensive/assets/core.inc");
-		
+
 	class Error {
 		private $msg;
 
@@ -24,10 +24,10 @@
 	function called_by_api() {
 		return true;
 	}
-	
+
 	function _api_exception_handler($e) {
 		if(is_null($e)) return;
-		
+
 		$responses = array(
 			"400" => "HTTP/1/0 400 Bad Request",
 			"401" => "HTTP/1/0 401 Unauthorized",
@@ -38,7 +38,7 @@
 			"503" => "HTTP/1/0 503 Service Unavailable"
 		);
 
-		$shortfile = (strlen($e->getFile()) > 25 ? 
+		$shortfile = (strlen($e->getFile()) > 25 ?
 	         "...".substr($e->getFile(), -22) : $e->getFile());
 
 		error_log($shortfile.":".$e->getLine().":[".$e->getCode()."] ".$e->getMessage());
@@ -53,9 +53,9 @@
 		exit;
 	}
 	set_exception_handler("_api_exception_handler");
-	
+
 	require_once("offensive/assets/argvalidation.inc");
-		
+
 	// get function name and return type
 	$broken = explode("/", $_SERVER["REQUEST_URI"]);
 	$call = array_pop($broken);
@@ -64,7 +64,7 @@
 		$broken = explode("?", $rtype);
 		$rtype = array_shift($broken);
 	}
-	
+
 	// return type validation and definitions:
 	require_once("offensive/assets/output/json.inc");
 	require_once("offensive/assets/output/php.inc");
@@ -77,18 +77,18 @@
 		echo "unsupported return format $rtype.";
 		exit;
 	}
-	
+
 	// validate the function call is valid
 	if(!is_callable("api_".$func)) {
 		throw new Exception("the function you requested ($func) was not found on this server.", 404);
 	}
-	
+
 	// authentication
 	if($func != "login") {
 		mustLogIn(array("prompt" => "http",
 		                "token" => null));
 	}
-	
+
 /**
 	Helper functions.
 */
@@ -98,9 +98,9 @@
 	 */
 	function format_data(&$data) {
 		global $rtype;
-		
+
 		if(is_object($data)) return;
-		
+
 		if(is_array($data)) {
 			foreach($data as $key => $val) {
 				format_data($data[$key]);
@@ -125,21 +125,21 @@
 			$data = str_replace(array("&", "<", ">"), array("&amp;", "&lt;", "&gt;"), $data);
 		}
 	}
-	
+
 	/*
 	 * return php data to the caller in the format requested.
 	 */
 	require_once("offensive/assets/conditionalGet.inc");
 	function send($ret) {
 		global $rtype;
-		
+
 		// get the newest timestamp in the dataset (if possible) and conditional GET
 		if(is_object($ret) && method_exists($ret, "timestamp")) {
 				conditionalGet($ret->timestamp());
 		} else if(is_array($ret) && count($ret) > 0) {
 			$timestamp = 0;
 			foreach($ret as $val) {
-				if(is_object($val) && method_exists($val, "timestamp") && 
+				if(is_object($val) && method_exists($val, "timestamp") &&
 				   // this line is silly, but it avoids an extra call to strtotime.
 				   ($tmpstamp = strtotime($val->timestamp())) > $timestamp) {
 					$timestamp = $tmpstamp;
@@ -149,8 +149,8 @@
 				conditionalGet($timestamp);
 			}
 		}
-		
-		$send_html = $_REQUEST['html'] == '1';
+
+		$send_html = isset($_REQUEST['html']) && $_REQUEST['html'] == '1';
 
 		// send the data back
 		if(in_array($rtype, array("plist", "xml"))) {
@@ -160,17 +160,17 @@
 		} else {
 			header("Content-type: text/plain");
 		}
-		
+
 		// allow XHR/Fetch requests (CORS)
 		header("Access-Control-Allow-Origin: *");
-		
+
 		echo call_user_func("tmbo_".$rtype."_encode", $ret, $send_html);
 		exit;
 	}
-	
+
 /**
 	API functions
-*/	
+*/
 	call_user_func("api_".$func);
 
 	/**
@@ -193,7 +193,7 @@
 	function api_getuploads() {
 		send(core_getuploads($_REQUEST));
 	}
-	
+
 	function api_getchanges() {
 		global $redis;
 		$since = check_arg("since", "integer");
@@ -225,10 +225,10 @@
 	 */
 	function api_getupload() {
 		global $uploadsql;
-		
+
 		$arg = check_arg("fileid", "integer");
 		handle_errors();
-		
+
 		send(core_getupload($arg));
 	}
 
@@ -266,9 +266,9 @@
 			assert('me()');
 			$userid = me()->id();
 		}
-		
+
 		$ret = new User($userid);
-		
+
 		if($ret->exists()) {
 			send($ret);
 		} else {
@@ -289,12 +289,12 @@
 	function api_getposse() {
 		$userid = check_arg("userid", "integer", null, false);
 		handle_errors();
-		
+
 		if($userid === false) {
 			assert('me()');
 			$userid = me()->id();
 		}
-		
+
 		send(id(new User($userid))->posse());
 	}
 
@@ -319,7 +319,7 @@
 		$token = check_arg("gettoken", "integer", null, false, array("0", "1"));
 		handle_errors();
 		session_unset();
-		
+
 		$loggedin = login(array("u/p" => array($username, $password)));
 		if($loggedin === false) {
 			global $login_message;
@@ -359,7 +359,7 @@
 
 	/**
 	 * @method getcomments
-	 * 
+	 *
 	 *
 	 * @param votefilter string optional Can contain any of "+-xrc" in any order. Other characters are ignored. Applies the following filters:
 	 * •&nbsp;<b>+</b> - vote is 'this is good'.
@@ -384,7 +384,7 @@
 	function api_getcomments() {
 		send(core_getcomments($_REQUEST));
 	}
-	
+
 	/**
 	 * @method postcomment
 	 * Post a comment to a thread.
@@ -411,7 +411,7 @@
 		handle_errors();
 		assert('me()');
 		assert('id(new Upload($_POST["fileid"]))->exists()');
-		
+
 		send(core_postcomment($_POST));
 	}
 
@@ -425,9 +425,9 @@
 		$nsfw = check_arg("nsfw", "integer", $_POST, false, array("0", "1"));
 		$tmbo = check_arg("tmbo", "integer", $_POST, false, array("0", "1"));
 		handle_errors();
-		
+
 		// XXX: this will have to call some uploader helper functions to cooperate with the upload page.
-		
+
 		throw new Exception("unimplemented", 404);
 	}
 
@@ -436,7 +436,7 @@
 		$title = check_arg("title", "string", $_POST);
 		$comment = check_arg("comment", "string", $_POST, false);
 		handle_errors();
-		
+
 		throw new Exception("unimplemented", 404);
 	}
 
@@ -479,7 +479,7 @@
 	function api_invite() {
 		$email = check_arg("email", "string", $_REQUEST);
 		handle_errors();
-		
+
 		throw new Exception("unimplemented", 404);
 	}
 
@@ -509,7 +509,7 @@
 
 	/**
 	 * @method setlocation
-	 * 
+	 *
 	 * Set a user's location
 	 *
 	 * @param lat float required User's latitude in degrees.
@@ -524,7 +524,7 @@
 		assert('me()');
 		$userid = me()->id();
 		handle_errors();
-		
+
 		$sql = "REPLACE INTO maxxer_locations (userid, x, y, mapversion) VALUES( $userid, $lat, $long, 'google' )";
 		$result = tmbo_query( $sql );
 		send(true);
@@ -625,7 +625,7 @@
 	function api_unreadcomments() {
 		send(core_unreadcomments($_REQUEST));
 	}
-	
+
 	/**
 	 * @method subscribe
 	 *
@@ -638,20 +638,20 @@
 	 * @see resetsubscription
 	 * @see unreadcomments
 	 */
-	function api_subscribe() {	
+	function api_subscribe() {
 		$threadid = check_arg("threadid", "integer");
 		$subscribe = check_arg("subscribe", "integer", null, array("1", "0"));
 		handle_errors();
-		
+
 		$upload = new Upload($threadid);
-		
+
 		if($subscribe == 0) {
 			send($upload->unsubscribe());
 			return;
 		}
 		send($upload->subscribe());
 	}
-	
+
 	/**
 	 * @method resetsubscription
 	 *
@@ -666,7 +666,7 @@
 	function api_resetsubscription() {
 		$threadid = check_arg("threadid", "integer");
 		handle_errors();
-		
+
 		send(id(new Upload($threadid))->clearSubscription());
 	}
 
