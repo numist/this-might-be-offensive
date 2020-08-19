@@ -479,8 +479,8 @@ function theimage() { return $(document).find("a#imageLink img").last(); };
  *****************************************************************************/
 
 $(document).ready(function() {
-  // init quick comment box
-  $("#qc_dialog").show().dialog(qc_dialog_init());
+	// init quick comment box
+	$("#qc_dialog").show().dialog(qc_dialog_init());
 
 	// bind vote links
 	$("#votelinks a").on("click", function(e) {
@@ -508,32 +508,6 @@ $(document).ready(function() {
 
 	// show image dimensions
 	image_dimensions(theimage(), function(width, height) {
-	  $("span#dimensions").append(", "+width+"x"+height+' <span id="scaled"></span>');
+		$("span#dimensions").append(`, ${width}x${height}`);
 	});
-	
-	// set up image resizer
-	var ypad = $("body").height() - theimage().outerHeight(true);
-	var xpad = $("div#content").outerWidth(true) - $("div#content").width();
-	theimage().irsz({
-		min_height: 40, min_width: 40,
-		padding: [xpad, ypad],
-		cursor_zoom_in: "url(/offensive/graphics/zoom_in.cur),default", cursor_zoom_out: "url(/offensive/graphics/zoom_out.cur),default"
-	})
-	.on("resize", function() {
-		if($("span#scaled").length == 0) { return true; }
-    if(theimage().length == 0) { return true; }
-
-		var image = theimage();
-		var current_width = image.width(), current_height = image.height();
-    
-		image_dimensions(image, function(actual_width, actual_height) {
-		  if(actual_width != current_width || actual_height != current_height) {
-		    $("span#scaled").text("(shown: "+current_width+"x"+current_height+")");
-		  } else {
-		    $("span#scaled").text("");
-		  }
-		})
-		return true;
-	})
-	.resize();
 });
