@@ -19,7 +19,7 @@ function body() {
 		<div>
 			There's been a bit of confusion lately about what the rules are around here, so in the interest of clarity we've compiled the following list:
 			<ol>
-				<li>Don't be retarded.</li>	
+				<li>Don't be a dick.</li>	
 			</ol>
 			
 			Please refer to this list when you have doubts about whether something you're about to do is inappropriate. Failure to observe these rules may result in account termination.
