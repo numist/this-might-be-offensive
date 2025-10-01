@@ -71,7 +71,7 @@
 	
 		switch ($status) {
 			case "locked":
-				$accountMessage = "$name was acting retarded and was sent home.";
+				$accountMessage = "$name flamed out and was put down for a nap.";
 			break;
 			
 			case "awaiting activation":
