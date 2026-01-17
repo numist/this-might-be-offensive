@@ -25,21 +25,11 @@ a.userLink {
 	margin-right:auto;
 	text-align:left;
 	line-height: 15px;
-	width:741px;
-}
-	
-#rightcol {
-	width:580px;
-	float:left;
-	margin-right: auto;
-	margin-left: 0px;
-}
+	width:771px;
 
-
-#leftcol {
-	width:175px;
-	float:left;
-	margin-right: 12px;
+    display: grid;
+    grid-template-columns: 175px 1fr;
+    gap: 12px;
 }
 
 .bluebox,.entry {
@@ -111,6 +101,7 @@ a.heading {
 
 #titleimg {
 	text-align: right;
+	grid-column: 1 / -1;
 }
 
 form {
