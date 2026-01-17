@@ -33,7 +33,8 @@ function openDbConnection() {
 		
 		// Overloading this into the db connect since the combination is our "database"
 		if(!$redis) {
-			$redis = new Predis\Client();
+			$redis_host = isset($config['redis_host']) ? $config['redis_host'] : 'localhost';
+			$redis = new Predis\Client(['host' => $redis_host]);
 		}
 		return $link;		
 }

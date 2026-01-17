@@ -2,10 +2,9 @@ var util = require("util"),
   io = require("socket.io").listen(1337),
   path = require("path"),
   iniparser = require("iniparser"),
-  mysql = require("mysql"),
-  redis = require("redis").createClient();
+  mysql = require("mysql");
 
-var db_config = iniparser.parseSync(path.normalize(path.join(__dirname, '../admin/.config'))).tmbo;
+var db_config = iniparser.parseSync(path.normalize(path.join(__dirname, 'admin/.config'))).tmbo;
 
 // iniparser returns everything as a literal, so we need to eval strings if they are literal strings
 function checkIniString(data) {
@@ -14,6 +13,10 @@ function checkIniString(data) {
   else
     return data;
 }
+
+var redis_host = checkIniString(db_config.redis_host) || 'localhost';
+// Old redis module (0.8.x) uses positional args: createClient(port, host)
+var redis = require("redis").createClient(6379, redis_host);
 
 var db = mysql.createConnection({
   user: checkIniString(db_config.database_user),

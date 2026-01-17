@@ -1,0 +1,61 @@
+# Production overrides
+# Usage: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+
+services:
+  nginx:
+    restart: always
+    volumes:
+      # In production, use named volumes instead of bind mounts
+      - app_code:/var/www/html:ro
+      - uploads:/var/www/html/offensive/uploads:rw
+      - zips:/var/www/html/offensive/zips:rw
+      - quarantine:/var/www/html/offensive/quarantine:rw
+      # Mount production SSL certificates
+      - ./services/nginx/certs/production:/etc/ssl/certs:ro
+      - ./services/nginx/private/production:/etc/ssl/private:ro
+
+  php:
+    restart: always
+    environment:
+      - TMBO_ENV=production
+    volumes:
+      - app_code:/var/www/html
+      - uploads:/var/www/html/offensive/uploads:rw
+      - zips:/var/www/html/offensive/zips:rw
+      - quarantine:/var/www/html/offensive/quarantine:rw
+      - ./admin/.config.prod:/var/www/html/admin/.config:ro
+
+  db:
+    restart: always
+    ports: []  # Don't expose database port in production
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-tmbo}
+      MYSQL_USER: ${MYSQL_USER:-tmbo}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+
+  redis:
+    restart: always
+
+  realtime:
+    restart: always
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./admin/.config.prod:/app/admin/.config:ro
+
+  cron:
+    restart: always
+    profiles: []  # Always run cron in production (remove profile requirement)
+    volumes:
+      - app_code:/var/www/html
+      - uploads:/var/www/html/offensive/uploads:rw
+      - zips:/var/www/html/offensive/zips:rw
+      - quarantine:/var/www/html/offensive/quarantine:rw
+      - ./admin/.config.prod:/var/www/html/admin/.config:ro
+
+volumes:
+  app_code:
+  uploads:
+  zips:
+  quarantine:

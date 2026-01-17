@@ -9,3 +9,12 @@ admin/certificates
 *.swp
 todo.txt
 .vagrant/
+
+# Docker runtime/generated files
+services/temp/
+services/web/src/
+services/nginx/certs/
+services/nginx/private/
+
+# Claude Code
+.claude/
