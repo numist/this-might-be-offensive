@@ -539,8 +539,9 @@
 		updateCommentCount($fileid, $good_count, $bad_count, $repost, $offensive, $comment_count);
 
 		// add the comment to the database
-		$sql = "INSERT INTO offensive_comments ( userid, fileid, comment, vote, offensive, repost, user_ip ) 
-		        VALUES ( $userid, $fileid, '$comment', '$vote', $offensive, $repost, '".sqlEscape($_SERVER['REMOTE_ADDR'])."')";
+		$vote_sql = $vote ? "'$vote'" : "NULL";
+		$sql = "INSERT INTO offensive_comments ( userid, fileid, comment, vote, offensive, repost, user_ip )
+		        VALUES ( $userid, $fileid, '$comment', $vote_sql, $offensive, $repost, '".sqlEscape($_SERVER['REMOTE_ADDR'])."')";
 		tmbo_query($sql);
 		$commentid = mysql_insert_id();
 

@@ -244,7 +244,7 @@ CREATE TABLE `offensive_uploads` (
   `filename` varchar(255) NOT NULL DEFAULT '',
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `ip` varchar(16) DEFAULT NULL,
-  `nsfw` tinyint(4) NOT NULL,
+  `nsfw` tinyint(4) NOT NULL DEFAULT 0,
   `hash` varchar(32) DEFAULT NULL,
   `tmbo` tinyint(4) NOT NULL DEFAULT '0',
   `type` enum('image','topic','audio','video','avatar') NOT NULL DEFAULT 'image',
