@@ -166,6 +166,10 @@
 		</script>
 		<script type="text/javascript" src="/socket.io/socket.io.js"></script>
 <?
+	CSS::add("/styles/theme.css");
+	if(getenv('TMBO_ENV') === 'development') {
+		CSS::add("/styles/theme.dev.css");
+	}
 	CSS::add("/styles/jquery-ui-1.8.17.custom.css");
 	CSS::add("/styles/pic.css");
 	CSS::emit();
@@ -201,7 +205,7 @@
 					if (comment.tmbo) {
 						var tmbo_span = stats_row.find('#count_tmbo');
 						if (tmbo_span.length == 0) {
-							stats_row.find("#count_bad").after(' x<span id="count_tmbo" style="color:#990000">0</span>');
+							stats_row.find("#count_bad").after(' x<span id="count_tmbo" style="color:var(--state-warning)">0</span>');
 							tmbo_span = stats_row.find('#count_tmbo');
 						}
 						var tmbo_count = parseInt(tmbo_span.text()) + 1;
@@ -471,7 +475,7 @@
 						$tags = $info['id3v2']['comments'];
 
 						if(array_key_exists('title', $tags)) { ?>
-						<span style="color:#666666">Title: <?= trim($tags['title'][0]); ?>
+						<span style="color:var(--text-secondary)">Title: <?= trim($tags['title'][0]); ?>
 							<?
 							if(array_key_exists('tracknum', $tags)) {
 								echo "(track ".(int)trim($tags['tracknum'][0]);
@@ -485,11 +489,11 @@
 						<? }
 
 						if(array_key_exists('artist', $tags)) { ?>
-						<span style="color:#666666">By: <?= trim($tags['artist'][0]); ?></span><br />
+						<span style="color:var(--text-secondary)">By: <?= trim($tags['artist'][0]); ?></span><br />
 						<? }
 
 						if(array_key_exists('album', $tags)) { ?>
-						<span style="color:#666666">Album: <?= trim($tags['album'][0]); ?></span><br /><br />
+						<span style="color:var(--text-secondary)">Album: <?= trim($tags['album'][0]); ?></span><br /><br />
 						<? }
 					}
 					?></td></tr></table><?
@@ -515,7 +519,7 @@
 					<table><tr><td style="text-align:right" width="480px">
 							&nbsp;
 							<? if(!array_key_exists('loop', $_REQUEST)) { ?>
-									<a style="color:#999999; text-decoration:underline" href="<?= Link::upload($upload) ?>&loop">loop</a>
+									<a style="color:var(--bg-admin); text-decoration:underline" href="<?= Link::upload($upload) ?>&loop">loop</a>
 							<? } ?>
 					</td></tr></table>
 					<?

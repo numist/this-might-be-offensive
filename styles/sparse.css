@@ -2,11 +2,11 @@
 p {
 	font-family:verdana;
 	font-size:11px;
-	color:#333366;
+	color: var(--link-visited);
 }
 
 a {
-	color:#333366;
+	color: var(--link-visited);
 }
 
 .label {

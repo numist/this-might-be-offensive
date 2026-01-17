@@ -1,0 +1,4 @@
+/* Development environment overrides */
+:root {
+  --bg-page: tomato; /* differentiate from production */
+}

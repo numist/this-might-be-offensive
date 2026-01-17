@@ -1,0 +1,77 @@
+:root {
+  /* ==========================================================================
+     Base Color Palette
+     ========================================================================== */
+
+  /* Purple scale - core theme colors */
+  --purple-darkest: #000033;
+  --purple-dark: #333366;
+  --purple-medium: #666699;
+  --purple-muted: #7777aa;
+  --purple-soft: #9999cc;
+  --purple-light: #bbbbee;
+  --purple-lightest: #ccccff;
+  --purple-highlight: #aaaadd;
+
+  /* Primary colors */
+  --blue: #000099;
+  --orange: #ff6600;
+  --orange-button: #ff8400;
+
+  /* Neutrals */
+  --black: #000000;
+  --white: #ffffff;
+  --gray-dark: #333333;
+  --gray-medium: #474646;
+  --gray: #888888;
+  --gray-light: #999999;
+  --gray-muted: #cccccc;
+
+  /* Status colors */
+  --red-dark: #660000;
+  --red: #990000;
+  --red-error: #aa0000;
+  --red-error-bg: #a32d00;
+  --green: #009933;
+
+  /* ==========================================================================
+     Semantic Aliases
+     ========================================================================== */
+
+  /* Backgrounds */
+  --bg-page: var(--purple-dark);
+  --bg-heading: var(--purple-darkest);
+  --bg-content: var(--purple-lightest);
+  --bg-content-alt: var(--purple-light);
+  --bg-box: var(--purple-soft);
+  --bg-tab-off: var(--purple-muted);
+  --bg-highlight: var(--purple-dark);
+  --bg-admin: var(--gray-light);
+  --bg-error: var(--red-error-bg);
+  --bg-overlay: #aaaaaa;
+
+  /* Text */
+  --text-primary: var(--purple-darkest);
+  --text-body: var(--gray-medium);
+  --text-muted: var(--purple-soft);
+  --text-heading: var(--purple-lightest);
+  --text-secondary: var(--gray);
+  --text-disabled: var(--gray-muted);
+
+  /* Links */
+  --link-primary: var(--blue);
+  --link-visited: var(--purple-dark);
+  --link-user: var(--purple-medium);
+  --link-accent: var(--orange);
+
+  /* Borders */
+  --border-dark: var(--black);
+  --border-medium: var(--purple-medium);
+  --border-light: var(--purple-lightest);
+
+  /* States */
+  --state-warning: var(--red);
+  --state-error: var(--red-error);
+  --state-error-text: var(--white);
+  --state-success: var(--green);
+}
