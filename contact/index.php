@@ -66,6 +66,7 @@ function logBadRequest() {
 <html>
 <head>
 	<title>freakin' contact form.</title>
+	<?php include 'includes/meta.inc'; ?>
 	<link rel="stylesheet" href="/styles/theme.css" type="text/css">
 	<style>
 		body { background: var(--bg-page); }
