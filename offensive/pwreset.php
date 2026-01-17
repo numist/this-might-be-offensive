@@ -145,6 +145,7 @@ https://".$_SERVER['HTTP_HOST']."/offensive/pwreset.php?x=$code
 <html>
 <head>
 	<title>tmbo.org : do we know you?</title>
+	<?php include 'includes/meta.inc'; ?>
 	<link rel="stylesheet" type="text/css" href="/styles/sparse.css"/>
 </head>
 

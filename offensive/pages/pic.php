@@ -75,6 +75,7 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+		<?php include 'includes/meta.inc'; ?>
 		<META NAME="ROBOTS" CONTENT="NOARCHIVE" />
 		<title>[<?= $upload->type() ?>] : <?= $upload->filename() ?> </title>
 		<!-- <? if($upload->next_filtered()) { ?>

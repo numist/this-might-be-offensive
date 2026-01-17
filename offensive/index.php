@@ -90,6 +90,7 @@ $timelimit = 10;
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<?php include 'includes/meta.inc'; ?>
 	<title><?
 		if( function_exists( 'title' ) ) {
 			echo title();

@@ -11,7 +11,7 @@
 <html>
 <head>
 	<title>themaxx.com : this page intentionally left blank.</title>
-	
+	<?php include 'includes/meta.inc'; ?>
 	<style type="text/css">
 		p {
 			font-family:verdana;

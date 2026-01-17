@@ -40,6 +40,7 @@
 <html>
 <head>
 	<title></title>
+	<?php include 'includes/meta.inc'; ?>
 	<?
 	CSS::add("/styles/theme.css");
 	if(getenv('TMBO_ENV') === 'development') {
