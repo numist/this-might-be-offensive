@@ -145,11 +145,10 @@
 			<div class="floatright"><a href="<?= Link::content("thumbs").query_string("c p", "&") ?>">thumbnail view</a></div>
 		</div>
 		<div class="grid" id="main">
-			<ul>
+			<ul class="imagelist">
 			<?php
 				$result = core_getuploads($args);
 				foreach( $result as $upload ) {
-					$css = (isset($css) && strpos($css, "odd_row") !== false) ? "even_row" : "odd_row";
 					require("offensive/templates/listitem_file.inc");
 				}
 			?>

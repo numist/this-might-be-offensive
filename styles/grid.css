@@ -20,9 +20,21 @@
   clear: both;
 }
 
-.grid li {
-  display: inline;
-  line-height: 15px;
+
+.grid .imagelist {
+  display: grid;
+  grid-template-columns: 1fr min-content;
+  gap: 0 8px;
+
+  > li {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: subgrid;
+    
+    &:nth-child(odd) {
+      background: #bbbbee
+    }
+  }
 }
 
 .grid a {
