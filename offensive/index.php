@@ -103,6 +103,10 @@ $timelimit = 10;
 	<link rel="shortcut icon" href="/favicon.ico" />
 	<script type="text/javascript" src="/socket.io/socket.io.js"></script>
 	<?
+	CSS::add("/styles/theme.css");
+	if(getenv('TMBO_ENV') === 'development') {
+		CSS::add("/styles/theme.dev.css");
+	}
 	CSS::add("/styles/filepilestyle.css");
 	CSS::add("/styles/oldskool.css");
 	CSS::add("/styles/index.css");
@@ -175,7 +179,7 @@ $timelimit = 10;
 </script>
 </head>
 
-<body bgcolor="#333366" link="#000066" vlink="#000033">
+<body>
 
 <?php 
 	if($upgrading) {

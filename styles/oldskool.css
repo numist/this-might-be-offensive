@@ -1,5 +1,5 @@
 body {
-	background: orange;
+	background: var(--bg-page);
 	text-align: center;
 	margin: 0px;
 }
@@ -8,16 +8,16 @@ a,
 #pic a.userLink
 {
 	text-decoration:underline;
-	color:#000099;
+	color: var(--link-primary);
 }
 
 a:visited,
 #pic a.userLink {
-	color:#333366;
+	color: var(--link-visited);
 }
 
 a.userLink {
-	color:#666699;
+	color: var(--link-user);
 }
 
 #content {
@@ -33,7 +33,7 @@ a.userLink {
 }
 
 .bluebox,.entry {
-	background: #ccccff;
+	background: var(--bg-content);
 	padding: 10px;
 	font-family: verdana;
 	font-size: 10px;
@@ -47,11 +47,11 @@ a.userLink {
 }
 
 .blocked, a.blocked {
-	color:#9999cc;
+	color: var(--text-muted);
 }
 
 .squelched, a.squelched {
-	color:#9999cc;
+	color: var(--text-muted);
 	font-size:10px;
 }
 
@@ -70,32 +70,32 @@ label {
 }
 
 .heading {
-	background: #000033;
+	background: var(--bg-heading);
 	padding: 5px;
 	font-family: verdana;
 	font-size: 10px;
 	font-weight: bold;
-	color: #ccccff;
+	color: var(--text-heading);
 }
 
 a.heading {
-	color: #ccccff;
+	color: var(--text-heading);
 }
 
 .blackbar {
-	background: #000000;
+	background: var(--border-dark);
 	height: 11px;
-	border-top: 1px solid #666699;
-	border-left: 1px solid #333333;
+	border-top: 1px solid var(--border-medium);
+	border-left: 1px solid var(--gray-dark);
 }
 
 
 .contentbox {
-	background: #9999cc;
-	border: 2px solid black;
+	background: var(--bg-box);
+	border: 2px solid var(--border-dark);
 	font-family: verdana;
 	font-size: 10px;
-	color: #000033;
+	color: var(--text-primary);
 	margin-bottom: 12px;
 }
 
@@ -119,12 +119,12 @@ input {
 }
 
 .textlinks, .textlinks a {
-	color:#9999cc;
+	color: var(--text-muted);
 	font-size:11px;
 }
 
 .orange, a.orange {
-	color:#ff6600;
+	color: var(--link-accent);
 }
 
 table.thumbnails {
@@ -140,19 +140,19 @@ table.thumbnails td {
 }
 
 .odd_row {
-	background:#bbbbee;
+	background: var(--bg-content-alt);
 }
 
 .even_row {
-	background: #ccccff;
+	background: var(--bg-content);
 }
 
 .my_hof {
-	background: #aaaadd;
+	background: var(--purple-highlight);
 }
 
 .weeks_0, .weeks_1, .weeks_2 {
-	color:#660000;
+	color: var(--red-dark);
 }
 
 table.thumbnails td a {
@@ -160,32 +160,32 @@ table.thumbnails td a {
 }
 
 .taboff, .tabspacer {
-	border-bottom:2px solid black;
-	background:#000033;
+	border-bottom: 2px solid var(--border-dark);
+	background: var(--bg-heading);
 }
 
 .taboff, .tabon {
-	border-right:2px solid black;
+	border-right: 2px solid var(--border-dark);
 	float:left;
 	padding:0px 15px;
 	font-weight:bold;
 }
 .tabon, .tabon a {
-	background:#ccccff;
-	color:#000033;
-	border-bottom:2px solid #ccccff;
-	text-decoration:none;	
+	background: var(--bg-content);
+	color: var(--text-primary);
+	border-bottom: 2px solid var(--bg-content);
+	text-decoration:none;
 }
 
 .taboff, .taboff a {
-	background:#7777aa;
-	color:#000033;
+	background: var(--bg-tab-off);
+	color: var(--text-primary);
 	text-decoration:none;
 }
 
 
 .timestamp, .votecount {
-	color:#9999cc;
+	color: var(--text-muted);
 }
 
 .timestamp {
@@ -195,7 +195,7 @@ table.thumbnails td a {
 }
 
 .timestamp a {
-	color:#9999cc;
+	color: var(--text-muted);
 	text-decoration:none;
 }
 
@@ -229,7 +229,7 @@ table.thumbnails td a {
 }
 
 .adminControls {
-	background:#999999;
+	background: var(--bg-admin);
 	padding:1em;
 	margin:1em 0;
 }

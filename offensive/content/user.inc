@@ -102,7 +102,7 @@
 					<div class="blackbar"></div>
 					<div class="heading">
 						<? echo $accountMessage ?><br/>
-						<span style="color:#666699">
+						<span style="color:var(--link-user)">
 							<? echo "$name has been around since $accountDateMessage."?>
 							<? if( $referredby ) { ?>
 								(thanks to <?= $referredby->htmlUsername() ?>.)

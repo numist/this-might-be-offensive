@@ -15,19 +15,19 @@ body {
 }
 
 #votelinks.off, #votelinks.off a {
-	color:#ccc;
+	color: var(--text-disabled);
 	text-decoration:none;
 }
 
 #count_tmbo {
-	color:#990000;
+	color: var(--state-warning);
 }
 
 .blackbar {
-        background: #000000;
+        background: var(--border-dark);
         height: 11px;
-        border-top: 1px solid #666699;
-        border-left: 1px solid #333333;
+        border-top: 1px solid var(--border-medium);
+        border-left: 1px solid var(--gray-dark);
 }
 
 #pic_header {
@@ -35,8 +35,8 @@ body {
 	overflow: hidden;
 	padding: 3px;
 	margin-bottom: 0px;
-	background: #000033;
-	color: #ff6600;
+	background: var(--bg-heading);
+	color: var(--link-accent);
 	font-size: 10px;
 	font-weight: bold;
 	padding-left: 4px;
@@ -52,7 +52,7 @@ body {
 }
 
 #instruction_link a {
-	color: #ff6600;
+	color: var(--link-accent);
 }
 
 #instructions {
@@ -61,21 +61,21 @@ body {
 	overflow: hidden;
 	padding: 3px;
 	margin-bottom: 6px;
-	background: #cccccc;
-	color: #333333;
+	background: var(--gray-muted);
+	color: var(--gray-dark);
 }
 
 .info {
-	color: #999999;
+	color: var(--bg-admin);
 }
 
 .ghost {
-	color: #ccc;
+	color: var(--text-disabled);
 }
 
 .warning_link {
-	font-style: italic; 
-	color: #990000;
+	font-style: italic;
+	color: var(--state-warning);
 }
 
 .warning_tags {
@@ -83,7 +83,7 @@ body {
 }
 
 .warning_tags a {
-	color: #990000;
+	color: var(--state-warning);
 }
 
 .title_link {
@@ -91,12 +91,12 @@ body {
 }
 
 .heading {
-        background: #000033;
+        background: var(--bg-heading);
         padding: 5px;
         font-family: verdana;
         font-size: 10px;
         font-weight: bold;
-        color: #ccccff;
+        color: var(--text-heading);
 }
 
 
@@ -104,7 +104,7 @@ body {
 	float: right;
 	padding-left: 8px;
 	font-size: 9px;
-	color: #9999cc;
+	color: var(--text-muted);
 }
 
 audio {
@@ -116,20 +116,20 @@ audio {
 #qc_dialog #pic a.userLink
 {
 	text-decoration:underline;
-	color:#000099;
+	color: var(--link-primary);
 }
 
 #qc_dialog a:visited,
 #qc_dialog #pic a.userLink {
-	color:#333366;
+	color: var(--link-visited);
 }
 
 #qc_dialog a.userLink {
-	color:#666699;
+	color: var(--link-user);
 }
 
 #qc_dialog .bluebox,.entry {
-	background: #ccccff;
+	background: var(--bg-content);
 	padding: 10px;
 	font-family: verdana;
 	font-size: 10px;
@@ -143,11 +143,11 @@ audio {
 }
 
 #qc_dialog .blocked, a.blocked {
-	color:#9999cc;
+	color: var(--text-muted);
 }
 
 #qc_dialog .squelched, a.squelched {
-	color:#9999cc;
+	color: var(--text-muted);
 	font-size:10px;
 }
 
@@ -156,7 +156,7 @@ audio {
 }
 
 #qc_dialog .timestamp, .votecount {
-	color:#9999cc;
+	color: var(--text-muted);
 }
 
 #qc_dialog .timestamp {
@@ -166,7 +166,7 @@ audio {
 }
 
 #qc_dialog .timestamp a {
-	color:#9999cc;
+	color: var(--text-muted);
 	text-decoration:none;
 }
 

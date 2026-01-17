@@ -42,7 +42,7 @@ function api_getcomments() {
 	$numbad = 0;
 	foreach($comments as $comment) {
 		if(strlen($comment->text()) == 0) continue;
-		$css = $style = $commentnum++ % 2 ? "background:#bbbbee;" : "background:#ccccff";
+		$css = $style = $commentnum++ % 2 ? "background:var(--bg-content-alt);" : "background:var(--bg-content)";
 		require("offensive/templates/comment.inc");
 	}
 	

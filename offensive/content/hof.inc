@@ -27,7 +27,7 @@
 		<div class="heading">hall of fame: the coolest files of all time (according to you sick puppies).</div>
 		<? tabs(); ?>
 
-		<div style="padding-top:8px;background:#ccccff;background-image:url( graphics/subtab_bg.gif );background-position:top left;background-repeat:repeat-x">
+		<div style="padding-top:8px;background:var(--bg-content);background-image:url( graphics/subtab_bg.gif );background-position:top left;background-repeat:repeat-x">
 			<div class="<?= ($view == 'hof' ? 'tabon' : 'taboff') ?>"><a href="<?= Link::content("hof") ?>">all time</a></div>
 			<div class="<?= ($view == 'today' ? 'tabon' : 'taboff') ?>"><a href="<?= Link::content("hof") ?>&t=today">past 24 hours</a></div>
 			<div class="tabspacer" style="background:none">&nbsp;</div>

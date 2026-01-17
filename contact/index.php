@@ -66,10 +66,16 @@ function logBadRequest() {
 <html>
 <head>
 	<title>freakin' contact form.</title>
+	<link rel="stylesheet" href="/styles/theme.css" type="text/css">
+	<style>
+		body { background: var(--bg-page); }
+		a:link { color: var(--link-primary); }
+		a:visited { color: var(--purple-darkest); }
+	</style>
 </head>
 
 
-<body bgcolor="#333366" link="#000066" vlink="#000033">
+<body>
 
 <div align="center">
 
@@ -92,7 +98,7 @@ function logBadRequest() {
 					<td valign="top">
 						<table border="0" cellpadding="2" cellspacing="0">
 							<tr>
-								<td bgcolor="#000000">
+								<td style="background:var(--border-dark)">
 									
 									<table border="0" cellpadding="0" cellspacing="0" width="171">
 										<tr>
@@ -100,7 +106,7 @@ function logBadRequest() {
 										</tr>
 
 										<tr>
-											<td bgcolor="#ccccff">
+											<td style="background:var(--bg-content)">
 
 												<table border="0" cellpadding="8" cellspacing="0" width="100%">
 													<tr>
@@ -164,13 +170,13 @@ will be stapled to a pigeon and flown directly to me.
 
 			<table border="0" cellpadding="2" cellspacing="0">
 				<tr>
-					<td bgcolor="#000000">
+					<td style="background:var(--border-dark)">
 						<table border="0" cellpadding="0" cellspacing="0" width="346">
 							<tr>
-								<td bgcolor="#ccccff"><!--<img src="/graphics/maincolumntopbar.gif" width="346" height="12">--></td>
+								<td style="background:var(--bg-content)"><!--<img src="/graphics/maincolumntopbar.gif" width="346" height="12">--></td>
 							</tr>
 							<tr>
-								<td bgcolor="#ccccff">
+								<td style="background:var(--bg-content)">
 
 									<table border="0" cellpadding="8" cellspacing="0">
 										<tr>
@@ -221,7 +227,7 @@ will be stapled to a pigeon and flown directly to me.
 								</td>
 							</tr>
 							<tr>
-								<td bgcolor="#ccccff"><!--<img src="/graphics/maincolumntopbar.gif" width="346" height="12">--></td>
+								<td style="background:var(--bg-content)"><!--<img src="/graphics/maincolumntopbar.gif" width="346" height="12">--></td>
 							</tr>
 						</table>
 
