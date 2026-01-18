@@ -25,18 +25,17 @@ a.userLink {
 	margin-right:auto;
 	text-align:left;
 	line-height: 15px;
-	width:771px;
+	width: 100%;
+	max-width:771px;
 
     display: grid;
-    grid-template-columns: 175px 1fr;
+    grid-template-columns: 175px minmax(300px, 1fr);
     gap: 12px;
 }
 
 .bluebox,.entry {
 	background: var(--bg-content);
 	padding: 10px;
-	font-family: verdana;
-	font-size: 10px;
 }
 
 .entry {
@@ -145,10 +144,6 @@ table.thumbnails td {
 
 .even_row {
 	background: var(--bg-content);
-}
-
-.my_hof {
-	background: var(--purple-highlight);
 }
 
 .weeks_0, .weeks_1, .weeks_2 {
