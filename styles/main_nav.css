@@ -1,0 +1,69 @@
+.tabs {
+    display: flex;
+    overflow: auto;
+
+    > * {
+        padding-inline: var(--spacing-lg);
+        font-weight: bold;
+        border-right: 2px solid black;
+        white-space: nowrap;
+    }
+
+    a {
+        color: var(--color-brand-dark);
+        text-decoration: none;
+    }
+
+    .tabon {
+        background: var(--color-brand-light);
+        position: sticky;
+        left: 0;
+        right: 0;
+        
+        &, a {
+            border-bottom: 2px solid var(--color-brand-light);
+        }
+    }
+
+    .taboff {
+        background: var(--color-brand-dark-tab);
+        border-bottom: 2px solid black;
+    }
+
+    .moreButton {
+        anchor-name: --moreMenuButton;
+        
+        display: none;
+        appearance: none;
+        border: none;
+        padding: 0;
+        background: white;
+        padding: var(--spacing-xs) var(--spacing-lg);
+        border-bottom: 2px solid orange;
+    }
+    
+    @media (width < 800px) {
+        :nth-child(n+3) {
+            display: none;
+        }
+
+        .moreButton {
+            display: flex;
+        }
+    }
+}
+
+.moreMenu {
+    position-anchor: --moreMenuButton;
+    position: fixed;
+    top: anchor(bottom);
+    right: anchor(right);
+    left: auto;
+    bottom: auto;
+    padding: 0;
+
+    > * {
+        padding-inline: var(--spacing-lg);
+        padding-block: var(--spacing-xs);
+    }
+}

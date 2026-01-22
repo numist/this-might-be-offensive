@@ -16,6 +16,25 @@
     --color-brand-light: oklch(from var(--color-brand) 0.86 c h);
     --color-link: oklch(from var(--color-brand) 0.35 0.15 h);
 
+    /* maybe trying to derive the palette from a single color isn't a good idea. */
+    --orange: #ff6600;
+    --link-accent: var(--orange);
+
+    /* Backgrounds */
+  --bg-page: var(--purple-dark);
+  --bg-heading: var(--color-brand-dark);
+  --bg-content: var(--purple-lightest);
+  --bg-content-alt: var(--purple-light);
+  --bg-box: var(--purple-soft);
+  --bg-tab-off: var(--purple-muted);
+  --bg-highlight: var(--purple-dark);
+  --bg-admin: var(--gray-light);
+  --bg-error: var(--red-error-bg);
+  --bg-overlay: #aaaaaa;
+
+  --link-accent: var(--orange);
+
+
     font-size: 10px;
     line-height: 1.5;
 
@@ -31,136 +50,4 @@
     --spacing-md: calc(var(--spacing) * 1.2);
     --spacing-lg: calc(var(--spacing) * 1.5);
     --spacing-xl: calc(var(--spacing) * 2);
-}
-
-body {
-    background: var(--color-brand);
-    font-family: verdana, helvetica, sans-serif;
-}
-
-a:link {
-    color: var(--color-link);
-}
-
-a:visited {
-    color: var(--color-brand);
-}
-
-.tabs {
-    display: flex;
-    /* flex-wrap: wrap; */
-    overflow: auto;
-
-    > * {
-        padding-inline: var(--spacing-lg);
-        font-weight: bold;
-        border-right: 2px solid black;
-        white-space: nowrap;
-    }
-
-    a {
-        color: var(--color-brand-dark);
-        text-decoration: none;
-    }
-
-    .tabon {
-        background: var(--color-brand-light);
-        position: sticky;
-        left: 0;
-        right: 0;
-        
-        &, a {
-            border-bottom: 2px solid var(--color-brand-light);
-        }
-    }
-
-    .taboff {
-        background: var(--color-brand-dark-tab);
-        border-bottom: 2px solid black;
-    }
-}
-
-#content {
-    display: grid;
-    grid-template-columns: 175px 1fr;
-    /* gap: 12px; */
-    gap: var(--spacing-lg);
-    max-width: 775px;
-    margin: 0 auto;
-
-    @media (width < 800px) {
-        grid-template-columns: 1fr;
-
-        #leftcol {
-            display: none;
-        }
-
-        #rightcol {
-            width: 100%;
-            overflow: auto;
-        }
-    }
-}
-
-#titleimg {
-    grid-column: 1 / -1;
-    text-align: right;
-    margin-bottom: calc(var(--spacing-lg) * -1);
-}
-
-#leftcol {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-lg);
-}
-
-.contentbox {
-    display: flex;
-    flex-direction: column;
-    background: var(--color-brand-dark);
-    border: 2px solid black;
-
-    .heading {
-        color: var(--color-brand-light);
-        font-weight: bold;
-        padding: 0.5rem;
-    }
-}
-
-.blackbar {
-    background: black;
-    height: 11px;
-    border-top: 1px solid #666699;
-    border-left: 1px solid #333333;
-}
-
-.bluebox {
-    background: var(--color-brand-light);
-    padding: var(--spacing);
-}
-
-.imagelist {
-    display: grid;
-    grid-template-columns: minmax(200px, 1fr) min-content;
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-
-    li {
-        display: grid;
-        grid-column: 1 / -1;
-        grid-template-columns: subgrid;
-        padding: var(--spacing-xs);
-
-        @media (width < 800px) {
-            .commentlabel {
-                display: none;
-            }
-            /* padding-block: var(--spacing-md); */
-        }
-
-        &:nth-child(odd) {
-            background: var(--color-brand-light-alt);
-        }
-    }
 }

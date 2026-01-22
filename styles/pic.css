@@ -12,6 +12,10 @@ body {
 	font-family:verdana;
 	font-size:11px;
 
+	&#pic {
+		background: white;
+	}
+
 }
 
 #votelinks.off, #votelinks.off a {

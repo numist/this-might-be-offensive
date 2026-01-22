@@ -1,0 +1,116 @@
+@import "main_nav.css";
+
+body {
+    background: var(--color-brand);
+    font-family: verdana, helvetica, sans-serif;
+}
+
+a:link {
+    color: var(--color-link);
+}
+
+a:visited {
+    color: var(--color-brand);
+}
+
+#content {
+    display: grid;
+    grid-template-columns: 175px 1fr;
+    /* gap: 12px; */
+    gap: var(--spacing-lg);
+    max-width: 775px;
+    margin: 0 auto;
+
+    @media (width < 800px) {
+        grid-template-columns: 1fr;
+
+        #leftcol {
+            display: none;
+        }
+
+        #rightcol {
+            width: 100%;
+            overflow: auto;
+        }
+    }
+}
+
+#titleimg {
+    grid-column: 1 / -1;
+    text-align: right;
+    margin-bottom: calc(var(--spacing-lg) * -1);
+}
+
+#leftcol {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.contentbox {
+    display: flex;
+    flex-direction: column;
+    background: var(--color-brand-dark);
+    border: 2px solid black;
+
+    .heading {
+        color: var(--color-brand-light);
+        font-weight: bold;
+        padding: 0.5rem;
+    }
+}
+
+.blackbar {
+    background: black;
+    height: 11px;
+    border-top: 1px solid #666699;
+    border-left: 1px solid #333333;
+}
+
+.bluebox {
+    background: var(--color-brand-light);
+    padding: var(--spacing);
+}
+
+.imagelist {
+    display: grid;
+    grid-template-columns: minmax(200px, 1fr) min-content;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+
+    li {
+        display: grid;
+        grid-column: 1 / -1;
+        grid-template-columns: subgrid;
+        padding: var(--spacing-xs);
+
+        @media (width < 800px) {
+            .commentlabel {
+                display: none;
+            }
+            /* padding-block: var(--spacing-md); */
+        }
+
+        &:nth-child(odd) {
+            background: var(--color-brand-light-alt);
+        }
+    }
+}
+
+.unreadlist {
+    display: grid;
+    margin: 0;
+    padding: 0;
+
+    li {
+        display: grid;
+        grid-column: 1 / -1;
+        grid-template-columns: subgrid;
+        padding: var(--spacing-xs);
+
+        &:nth-child(even) {
+            background: var(--color-brand-light-alt);
+        }
+    }
+}
