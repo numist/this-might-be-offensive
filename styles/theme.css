@@ -10,7 +10,7 @@
     --color-link: #000099;
 
     /* Modern browsers: derive from brand color */
-    --color-brand-dark: oklch(from var(--color-brand) 0.15 c h);
+    /* --color-brand-dark: oklch(from var(--color-brand) 0.15 c h); */
     --color-brand-dark-tab: oklch(from var(--color-brand) 0.57 c h);
     --color-brand-light-alt: oklch(from var(--color-brand) 0.80 c h);
     --color-brand-light: oklch(from var(--color-brand) 0.86 c h);

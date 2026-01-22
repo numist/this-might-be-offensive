@@ -39,6 +39,10 @@ a:visited {
     grid-column: 1 / -1;
     text-align: right;
     margin-bottom: calc(var(--spacing-lg) * -1);
+
+    @media (width < 800px) {
+        display: none;
+    }
 }
 
 #leftcol {
@@ -112,5 +116,11 @@ a:visited {
         &:nth-child(even) {
             background: var(--color-brand-light-alt);
         }
+    }
+}
+
+@media (width < 800px) {
+    .mainheading {
+        display: none; /* hide quips on mobile */
     }
 }
