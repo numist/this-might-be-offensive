@@ -117,7 +117,7 @@
 ?>
 <div class="contentbox">
 <div class="blackbar"></div>
-<div class="heading">
+<div class="heading mainheading">
 
 	<?
 		require("offensive/data/quips.inc");
