@@ -44,18 +44,28 @@
     .moreButton {
         anchor-name: --moreMenuButton;
     }
+    
+    .youButton {
+        anchor-name: --youMenuButton;
+    }
 
     .unreadButton {
         anchor-name: --unreadMenuButton;
         margin-left: auto;
     }
+
     
     @media (width < 800px) {
-        :nth-child(n+3) {
+        position: fixed;
+        inset: 0;
+        top: auto;
+        background: var(--color-brand-dark);
+
+        > * {
             display: none;
         }
 
-        .menuButton {
+        > .menuButton {
             display: flex;
         }
     }
@@ -64,29 +74,47 @@
 .moreMenu {
     position-anchor: --moreMenuButton;
     position: fixed;
-    top: anchor(bottom);
-    right: anchor(right);
-    left: auto;
-    bottom: auto;
+    /* top: anchor(bottom); */
+    bottom: anchor(top);
+    left: anchor(left);
+    right: auto;
+    /* bottom: auto; */
+    top: auto;
     padding: 0;
 
     > * {
         padding-inline: var(--spacing-lg);
         padding-block: var(--spacing-xs);
     }
+
+    .taboff, .tabon {
+        background: var(--color-brand-light);
+        font-weight: bold;
+
+        a {
+            text-decoration: none;
+        }
+    }
+
+    .tabon::before {
+        content: '• ';
+        margin-left: -1em;
+    }
 }
 
 .unreadMenu {
     position-anchor: --unreadMenuButton;
     position: fixed;
-    top: anchor(bottom);
+    /* top: anchor(bottom); */
+    bottom: anchor(top);
     right: anchor(right);
     left: auto;
-    bottom: auto;
+    /* bottom: auto; */
+    top: auto;
     padding: 0;
-    box-shadow: 0px 2px 4px #666699;
+    /* box-shadow: 0px 2px 4px #666699;
     border: none;
-    border-radius: 3px;
+    border-radius: 3px; */
 
     .contentbox {
         border: none;
@@ -95,4 +123,33 @@
     :is(.blackbar, .heading) {
         display: none;
     }
+}
+
+.youMenu {
+    position-anchor: --youMenuButton;
+    position: fixed;
+    /* top: anchor(bottom); */
+    bottom: anchor(top);
+    left: anchor(left);
+    right: auto;
+    /* bottom: auto; */
+    top: auto;
+    padding: 0;
+    /* box-shadow: 0px 2px 4px #666699;
+    border: none;
+    border-radius: 3px; */
+
+    .contentbox {
+        border: none;
+    }
+
+    :is(.blackbar, .heading) {
+        display: none;
+    }
+}
+
+[popover] {
+    box-shadow: 0px 2px 4px #666699;
+    border: none;
+    border-radius: 3px;
 }
