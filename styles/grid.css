@@ -9,6 +9,7 @@
 
 #grid-container {
     --columns: minmax(200px, 1fr) max-content;
+    overflow-x: auto;
 
     #discussions {
         --columns: minmax(200px, 1fr) max-content max-content;
