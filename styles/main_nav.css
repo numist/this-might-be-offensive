@@ -37,7 +37,7 @@
         padding: 0;
         background: var(--color-brand-dark);
         color: white;
-        padding: var(--spacing-xs) var(--spacing-lg);
+        padding: var(--spacing-lg);
         border-bottom: 2px solid orange;
     }
 
