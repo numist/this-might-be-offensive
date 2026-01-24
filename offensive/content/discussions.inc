@@ -12,7 +12,6 @@
 	}
 
 	function head() {
-		CSS::add("/styles/grid.css");
 		JS::add("/offensive/js/prep_evenodd.js");
 		JS::add("/offensive/js/lazyload_bottom.js");
 		?>

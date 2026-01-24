@@ -67,6 +67,15 @@
 
         > .menuButton {
             display: flex;
+            gap: var(--spacing-sm);
+            align-items: center;
+
+            &::after {
+                content: '';
+                border: 4px solid transparent;
+                border-bottom-color: var(--color-brand-light);
+                border-top-width: 0px;
+            }
         }
     }
 }

@@ -1,0 +1,51 @@
+/* top bar containing some links */
+#commands {
+  font-weight: bold;
+  overflow: hidden;
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+#grid-container {
+    --columns: minmax(200px, 1fr) max-content;
+
+    #discussions {
+        --columns: minmax(200px, 1fr) max-content max-content;
+    }
+
+    #hof {
+        --columns: repeat(6, minmax(max-content, 1fr))
+    }
+
+    .grid {
+        margin: 5px 0 15px 0;
+    
+        > ul {
+            display: grid;
+            grid-template-columns: var(--columns);
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            gap: 0 var(--spacing-sm);
+        
+            li {
+                display: grid;
+                grid-column: 1 / -1;
+                grid-template-columns: subgrid;
+                padding: var(--spacing-xs);
+        
+                @media (width < 800px) {
+                    .commentlabel {
+                        display: none;
+                    }
+                }
+        
+                &:nth-child(odd) {
+                    background: var(--color-brand-light-alt);
+                }
+            }
+        }
+    }
+}
+
