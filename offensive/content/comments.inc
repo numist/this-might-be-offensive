@@ -126,9 +126,7 @@
 				function addComment(comment) {
 					if(commentExists(comment))
 						return;
-					var color = ($("#commentList .entry").length % 2) == 0 ? "var(--bg-content)" : "var(--bg-content-alt)";
 					var html = $(comment.html);
-					$(html[2]).css({'background': color});
 					if($.inArray(comment.userid, me.squelched) != -1)
 						$(html[2]).find('.comment_body').html('<div class="squelched">[ squelched ]</div>');
 					if ($('#thumbnail').length > 0)
@@ -426,12 +424,4 @@
 <?
     }
 }
-
-	function nextStyle($i) {
-		global $style;
-	    $style = $i % 2 ? "background:var(--bg-content-alt);" : "background:var(--bg-content)";
-		return $style;
-	}
-
-
 ?>

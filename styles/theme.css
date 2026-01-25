@@ -23,8 +23,8 @@
     /* Backgrounds */
   --bg-page: var(--purple-dark);
   --bg-heading: var(--color-brand-dark);
-  --bg-content: var(--purple-lightest);
-  --bg-content-alt: var(--purple-light);
+  --bg-content: var(--color-brand-light);
+  --bg-content-alt: var(--color-brand-light-alt);
   --bg-box: var(--purple-soft);
   --bg-tab-off: var(--purple-muted);
   --bg-highlight: var(--purple-dark);

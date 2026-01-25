@@ -191,14 +191,19 @@ label {
     }
 }
 
+.entry:nth-child(odd) {
+    background: var(--color-brand-light-alt);
+}
+
 #commentList {
-    .entry:nth-child(odd) {
-        background: var(--color-brand-light-alt);
-    }
 
     .comment_link {
         transform: translateY(-10px);
         display: block;
+    }
+
+    .userLink {
+        color: var(--color-brand-medium, #669);
     }
 }
 
