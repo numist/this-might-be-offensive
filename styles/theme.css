@@ -35,7 +35,6 @@
   --link-accent: var(--orange);
   --text-muted: #9999cc;
 
-
     font-size: 10px;
     line-height: 1.5;
 
@@ -51,4 +50,12 @@
     --spacing-md: calc(var(--spacing) * 1.2);
     --spacing-lg: calc(var(--spacing) * 1.5);
     --spacing-xl: calc(var(--spacing) * 2);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+textarea {
+    width: 100%;
 }

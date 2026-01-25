@@ -124,6 +124,10 @@ label {
     }
 }
 
+#leftcol .contentbox.empty {
+    display: none;
+}
+
 .blackbar {
     background: black;
     height: 11px;

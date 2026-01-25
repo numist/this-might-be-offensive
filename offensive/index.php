@@ -393,16 +393,21 @@ $timelimit = 10;
 		
 		$comments = core_unreadcomments(array());
 
-		if(count($comments) == 0) {
-			$hidden = "none";
-		} else {
-			$hidden = "block";
-		} ?>
+		$isEmpty = count($comments) == 0;
+
+		?>
 		
-		<div id="unread" class="contentbox" style="display: <?= $hidden ?>;">
+		<div id="unread" class="contentbox <?= ($isEmpty ? 'empty' : '')?>">
 			<div class="blackbar"></div>
 			<div class="heading">unread comments:</div>
 			<div id="unread-container" class="bluebox">
+
+				<? 
+					if($isEmpty) {
+						?>all caught up.<?
+					}
+				?>
+
 				<? foreach ($comments as $comment) {
 					$upload = $comment->upload();
 					if($upload->squelched()) continue;
