@@ -278,12 +278,13 @@
 		</div>
 
 		<div id="content">
-			<div id="heading" style="white-space:nowrap;">
+			<div id="heading" style="white-space:nowrap;" class="scrollcontainer">
+				<div class="scroll-hint"><div class="scroll-hint-icon">→</div></div>
 				&nbsp;&nbsp;<span id="navigation_controls">
 				<?
 				/*
-				 * navigation buttons, prev index next are dependant on type
-				 */
+				* navigation buttons, prev index next are dependant on type
+				*/
 				$index="";
 				switch($upload->type()) {
 					case "avatar":
@@ -317,8 +318,8 @@
 				-->
 				<span id="voting_stats">
 					<a style="margin-left:48px;"
-					   id="comments"
-					   href="<?= Link::thread($upload) ?>">comments</a>
+					id="comments"
+					href="<?= Link::thread($upload) ?>">comments</a>
 					(<span id="count_comment"><?= $upload->comments() ?></span>c
 					+<span id="count_good"><?= $upload->goods() ?></span>
 					-<span id="count_bad"><?= $upload->bads() ?></span><?
@@ -363,24 +364,24 @@
 				</span>
 
 				<!--
-				    filter block
+					filter block
 				-->
 				<span id="filter_controls">
 					<span style="margin-left:48px;">filters:</span>
 					<span style="margin-left:5px;"><?
-					        if(me()->getPref("hide_nsfw") == 1) { ?>
-					                <a href="<?= Link::setPref("hide_nsfw", "") ?>">nsfw(on)</a>
-					        <? } else { ?>
-					                <a href="<?= Link::setPref("hide_nsfw", 1) ?>">nsfw(off)</a>
-					        <? } ?>
+							if(me()->getPref("hide_nsfw") == 1) { ?>
+									<a href="<?= Link::setPref("hide_nsfw", "") ?>">nsfw(on)</a>
+							<? } else { ?>
+									<a href="<?= Link::setPref("hide_nsfw", 1) ?>">nsfw(off)</a>
+							<? } ?>
 					</span>
-        	
+			
 					<span style="margin-left:5px;"><?
-					        if(me()->getPref("hide_tmbo") == 1) { ?>
-					                        <a href="<?= Link::setPref("hide_tmbo", "") ?>">tmbo(on)</a>
-					        <? } else { ?>
-					                        <a href="<?= Link::setPref("hide_tmbo", 1) ?>">tmbo(off)</a>
-					        <? } ?>
+							if(me()->getPref("hide_tmbo") == 1) { ?>
+											<a href="<?= Link::setPref("hide_tmbo", "") ?>">tmbo(on)</a>
+							<? } else { ?>
+											<a href="<?= Link::setPref("hide_tmbo", 1) ?>">tmbo(off)</a>
+							<? } ?>
 					</span>
 				</span>
 			</div>

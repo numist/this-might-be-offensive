@@ -224,3 +224,88 @@ audio {
 	}
 
 }
+
+.scrollcontainer {
+    container-type: scroll-state;
+	position: relative;
+
+	--initialDelay: 1s;
+	--bounceDelay: var(--initialDelay);
+	--numBounces: 4;
+	--bounceDuration: 0.25s;
+
+	--doubleBounces: calc(var(--numBounces) * 2);
+	--bounceIterations: calc(var(--doubleBounces) - mod(calc(var(--doubleBounces) - 1), 2)); /* double the number of bounces, floored to odd */
+
+	--fadeDuration: 0.5s;
+	--fadeOutDelay: calc(var(--initialDelay) + var(--fadeDuration) + var(--bounceDuration) * (var(--bounceIterations) - 1));
+
+	.scroll-hint {
+		opacity: 0;
+		position: absolute;
+		right: 0;
+		top: 50%;
+        transform: translateY(-50%);
+		pointer-events: none;
+		font-weight: bold;
+		font-size: 12px;
+
+		@container (scroll-state(scrollable: right)) and (not scroll-state(scrollable: left)) {
+			animation: var(--fadeDuration) ease-in-out var(--initialDelay) 1 forwards fadeIn,
+				var(--fadeDuration) ease-in-out var(--fadeOutDelay) 1 reverse forwards fadeIn;
+			}
+		
+		@supports not (container-type: scroll-state) {
+			animation: var(--fadeDuration) ease-in-out var(--initialDelay) 1 forwards fadeIn,
+				var(--fadeDuration) ease-in-out var(--fadeOutDelay) 1 reverse forwards fadeIn;
+		}
+	}
+
+	.scroll-hint-icon {
+		background: var(--color-brand-light);
+		color: var(--color-brand-dark);
+		padding: 12px;
+		border-radius: 4px;
+
+		@container (scroll-state(scrollable: right)) and (not scroll-state(scrollable: left)) {
+			animation: var(--bounceDuration) ease-in var(--bounceDelay) var(--bounceIterations) alternate forwards bounce;
+		}
+
+		@supports not (container-type: scroll-state) {
+			animation: var(--bounceDuration) ease-in var(--bounceDelay) var(--bounceIterations) alternate forwards bounce;
+		}
+	}
+}
+
+
+
+@keyframes bounce {
+	from {
+		transform: translateX(-5px);
+	}
+	to {
+		transform: translateX(0);
+	}
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		right: -50px;
+	}
+	to {
+		opacity: 1;
+		right: 16px;
+	}
+}
+
+@keyframes fadeOut {
+	from {
+		opacity: 1;
+		right: 16px;
+	}
+	to {
+		opacity: 0;
+		right: -50px;
+	}
+}
