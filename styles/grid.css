@@ -5,6 +5,7 @@
   display: flex;
   justify-content: space-between;
   gap: 4px;
+  margin-bottom: var(--spacing, 10px);
 }
 
 #grid-container {
@@ -50,7 +51,7 @@
     }
 }
 
-#thumbnails.grid_thumbs {
+.grid_thumbs {
     ul {
         list-style-type: none;
         margin: 0;

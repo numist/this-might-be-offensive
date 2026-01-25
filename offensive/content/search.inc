@@ -206,7 +206,7 @@
 		$find = trim(array_key_exists("find", $_REQUEST) ? $_REQUEST['find'] : "");
 
 		?>
-		<div class="entry" style="background:var(--bg-content-alt)">
+		<div class="entry">
 				<form action="./">
 					<input type="hidden" name="c" value="search"/>
 					<input type="text" name="find" value="<?= htmlspecialchars($find) ?>"/>
@@ -220,7 +220,7 @@
 		</form>
 
 		</div>
-		<div class="entry" style="background:var(--bg-content-alt)">
+		<div class="entry">
 		<form action="./">
 			<input type="text" name="findfile" value="<?= array_key_exists("findfile", $_REQUEST) ? $_REQUEST['findfile'] : "" ?>"/>
 			<input type="hidden" name="c" value="findfile"/>
