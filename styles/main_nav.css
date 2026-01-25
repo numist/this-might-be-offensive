@@ -114,16 +114,11 @@
 .unreadMenu {
     position-anchor: --unreadMenuButton;
     position: fixed;
-    /* top: anchor(bottom); */
     bottom: anchor(top);
     right: anchor(right);
     left: auto;
-    /* bottom: auto; */
     top: auto;
     padding: 0;
-    /* box-shadow: 0px 2px 4px #666699;
-    border: none;
-    border-radius: 3px; */
 
     .contentbox {
         border: none;
@@ -137,16 +132,11 @@
 .youMenu {
     position-anchor: --youMenuButton;
     position: fixed;
-    /* top: anchor(bottom); */
     bottom: anchor(top);
     left: anchor(left);
     right: auto;
-    /* bottom: auto; */
     top: auto;
     padding: 0;
-    /* box-shadow: 0px 2px 4px #666699;
-    border: none;
-    border-radius: 3px; */
 
     .contentbox {
         border: none;

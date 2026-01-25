@@ -36,11 +36,11 @@
                 grid-template-columns: subgrid;
                 padding: var(--spacing-xs);
         
-                @media (width < 800px) {
+                /* @media (width < 800px) {
                     .commentlabel {
                         display: none;
                     }
-                }
+                } */
         
                 &:nth-child(odd) {
                     background: var(--color-brand-light-alt);
@@ -50,3 +50,18 @@
     }
 }
 
+#thumbnails.grid_thumbs {
+    ul {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 5px;
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+        justify-items: center;
+
+        li {
+            overflow: hidden;
+        }
+    }
+}

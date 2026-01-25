@@ -24,7 +24,7 @@
 ?>
 <div class="contentbox">
 	<div class="blackbar"></div>
-		<div class="heading">hall of fame: the coolest files of all time (according to you sick puppies).</div>
+		<div class="heading">hall of fame: the coolest files of all time (according to you).</div>
 		<? tabs(); ?>
 
 		<div style="padding-top:8px;background:var(--bg-content);background-image:url( graphics/subtab_bg.gif );background-position:top left;background-repeat:repeat-x">
@@ -39,7 +39,7 @@
 				<div class="grid" id="hof">
 					<ul>
 						<li class="header">
-							<div class="col col1">rank</div>
+							<div class="col col1"></div>
 							<div class="col col2">filename</div>
 							<div class="col col3">uploaded by</div>
 							<div class="col col4">comments</div>
