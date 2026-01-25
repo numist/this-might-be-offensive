@@ -259,11 +259,11 @@
 
 		echo htmlEscape($upload->filename());
 
-		?><br/><span style="color:var(--link-user)"><?= $prefix ?> <?= $uploader->htmlUsername() ?> started it.</span><br/>
+		?><br/><span class="blame"><?= $prefix ?> <?= $uploader->htmlUsername() ?> started it.</span><br/>
 <?
 	} else {
 ?>
-		<a class="heading" id="pic" href="<?= $href ?>"><?= $upload->htmlFilename() ?></a><br/><span style="color:var(--link-user)">uploaded by <?= $uploader->htmlUsername() ?></span><br/>
+		<a class="heading" id="pic" href="<?= $href ?>"><?= $upload->htmlFilename() ?></a><br/><span class="blame">uploaded by <?= $uploader->htmlUsername() ?></span><br/>
 <?
 	}	
 ?></div>
@@ -278,7 +278,6 @@
 
 <?php 
 
-	$commentnum = 0;
 	$lastcomment = 0;
 	if( $comments_exist > 0) { 
         // changeblog doesn't say anything demeaning about the people who posted.
@@ -289,7 +288,6 @@
 		$numgood = 0;
 		$numbad = 0;
 		foreach($upload->getComments() as $comment) {
-			$css = nextStyle($commentnum++);
 			$lastcomment = $comment->id();
 			require("offensive/templates/comment.inc");
 		}

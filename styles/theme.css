@@ -2,7 +2,7 @@
     /* Single source of truth - change this to re-theme the site */
     --color-brand: #333366;
 
-    /* Fallback for older browsers */
+    --color-brand-medium: #666699;
     --color-brand-dark: #000033;
     --color-brand-dark-tab: #7777aa;
     --color-brand-light-alt: #bbbbee;
@@ -33,6 +33,7 @@
   --bg-overlay: #aaaaaa;
 
   --link-accent: var(--orange);
+  --text-muted: #9999cc;
 
 
     font-size: 10px;

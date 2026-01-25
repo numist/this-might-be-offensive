@@ -13,7 +13,6 @@ $commenter = $comment->commenter();
 global $numgood, $numbad;
 
 ?>
-<a name="<?= $comment->id() ?>"></a>
 <div class="entry u<? echo $commenter->id();
 	if($comment->vote() == "this is good") echo " tig";
 	if($comment->vote() == "this is bad") echo " tib";
@@ -21,6 +20,7 @@ global $numgood, $numbad;
 	if($comment->tmbo()) echo " tmbo";
 	if(strlen($comment->text())) echo " comment"; ?>"
 	style="<?= isset($css) ? $css : '' ?>">
+		<a class="comment_link" name="<?= $comment->id() ?>"></a>
 		<span class='comment_body'><?= $comment->HTMLcomment(); ?></span>
 		<br />
 		<div class="timestamp"><a href="<?= Link::comment($comment) ?>"><?= $comment->timestamp() ?></a></div>
