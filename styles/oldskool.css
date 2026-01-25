@@ -25,8 +25,8 @@ a:visited {
 
 .entry {
 	padding: 10px;
-	font-size: 11px;
-	line-height:21px;
+	font-size: 1.1rem;
+	line-height: 2;
 	word-wrap: break-word;
 }
 
