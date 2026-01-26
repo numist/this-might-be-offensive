@@ -17,11 +17,15 @@
     }
 
     #hof {
-        --columns: repeat(6, minmax(max-content, 1fr))
+        --columns: repeat(6, max-content);
     }
 
     .grid {
         margin: 5px 0 15px 0;
+
+        .header {
+            font-weight: bold;
+        }
     
         > ul {
             display: grid;

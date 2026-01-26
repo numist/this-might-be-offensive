@@ -295,17 +295,6 @@ audio {
 	}
 	to {
 		opacity: 1;
-		right: 16px;
-	}
-}
-
-@keyframes fadeOut {
-	from {
-		opacity: 1;
-		right: 16px;
-	}
-	to {
-		opacity: 0;
-		right: -50px;
+		right: 0px;
 	}
 }

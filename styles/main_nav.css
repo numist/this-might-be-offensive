@@ -80,6 +80,15 @@
     }
 }
 
+.subtabs {
+    background: linear-gradient(var(--color-brand-light) 12px, var(--color-brand-light-alt));
+    padding-top: var(--spacing, 8px);
+
+    @media (width < 800px) {
+        display: none;
+    }
+}
+
 .moreMenu {
     position-anchor: --moreMenuButton;
     position: fixed;

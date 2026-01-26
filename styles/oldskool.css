@@ -138,6 +138,11 @@ label {
 .bluebox {
     background: var(--color-brand-light);
     padding: var(--spacing);
+
+    .header {
+        color: var(--color-brand-dark, #003);
+        text-align: center;
+    }
 }
 
 .imagelist {
