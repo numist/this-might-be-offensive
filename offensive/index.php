@@ -342,16 +342,16 @@ $timelimit = 10;
 	</div>
 
 <br clear="all">
-<div class="textlinks" style="text-align:center">
+<div class="textlinks">
 
 	<? require('includes/footer.txt'); ?>
 
-	<div class="textlinks">portions &copy; 1997-<?= date("Y") ?>.
+	<div>portions &copy; 1997-<?= date("Y") ?>.
 		site development by
-		<a href="/contact/" class="textlinks" onmouseover='window.status="[ connect ]"; return true' onmouseout='window.status=""'>ray hatfield</a>,
+		<a href="/contact/" onmouseover='window.status="[ connect ]"; return true' onmouseout='window.status=""'>ray hatfield</a>,
 		<a href="mailto:thismightbe@numist.net">scott perry</a>,
 		and <a href="https://github.com/numist/this-might-be-offensive/contributors">others</a>.</div>
-	<div class="textlinks" style="margin: 1em;">Ingredients:
+	<div style="margin: 1em;">Ingredients:
 		<a href="http://php.net/" title="to talk to the computer">PHP</a>,
 		<a href="http://www.mysql.com/" title="for things of importance">MySQL</a>,
 		<a href="http://redis.io/" title="for things that need to be fast">Redis</a>,
@@ -367,7 +367,7 @@ $timelimit = 10;
 	
 	if(me()->status() == "admin") {
 		?>
-		<div class="textlinks"><?= number_format(time_end($ptime), 3)."s php, ".number_format($querytime, 3)."s sql, ".count($queries)." queries\n\n <!-- query statistics: \n";
+		<div><?= number_format(time_end($ptime), 3)."s php, ".number_format($querytime, 3)."s sql, ".count($queries)." queries\n\n <!-- query statistics: \n";
 			var_dump($queries);
 			echo "\n\n-->\n\n"; ?></div>
 		<?
@@ -375,7 +375,7 @@ $timelimit = 10;
 		if(file_exists($loadavg) && is_readable($loadavg)) {
 			$load = file_get_contents($loadavg);
 			?>
-			<div class="textlinks"><?= $load ?></div>
+			<div><?= $load ?></div>
 			<?
 		}
 	}
