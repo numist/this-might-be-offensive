@@ -211,9 +211,3 @@ label {
         color: var(--color-brand-medium, #669);
     }
 }
-
-/* @media (width < 800px) {
-    .mainheading {
-        display: none;
-    }
-} */
