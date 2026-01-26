@@ -42,6 +42,11 @@ body {
 	padding-left: 4px;
 }
 
+#image {
+	max-width: 100vw;
+	max-height: calc(100vh - 105px);
+}
+
 #instruction_link {
 	float: right;
 }
