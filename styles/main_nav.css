@@ -1,0 +1,163 @@
+.tabs {
+    display: flex;
+    overflow: auto;
+
+    > * {
+        padding-inline: var(--spacing-lg);
+        font-weight: bold;
+        border-right: 2px solid black;
+        white-space: nowrap;
+    }
+
+    a:is(:link, :active, :visited) {
+        color: var(--color-brand-dark);
+        text-decoration: none;
+    }
+
+    .tabon {
+        background: var(--color-brand-light);
+        position: sticky;
+        left: 0;
+        right: 0;
+        
+        &, a {
+            border-bottom: 2px solid var(--color-brand-light);
+        }
+    }
+
+    .taboff {
+        background: var(--color-brand-dark-tab);
+        border-bottom: 2px solid black;
+    }
+
+    .menuButton {
+        display: none;
+        appearance: none;
+        border: none;
+        padding: 0;
+        background: var(--color-brand-dark);
+        color: var(--color-brand-light);
+        padding: var(--spacing-lg);
+        border-bottom: 2px solid orange;
+    }
+
+    .moreButton {
+        anchor-name: --moreMenuButton;
+    }
+    
+    .youButton {
+        anchor-name: --youMenuButton;
+    }
+
+    .unreadButton {
+        anchor-name: --unreadMenuButton;
+        margin-left: auto;
+    }
+
+    
+    @media (width < 800px) {
+        position: fixed;
+        inset: 0;
+        top: auto;
+        background: var(--color-brand-dark);
+
+        > * {
+            display: none;
+        }
+
+        > .menuButton {
+            display: flex;
+            gap: var(--spacing-sm);
+            align-items: center;
+
+            &::after {
+                content: '';
+                border: 4px solid transparent;
+                border-bottom-color: var(--color-brand-light);
+                border-top-width: 0px;
+            }
+        }
+    }
+}
+
+.subtabs {
+    background: linear-gradient(var(--color-brand-light) 12px, var(--color-brand-light-alt));
+    padding-top: var(--spacing, 8px);
+
+    @media (width < 800px) {
+        display: none;
+    }
+}
+
+.moreMenu {
+    position-anchor: --moreMenuButton;
+    position: fixed;
+    /* top: anchor(bottom); */
+    bottom: anchor(top);
+    left: anchor(left);
+    right: auto;
+    /* bottom: auto; */
+    top: auto;
+    padding: 0;
+
+    > * {
+        padding-inline: var(--spacing-lg);
+        padding-block: var(--spacing-xs);
+    }
+
+    .taboff, .tabon {
+        background: var(--color-brand-light);
+        font-weight: bold;
+
+        a {
+            text-decoration: none;
+        }
+    }
+
+    .tabon::before {
+        content: '• ';
+        margin-left: -1em;
+    }
+}
+
+.unreadMenu {
+    position-anchor: --unreadMenuButton;
+    position: fixed;
+    bottom: anchor(top);
+    right: anchor(right);
+    left: auto;
+    top: auto;
+    padding: 0;
+
+    .contentbox {
+        border: none;
+    }
+
+    :is(.blackbar, .heading) {
+        display: none;
+    }
+}
+
+.youMenu {
+    position-anchor: --youMenuButton;
+    position: fixed;
+    bottom: anchor(top);
+    left: anchor(left);
+    right: auto;
+    top: auto;
+    padding: 0;
+
+    .contentbox {
+        border: none;
+    }
+
+    :is(.blackbar, .heading) {
+        display: none;
+    }
+}
+
+[popover] {
+    box-shadow: 0px 2px 4px #666699;
+    border: none;
+    border-radius: 3px;
+}

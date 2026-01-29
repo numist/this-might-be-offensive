@@ -90,6 +90,7 @@ $timelimit = 10;
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<?php include 'includes/meta.inc'; ?>
 	<title><?
 		if( function_exists( 'title' ) ) {
 			echo title();
@@ -103,6 +104,10 @@ $timelimit = 10;
 	<link rel="shortcut icon" href="/favicon.ico" />
 	<script type="text/javascript" src="/socket.io/socket.io.js"></script>
 	<?
+	CSS::add("/styles/theme.css");
+	if(getenv('TMBO_ENV') === 'development') {
+		CSS::add("/styles/theme.dev.css");
+	}
 	CSS::add("/styles/filepilestyle.css");
 	CSS::add("/styles/oldskool.css");
 	CSS::add("/styles/index.css");
@@ -175,7 +180,7 @@ $timelimit = 10;
 </script>
 </head>
 
-<body bgcolor="#333366" link="#000066" vlink="#000033">
+<body>
 
 <?php 
 	if($upgrading) {
@@ -199,22 +204,8 @@ $timelimit = 10;
 		<div id="leftcol">
 
 			<? if (login()) { // log in --> get info restricted block ?>
-				<div class="contentbox">
-					<div class="blackbar"></div>
-						<div class="heading">your stuff:</div>
-						<div class="bluebox">
-							<p>hi <b><?= me()->htmlUsername() ?></b>!</p>
-							
-							<p><a href="<?= Link::content("upload") ?>">upload</a></p>
-							
-							<p><a href="<?= Link::content("subscriptions") ?>">subscribed threads</a></p>
-							
-							<p><a href="<?= Link::content("settings") ?>">settings</a></p>
-            	
-							<p><a href="logout.php">log out</a></p>
-						</div>
-					<div class="blackbar"></div>
-				</div>
+				<?php include 'content/your_stuff.inc'; ?>
+
 				<?
 					if(function_exists('sidebar')) {
 						sidebar();
@@ -402,16 +393,21 @@ $timelimit = 10;
 		
 		$comments = core_unreadcomments(array());
 
-		if(count($comments) == 0) {
-			$hidden = "none";
-		} else {
-			$hidden = "block";
-		} ?>
+		$isEmpty = count($comments) == 0;
+
+		?>
 		
-		<div id="unread" class="contentbox" style="display: <?= $hidden ?>;">
+		<div id="unread" class="contentbox <?= ($isEmpty ? 'empty' : '')?>">
 			<div class="blackbar"></div>
 			<div class="heading">unread comments:</div>
 			<div id="unread-container" class="bluebox">
+
+				<? 
+					if($isEmpty) {
+						?>all caught up.<?
+					}
+				?>
+
 				<? foreach ($comments as $comment) {
 					$upload = $comment->upload();
 					if($upload->squelched()) continue;

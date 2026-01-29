@@ -16,7 +16,7 @@
 <div class="contentbox">
 	<div class="blackbar"></div>
 					<div class="heading">
-						<span style="color:#666699">
+						<span style="color:var(--link-user)">
 							<?= $them->htmlUsername() ?> has a posse.
 						</span>
 					</div>

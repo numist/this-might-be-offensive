@@ -1,67 +1,41 @@
+@import "main_nav.css";
+@import "grid.css";
+
 body {
-	background: orange;
-	text-align: center;
-	margin: 0px;
+    background: var(--color-brand);
+    font-family: verdana, helvetica, sans-serif;
 }
 
-a,
-#pic a.userLink
-{
-	text-decoration:underline;
-	color:#000099;
+a:link {
+    color: var(--color-link);
 }
 
-a:visited,
-#pic a.userLink {
-	color:#333366;
+a:visited {
+    color: var(--color-brand);
 }
 
-a.userLink {
-	color:#666699;
-}
-
-#content {
-	margin-left:auto;
-	margin-right:auto;
-	text-align:left;
-	line-height: 15px;
-	width:741px;
-}
-	
-#rightcol {
-	width:580px;
-	float:left;
-	margin-right: auto;
-	margin-left: 0px;
-}
-
-
-#leftcol {
-	width:175px;
-	float:left;
-	margin-right: 12px;
+.orange.orange {
+    color: var(--link-accent);
 }
 
 .bluebox,.entry {
-	background: #ccccff;
+	background: var(--bg-content);
 	padding: 10px;
-	font-family: verdana;
-	font-size: 10px;
 }
 
 .entry {
 	padding: 10px;
-	font-size: 11px;
-	line-height:21px;
+	font-size: 1.1rem;
+	line-height: 2;
 	word-wrap: break-word;
 }
 
 .blocked, a.blocked {
-	color:#9999cc;
+	color: var(--text-muted);
 }
 
 .squelched, a.squelched {
-	color:#9999cc;
+	color: var(--text-muted);
 	font-size:10px;
 }
 
@@ -74,127 +48,8 @@ a.userLink {
 	font-size:9px;
 }
 
-label {
-	font-weight:bold;
-	font-size:11px;
-}
-
-.heading {
-	background: #000033;
-	padding: 5px;
-	font-family: verdana;
-	font-size: 10px;
-	font-weight: bold;
-	color: #ccccff;
-}
-
-a.heading {
-	color: #ccccff;
-}
-
-.blackbar {
-	background: #000000;
-	height: 11px;
-	border-top: 1px solid #666699;
-	border-left: 1px solid #333333;
-}
-
-
-.contentbox {
-	background: #9999cc;
-	border: 2px solid black;
-	font-family: verdana;
-	font-size: 10px;
-	color: #000033;
-	margin-bottom: 12px;
-}
-
-#titleimg {
-	text-align: right;
-}
-
-form {
-	margin: 0px;
-}
-
-input {
-	font-size: 11px;
-	font-family: verdana;
-}
-
-.permalink {
-	font-size: 8px;
-	padding: 0px;
-}
-
-.textlinks, .textlinks a {
-	color:#9999cc;
-	font-size:11px;
-}
-
-.orange, a.orange {
-	color:#ff6600;
-}
-
-table.thumbnails {
-	border-collapse: separate;
-	border-spacing: 8px;
-}
-
-table.thumbnails td {
-	background:none;
-	text-align:center;
-	vertical-align:bottom;
-	font-weight:bold;
-}
-
-.odd_row {
-	background:#bbbbee;
-}
-
-.even_row {
-	background: #ccccff;
-}
-
-.my_hof {
-	background: #aaaadd;
-}
-
-.weeks_0, .weeks_1, .weeks_2 {
-	color:#660000;
-}
-
-table.thumbnails td a {
-
-}
-
-.taboff, .tabspacer {
-	border-bottom:2px solid black;
-	background:#000033;
-}
-
-.taboff, .tabon {
-	border-right:2px solid black;
-	float:left;
-	padding:0px 15px;
-	font-weight:bold;
-}
-.tabon, .tabon a {
-	background:#ccccff;
-	color:#000033;
-	border-bottom:2px solid #ccccff;
-	text-decoration:none;	
-}
-
-.taboff, .taboff a {
-	background:#7777aa;
-	color:#000033;
-	text-decoration:none;
-}
-
-
 .timestamp, .votecount {
-	color:#9999cc;
+	color: var(--text-muted);
 }
 
 .timestamp {
@@ -204,61 +59,155 @@ table.thumbnails td a {
 }
 
 .timestamp a {
-	color:#9999cc;
+	color: var(--text-muted);
 	text-decoration:none;
 }
 
-.clipper {
-	white-space:nowrap;
-	overflow:hidden;
-	width:100%;
+
+label {
+	font-weight:bold;
+	font-size:11px;
 }
 
-/* in the subject column on discussions page */
-#discussions .clipr {
-	float:left;
-	overflow:hidden;
-	white-space:nowrap;
-	width:338px;
+#content {
+    display: grid;
+    grid-template-columns: 175px 1fr;
+    /* gap: 12px; */
+    gap: var(--spacing-lg);
+    max-width: 775px;
+    margin: 0 auto;
+
+    @media (width < 800px) {
+        grid-template-columns: 1fr;
+
+        #leftcol {
+            display: none;
+        }
+
+        #rightcol {
+            width: 100%;
+            overflow: auto;
+        }
+    }
 }
 
-/* in the filename column on main page */
-#main .clipr {
-	float:left;
-	overflow:hidden;
-	white-space:nowrap;
-	width:405px;
+#titleimg {
+    grid-column: 1 / -1;
+    text-align: right;
+    margin-bottom: calc(var(--spacing-lg) * -1);
+
+    @media (width < 800px) {
+        display: none;
+    }
 }
 
-/* date and timestamp columns on discussions page */
-.dater,
-.com_cnt {
-	text-align:right;
-	white-space:nowrap;
+#leftcol, #rightcol {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
 }
 
-.adminControls {
-	background:#999999;
-	padding:1em;
-	margin:1em 0;
+.contentbox {
+    display: flex;
+    flex-direction: column;
+    background: var(--color-brand-dark);
+    border: 2px solid black;
+
+    .heading {
+        color: var(--color-brand-light);
+        font-weight: bold;
+        padding: 0.5rem;
+
+        .blame, .blame a {
+            color: var(--color-brand-medium);
+        }
+    }
 }
 
-.nowrap {
-	white-space:nowrap;
+#leftcol .contentbox.empty {
+    display: none;
 }
 
-.votecount {
-	font-weight:normal;
+.blackbar {
+    background: black;
+    height: 11px;
+    border-top: 1px solid #666699;
+    border-left: 1px solid #333333;
 }
 
-.votecount .good, .votecount .bad {
-	padding-left:5px;
+.bluebox {
+    background: var(--color-brand-light);
+    padding: var(--spacing);
+
+    .header {
+        color: var(--color-brand-dark, #003);
+        text-align: center;
+    }
 }
 
-a .tags {
+.imagelist {
+    display: grid;
+    grid-template-columns: minmax(200px, 1fr) min-content;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
 
+    li {
+        display: grid;
+        grid-column: 1 / -1;
+        grid-template-columns: subgrid;
+        padding: var(--spacing-xs);
+
+        @media (width < 800px) {
+            /* .commentlabel {
+                display: none;
+            } */
+            /* padding-block: var(--spacing-md); */
+        }
+
+        &:nth-child(odd) {
+            background: var(--color-brand-light-alt);
+        }
+    }
 }
 
-@media only screen and (max-device-width: 480px) {
-	body { -webkit-text-size-adjust: none; }
+/* .unreadlist {
+    display: grid;
+    margin: 0;
+    padding: 0;
+
+    li {
+        display: grid;
+        grid-column: 1 / -1;
+        grid-template-columns: subgrid;
+        padding: var(--spacing-xs);
+
+        &:nth-child(even) {
+            background: var(--color-brand-light-alt);
+        }
+    }
+} */
+
+#unread {
+    line-height: 1.8;
+
+    a {
+        color: var(--color-brand-medium);
+    }
+}
+
+.entry:nth-child(odd) {
+    background: var(--color-brand-light-alt);
+}
+
+#commentList {
+
+    .comment_link {
+        transform: translateY(-10px);
+        display: block;
+    }
+
+    .userLink {
+        color: var(--color-brand-medium, #669);
+    }
 }

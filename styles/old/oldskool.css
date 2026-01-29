@@ -1,0 +1,250 @@
+body {
+	background: var(--bg-page);
+	text-align: center;
+	margin: 0px;
+}
+
+a,
+#pic a.userLink
+{
+	text-decoration:underline;
+	color: var(--link-primary);
+}
+
+a:visited,
+#pic a.userLink {
+	color: var(--link-visited);
+}
+
+a.userLink {
+	color: var(--link-user);
+}
+
+#content {
+	margin-left:auto;
+	margin-right:auto;
+	text-align:left;
+	line-height: 15px;
+	width: 100%;
+	max-width:771px;
+
+    display: grid;
+    grid-template-columns: 175px minmax(300px, 1fr);
+    gap: 12px;
+}
+
+.bluebox,.entry {
+	background: var(--bg-content);
+	padding: 10px;
+}
+
+.entry {
+	padding: 10px;
+	font-size: 11px;
+	line-height:21px;
+	word-wrap: break-word;
+}
+
+.blocked, a.blocked {
+	color: var(--text-muted);
+}
+
+.squelched, a.squelched {
+	color: var(--text-muted);
+	font-size:10px;
+}
+
+.entry .squelched {
+	text-align:center;
+}
+
+.vote, label, .votecount {
+	font-weight:bold;
+	font-size:9px;
+}
+
+label {
+	font-weight:bold;
+	font-size:11px;
+}
+
+.heading {
+	background: var(--bg-heading);
+	padding: 5px;
+	font-family: verdana;
+	font-size: 10px;
+	font-weight: bold;
+	color: var(--text-heading);
+}
+
+a.heading {
+	color: var(--text-heading);
+}
+
+.blackbar {
+	background: var(--border-dark);
+	height: 11px;
+	border-top: 1px solid var(--border-medium);
+	border-left: 1px solid var(--gray-dark);
+}
+
+
+.contentbox {
+	background: var(--bg-box);
+	border: 2px solid var(--border-dark);
+	font-family: verdana;
+	font-size: 10px;
+	color: var(--text-primary);
+	margin-bottom: 12px;
+}
+
+#titleimg {
+	text-align: right;
+	grid-column: 1 / -1;
+}
+
+form {
+	margin: 0px;
+}
+
+input {
+	font-size: 11px;
+	font-family: verdana;
+}
+
+.permalink {
+	font-size: 8px;
+	padding: 0px;
+}
+
+.textlinks, .textlinks a {
+	color: var(--text-muted);
+	font-size:11px;
+}
+
+.orange, a.orange {
+	color: var(--link-accent);
+}
+
+table.thumbnails {
+	border-collapse: separate;
+	border-spacing: 8px;
+}
+
+table.thumbnails td {
+	background:none;
+	text-align:center;
+	vertical-align:bottom;
+	font-weight:bold;
+}
+
+.odd_row {
+	background: var(--bg-content-alt);
+}
+
+.even_row {
+	background: var(--bg-content);
+}
+
+.weeks_0, .weeks_1, .weeks_2 {
+	color: var(--red-dark);
+}
+
+table.thumbnails td a {
+
+}
+
+.taboff, .tabspacer {
+	border-bottom: 2px solid var(--border-dark);
+	background: var(--bg-heading);
+}
+
+.taboff, .tabon {
+	border-right: 2px solid var(--border-dark);
+	float:left;
+	padding:0px 15px;
+	font-weight:bold;
+}
+.tabon, .tabon a {
+	background: var(--bg-content);
+	color: var(--text-primary);
+	border-bottom: 2px solid var(--bg-content);
+	text-decoration:none;
+}
+
+.taboff, .taboff a {
+	background: var(--bg-tab-off);
+	color: var(--text-primary);
+	text-decoration:none;
+}
+
+
+.timestamp, .votecount {
+	color: var(--text-muted);
+}
+
+.timestamp {
+	font-size:10px;
+	padding-left:8px;
+	float:right;
+}
+
+.timestamp a {
+	color: var(--text-muted);
+	text-decoration:none;
+}
+
+.clipper {
+	white-space:nowrap;
+	overflow:hidden;
+	width:100%;
+}
+
+/* in the subject column on discussions page */
+#discussions .clipr {
+	float:left;
+	overflow:hidden;
+	white-space:nowrap;
+	width:338px;
+}
+
+/* in the filename column on main page */
+#main .clipr {
+	float:left;
+	overflow:hidden;
+	white-space:nowrap;
+	width:405px;
+}
+
+/* date and timestamp columns on discussions page */
+.dater,
+.com_cnt {
+	text-align:right;
+	white-space:nowrap;
+}
+
+.adminControls {
+	background: var(--bg-admin);
+	padding:1em;
+	margin:1em 0;
+}
+
+.nowrap {
+	white-space:nowrap;
+}
+
+.votecount {
+	font-weight:normal;
+}
+
+.votecount .good, .votecount .bad {
+	padding-left:5px;
+}
+
+a .tags {
+
+}
+
+@media only screen and (max-device-width: 480px) {
+	body { -webkit-text-size-adjust: none; }
+}

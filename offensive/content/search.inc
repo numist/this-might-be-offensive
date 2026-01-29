@@ -125,13 +125,13 @@
 					  // changeblog special header
 						if($upload->id() == "211604") { ?>
 							<a class="heading" id="pic" href="<?= Link::content("changeblog") ?>">changeblog</a>
-							<br/><span style="color:#666699">beat to fit. paint to match.</span><br/>
+							<br/><span style="color:var(--link-user)">beat to fit. paint to match.</span><br/>
 					<? } else if( $upload->type() == 'topic' ) {
 							$prefix = $upload->uploader()->status() == "admin" ? "" : "don't blame me,"; ?>
 							<a class="heading" id="pic" href="<?= Link::thread($upload) ?>"><?= $upload->htmlFilename(); ?></a>
-								<br/><span style="color:#666699"><?= $prefix ?> <a href="<?= Link::user($upload->uploader()) ?>" style="color:#666699"><?= $upload->uploader()->username() ?></a> started it.</span><br/>
+								<br/><span style="color:var(--link-user)"><?= $prefix ?> <a href="<?= Link::user($upload->uploader()) ?>" style="color:var(--link-user)"><?= $upload->uploader()->username() ?></a> started it.</span><br/>
 					<? } else { ?>
-							<a class="heading" id="pic" href="<?= Link::upload($upload) ?>"><?= $upload->htmlFilename(); ?></a><br/><span style="color:#666699">uploaded by <?= $upload->uploader()->htmlUsername() ?></span><br/>
+							<a class="heading" id="pic" href="<?= Link::upload($upload) ?>"><?= $upload->htmlFilename(); ?></a><br/><span style="color:var(--link-user)">uploaded by <?= $upload->uploader()->htmlUsername() ?></span><br/>
 					<? } ?>
 					</div>
 				<div class="entry">
@@ -206,7 +206,7 @@
 		$find = trim(array_key_exists("find", $_REQUEST) ? $_REQUEST['find'] : "");
 
 		?>
-		<div class="entry" style="background:#bbbbee">
+		<div class="entry">
 				<form action="./">
 					<input type="hidden" name="c" value="search"/>
 					<input type="text" name="find" value="<?= htmlspecialchars($find) ?>"/>
@@ -220,7 +220,7 @@
 		</form>
 
 		</div>
-		<div class="entry" style="background:#bbbbee">
+		<div class="entry">
 		<form action="./">
 			<input type="text" name="findfile" value="<?= array_key_exists("findfile", $_REQUEST) ? $_REQUEST['findfile'] : "" ?>"/>
 			<input type="hidden" name="c" value="findfile"/>

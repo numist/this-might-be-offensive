@@ -89,7 +89,7 @@
 <div class="contentbox">
 	<div class="blackbar"></div>
 	<div class="heading">
-		oh lookie here...
+		alright. listen up.
 	</div>
 	
 	<?

@@ -126,9 +126,7 @@
 				function addComment(comment) {
 					if(commentExists(comment))
 						return;
-					var color = ($("#commentList .entry").length % 2) == 0 ? "#ccccff" : "#bbbbee";
 					var html = $(comment.html);
-					$(html[2]).css({'background': color});
 					if($.inArray(comment.userid, me.squelched) != -1)
 						$(html[2]).find('.comment_body').html('<div class="squelched">[ squelched ]</div>');
 					if ($('#thumbnail').length > 0)
@@ -252,18 +250,18 @@
 	if($upload->id() == "211604") {
 		?>
 		changeblog
-		<br/><span style="color:#666699">beat to fit. paint to match.</span><br/>
+		<br/><span style="color:var(--link-user)">beat to fit. paint to match.</span><br/>
 		<?
 	} else if( $upload->type() == 'topic' ) {
 		$prefix = $uploader->status() == "admin" ? "" : "don't blame me,";
 
 		echo htmlEscape($upload->filename());
 
-		?><br/><span style="color:#666699"><?= $prefix ?> <?= $uploader->htmlUsername() ?> started it.</span><br/>
+		?><br/><span class="blame"><?= $prefix ?> <?= $uploader->htmlUsername() ?> started it.</span><br/>
 <?
 	} else {
 ?>
-		<a class="heading" id="pic" href="<?= $href ?>"><?= $upload->htmlFilename() ?></a><br/><span style="color:#666699">uploaded by <?= $uploader->htmlUsername() ?></span><br/>
+		<a class="heading" id="pic" href="<?= $href ?>"><?= $upload->htmlFilename() ?></a><br/><span class="blame">uploaded by <?= $uploader->htmlUsername() ?></span><br/>
 <?
 	}	
 ?></div>
@@ -278,7 +276,6 @@
 
 <?php 
 
-	$commentnum = 0;
 	$lastcomment = 0;
 	if( $comments_exist > 0) { 
         // changeblog doesn't say anything demeaning about the people who posted.
@@ -289,7 +286,6 @@
 		$numgood = 0;
 		$numbad = 0;
 		foreach($upload->getComments() as $comment) {
-			$css = nextStyle($commentnum++);
 			$lastcomment = $comment->id();
 			require("offensive/templates/comment.inc");
 		}
@@ -304,7 +300,7 @@
 		// thumbnail
 		if( $upload->type() != 'topic' && ($upload->type() != "audio" || $upload->thumb())) {
 			?>
-				<div id="thumbnail" style="background:#ccccff; border-top:1px solid #000033">
+				<div id="thumbnail" style="background:var(--bg-content); border-top:1px solid var(--bg-heading)">
 					<div style="float:right"><? toggleThumbnailLink() ?></div>
 					<?
 						if(me()->getPref("thumbnails_in_comments") == 1) {
@@ -428,12 +424,4 @@
 <?
     }
 }
-
-	function nextStyle($i) {
-		global $style;
-	    $style = $i % 2 ? "background:#bbbbee;" : "background:#ccccff";
-		return $style;
-	}
-
-
 ?>

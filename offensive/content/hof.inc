@@ -24,13 +24,12 @@
 ?>
 <div class="contentbox">
 	<div class="blackbar"></div>
-		<div class="heading">hall of fame: the coolest files of all time (according to you sick puppies).</div>
+		<div class="heading">hall of fame: the coolest files of all time (according to you).</div>
 		<? tabs(); ?>
 
-		<div style="padding-top:8px;background:#ccccff;background-image:url( graphics/subtab_bg.gif );background-position:top left;background-repeat:repeat-x">
+		<div class="tabs subtabs">
 			<div class="<?= ($view == 'hof' ? 'tabon' : 'taboff') ?>"><a href="<?= Link::content("hof") ?>">all time</a></div>
 			<div class="<?= ($view == 'today' ? 'tabon' : 'taboff') ?>"><a href="<?= Link::content("hof") ?>&t=today">past 24 hours</a></div>
-			<div class="tabspacer" style="background:none">&nbsp;</div>
 		</div>
 
 
@@ -39,7 +38,7 @@
 				<div class="grid" id="hof">
 					<ul>
 						<li class="header">
-							<div class="col col1">rank</div>
+							<div class="col col1"></div>
 							<div class="col col2">filename</div>
 							<div class="col col3">uploaded by</div>
 							<div class="col col4">comments</div>
