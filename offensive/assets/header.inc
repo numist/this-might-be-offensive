@@ -61,6 +61,18 @@ if(!ssl()) {
  */
 session_name("TMBOSESS1");
 
+/* the session cookie never carried secure or httponly: they aren't set in
+ * php.ini and nothing set them in code, so the flags default off.  this site
+ * redirects every request to https a few lines above, and the session cookie is
+ * a login credential, so it has no business travelling in the clear or being
+ * readable from script.  set them here rather than in php.ini because changing
+ * php.ini needs root on the host, which we don't have.
+ *
+ * lifetime 0 and path / preserve the existing behaviour; only the last two
+ * arguments are a change.
+ */
+session_set_cookie_params(0, "/", "", true, true);
+
 // if we are not an admin, buffer output until the end in case of fatal errors.
 session_start();
 //ob_start("ob_gzhandler", 0);
