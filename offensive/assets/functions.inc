@@ -16,36 +16,36 @@ function htmlEscape($string) {
 	                                $string));
 }
 
-/* fetch a secret out of admin/.config (which is not in source control).
+/* fetch a secret out of admin/.config, which is not in source control.
  *
- * these used to be string literals in the source, which meant anyone reading
- * the public repository could forge a remember cookie for any account.
- * secrets live in the config file now and must never come back.
+ * resolves at the point of use rather than at parse time: core.inc includes
+ * activationFunctions.inc before admin/mysqlConnectionInfo.inc, so $config does
+ * not exist yet while this function's callers are being parsed.
  *
- * this is a function rather than a global assignment on purpose: api.php and
- * activate.php both include activationFunctions.inc *before* they include
- * admin/mysqlConnectionInfo.inc, so $config does not exist yet at the time
- * those files are parsed.  resolve it lazily, at the point of use.
- *
- * a missing or obviously-too-short secret is fatal.  falling back to a
- * default would quietly reintroduce the bug this replaced.
+ * a missing or too-short secret is fatal, and there is deliberately no default.
  */
 function tmbo_secret($key) {
 	global $config;
 
 	if(!isset($config) || !is_array($config) ||
 	   !array_key_exists($key, $config) || strlen($config[$key]) < 32) {
+		/* E_USER_ERROR only terminates by way of tmbo_error_handler, which is
+		 * installed by header.inc and returns early if error_reporting is lowered.
+		 * falling through would return null, which concatenates into a caller's
+		 * key as "" -- the default this function promises not to have.
+		 */
 		trigger_error("missing or too-short secret \"$key\" in admin/.config", E_USER_ERROR);
+		exit;
 	}
 
 	return $config[$key];
 }
 
 /* generate $bytes cryptographically strong random bytes, hex encoded.
- * this runs on php 5.5, so random_bytes() is not available.  every source
- * below is a CSPRNG: there is deliberately no mt_rand()/uniqid() fallback,
- * because predictable output here silently recreates the forgeable cookie
- * bug this function exists to fix.  no entropy means no login, not a weak one.
+ * php 5.5 has no random_bytes(), so the sources are tried in turn by hand.
+ * every one is a CSPRNG, and there is deliberately no mt_rand()/uniqid()
+ * fallback: callers use this for credentials, so failing outright is correct
+ * and predictable output is not.
  */
 function tmbo_random_hex($bytes) {
 	if(function_exists("openssl_random_pseudo_bytes")) {
@@ -66,7 +66,10 @@ function tmbo_random_hex($bytes) {
 		if($raw !== false && strlen($raw) == $bytes) return bin2hex($raw);
 	}
 
+	// see tmbo_secret() on why this does not rely on E_USER_ERROR to terminate:
+	// returning null here hands the caller an empty credential.
 	trigger_error("no source of cryptographic randomness available", E_USER_ERROR);
+	exit;
 }
 
 /* compare two strings in constant time.
