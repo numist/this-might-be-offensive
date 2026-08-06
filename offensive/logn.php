@@ -111,7 +111,7 @@
 							</p>
 						<? } ?>
 						<? if($redirect) { ?>
-							<input type="hidden" name="redirect" value="<?= $redirect ?>" />
+							<input type="hidden" name="redirect" value="<?= htmlEscape($redirect) ?>" />
 						<? } ?>
 					</form>
 				
