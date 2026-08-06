@@ -1,6 +1,6 @@
 -- this script prepopulates the tmbo database with values needed to run the site.
 -- columns are named explicitly so that adding one to the users table doesn't
--- silently break dev provisioning the way a positional INSERT would.
+-- silently break dev provisioning.
 INSERT INTO users (userid, password, email, username, created, account_status, ip, last_login_ip, timestamp, referred_by)
 	VALUES(1, '157a54bda15e9c2b045ad8049698cb555baa0f1d', 'root@localhost', 'admin', '2004-09-15 01:48:15', 'admin', '127.0.0.1', '127.0.0.1', '2008-01-01 22:39:01', 1);
 INSERT INTO users (userid, password, email, username, created, account_status, ip, last_login_ip, timestamp, referred_by)
