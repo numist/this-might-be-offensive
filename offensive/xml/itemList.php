@@ -1,6 +1,7 @@
 <? 
 set_include_path("../..");
 require_once( 'offensive/assets/header.inc' );
+mustLogIn(array("prompt" => "http", "token" => null));
 
 header( "Content-type: text/xml" ); ?>
 <itemList version="1.0">
