@@ -314,7 +314,14 @@ function loginWithCookie() {
 		}
 		list($uid, $nonce, $mac) = $parts;
 
-		if(is_intger($uid) && strlen($nonce) && strlen($mac)) {
+		/* ctype_digit rather than is_intger: this field is attacker-controlled,
+		 * and is_intger() accepts anything is_numeric() likes -- "1e3", " 1",
+		 * "1.0".  none of those are exploitable here, because the mac is keyed
+		 * on the userid that comes back from the database rather than on this
+		 * string, but "1e3" casts to 1 on php 5 and 1000 on php 7, and a cookie
+		 * parser is no place to leave that lying around.
+		 */
+		if(ctype_digit($uid) && strlen($nonce) && strlen($mac)) {
 			$uid = (int)$uid;
 			$sql = "SELECT * from users where userid=$uid LIMIT 1";
 			$result = tmbo_query( $sql );
