@@ -213,7 +213,7 @@ function login($methods=array()) {
 			case "token":
 				$success = loginWithToken($params);
 				if(!is_null($success)) {
-					return true;
+					return $success;
 				}
 				break;
 		}
