@@ -37,9 +37,9 @@ The word "sandbox" implies somewhere safe to experiment.  Here it isn't.  Every
 UPDATE, DELETE and ALTER you run from the sandbox host lands on production data.
 There is no undo and no separate copy to fall back on.  A statement like
 
-    UPDATE users SET cookie_secret = NULL;
+    UPDATE users SET password = '';
 
-run "just on sandbox to test it" logs out every user on the live site.
+run "just on sandbox to test it" locks every user out of the live site.
 
 Practical consequences:
 
@@ -115,10 +115,10 @@ If you must, in this order:
 
     git -C ~/sites/tmbo checkout <the commit you wrote down>
 
-That is enough on its own.  The users.cookie_secret column is harmless to old code,
-which selects it and ignores it -- leave it alone.  Do NOT drop the column to "clean
-up": it holds every user's cookie secret, and dropping it logs out everyone holding
-a valid remember cookie, for no benefit.
+That is enough on its own, as long as you stop at a commit that still has
+users.cookie_secret.  Commits between the column being added and being dropped
+select it; earlier and later ones don't mention it.  If you land before it existed,
+the column is harmless -- old code selects it and ignores it.
 
 Rolling the code back also reverts the session cookie rename, which makes every
 orphaned PHPSESSID session reachable again.  Those may include sessions created by
@@ -141,11 +141,12 @@ Lose admin/.config and you have not lost the site, but every remember cookie sto
 verifying and every pending activation and reset link dies.  Back it up somewhere
 that is not this repository.
 
-Cleared cookie secrets.  Setting users.cookie_secret to NULL invalidates every
-remember cookie in existence.  That is a feature -- it is how the fix was deployed --
-but it is not reversible, and it is the correct lever to pull again if credentials
-are ever suspected: nulling the column for one user logs out that user's devices,
-and for all users logs out everybody.
+Rotated peppers.  Rotating remember_pepper invalidates every remember cookie on the
+site at once.  That is a feature -- it is the correct lever to pull if credentials
+are ever suspected, and the only one that works while the site is read-only, since
+it writes nothing to the database.  It is not reversible unless you kept the old
+value.  There is no per-user equivalent: the only way to invalidate one user's
+cookies is to change their password, which the cookie is keyed on.
 
 The session cookie name.  Bumping the suffix in TMBOSESS<n> (header.inc, logn.inc
 and logout.php must all agree) orphans every live session.  Also a feature, also
