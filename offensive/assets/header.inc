@@ -46,6 +46,21 @@ if(!ssl()) {
  *          |___/ |___/         |___/
  */
 
+/* php finds a session by the cookie named in session.name, so changing that
+ * name orphans every session file already on disk in a single step.  that is
+ * the only lever we have here: session.gc_probability is 0, nothing collects
+ * stale session files, and invalidating them by hand needs root on the box.
+ *
+ * bump the suffix to log the entire site out again.  the three session_start()
+ * calls in the codebase -- here, logn.inc, and logout.php -- must all agree on
+ * the name, and logout.php includes nothing, so it can't share a constant.
+ *
+ * TMBOSESS1: sessions predating the remember-cookie fix could have been created
+ * by a forged cookie, and loginWithSession() runs before loginWithCookie(), so
+ * fixing the cookie did not by itself dislodge them.
+ */
+session_name("TMBOSESS1");
+
 // if we are not an admin, buffer output until the end in case of fatal errors.
 session_start();
 //ob_start("ob_gzhandler", 0);

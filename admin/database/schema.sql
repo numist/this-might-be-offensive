@@ -318,6 +318,7 @@ CREATE TABLE `users` (
   `last_login_ip` varchar(15) DEFAULT NULL,
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `referred_by` int(11) DEFAULT NULL,
+  `cookie_secret` char(64) DEFAULT NULL,
   PRIMARY KEY (`userid`),
   UNIQUE KEY `username` (`username`),
   KEY `last_login_ip` (`last_login_ip`),
