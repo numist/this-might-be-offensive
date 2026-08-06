@@ -471,7 +471,7 @@
 						$tags = $info['id3v2']['comments'];
 
 						if(array_key_exists('title', $tags)) { ?>
-						<span style="color:#666666">Title: <?= trim($tags['title'][0]); ?>
+						<span style="color:#666666">Title: <?= htmlEscape(trim($tags['title'][0])); ?>
 							<?
 							if(array_key_exists('tracknum', $tags)) {
 								echo "(track ".(int)trim($tags['tracknum'][0]);
@@ -485,11 +485,11 @@
 						<? }
 
 						if(array_key_exists('artist', $tags)) { ?>
-						<span style="color:#666666">By: <?= trim($tags['artist'][0]); ?></span><br />
+						<span style="color:#666666">By: <?= htmlEscape(trim($tags['artist'][0])); ?></span><br />
 						<? }
 
 						if(array_key_exists('album', $tags)) { ?>
-						<span style="color:#666666">Album: <?= trim($tags['album'][0]); ?></span><br /><br />
+						<span style="color:#666666">Album: <?= htmlEscape(trim($tags['album'][0])); ?></span><br /><br />
 						<? }
 					}
 					?></td></tr></table><?
