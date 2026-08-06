@@ -181,7 +181,7 @@
 			?>
 			<table>
 				<tr>
-					<td colspan="2">application: <?= (strlen($token->issued_to()) > 64) ? substr($token->issued_to(), 0, 61)."…" : $token->issued_to() ?></td>
+					<td colspan="2">application: <?= htmlEscape((strlen($token->issued_to()) > 64) ? substr($token->issued_to(), 0, 61)."…" : $token->issued_to()) ?></td>
 				</tr>
 				<tr>
                     <td colspan="2">token: <?= $token->tokenid() ?><?= $token->readonly() ? " (read only)" : "" ?></td>
