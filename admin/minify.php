@@ -1,5 +1,11 @@
 <?
 
+// do not allow this file to run other than on the command line
+if (php_sapi_name() != "cli") {
+    trigger_error("this script can only be run from the command line", E_USER_ERROR);
+    exit(1);
+}
+
 if(php_sapi_name()==="cli") {
 	set_include_path(".");
 } else {
