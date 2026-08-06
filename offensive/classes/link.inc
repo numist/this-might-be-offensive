@@ -36,7 +36,7 @@ class Link {
 	// pagination links (search query_string)
 	static function content($page) {
 		assert('is_string($page)');
-		return "/offensive/?c=$page";
+		return "/offensive/?c=".rawurlencode($page);
 	}
 
 	static function upload($upload) {
