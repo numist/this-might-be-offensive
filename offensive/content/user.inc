@@ -133,7 +133,7 @@
 								<div class="adminControls"><?
 									setStatusForm( $usrid, $status, $email );
 								?>
-									<a href="mailto:<?= $email ?>"><?= $email ?></a>
+									<a href="mailto:<?= htmlEscape($email) ?>"><?= htmlEscape($email) ?></a>
 								</div>
 								<?
 							}
@@ -260,7 +260,7 @@ function handleSetStatusSubmission() {
 	$changed = $them->status() != $status;
 
 	if( is_intger($usrid ) && $status !== "" ) {
-		$isEmailValid = preg_match( '/[a-zA-Z0-9-_\.]+\@[a-zA-Z0-9-_\.]+\.[a-zA-Z0-9-_\.]+/', $email ) > 0;
+		$isEmailValid = preg_match( '/^[a-zA-Z0-9-_\.]+\@[a-zA-Z0-9-_\.]+\.[a-zA-Z0-9-_\.]+$/', $email ) > 0;
 		$emailClause = $isEmailValid ? ", email = '$email' " : "";
 		$sql = "UPDATE users SET timestamp = timestamp, account_status ='$status' $emailClause WHERE userid = $usrid limit 1";
 		$result = tmbo_query( $sql );
@@ -298,7 +298,7 @@ function setStatusForm( $id, $status, $email ) {
 				}
 				?>
 				</select>
-				<input type="text" name="set_email" value="<?= $email ?>"/>
+				<input type="text" name="set_email" value="<?= htmlEscape($email) ?>"/>
 				<input type="submit" value="update account"/>
 			</form>
 		</div>
