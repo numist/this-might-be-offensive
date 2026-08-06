@@ -1,21 +1,10 @@
--- Drop users.cookie_secret.
+-- Drop users.cookie_secret.  The remember cookie is keyed on the user's stored
+-- password hash, so nothing reads this column.
 --
--- 2026-08-06.sql added this column to key the remember cookie with a random
--- per-user secret.  The cookie is now keyed with the user's stored password
--- hash instead, which pwreset.php already does for reset codes, so the column
--- has no readers left.
+-- Destructive: deploy the code first.  Any commit that still selects the column
+-- fatals on every page that issues or verifies a remember cookie once it is gone.
 --
--- Keying on the password hash means a password change invalidates that user's
--- cookies as a property of the scheme rather than as something to remember to
--- do, and issuing a cookie no longer writes to the database -- which matters
--- because tmbo_query() silently discards writes under TMBO::readonly(), so the
--- old scheme minted cookies keyed on a secret it had failed to store.
---
--- Run this AFTER deploying the code.  Old code selects the column and would
--- fail on its absence; new code never mentions it.
---
--- This drops every remaining cookie secret, so it also invalidates any cookie
--- issued by the old scheme.  That is intended and is not reversible.  Cookies
--- issued by the new scheme are unaffected: they do not depend on this column.
+-- Not reversible.  Cookies still signed with a per-user secret stop verifying;
+-- cookies keyed on the password hash are unaffected.
 
 ALTER TABLE users DROP COLUMN cookie_secret;

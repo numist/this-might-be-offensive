@@ -242,25 +242,9 @@ function loginWithSession() {
  * fields, keyed with the user's stored password hash concatenated with a
  * site-wide pepper from admin/.config.
  *
- * this replaces a scheme that hashed only the userid, the username, and a salt
- * that was a literal in the public repository -- every input was public, so
- * anyone could compute a valid cookie for any account without ever touching the
- * site.  it is worth spelling out what each piece here is for:
- *
- *   * the password hash means a cookie cannot be derived from public data, and
- *     that changing a password invalidates that user's cookies as a consequence
- *     of the scheme rather than of remembering to revoke them.  pwreset.php
- *     keys its reset codes the same way and for the same reason.
- *   * the pepper means a dump of the users table is not by itself enough to mint
- *     cookies; you need the server's config file too.  rotating it invalidates
- *     every cookie on the site at once, without writing to the database -- which
- *     is the only invalidation lever that works while the site is read-only.
- *   * the nonce makes each issued cookie unique, so the cookie is not a
- *     deterministic function of the account and two devices don't share a value.
- *
  * NOTE: revocation is all-or-nothing across a user's devices, and the only
- * per-user lever is a password change.  per-device revocation would need a
- * separate token table.
+ * per-user lever is a password change. per-client revocation can be accomplished
+ * by creating (and then using) a token in the settings page for each client.
  */
 define("REMEMBER_COOKIE", "remember");
 define("REMEMBER_TTL", 60*60*24*365*5);
@@ -271,11 +255,6 @@ function rememberCookieMac($userid, $nonce, $pwhash) {
 
 /*
  * issue a fresh rememberme cookie for a user.
- *
- * this reads and never writes, so it behaves correctly under TMBO::readonly() --
- * tmbo_query() silently discards non-SELECT queries there, so a scheme that had
- * to store per-user state would mint a cookie keyed on state that was never
- * persisted, and the cookie would never verify.
  */
 function issueRememberCookie($myself) {
 	$uid = $myself->id();
@@ -332,9 +311,7 @@ function loginWithCookie() {
 			if(mysql_num_rows( $result ) == 1) {
 				$row = mysql_fetch_assoc($result);
 
-				/* no stored hash means there is nothing to key the mac with, so
-				 * there is nothing to verify against.  see issueRememberCookie().
-				 */
+				// without a hash there is no key, so there is nothing to compare.
 				if(!is_null($row['password']) && strlen($row['password'])) {
 					$cookiemac = rememberCookieMac($row['userid'], $nonce, $row['password']);
 					if(tmbo_hash_equals($cookiemac, $mac)) {

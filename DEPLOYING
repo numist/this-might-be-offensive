@@ -1,9 +1,10 @@
 Deploying tmbo, and getting back out again.
 
-Everything above the HISTORY banner at the bottom is meant to stay true. The HISTORY
-section records one specific deploy and is safe to delete once nobody remembers it.
+This is a playbook, not a record of what happened.  If a past outage taught us
+something, the lesson belongs in the relevant section below as an instruction; the
+story does not belong here at all.
 
-If you add to this file, prefer naming files and functions over line numbers. Line
+If you add to this file, prefer naming files and functions over line numbers.  Line
 numbers are the first thing to rot, and a stale line number makes a true statement
 look false.
 
@@ -195,12 +196,8 @@ compromised, verify afterwards rather than assuming the NOT IN caught everything
 To rebuild internal tokens that have gone missing, do NOT write them by hand.  With
 readonly off and $fixing on, browse the site as an admin: the pages that need each
 token will recreate it through core_createtoken(), which checks for collisions and
-uses the same format as everything else.  Minting tokenids in SQL means minting
-bearer credentials out of RAND() or UUID(), neither of which is a CSPRNG.
-
-Note that core_createtoken() builds tokenids from rand(), which is not a CSPRNG
-either.  That is a known weakness, not a pattern to copy, and worth fixing before
-any large-scale reissue.
+draws from a CSPRNG.  Minting tokenids in SQL means minting bearer credentials out
+of RAND() or UUID(), neither of which is one.
 
 Deleting tokens is user-visible beyond the site itself: Link::rss() embeds a live
 token in every feed URL, so subscribers' saved URLs stop working permanently and
@@ -280,41 +277,32 @@ backtrace in the log may be cut off.
 
 
 ###############################################################################
-HISTORY: THE 2026-08 AUTH DEPLOY
+ROLLING BACK
 ###############################################################################
 
-Delete this section once it stops being useful.  It is here because the reasoning
-is worth keeping while anyone still runs a commit from this range.
+Fix forward by default.  Roll back only if the new code is itself causing an outage,
+and only for as long as the fix takes.
 
-The remember cookie was derived from the userid, the username, and a salt that was
-a string literal in this public repository.  Every input was public, so anyone could
-compute a valid cookie for any account, including admin, without ever touching the
-site.  It was reported externally and had been exploitable since at least 2011.
+    git -C ~/sites/tmbo checkout <the commit you wrote down>
 
-Do not roll back past b3ad558.  Doing so restores that literal from public git
-history and republishes a remote authentication bypass.  Checking out an older
-commit is the dangerous option here, not the safe one.  Fix forward; roll back only
-if the new code is itself causing an outage, and only for as long as the fix takes.
+Before you do, check what you are reverting past.  Three things make an older commit
+the more dangerous option rather than the safer one:
 
-The fix went through two shapes.  The first added a random per-user secret in a new
-users.cookie_secret column.  The second replaced that with the user's stored
-password hash, which pwreset.php already keyed its reset codes on, and dropped the
-column again.  Keying on the password hash means a password change invalidates that
-user's cookies without anyone having to remember to revoke them, and it means
-issuing a cookie performs no write -- which matters because the column-based version
-minted cookies keyed on a secret that readonly mode had silently discarded.
+* A security fix.  Reverting one republishes the hole, and because this repository
+  is public, the vulnerable code stays readable forever -- so anyone can tell what
+  an old commit is vulnerable to.  Read the log for the range you are crossing:
 
-Consequences that outlived the deploy:
+      git -C ~/sites/tmbo log --oneline <old>..<current>
 
-* All tokens issued before this had to be assumed compromised.  A forged cookie
-  authenticated the API, and api_login mints a permanent token, so a token was the
-  one form of access that survived rotating the salts and renaming the session
-  cookie.
-* The session cookie name was bumped twice: once because sessions predating the fix
-  could have been created by a forged cookie, and again because adding Secure and
-  HttpOnly does not reach sessions that already exist.
-* Activation and password-reset emails in flight were invalidated by the salt
-  rotation and had to be re-requested.
+* A destructive migration.  Older code is fine with columns it does not select, so
+  crossing an additive migration backwards costs nothing.  Crossing a DROP or a
+  rename backwards means the old code selects something that is gone, and
+  tmbo_query() escalates that to a fatal on every page that runs the query.  You
+  would have to restore the schema too, so usually: don't go that far back.
 
-The outage during response was `DELETE FROM tokens` while the site was in readonly.
-That is the whole story of THE THREE OFF SWITCHES and THE TOKENS TABLE above.
+* A session cookie rename.  Reverting the name makes every orphaned session
+  reachable again.  If the name was bumped to invalidate sessions, rolling back
+  undoes exactly that.
+
+The off switches are uncommitted edits to tracked files, so a checkout discards
+them.  If the site was in $fixing or readonly, put it back after you move.
