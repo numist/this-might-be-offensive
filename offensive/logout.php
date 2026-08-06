@@ -1,7 +1,7 @@
 <?php
 	// must match header.inc; see the note there.  this file includes nothing,
 	// so the name is repeated rather than shared.
-	session_name("TMBOSESS1");
+	session_name("TMBOSESS2");
 	session_set_cookie_params(0, "/", "", true, true);
 	session_start();
 	session_unset();

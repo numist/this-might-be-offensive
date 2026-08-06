@@ -110,7 +110,7 @@ function logInUser($myself, $session=true) {
 			if(session_id() == "") {
 				// must match header.inc; see the note there.  guarded because
 				// session_name() warns if a session is already active.
-				session_name("TMBOSESS1");
+				session_name("TMBOSESS2");
 				session_set_cookie_params(0, "/", "", true, true);
 				session_start();
 			}
