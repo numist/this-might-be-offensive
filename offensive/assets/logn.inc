@@ -111,6 +111,7 @@ function logInUser($myself, $session=true) {
 				// must match header.inc; see the note there.  guarded because
 				// session_name() warns if a session is already active.
 				session_name("TMBOSESS1");
+				session_set_cookie_params(0, "/", "", true, true);
 				session_start();
 			}
 			$_SESSION['userid'] = $myself->id();
