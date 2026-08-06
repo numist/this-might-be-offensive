@@ -141,7 +141,7 @@ function tmbo_error_handler($errno, $errstr, $errfile, $errline, $errcontext) {
 					           $_SESSION['status'] == "admin") {
 						ob_start();
 						var_dump(debug_backtrace());
-						$trace = nl2br(ob_get_contents());
+						$trace = nl2br(htmlspecialchars(ob_get_contents()));
 						ob_end_clean();
 						echo $trace;
 					}
@@ -172,7 +172,7 @@ function tmbo_exception_handler($e) {
 		    ." in <b>".$shortfile."</b> on line <b>".$e->getLine()."</b><br /><br />";
 		ob_start();
 		var_dump(debug_backtrace());
-		$trace = nl2br(ob_get_contents());
+		$trace = nl2br(htmlspecialchars(ob_get_contents()));
 		ob_end_clean();
 		echo $trace;
 	}
