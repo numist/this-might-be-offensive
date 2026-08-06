@@ -114,6 +114,8 @@ function logInUser($myself, $session=true) {
 				session_set_cookie_params(0, "/", "", true, true);
 				session_start();
 			}
+			// a session id the client chose must not survive becoming authenticated.
+			session_regenerate_id(true);
 			$_SESSION['userid'] = $myself->id();
 			$_SESSION['status'] = $myself->status();
 			$_SESSION['username'] = $myself->username();
