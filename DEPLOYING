@@ -27,6 +27,41 @@ code deploy that lands before its config secrets exist fails closed on every req
 
 
 ###############################################################################
+SANDBOX AND PROD SHARE A DATABASE
+###############################################################################
+
+sandbox is not an isolated copy of the site.  It runs against the same MySQL
+database as production; the difference between the two is the UI, not the data.
+
+The word "sandbox" implies somewhere safe to experiment.  Here it isn't.  Every
+UPDATE, DELETE and ALTER you run from the sandbox host lands on production data.
+There is no undo and no separate copy to fall back on.  A statement like
+
+    UPDATE users SET cookie_secret = NULL;
+
+run "just on sandbox to test it" logs out every user on the live site.
+
+Practical consequences:
+
+* Migrations are run ONCE, not once per environment.  If a column exists on
+  sandbox it is because it exists in production, and vice versa.
+* Backups protect both or neither.  See the section above; take one.
+* Test destructive changes against a local Vagrant VM, which does have its own
+  database, not against sandbox.
+* Sharing auth secrets between the two hosts is fine, and separating them buys
+  very little.  The trust boundary is already shared: anyone who can deploy to
+  sandbox can read and write production data directly.  Cookies are host-only
+  (setcookie passes no domain), so nothing leaks between thismight.be and
+  sandbox.thismight.be regardless.
+
+What actually is per-environment: the code checkout, admin/.config, and the
+system configuration under /etc.  Note that none of the latter two are version
+controlled, so two hosts on identical commits can still behave differently --
+admin/configroot/ holds only the Vagrant dev VM's templates, which vm_setup.sh
+installs on the dev VM and nowhere else.
+
+
+###############################################################################
 THE TOKENS TABLE IS NOT WHAT IT LOOKS LIKE
 ###############################################################################
 
