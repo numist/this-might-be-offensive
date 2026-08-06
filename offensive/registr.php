@@ -177,7 +177,7 @@
 						<table>
 							<tr>
 								<td class="label">desired username:</td>
-								<td><input type="text" name="howsername" size="20" value="<?php echo $username?>"/></td>
+								<td><input type="text" name="howsername" size="20" value="<?php echo htmlEscape($username)?>"/></td>
 							</tr>
 							<tr>
 								<td class="label">password:</td>
@@ -193,7 +193,7 @@
 							</tr>
 							<tr>
 								<td class="label">referral code<?= isOpenRegistration() ? " (if you have one)" : "" ?>:</td>
-								<td><input type="text" name="referralcode" size="20" value="<?php echo $referralcode?>"/></td>
+								<td><input type="text" name="referralcode" size="20" value="<?php echo htmlEscape($referralcode)?>"/></td>
 							</tr>
 							<tr>
 								<td colspan="2" class="submitcell">
