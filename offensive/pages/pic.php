@@ -54,7 +54,7 @@
 
 		$filter = me()->getPref("hide_nsfw") ? " AND nsfw = 0" : "";
 		$filter .= me()->getPref("hide_tmbo") ? " AND tmbo = 0" : "";
-		$sql = "SELECT id FROM offensive_uploads WHERE type='".$upload->type()."' AND status='normal' AND id < ".min($pickuplinks).$filter." ORDER BY RAND() LIMIT 1";
+		$sql = "SELECT id FROM offensive_uploads WHERE type='".$upload->type()."' AND status='normal' AND id < ".(int)min($pickuplinks).$filter." ORDER BY RAND() LIMIT 1";
 		$res = tmbo_query($sql);
 		$row = mysql_fetch_assoc( $res );
 		return($row['id']);
