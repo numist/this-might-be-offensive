@@ -1,9 +1,10 @@
 <?
 	require_once( "offensive/classes/statusMessage.inc" );
+	require_once( "offensive/assets/functions.inc" );
 
 	function isValidEmail( $email ) {
 	
-		$valid = preg_match( '/[a-zA-Z0-9-_\.]+\@[a-zA-Z0-9-_\.]+\.[a-zA-Z0-9-_\.]+/', $email ) > 0 && strpos( $email, "mailinator.com" ) == false;
+		$valid = preg_match( '/^[a-zA-Z0-9-_\.]+\@[a-zA-Z0-9-_\.]+\.[a-zA-Z0-9-_\.]+$/', $email ) > 0 && strpos( $email, "mailinator.com" ) == false;
 	
 		if( ! $valid ) {
 			return new statusMessage( false, "The email address provided is invalid, either because it contains structural errors or is from an unsupported provider (mailinator, etc)." );
@@ -13,7 +14,7 @@
 		require_once( 'admin/mysqlConnectionInfo.inc' );
 		if(!isset($link) || !$link) $link = openDbConnection();
 
-		$sql = "SELECT count(*) AS theCount FROM users WHERE email = '" . $email . "'";
+		$sql = "SELECT count(*) AS theCount FROM users WHERE email = '" . sqlEscape( $email ) . "'";
 		$result = tmbo_query( $sql );
 		$row = mysql_fetch_assoc( $result );
 		if( $row['theCount'] > 0 ) {
