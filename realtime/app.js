@@ -46,7 +46,7 @@ db.connect();
 
 // Authorize by the token
 function checkToken(token, callback) {
-	db.query('SELECT users.userid, users.username FROM tokens, users WHERE tokens.tokenid = ? AND users.userid = tokens.userid;', [token], function(err, results, fields) {
+	db.query("SELECT users.userid, users.username FROM tokens, users WHERE tokens.tokenid = ? AND users.userid = tokens.userid AND users.account_status IN ('normal','admin');", [token], function(err, results, fields) {
 		if (results.length > 0) {
 		  callback(results[0]);
 		} else {
