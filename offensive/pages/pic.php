@@ -147,10 +147,10 @@
             // TODO: remove key-agnosticism
             if($code <= KEY_CODE_MASK) {
               // code is modifier-agnostic ?>
-            if(<?= $code ?> == (keycode & <?= KEY_CODE_MASK ?>)) {
+            if(<?= (int)$code ?> == (keycode & <?= KEY_CODE_MASK ?>)) {
             <? } else {
               // code is modifier-strict ?>
-            if(<?= $code ?> == keycode) {
+            if(<?= (int)$code ?> == keycode) {
             <? } ?>
               
               e.preventDefault();

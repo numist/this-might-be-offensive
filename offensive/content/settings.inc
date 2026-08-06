@@ -23,7 +23,7 @@
 				
 				if(!array_key_exists($_POST["key$n"], $choices))
 					$choices[$_POST["key$n"]] = array();
-				$choices[$_POST["key$n"]][] = $_POST["keycode$n"];
+				$choices[$_POST["key$n"]][] = (int)$_POST["keycode$n"];
 			}
 		
 			$prefnames = array_keys($key_options);
@@ -215,9 +215,9 @@
 					} ?>
 				</select>
 			</td>
-			<td><input size='16' class="keycode" id="" name="" value="<?= $keycode ?>" /></td>
+			<td><input size='16' class="keycode" id="" name="" value="<?= (int)$keycode ?>" /></td>
 			<td><span class="key_notification"></span></td>
-			<td><input type="hidden" class="registered_key" value="<?= $keycode ?>" /></td>
+			<td><input type="hidden" class="registered_key" value="<?= (int)$keycode ?>" /></td>
 		</tr>
 	<? }
 ?>
