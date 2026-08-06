@@ -58,8 +58,14 @@ if(!ssl()) {
  * TMBOSESS1: sessions predating the remember-cookie fix could have been created
  * by a forged cookie, and loginWithSession() runs before loginWithCookie(), so
  * fixing the cookie did not by itself dislodge them.
+ *
+ * TMBOSESS2: secure and httponly were added to the session cookie below, but php
+ * only emits Set-Cookie when it creates a session -- resuming one from a valid
+ * cookie sends no header at all, so existing sessions would have kept their old
+ * flagless cookies until each browser happened to discard them.  renaming forces
+ * every client to be issued a fresh cookie carrying the flags.
  */
-session_name("TMBOSESS1");
+session_name("TMBOSESS2");
 
 /* the session cookie never carried secure or httponly: they aren't set in
  * php.ini and nothing set them in code, so the flags default off.  this site
