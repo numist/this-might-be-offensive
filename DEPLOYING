@@ -1,8 +1,11 @@
 Deploying tmbo, and getting back out again.
 
-This file covers the auth hardening deployed 2026-08-06 (branch harden-remember-cookie)
-and the general traps that deploy walked into.  Read the "before you touch anything"
-section every time; the rest is specific to that change.
+Everything above the HISTORY banner at the bottom is meant to stay true. The HISTORY
+section records one specific deploy and is safe to delete once nobody remembers it.
+
+If you add to this file, prefer naming files and functions over line numbers. Line
+numbers are the first thing to rot, and a stale line number makes a true statement
+look false.
 
 
 ###############################################################################
@@ -14,6 +17,12 @@ and it takes two seconds:
 
     git -C ~/sites/tmbo rev-parse HEAD
 
+Check whether the site is already in a non-default state.  The off switches below
+are uncommitted edits to tracked files, so the working tree is the record:
+
+    git -C ~/sites/tmbo status --short
+    git -C ~/sites/tmbo diff
+
 Back up any table you are about to change, and any table you are about to delete
 rows from.  Restoring from a dump is easy; reconstructing destroyed rows from a
 stack trace is not:
@@ -21,9 +30,70 @@ stack trace is not:
     mysqldump -u tmbo -p tmbo users  > ~/backup-users-$(date +%F-%H%M).sql
     mysqldump -u tmbo -p tmbo tokens > ~/backup-tokens-$(date +%F-%H%M).sql
 
-Deploy order is always: config first, then code, then migration.  A migration that
-lands before the code that understands it leaves the site unable to serve, and a
-code deploy that lands before its config secrets exist fails closed on every request.
+Nothing takes these on a schedule.  There is no cron job and no other copy.  If you
+did not just take a dump, one does not exist.
+
+To put a dump back:
+
+    mysql -u tmbo -p tmbo < ~/backup-tokens-2026-08-06-1412.sql
+
+A mysqldump of a single table begins with DROP TABLE IF EXISTS, so restoring
+replaces the table wholesale.  Anything the site wrote to it since the dump is
+gone.  That matters most for tokens, which the code recreates rows in on its own:
+restore it and you will also revive rows the app had already replaced.
+
+
+###############################################################################
+DEPLOY ORDER
+###############################################################################
+
+Config first.  Code and migrations depend on which direction the migration goes.
+
+Secrets in admin/.config must exist before the code that reads them.  tmbo_secret()
+fails hard rather than falling back to a default, so a code deploy that lands first
+fails closed on whatever paths use the missing key.
+
+For an ADDITIVE migration -- a new nullable column, a new table -- run the migration
+FIRST.  Old code ignores columns it does not select, so the migration is invisible
+to the running site, and new code that selects the new column would otherwise fatal
+until the migration lands.
+
+For a DESTRUCTIVE migration -- dropping or renaming a column, changing a type --
+deploy the code FIRST, so nothing is still reading what you are about to remove.
+
+The failure mode when you get this backwards is not subtle but it is confusing:
+tmbo_query() escalates any failed query to E_USER_ERROR, so a missing column takes
+out every page that runs that query, while pages that do not are fine.
+
+
+###############################################################################
+THE THREE OFF SWITCHES
+###############################################################################
+
+None of these are in a config file.  All three are hand-edited on the server, and
+none survive a git checkout of another commit -- see BEFORE YOU TOUCH ANYTHING.
+
+$fixing in offensive/assets/header.inc.  Set it to true and everyone except admins
+gets the fixing page.  Admins pass through and see a notice.  This is the break
+glass switch: it is what keeps users off the site while you work.
+
+$downtime in offensive/assets/header.inc drives $upgrading, which shows the upgrade
+page once the time you set has passed.  Use it for planned work you want announced;
+use $fixing for right now.
+
+TMBO::readonly in offensive/classes/tmbo.inc.  Change the initialiser to true and
+tmbo_query() silently discards every query that is not a SELECT or SHOW.  Silently:
+it returns without touching the database and without raising anything.  Two
+consequences worth internalising:
+
+  * Any write path lacking an explicit TMBO::readonly() guard appears to succeed
+    and does not.  Most of classes/ has the guard.  Assume nothing.
+  * core_createtoken() returns false, which is what makes the tokens table
+    dangerous while readonly is set.  See the next section.
+
+The combination that table surgery needs is writes ON and users OFF -- $fixing true
+AND readonly false, at the same time.  Reaching for only one of them is how a
+maintenance window becomes an outage.
 
 
 ###############################################################################
@@ -35,11 +105,9 @@ database as production; the difference between the two is the UI, not the data.
 
 The word "sandbox" implies somewhere safe to experiment.  Here it isn't.  Every
 UPDATE, DELETE and ALTER you run from the sandbox host lands on production data.
-There is no undo and no separate copy to fall back on.  A statement like
-
-    UPDATE users SET password = '';
-
-run "just on sandbox to test it" locks every user out of the live site.
+There is no undo and no separate copy to fall back on.  Running destructive queries
+"just on sandbox to test it" will break the live site.  In general, nobody should be
+interacting with the database directly without a buddy.
 
 Practical consequences:
 
@@ -50,123 +118,203 @@ Practical consequences:
   database, not against sandbox.
 * Sharing auth secrets between the two hosts is fine, and separating them buys
   very little.  The trust boundary is already shared: anyone who can deploy to
-  sandbox can read and write production data directly.  Cookies are host-only
-  (setcookie passes no domain), so nothing leaks between thismight.be and
-  sandbox.thismight.be regardless.
+  sandbox can read and write production data directly.
+* Cookies prod sets do not reach sandbox: setcookie() passes no domain, so they
+  are host-only.  This does NOT hold in reverse.  Any host under thismight.be can
+  set a cookie scoped to the parent domain, so sandbox can put a cookie into
+  prod's scope.  Treat a sandbox compromise as reaching production.
 
-What actually is per-environment: the code checkout, admin/.config, and the
-system configuration under /etc.  Note that none of the latter two are version
-controlled, so two hosts on identical commits can still behave differently --
-admin/configroot/ holds only the Vagrant dev VM's templates, which vm_setup.sh
-installs on the dev VM and nowhere else.
+
+###############################################################################
+WHAT IS PER-ENVIRONMENT
+###############################################################################
+
+The code checkout, admin/.config, and the system configuration under /etc.
+
+Neither of the last two is version controlled, so two hosts on identical commits
+can still behave differently, and a config problem cannot be diagnosed from the
+repository alone.
+
+admin/configroot/ looks like it covers /etc and does not.  Those are the Vagrant
+dev VM's templates.  vm_setup.sh installs them on the dev VM and nowhere else, so
+do not read them as a description of any real server.
+
+admin/.config is gitignored and holds the only copy of the database credentials and
+the auth secrets.  Losing it takes the whole site down, not just authentication:
+mysqlConnectionInfo.inc raises E_USER_ERROR when parse_ini_file() fails.  Back it
+up somewhere outside this repository.
 
 
 ###############################################################################
 THE TOKENS TABLE IS NOT WHAT IT LOOKS LIKE
 ###############################################################################
 
-`DELETE FROM tokens` takes the entire site down with a fatal error.  It does not
-just log out API clients.
+`DELETE FROM tokens` can take the entire site down.  It does not just log out API
+clients.
 
-The table mixes user API credentials with three internal per-user tokens that the
-code creates lazily and then assumes exist forever:
+The table mixes user API credentials with internal per-user tokens that the code
+creates lazily and then assumes exist forever.  At the time of writing:
 
     " tmbo"      leading space.  constructor default, used by User::token()
-    " rss"       leading space.  Link::rss(), used in RSS feed URLs
-    "realtime"   NO leading space.  socket.io, used from seven call sites
+    " rss"       leading space.  Link::rss(), embedded in RSS feed URLs
+    "realtime"   NO leading space.  socket.io
 
-Token::getTokenRow() treats any row count other than one -- zero OR duplicates --
-as "create a replacement", calls core_createtoken(), and dereferences the result
-without checking it.  When that returns false you get
-
-    Call to a member function tokenid() on boolean in classes/token.inc on line 81
-
-on every page that renders, which is nearly all of them.
-
-To purge only real user credentials:
-
-    DELETE FROM tokens WHERE issued_to NOT IN (' tmbo', ' rss', 'realtime');
-
-To rebuild an internal token that has gone missing, per active user:
-
-    INSERT INTO tokens (tokenid, userid, issued_to, issue_date, last_used)
-    SELECT MD5(CONCAT(RAND(), userid, 'realtime')), userid, 'realtime', NOW(), NOW()
-    FROM users WHERE account_status IN ('normal','admin');
-
-Before believing you have found all of them, enumerate rather than guess:
+Do not trust that list.  Enumerate:
 
     grep -rn "new Token(" --include="*.php" --include="*.inc" .
 
+Token::getTokenRow() treats any row count other than one -- zero OR duplicates --
+as "create a replacement", calls core_createtoken(), and dereferences the result
+without checking it.
 
-###############################################################################
-ROLLING BACK THE AUTH HARDENING: MOSTLY, DON'T
-###############################################################################
+Whether that is fatal depends on the readonly switch, and this is the part that is
+easy to get wrong:
 
-Reverting this change reinstates a remote authentication bypass.  The old code
-derived the remember cookie from the userid, the username, and a salt that is a
-string literal in public git history, so anyone can compute a valid cookie for any
-account, including admin, without ever touching the site.  Checking out a commit
-older than b3ad558 puts that literal back in place and republishes the hole.
+  * readonly FALSE: core_createtoken() succeeds and the row is recreated on demand.
+    A wholesale delete of the internal tokens mostly heals itself.
+  * readonly TRUE: core_createtoken() returns false at its first line, and
+    getTokenRow() calls a method on it.  On PHP 5 that reads
 
-So: fix forward.  Rollback is correct only if the new code is itself causing an
-outage, and only for as long as it takes to fix it.
+        Call to a member function tokenid() on a non-object in classes/token.inc
 
-If you must, in this order:
+    on every page that renders, which is nearly all of them.
 
-    git -C ~/sites/tmbo checkout <the commit you wrote down>
+So the danger is not the DELETE by itself, it is a DELETE while writes are off.  If
+you are purging this table, turn readonly off and $fixing on first.
 
-That is enough on its own, as long as you stop at a commit that still has
-users.cookie_secret.  Commits between the column being added and being dropped
-select it; earlier and later ones don't mention it.  If you land before it existed,
-the column is harmless -- old code selects it and ignores it.
+To purge user API credentials while leaving the internal tokens alone:
 
-Rolling the code back also reverts the session cookie rename, which makes every
-orphaned PHPSESSID session reachable again.  Those may include sessions created by
-the attacker with a forged cookie, which is exactly what renaming the cookie was for.
-Treat a rollback as re-opening that door and close it again quickly.
+    DELETE FROM tokens WHERE issued_to NOT IN (' tmbo', ' rss', 'realtime');
 
+Know what that misses.  issued_to is whatever the client sent as its User-Agent
+(see api_login in offensive/api.php), so a user token can be named "realtime" or
+" rss" and will survive this DELETE.  The comparison is also case-insensitive under
+the table's utf8 collation.  If the point of the purge is that credentials are
+compromised, verify afterwards rather than assuming the NOT IN caught everything.
 
-###############################################################################
-WHAT CANNOT BE ROLLED BACK
-###############################################################################
+To rebuild internal tokens that have gone missing, do NOT write them by hand.  With
+readonly off and $fixing on, browse the site as an admin: the pages that need each
+token will recreate it through core_createtoken(), which checks for collisions and
+uses the same format as everything else.  Minting tokenids in SQL means minting
+bearer credentials out of RAND() or UUID(), neither of which is a CSPRNG.
 
-Some of this deploy is one-way.  Know which parts before you start.
+Note that core_createtoken() builds tokenids from rand(), which is not a CSPRNG
+either.  That is a known weakness, not a pattern to copy, and worth fixing before
+any large-scale reissue.
 
-Rotated salts.  remember_pepper, activation_salt and pwreset_salt live in
-admin/.config, which is gitignored and holds the only copy.  Rotating them
-permanently invalidates every activation and password-reset email already sent;
-those users must request a new one.  There is no undo, only re-sending.
-
-Lose admin/.config and you have not lost the site, but every remember cookie stops
-verifying and every pending activation and reset link dies.  Back it up somewhere
-that is not this repository.
-
-Rotated peppers.  Rotating remember_pepper invalidates every remember cookie on the
-site at once.  That is a feature -- it is the correct lever to pull if credentials
-are ever suspected, and the only one that works while the site is read-only, since
-it writes nothing to the database.  It is not reversible unless you kept the old
-value.  There is no per-user equivalent: the only way to invalidate one user's
-cookies is to change their password, which the cookie is keyed on.
-
-The session cookie name.  Bumping the suffix in TMBOSESS<n> (header.inc, logn.inc
-and logout.php must all agree) orphans every live session.  Also a feature, also
-not reversible, and the only session-invalidation lever available without root on
-the host.
+Deleting tokens is user-visible beyond the site itself: Link::rss() embeds a live
+token in every feed URL, so subscribers' saved URLs stop working permanently and
+API clients lose their credentials.  Say so somewhere before you do it.
 
 
 ###############################################################################
-AFTERWARDS
+INVALIDATION LEVERS
 ###############################################################################
 
-Confirm the deploy actually took effect rather than assuming it did.  Log in from a
-private window and look at the remember cookie: three dot-separated fields and the
-Secure flag means the new code is serving.  A single base64 blob means it is not.
+What you can revoke, and what it costs.  All of these are one-way.
 
-Errors land in ~/logs/thismight.be-error_log.  Note that trigger_error(E_USER_ERROR)
-renders the kaboom page with a 200, so a genuine 500 means a real PHP fatal -- a
-parse error or a call to an undefined function -- and the stack trace will be in
-that log.
+Rotate remember_pepper in admin/.config.  Invalidates every remember cookie on the
+site at once.  It writes nothing to the database, which makes it the only cookie
+invalidation that works while readonly is set.  Not reversible unless you kept the
+old value.
 
-Do not leave production checked out on a feature branch.  Merge first, then move the
-server back to develop, then delete the branch.  A branch deleted out from under a
-live checkout is its own outage.
+Change a user's password.  The remember cookie is an HMAC keyed on the stored
+password hash, so changing it invalidates that user's cookies and nothing else.
+This is the only per-user lever.  Note that neither the change-password page nor
+the reset flow issues a replacement cookie or tells the user, so they silently stop
+being remembered on every device.
+
+Rotate activation_salt or pwreset_salt in admin/.config.  Permanently invalidates
+every activation and password-reset email already sent.  There is no undo, only
+asking those users to request a new one.
+
+Bump TMBOSESS<n>.  PHP finds a session by the cookie named in session.name, so
+changing the name orphans every session file on disk in one step.  This is the only
+session invalidation available without root, because session.gc_probability is 0
+and nothing collects stale session files.  It is also the only way to change session
+cookie flags for users who already have a session, since PHP sends Set-Cookie only
+when it creates one.
+
+The name appears in three places -- header.inc, logn.inc and logout.php -- and
+logout.php includes nothing, so it cannot share a constant.  Only the header.inc and
+logout.php copies are reachable today; header.inc starts the session before logn.inc
+is even loaded, so logn.inc's copy never runs.  Change all three anyway: a divergence
+there is invisible until it isn't.
+
+
+###############################################################################
+AFTERWARDS: DID IT WORK, AND WHERE DID IT BREAK
+###############################################################################
+
+Confirm the deploy took effect rather than assuming it did.  Log in from a private
+window WITH the "remember me" box ticked -- without it no cookie is issued at all --
+and look at the remember cookie.  Three dot-separated fields and the Secure flag
+means the new code is serving.  A single base64 blob means it is not.
+
+Reading a failure.  There are two different kinds and they look nothing alike:
+
+  * A handled fatal.  trigger_error(E_USER_ERROR) and any failed query go through
+    tmbo_error_handler, which logs, then renders offensive/index.outoforder.php for
+    non-admins.  That page sends HTTP 500.  Admins do not get it; they get a
+    var_dump of the backtrace inline instead, which includes call arguments and can
+    therefore contain password hashes and secrets.  Do not paste it around.
+  * A real fatal.  Parse errors, E_ERROR, calling a method on a non-object: PHP
+    does not route these to a user error handler, and nothing here registers a
+    shutdown function to catch them.  They never reach the kaboom page.  With
+    display_errors on they print into the response body at whatever status was
+    already set, which can be a 200 with an error message in the middle of the page.
+
+So a 500 means the error handler ran and did its job.  A 200 containing an error
+message, or a blank page, is the more alarming one.  Check what display_errors is
+set to on the host you are debugging; it is not the same everywhere and it is not in
+this repository.
+
+Logs.  tmbo_error_handler calls error_log(), which goes wherever PHP's error_log
+directive points on that host.  Verify it before you need it:
+
+    php5 -i | grep error_log
+
+The nginx error_log under ~/logs/ is a different file and will not necessarily have
+PHP's output.  Note also that log_errors_max_len truncates long messages, so a
+backtrace in the log may be cut off.
+
+
+###############################################################################
+HISTORY: THE 2026-08 AUTH DEPLOY
+###############################################################################
+
+Delete this section once it stops being useful.  It is here because the reasoning
+is worth keeping while anyone still runs a commit from this range.
+
+The remember cookie was derived from the userid, the username, and a salt that was
+a string literal in this public repository.  Every input was public, so anyone could
+compute a valid cookie for any account, including admin, without ever touching the
+site.  It was reported externally and had been exploitable since at least 2011.
+
+Do not roll back past b3ad558.  Doing so restores that literal from public git
+history and republishes a remote authentication bypass.  Checking out an older
+commit is the dangerous option here, not the safe one.  Fix forward; roll back only
+if the new code is itself causing an outage, and only for as long as the fix takes.
+
+The fix went through two shapes.  The first added a random per-user secret in a new
+users.cookie_secret column.  The second replaced that with the user's stored
+password hash, which pwreset.php already keyed its reset codes on, and dropped the
+column again.  Keying on the password hash means a password change invalidates that
+user's cookies without anyone having to remember to revoke them, and it means
+issuing a cookie performs no write -- which matters because the column-based version
+minted cookies keyed on a secret that readonly mode had silently discarded.
+
+Consequences that outlived the deploy:
+
+* All tokens issued before this had to be assumed compromised.  A forged cookie
+  authenticated the API, and api_login mints a permanent token, so a token was the
+  one form of access that survived rotating the salts and renaming the session
+  cookie.
+* The session cookie name was bumped twice: once because sessions predating the fix
+  could have been created by a forged cookie, and again because adding Secure and
+  HttpOnly does not reach sessions that already exist.
+* Activation and password-reset emails in flight were invalidated by the salt
+  rotation and had to be re-requested.
+
+The outage during response was `DELETE FROM tokens` while the site was in readonly.
+That is the whole story of THE THREE OFF SWITCHES and THE TOKENS TABLE above.
