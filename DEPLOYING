@@ -31,12 +31,13 @@ stack trace is not:
     mysqldump -u tmbo -p tmbo users  > ~/backup-users-$(date +%F-%H%M).sql
     mysqldump -u tmbo -p tmbo tokens > ~/backup-tokens-$(date +%F-%H%M).sql
 
-Nothing takes these on a schedule.  There is no cron job and no other copy.  If you
-did not just take a dump, one does not exist.
+No dump is taken on a schedule by anything in this repository, and there is no other
+copy.  Confirm the server's own crontab before you rely on that -- but if you did not
+just take a dump, assume one does not exist.
 
 To put a dump back:
 
-    mysql -u tmbo -p tmbo < ~/backup-tokens-2026-08-06-1412.sql
+    mysql -u tmbo -p tmbo < ~/backup-tokens-<stamp>.sql
 
 A mysqldump of a single table begins with DROP TABLE IF EXISTS, so restoring
 replaces the table wholesale.  Anything the site wrote to it since the dump is
@@ -71,30 +72,45 @@ out every page that runs that query, while pages that do not are fine.
 THE THREE OFF SWITCHES
 ###############################################################################
 
-None of these are in a config file.  All three are hand-edited on the server, and
-none survive a git checkout of another commit -- see BEFORE YOU TOUCH ANYTHING.
+None of these are in a config file.  Two are hand-edited on the server and do not
+survive a git checkout of another commit -- see BEFORE YOU TOUCH ANYTHING.
 
-$fixing in offensive/assets/header.inc.  Set it to true and everyone except admins
-gets the fixing page.  Admins pass through and see a notice.  This is the break
-glass switch: it is what keeps users off the site while you work.
+$fixing in offensive/assets/header.inc.  Set it to true and non-admins get the
+fixing page instead of the front end; admins pass through and see a notice.
 
-$downtime in offensive/assets/header.inc drives $upgrading, which shows the upgrade
-page once the time you set has passed.  Use it for planned work you want announced;
-use $fixing for right now.
+  Know what it does NOT cover.  It is tested in index.php and nowhere else, so every
+  other entry point that includes header.inc keeps serving and keeps writing:
+  api.php, logn.php, registr.php, pwreset.php, setPref.php, subscribe.php, the
+  *_rss.php feeds.  $fixing keeps people out of the web UI.  It is not a maintenance
+  mode for the site.  If you need writes to actually stop, that is readonly.
+
+$downtime in offensive/index.php, near the top, currently commented out.  Set it to
+a unix timestamp and header.inc flips $upgrading once that time passes, which swaps
+the front end for the upgrade page; before then index.php shows a countdown, and
+$downtime_link alongside it points at an explanatory post.  Use it for planned work
+you want announced.  Use $fixing for right now.  Note it is edited in index.php, not
+in header.inc, which is only where it is read.
 
 TMBO::readonly in offensive/classes/tmbo.inc.  Change the initialiser to true and
-tmbo_query() silently discards every query that is not a SELECT or SHOW.  Silently:
-it returns without touching the database and without raising anything.  Two
-consequences worth internalising:
+tmbo_query() discards every query that is not a SELECT or SHOW, and any query
+containing a semicolon.  Silently: it returns without touching the database and
+without raising anything.  Three consequences worth internalising:
 
-  * Any write path lacking an explicit TMBO::readonly() guard appears to succeed
-    and does not.  Most of classes/ has the guard.  Assume nothing.
-  * core_createtoken() returns false, which is what makes the tokens table
-    dangerous while readonly is set.  See the next section.
+  * Any write path lacking an explicit TMBO::readonly() guard appears to succeed and
+    does not.  Most of classes/ has the guard.  Assume nothing.
+  * core_createtoken() returns false, which is what makes the tokens table dangerous
+    while readonly is set.  See the next section.
+  * A discarded query returns null rather than a result, so callers that pass it
+    straight to mysql_num_rows() will warn.
 
-The combination that table surgery needs is writes ON and users OFF -- $fixing true
-AND readonly false, at the same time.  Reaching for only one of them is how a
-maintenance window becomes an outage.
+This one is also set at runtime, not only by hand: a request authenticated with the
+" rss" token turns it on for that request.  So RSS requests are always in readonly
+regardless of what the initialiser says.
+
+The combination table surgery needs is writes ON and users OFF -- readonly false and
+$fixing true.  Remember that $fixing does not stop the API or the feeds, so for
+anything genuinely destructive, take the site out at the web server instead.
+Reaching for only one of these is how a maintenance window becomes an outage.
 
 
 ###############################################################################
@@ -226,11 +242,17 @@ every activation and password-reset email already sent.  There is no undo, only
 asking those users to request a new one.
 
 Bump TMBOSESS<n>.  PHP finds a session by the cookie named in session.name, so
-changing the name orphans every session file on disk in one step.  This is the only
-session invalidation available without root, because session.gc_probability is 0
-and nothing collects stale session files.  It is also the only way to change session
-cookie flags for users who already have a session, since PHP sends Set-Cookie only
-when it creates one.
+changing the name orphans every session file on disk in one step.  Short of root on
+the box this is the only session invalidation there is: expiring them properly needs
+the garbage collector, and session.gc_probability is set in the server's php.ini,
+which is not in this repository -- check it rather than assuming.  Bumping the name
+is also the only way to change session cookie flags for users who already have a
+session, since PHP sends Set-Cookie only when it creates one.
+
+Note what a password change does NOT cover: it invalidates that user's remember
+cookies, not their sessions.  Nothing rebinds a session to the password and nothing
+regenerates the id, so a stolen session survives it.  For a compromised session the
+only lever is the site-wide one above.
 
 The name appears in three places -- header.inc, logn.inc and logout.php -- and
 logout.php includes nothing, so it cannot share a constant.  Only the header.inc and
@@ -243,37 +265,49 @@ there is invisible until it isn't.
 AFTERWARDS: DID IT WORK, AND WHERE DID IT BREAK
 ###############################################################################
 
-Confirm the deploy took effect rather than assuming it did.  Log in from a private
-window WITH the "remember me" box ticked -- without it no cookie is issued at all --
-and look at the remember cookie.  Three dot-separated fields and the Secure flag
-means the new code is serving.  A single base64 blob means it is not.
+Confirm the deploy took effect rather than assuming it did, and pick a check that
+distinguishes the version you just shipped from the one before it -- "the cookie
+looks right" usually does not, because cookie shape rarely changes.  Something that
+does: verify the schema matches what the code expects,
 
-Reading a failure.  There are two different kinds and they look nothing alike:
+    SHOW COLUMNS FROM users;
 
-  * A handled fatal.  trigger_error(E_USER_ERROR) and any failed query go through
-    tmbo_error_handler, which logs, then renders offensive/index.outoforder.php for
-    non-admins.  That page sends HTTP 500.  Admins do not get it; they get a
-    var_dump of the backtrace inline instead, which includes call arguments and can
-    therefore contain password hashes and secrets.  Do not paste it around.
-  * A real fatal.  Parse errors, E_ERROR, calling a method on a non-object: PHP
-    does not route these to a user error handler, and nothing here registers a
-    shutdown function to catch them.  They never reach the kaboom page.  With
-    display_errors on they print into the response body at whatever status was
-    already set, which can be a 200 with an error message in the middle of the page.
+and exercise one behaviour the change was for, end to end, as a real user.
 
-So a 500 means the error handler ran and did its job.  A 200 containing an error
-message, or a blank page, is the more alarming one.  Check what display_errors is
-set to on the host you are debugging; it is not the same everywhere and it is not in
-this repository.
+Reading a failure.  There are three outcomes, and they look nothing alike:
 
-Logs.  tmbo_error_handler calls error_log(), which goes wherever PHP's error_log
-directive points on that host.  Verify it before you need it:
+  * A handled fatal, with output buffering on.  trigger_error(E_USER_ERROR) and any
+    failed query go through tmbo_error_handler, which logs, then renders
+    offensive/index.outoforder.php for non-admins.  That page sends HTTP 500.
+  * A handled fatal, with output buffering off.  The kaboom branch requires
+    ob_get_level() > 0, and nothing in the code calls ob_start() -- the one in
+    header.inc is commented out -- so the buffer only exists if php.ini
+    output_buffering is on.  Without it, the handler logs and exits with no page and
+    no status set.  You get a blank response.
+  * A real fatal.  Parse errors, E_ERROR, calling a method on a non-object: PHP does
+    not route these to a user error handler, and nothing registers a shutdown
+    function, so they never reach the kaboom page at all.  With display_errors on
+    they print into the response body at whatever status was already set, which can
+    be a 200 with an error message in the middle of an otherwise normal page.
 
-    php5 -i | grep error_log
+Admins never get the kaboom page.  They get a var_dump of the backtrace inline
+instead, which includes call arguments and so can contain plaintext passwords,
+password hashes and config secrets.  Do not paste it into a chat or a ticket.
+
+So a 500 is the good case: the handler ran.  A blank page or a 200 with an error in
+it are the ones that need the log.  Check output_buffering and display_errors on the
+host you are debugging before you interpret any of this; they are set in the server's
+php.ini, which is not in this repository -- admin/configroot/ is the dev VM only.
+
+Logs.  tmbo_error_handler calls error_log(), which goes wherever the error_log
+directive points for the SAPI serving the request.  That is php-fpm, so check the
+pool and fpm config rather than the CLI:
+
+    php-fpm -i | grep error_log        # not `php -i`, which reads the CLI ini
 
 The nginx error_log under ~/logs/ is a different file and will not necessarily have
-PHP's output.  Note also that log_errors_max_len truncates long messages, so a
-backtrace in the log may be cut off.
+PHP's output.  log_errors_max_len also truncates, so a backtrace in the log may be
+cut off.
 
 
 ###############################################################################
@@ -305,4 +339,9 @@ the more dangerous option rather than the safer one:
   undoes exactly that.
 
 The off switches are uncommitted edits to tracked files, so a checkout discards
-them.  If the site was in $fixing or readonly, put it back after you move.
+them.  If the site was in $fixing or readonly, put it back -- and put it back again
+after you roll forward, for the same reason.
+
+Do not leave production checked out on a detached commit or a feature branch.  Merge
+first, then move the server back to develop, then delete the branch.  A branch
+deleted out from under a live checkout is its own outage.

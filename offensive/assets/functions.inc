@@ -29,7 +29,13 @@ function tmbo_secret($key) {
 
 	if(!isset($config) || !is_array($config) ||
 	   !array_key_exists($key, $config) || strlen($config[$key]) < 32) {
+		/* E_USER_ERROR only terminates by way of tmbo_error_handler, which is
+		 * installed by header.inc and returns early if error_reporting is lowered.
+		 * falling through would return null, which concatenates into a caller's
+		 * key as "" -- the default this function promises not to have.
+		 */
 		trigger_error("missing or too-short secret \"$key\" in admin/.config", E_USER_ERROR);
+		exit;
 	}
 
 	return $config[$key];
@@ -60,7 +66,10 @@ function tmbo_random_hex($bytes) {
 		if($raw !== false && strlen($raw) == $bytes) return bin2hex($raw);
 	}
 
+	// see tmbo_secret() on why this does not rely on E_USER_ERROR to terminate:
+	// returning null here hands the caller an empty credential.
 	trigger_error("no source of cryptographic randomness available", E_USER_ERROR);
+	exit;
 }
 
 /* compare two strings in constant time.

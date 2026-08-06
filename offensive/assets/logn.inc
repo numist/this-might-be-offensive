@@ -290,7 +290,8 @@ function issueRememberCookie($myself) {
  */
 function loginWithCookie() {
 	// attempt logging in using the user's cookie
-	if(isset($_COOKIE[REMEMBER_COOKIE])) {
+	// php parses array syntax in cookie names, so this can arrive as an array.
+	if(isset($_COOKIE[REMEMBER_COOKIE]) && is_string($_COOKIE[REMEMBER_COOKIE])) {
 		$parts = explode(".", $_COOKIE[REMEMBER_COOKIE]);
 		if(count($parts) != 3) {
 			return null;
