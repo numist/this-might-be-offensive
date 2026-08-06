@@ -1,0 +1,171 @@
+Deploying tmbo, and getting back out again.
+
+This file covers the auth hardening deployed 2026-08-06 (branch harden-remember-cookie)
+and the general traps that deploy walked into.  Read the "before you touch anything"
+section every time; the rest is specific to that change.
+
+
+###############################################################################
+BEFORE YOU TOUCH ANYTHING
+###############################################################################
+
+Write down the commit you are on.  This is the single most useful thing you can do
+and it takes two seconds:
+
+    git -C ~/sites/tmbo rev-parse HEAD
+
+Back up any table you are about to change, and any table you are about to delete
+rows from.  Restoring from a dump is easy; reconstructing destroyed rows from a
+stack trace is not:
+
+    mysqldump -u tmbo -p tmbo users  > ~/backup-users-$(date +%F-%H%M).sql
+    mysqldump -u tmbo -p tmbo tokens > ~/backup-tokens-$(date +%F-%H%M).sql
+
+Deploy order is always: config first, then code, then migration.  A migration that
+lands before the code that understands it leaves the site unable to serve, and a
+code deploy that lands before its config secrets exist fails closed on every request.
+
+
+###############################################################################
+SANDBOX AND PROD SHARE A DATABASE
+###############################################################################
+
+sandbox is not an isolated copy of the site.  It runs against the same MySQL
+database as production; the difference between the two is the UI, not the data.
+
+The word "sandbox" implies somewhere safe to experiment.  Here it isn't.  Every
+UPDATE, DELETE and ALTER you run from the sandbox host lands on production data.
+There is no undo and no separate copy to fall back on.  A statement like
+
+    UPDATE users SET cookie_secret = NULL;
+
+run "just on sandbox to test it" logs out every user on the live site.
+
+Practical consequences:
+
+* Migrations are run ONCE, not once per environment.  If a column exists on
+  sandbox it is because it exists in production, and vice versa.
+* Backups protect both or neither.  See the section above; take one.
+* Test destructive changes against a local Vagrant VM, which does have its own
+  database, not against sandbox.
+* Sharing auth secrets between the two hosts is fine, and separating them buys
+  very little.  The trust boundary is already shared: anyone who can deploy to
+  sandbox can read and write production data directly.  Cookies are host-only
+  (setcookie passes no domain), so nothing leaks between thismight.be and
+  sandbox.thismight.be regardless.
+
+What actually is per-environment: the code checkout, admin/.config, and the
+system configuration under /etc.  Note that none of the latter two are version
+controlled, so two hosts on identical commits can still behave differently --
+admin/configroot/ holds only the Vagrant dev VM's templates, which vm_setup.sh
+installs on the dev VM and nowhere else.
+
+
+###############################################################################
+THE TOKENS TABLE IS NOT WHAT IT LOOKS LIKE
+###############################################################################
+
+`DELETE FROM tokens` takes the entire site down with a fatal error.  It does not
+just log out API clients.
+
+The table mixes user API credentials with three internal per-user tokens that the
+code creates lazily and then assumes exist forever:
+
+    " tmbo"      leading space.  constructor default, used by User::token()
+    " rss"       leading space.  Link::rss(), used in RSS feed URLs
+    "realtime"   NO leading space.  socket.io, used from seven call sites
+
+Token::getTokenRow() treats any row count other than one -- zero OR duplicates --
+as "create a replacement", calls core_createtoken(), and dereferences the result
+without checking it.  When that returns false you get
+
+    Call to a member function tokenid() on boolean in classes/token.inc on line 81
+
+on every page that renders, which is nearly all of them.
+
+To purge only real user credentials:
+
+    DELETE FROM tokens WHERE issued_to NOT IN (' tmbo', ' rss', 'realtime');
+
+To rebuild an internal token that has gone missing, per active user:
+
+    INSERT INTO tokens (tokenid, userid, issued_to, issue_date, last_used)
+    SELECT MD5(CONCAT(RAND(), userid, 'realtime')), userid, 'realtime', NOW(), NOW()
+    FROM users WHERE account_status IN ('normal','admin');
+
+Before believing you have found all of them, enumerate rather than guess:
+
+    grep -rn "new Token(" --include="*.php" --include="*.inc" .
+
+
+###############################################################################
+ROLLING BACK THE AUTH HARDENING: MOSTLY, DON'T
+###############################################################################
+
+Reverting this change reinstates a remote authentication bypass.  The old code
+derived the remember cookie from the userid, the username, and a salt that is a
+string literal in public git history, so anyone can compute a valid cookie for any
+account, including admin, without ever touching the site.  Checking out a commit
+older than b3ad558 puts that literal back in place and republishes the hole.
+
+So: fix forward.  Rollback is correct only if the new code is itself causing an
+outage, and only for as long as it takes to fix it.
+
+If you must, in this order:
+
+    git -C ~/sites/tmbo checkout <the commit you wrote down>
+
+That is enough on its own.  The users.cookie_secret column is harmless to old code,
+which selects it and ignores it -- leave it alone.  Do NOT drop the column to "clean
+up": it holds every user's cookie secret, and dropping it logs out everyone holding
+a valid remember cookie, for no benefit.
+
+Rolling the code back also reverts the session cookie rename, which makes every
+orphaned PHPSESSID session reachable again.  Those may include sessions created by
+the attacker with a forged cookie, which is exactly what renaming the cookie was for.
+Treat a rollback as re-opening that door and close it again quickly.
+
+
+###############################################################################
+WHAT CANNOT BE ROLLED BACK
+###############################################################################
+
+Some of this deploy is one-way.  Know which parts before you start.
+
+Rotated salts.  remember_pepper, activation_salt and pwreset_salt live in
+admin/.config, which is gitignored and holds the only copy.  Rotating them
+permanently invalidates every activation and password-reset email already sent;
+those users must request a new one.  There is no undo, only re-sending.
+
+Lose admin/.config and you have not lost the site, but every remember cookie stops
+verifying and every pending activation and reset link dies.  Back it up somewhere
+that is not this repository.
+
+Cleared cookie secrets.  Setting users.cookie_secret to NULL invalidates every
+remember cookie in existence.  That is a feature -- it is how the fix was deployed --
+but it is not reversible, and it is the correct lever to pull again if credentials
+are ever suspected: nulling the column for one user logs out that user's devices,
+and for all users logs out everybody.
+
+The session cookie name.  Bumping the suffix in TMBOSESS<n> (header.inc, logn.inc
+and logout.php must all agree) orphans every live session.  Also a feature, also
+not reversible, and the only session-invalidation lever available without root on
+the host.
+
+
+###############################################################################
+AFTERWARDS
+###############################################################################
+
+Confirm the deploy actually took effect rather than assuming it did.  Log in from a
+private window and look at the remember cookie: three dot-separated fields and the
+Secure flag means the new code is serving.  A single base64 blob means it is not.
+
+Errors land in ~/logs/thismight.be-error_log.  Note that trigger_error(E_USER_ERROR)
+renders the kaboom page with a 200, so a genuine 500 means a real PHP fatal -- a
+parse error or a call to an undefined function -- and the stack trace will be in
+that log.
+
+Do not leave production checked out on a feature branch.  Merge first, then move the
+server back to develop, then delete the branch.  A branch deleted out from under a
+live checkout is its own outage.
