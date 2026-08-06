@@ -108,6 +108,15 @@ mysql --password=shortbus tmbo < $SRCROOT/admin/database/schema.sql
 mysql --password=shortbus tmbo < $SRCROOT/admin/database/populate.sql
 site_config_file /home/vagrant/sites/tmbo/admin/.config
 
+# Auth secrets are generated here rather than committed to the .config template.
+# These sign the remember cookie, activation links, and password reset links; a
+# value that lives in the repository is a value an attacker already has, which is
+# exactly how the remember cookie became forgeable. Every checkout gets its own.
+echo 'Generating auth secrets'
+for secret in remember_pepper activation_salt pwreset_salt; do
+  echo "$secret = \"$(openssl rand -hex 32)\"" >> /home/vagrant/sites/tmbo/admin/.config
+done
+
 system_config_file /etc/php5/cli/php.ini
 site_config_file /etc/cron.d/tmbo
 

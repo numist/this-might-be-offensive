@@ -59,7 +59,7 @@ https://".$_SERVER['HTTP_HOST']."/offensive/pwreset.php?x=$code
 
 	function hashFromUserRow( $row ) {
 		$id = $row[ 'userid' ];
-		$input = $row['username'] . $row['password'] . ":wakka";
+		$input = $row['username'] . $row['password'] . tmbo_secret("pwreset_salt");
 		$code = tmbohash( $id, $input );
 		return $code;
 	}
@@ -128,7 +128,7 @@ https://".$_SERVER['HTTP_HOST']."/offensive/pwreset.php?x=$code
 			if( mysql_num_rows( $result ) == 1 ) {
 				$row = mysql_fetch_assoc( $result );
 				$hash = hashFromUserRow( $row );
-				if( $hash == $code ) {
+				if( tmbo_hash_equals( $hash, $code ) ) {
 					return $row;
 				}
 			}

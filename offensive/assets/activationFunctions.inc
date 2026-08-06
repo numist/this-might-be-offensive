@@ -1,9 +1,34 @@
 <?
+require_once("offensive/assets/functions.inc");
 
 	$id_offset = 3737;
 	$pad_length = 8;
 	$hash_param_key = "z";
-	$salt = ":woot";
+
+	/* fetch a secret out of admin/.config (which is not in source control).
+	 *
+	 * these used to be string literals in this file, which meant anyone
+	 * reading the public repository could forge a remember cookie for any
+	 * account.  secrets live in the config file now and must never come back.
+	 *
+	 * this is a function rather than a global assignment on purpose: api.php
+	 * and activate.php both include this file *before* they include
+	 * admin/mysqlConnectionInfo.inc, so $config does not exist yet at the time
+	 * this file is parsed.  resolve it lazily, at the point of use.
+	 *
+	 * a missing or obviously-too-short secret is fatal.  falling back to a
+	 * default would quietly reintroduce the bug this replaced.
+	 */
+	function tmbo_secret( $key ) {
+		global $config;
+
+		if( !isset($config) || !is_array($config) ||
+		    !array_key_exists($key, $config) || strlen($config[$key]) < 32 ) {
+			trigger_error("missing or too-short secret \"$key\" in admin/.config", E_USER_ERROR);
+		}
+
+		return $config[$key];
+	}
 
 	// generates a string used in the link
 	// to identify the account to be activated
@@ -42,9 +67,9 @@
 	}
 
 	function activationMessageFor( $id, $email ) {
-		global $hash_param_key, $salt;
+		global $hash_param_key;
 
-		$hash = tmbohash( $id, $email . $salt );
+		$hash = tmbohash( $id, $email . tmbo_secret("activation_salt") );
 		$message = "  Thanks for registering at [ this might be offensive ].
   Please visit this link to activate your account:
   https://thismight.be/offensive/activate.php?$hash_param_key=$hash

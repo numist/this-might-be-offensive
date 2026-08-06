@@ -232,23 +232,104 @@ function loginWithSession() {
 }
 
 /*
+ * the rememberme cookie.
+ *
+ * the cookie is "userid.nonce.mac", where the mac is an HMAC over the first two
+ * fields, keyed with a random per-user secret (users.cookie_secret) concatenated
+ * with a site-wide pepper from admin/.config.
+ *
+ * this replaces a scheme that hashed only the userid, the username, and a salt
+ * that was a literal in the public repository -- every input was public, so
+ * anyone could compute a valid cookie for any account without ever touching the
+ * site.  it is worth spelling out what each piece here is for:
+ *
+ *   * the per-user secret means a cookie cannot be derived from public data, and
+ *     that overwriting one row logs that one user out without disturbing anyone
+ *     else.  clearing the column for everybody invalidates every cookie at once.
+ *   * the pepper means a dump of the users table is not by itself enough to mint
+ *     cookies; you need the server's config file too.
+ *   * the nonce makes each issued cookie unique, so the cookie is not a
+ *     deterministic function of the account and two devices don't share a value.
+ *
+ * NOTE: a single secret per user means revocation is all-or-nothing across that
+ * user's devices.  per-device revocation would need a separate token table.
+ */
+define("REMEMBER_COOKIE", "remember");
+define("REMEMBER_TTL", 60*60*24*365*5);
+
+function rememberCookieMac($userid, $nonce, $secret) {
+	return hash_hmac("sha256", $userid.".".$nonce, $secret.tmbo_secret("remember_pepper"));
+}
+
+/*
+ * issue a fresh rememberme cookie for a user, minting them a cookie secret if
+ * they don't have one yet.
+ */
+function issueRememberCookie($myself) {
+	$uid = $myself->id();
+
+	$sql = "SELECT cookie_secret FROM users WHERE userid=$uid LIMIT 1";
+	$result = tmbo_query( $sql );
+	if(mysql_num_rows( $result ) != 1) {
+		trigger_error("tried to issue a remember cookie for nonexistent user $uid", E_USER_WARNING);
+		return false;
+	}
+
+	$row = mysql_fetch_assoc( $result );
+	$secret = $row['cookie_secret'];
+
+	if(is_null($secret) || strlen($secret) == 0) {
+		$secret = tmbo_random_hex(32);
+		tmbo_query( "UPDATE users SET timestamp = timestamp, cookie_secret = '".sqlEscape($secret)."' WHERE userid=$uid LIMIT 1" );
+	}
+
+	$nonce = tmbo_random_hex(16);
+	$value = $uid.".".$nonce.".".rememberCookieMac($uid, $nonce, $secret);
+
+	// secure: this site is https-only (see header.inc).  httponly: script has no business reading this.
+	setcookie(REMEMBER_COOKIE, $value, time() + REMEMBER_TTL, "/", "", true, true);
+	return true;
+}
+
+/*
+ * invalidate every rememberme cookie belonging to a user by throwing away the
+ * secret they were signed with.  for incident response and for a future
+ * "log out everywhere" control; ordinary logout just drops the local cookie.
+ */
+function revokeRememberCookies($myself) {
+	$uid = $myself->id();
+	tmbo_query( "UPDATE users SET timestamp = timestamp, cookie_secret = NULL WHERE userid=$uid LIMIT 1" );
+}
+
+/*
  * attempt to log on using the rememberme cookie as credentials.
  * returns a boolean if success/failure, null if not applicable.
  */
 function loginWithCookie() {
 	// attempt logging in using the user's cookie
-	if(isset($_COOKIE['remember'])) {
-		global $salt;
+	if(isset($_COOKIE[REMEMBER_COOKIE])) {
+		$parts = explode(".", $_COOKIE[REMEMBER_COOKIE]);
+		if(count($parts) != 3) {
+			return null;
+		}
+		list($uid, $nonce, $mac) = $parts;
 
-		$uid = id_from_hash( $_COOKIE['remember'] );
-		if(is_intger($uid)) {
+		if(is_intger($uid) && strlen($nonce) && strlen($mac)) {
+			$uid = (int)$uid;
 			$sql = "SELECT * from users where userid=$uid LIMIT 1";
 			$result = tmbo_query( $sql );
 			if(mysql_num_rows( $result ) == 1) {
 				$row = mysql_fetch_assoc($result);
-				$cookiehash = tmbohash($row['userid'], $row['username'].$salt);
-				if($cookiehash == $_COOKIE['remember']) {
-					return logInUser(new User($row));
+
+				/* no secret means every cookie for this user has been revoked
+				 * (or predates the fix).  either way there is nothing to verify
+				 * against, so don't try.
+				 */
+				if(!is_null($row['cookie_secret']) && strlen($row['cookie_secret'])) {
+					$cookiemac = rememberCookieMac($row['userid'], $nonce, $row['cookie_secret']);
+					if(tmbo_hash_equals($cookiemac, $mac)) {
+						return logInUser(new User($row));
+					}
 				}
 			}
 		}
@@ -261,7 +342,7 @@ function loginWithCookie() {
  * returns a boolean if success/failure, null if not applicable.
  */
 function loginWithUserPass($params) {
-	global $login_message, $salt;
+	global $login_message;
 
 	if(count($params) == 2 && !is_null($params[0]) && !is_null($params[1])) {
 		list($name, $pw) = $params;
@@ -276,10 +357,7 @@ function loginWithUserPass($params) {
 			if(logInUser(new User($userid))) {
 				// set rememberme cookie if the user requested it
 				if(array_key_exists("rememberme", $_REQUEST) && $_REQUEST['rememberme']) {
-					setcookie("remember", 
-					          tmbohash(me()->id(), 
-					                   me()->username().$salt ), 
-					                   time()+60*60*24*365*5, "/" );
+					issueRememberCookie(me());
 				}
 				return true;
 			}
