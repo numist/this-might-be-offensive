@@ -118,6 +118,21 @@ function csrfValid() {
 	       tmbo_hash_equals($_SESSION['csrf'], $_REQUEST['csrf']);
 }
 
+/* escape a value for XML element content.
+ *
+ * htmlEscape() is not a substitute.  An XML parser decodes entities in element
+ * content, so a value that was html-escaped once arrives at the consumer decoded
+ * back to markup; it has to be escaped again to survive that decode inert.  Nor
+ * does htmlEscape() touch "&" followed by "#", which a reader will decode too.
+ *
+ * Content inside <![CDATA[ ]]> is not decoded and does not want this.  It wants its
+ * own terminator to be unreachable instead -- check that whatever goes in cannot
+ * contain "]]>" before relying on the section.
+ */
+function xmlEscape($string) {
+	return htmlspecialchars($string, ENT_QUOTES | ENT_XML1, "UTF-8");
+}
+
 function getFileExtension($filename) {
 	preg_match( "/\.[^\.]+$/", $filename, $matches );
 	if(is_array($matches) && isset($matches[0])) return $matches[0];

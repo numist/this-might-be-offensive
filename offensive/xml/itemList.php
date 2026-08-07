@@ -50,7 +50,7 @@ header( "Content-type: text/xml" ); ?>
 ?>
 
 		<item id="<?= $row['id'] ?>">
-			<title><![CDATA[<?= $nsfw . $filename ?> (uploaded by <? echo $row['username']?>)]]></title>
+			<title><?= xmlEscape($nsfw . $filename) ?> (uploaded by <?= xmlEscape($row['username']) ?>)</title>
 			<date><? echo date( "r", strtotime( $row['timestamp'] ) ) ?></date>			
 			<imgUrl><?= "http://tmbo.org/offensive/uploads/$year/$month/$day/image/" . rawurlencode( $row['filename'] ) ?></imgUrl>
 			<thumbUrl><?= "http://tmbo.org/offensive/uploads/$year/$month/$day/image/thumbs/th" . $row['id'] . $extension ?></thumbUrl>
