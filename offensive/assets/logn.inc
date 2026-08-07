@@ -73,7 +73,7 @@ function checkUser($myself) {
 		if(strtotime($myself->timestamp()) < time() - 60 ||
 		   $myself->last_login_ip() != $_SERVER['REMOTE_ADDR']) {
 			
-			$sql = "UPDATE users SET last_login_ip='" . $_SERVER['REMOTE_ADDR'] . "', timestamp=NOW() WHERE userid=".$myself->id();
+			$sql = "UPDATE users SET last_login_ip='" . sqlEscape($_SERVER['REMOTE_ADDR']) . "', timestamp=NOW() WHERE userid=".$myself->id();
 			tmbo_query( $sql );
 			
 			// update the User cache with the new data.
@@ -132,7 +132,7 @@ function logInUser($myself, $session=true) {
  */
 function canLogIn() {
 	// check to see if this person has had too many login attempts in the last 30 minutes already.
-	$ip = $_SERVER['REMOTE_ADDR'];
+	$ip = sqlEscape($_SERVER['REMOTE_ADDR']);
 	$sql = "SELECT count( id ) as numFailed from failed_logins WHERE ip='$ip' AND timestamp > date_sub( now(), interval 30 minute )";
 	$result = tmbo_query( $sql );
 
@@ -149,7 +149,7 @@ function canLogIn() {
  * this is used to determine if a host canLogIn.
  */
 function failedLogIn($name) {
-	$ip = $_SERVER['REMOTE_ADDR'];
+	$ip = sqlEscape($_SERVER['REMOTE_ADDR']);
 	$sql = "insert into failed_logins (username,ip) VALUES ( '".sqlEscape($name)."', '$ip' )";
 	tmbo_query( $sql );
 }
