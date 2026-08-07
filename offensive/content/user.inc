@@ -250,6 +250,12 @@ function recentComments( $uid ) {
 
 
 function handleSetStatusSubmission() {
+	// an authenticated request is not the same as a request we asked for.
+	if(!csrfValid()) {
+		trigger_error("rejected an account change with a missing or wrong csrf token", E_USER_ERROR);
+		exit;
+	}
+
 	$usrid =  sqlEscape( $_POST['userid'] );
 	$status =  sqlEscape( $_POST['set_account_status'] );
 	$email =  sqlEscape( $_POST['set_email'] );
@@ -287,6 +293,7 @@ function setStatusForm( $id, $status, $email ) {
 		<div style="margin:8px 0px;">
 			<form action="<?= $_SERVER['PHP_SELF']?>" method="post">
 				<input type="hidden" name="c" value="user"/>
+				<input type="hidden" name="csrf" value="<?= htmlEscape(csrfToken()) ?>"/>
 				<input type="hidden" name="userid" value="<?= $id ?>"/>
 				<select name="set_account_status">
 				<?
