@@ -8,7 +8,8 @@
 		"consciousness doesn't really exist. it's just another one of our ideas.",
 		"what did you bring the book i didn't want to be read out of up for?",
 		"Each day's a gift!",
-		"HDR IS THE CAPS LOCK OF PHOTOGRAPHY!"
+		"HDR IS THE CAPS LOCK OF PHOTOGRAPHY!",
+		"please don't exploit me, my dad is dead."
 		);
 	$quip = $quips[rand(0, count($quips) - 1)];
 
