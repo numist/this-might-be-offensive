@@ -92,7 +92,7 @@ $timelimit = 10;
 	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 	<title><?
 		if( function_exists( 'title' ) ) {
-			echo title();
+			echo htmlEscape(title());
 		}
 		else {
 			echo "[ this might be offensive ]";

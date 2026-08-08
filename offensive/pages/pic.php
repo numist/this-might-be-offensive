@@ -54,7 +54,7 @@
 
 		$filter = me()->getPref("hide_nsfw") ? " AND nsfw = 0" : "";
 		$filter .= me()->getPref("hide_tmbo") ? " AND tmbo = 0" : "";
-		$sql = "SELECT id FROM offensive_uploads WHERE type='".$upload->type()."' AND status='normal' AND id < ".min($pickuplinks).$filter." ORDER BY RAND() LIMIT 1";
+		$sql = "SELECT id FROM offensive_uploads WHERE type='".$upload->type()."' AND status='normal' AND id < ".(int)min($pickuplinks).$filter." ORDER BY RAND() LIMIT 1";
 		$res = tmbo_query($sql);
 		$row = mysql_fetch_assoc( $res );
 		return($row['id']);
@@ -76,7 +76,7 @@
 	<head>
 		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 		<META NAME="ROBOTS" CONTENT="NOARCHIVE" />
-		<title>[<?= $upload->type() ?>] : <?= $upload->filename() ?> </title>
+		<title>[<?= $upload->type() ?>] : <?= htmlEscape($upload->filename()) ?> </title>
 		<!-- <? if($upload->next_filtered()) { ?>
 			<link rel="prefetch" href="<?= $_SERVER['PHP_SELF'] ?>?id=<?= $upload->next_filtered()->id() ?>"/>
 		<? } ?> -->
@@ -147,10 +147,10 @@
             // TODO: remove key-agnosticism
             if($code <= KEY_CODE_MASK) {
               // code is modifier-agnostic ?>
-            if(<?= $code ?> == (keycode & <?= KEY_CODE_MASK ?>)) {
+            if(<?= (int)$code ?> == (keycode & <?= KEY_CODE_MASK ?>)) {
             <? } else {
               // code is modifier-strict ?>
-            if(<?= $code ?> == keycode) {
+            if(<?= (int)$code ?> == keycode) {
             <? } ?>
               
               e.preventDefault();
@@ -471,7 +471,7 @@
 						$tags = $info['id3v2']['comments'];
 
 						if(array_key_exists('title', $tags)) { ?>
-						<span style="color:#666666">Title: <?= trim($tags['title'][0]); ?>
+						<span style="color:#666666">Title: <?= htmlEscape(trim($tags['title'][0])); ?>
 							<?
 							if(array_key_exists('tracknum', $tags)) {
 								echo "(track ".(int)trim($tags['tracknum'][0]);
@@ -485,11 +485,11 @@
 						<? }
 
 						if(array_key_exists('artist', $tags)) { ?>
-						<span style="color:#666666">By: <?= trim($tags['artist'][0]); ?></span><br />
+						<span style="color:#666666">By: <?= htmlEscape(trim($tags['artist'][0])); ?></span><br />
 						<? }
 
 						if(array_key_exists('album', $tags)) { ?>
-						<span style="color:#666666">Album: <?= trim($tags['album'][0]); ?></span><br /><br />
+						<span style="color:#666666">Album: <?= htmlEscape(trim($tags['album'][0])); ?></span><br /><br />
 						<? }
 					}
 					?></td></tr></table><?

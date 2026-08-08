@@ -526,7 +526,7 @@ class User {
 			$ret["referer"] = $this->referred_by()->username();
 		}
 
-		if($this->status() == "admin") {
+		if(me() && me()->status() == "admin") {
 			$ret["ip"] = $this->last_login_ip();
 			$ret["email"] = $this->email();
 		}

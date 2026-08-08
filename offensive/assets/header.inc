@@ -24,16 +24,19 @@ if(isset($downtime) && time() > $downtime) {
 
 /*****************************************************************************/
 
+// Revoke tokens sent in cleartext
+if(!ssl() && array_key_exists("token", $_REQUEST) && is_string($_REQUEST['token'])) {
+	tmbo_query("DELETE FROM tokens WHERE tokenid = '".sqlEscape($_REQUEST['token'])."'");
+}
+
 // force not www.
 if(substr($_SERVER["HTTP_HOST"], 0, 4) == "www.") {
-	// TODO: if a token was present in the URI, it should be invalidated.
 	header("Location: https://".substr($_SERVER["HTTP_HOST"], 4).$_SERVER["REQUEST_URI"], 301);
 	exit;
 }
 
 // force ssl.
 if(!ssl()) {
-	// TODO: if a token was present in the URI, it should be invalidated.
 	header("Location: https://".$_SERVER["HTTP_HOST"].$_SERVER["REQUEST_URI"], 301);
 	exit;
 }
@@ -141,7 +144,7 @@ function tmbo_error_handler($errno, $errstr, $errfile, $errline, $errcontext) {
 					           $_SESSION['status'] == "admin") {
 						ob_start();
 						var_dump(debug_backtrace());
-						$trace = nl2br(ob_get_contents());
+						$trace = nl2br(htmlspecialchars(ob_get_contents()));
 						ob_end_clean();
 						echo $trace;
 					}
@@ -172,7 +175,7 @@ function tmbo_exception_handler($e) {
 		    ." in <b>".$shortfile."</b> on line <b>".$e->getLine()."</b><br /><br />";
 		ob_start();
 		var_dump(debug_backtrace());
-		$trace = nl2br(ob_get_contents());
+		$trace = nl2br(htmlspecialchars(ob_get_contents()));
 		ob_end_clean();
 		echo $trace;
 	}

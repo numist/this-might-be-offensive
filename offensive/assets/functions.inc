@@ -90,6 +90,49 @@ function tmbo_hash_equals($known, $given) {
 	return $diff === 0;
 }
 
+/* per-session value proving a request was built by one of our own pages.
+ *
+ * the session cookie answers "who is this", and the browser attaches it to any
+ * request to us however that request was provoked -- which is why a form another
+ * site submits on a user's behalf arrives authenticated.  this value answers a
+ * different question, and nothing attaches it automatically: it has to be written
+ * into the request, and a page on another origin cannot read it to do so.
+ *
+ * minted on demand so anonymous forms can carry one too.  survives
+ * session_regenerate_id(), which keeps $_SESSION and changes only the id.
+ */
+function csrfToken() {
+	if(!array_key_exists('csrf', $_SESSION)) {
+		$_SESSION['csrf'] = tmbo_random_hex(16);
+	}
+	return $_SESSION['csrf'];
+}
+
+/* does this request carry the token of the session making it?
+ * deliberately does not mint one: a session with no token yet cannot have issued
+ * the form being submitted.
+ */
+function csrfValid() {
+	return array_key_exists('csrf', $_SESSION) &&
+	       array_key_exists('csrf', $_REQUEST) &&
+	       tmbo_hash_equals($_SESSION['csrf'], $_REQUEST['csrf']);
+}
+
+/* escape a value for XML element content.
+ *
+ * htmlEscape() is not a substitute.  An XML parser decodes entities in element
+ * content, so a value that was html-escaped once arrives at the consumer decoded
+ * back to markup; it has to be escaped again to survive that decode inert.  Nor
+ * does htmlEscape() touch "&" followed by "#", which a reader will decode too.
+ *
+ * Content inside <![CDATA[ ]]> is not decoded and does not want this.  It wants its
+ * own terminator to be unreachable instead -- check that whatever goes in cannot
+ * contain "]]>" before relying on the section.
+ */
+function xmlEscape($string) {
+	return htmlspecialchars($string, ENT_QUOTES | ENT_XML1, "UTF-8");
+}
+
 function getFileExtension($filename) {
 	preg_match( "/\.[^\.]+$/", $filename, $matches );
 	if(is_array($matches) && isset($matches[0])) return $matches[0];

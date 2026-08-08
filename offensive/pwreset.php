@@ -35,10 +35,10 @@
 		$result = tmbo_query( $sql );
 		if( mysql_num_rows( $result ) == 1 ) {
 			$row = mysql_fetch_assoc( $result );
-			$code = hashFromUserRow( $row );
+			$code = hashFromUserRow( $row, gmdate( "Y-m-d" ) );
 			$message = "Someone (hopefully you) wants to reset your [this might be offensive] password. To reset your password, please visit the following link:
 
-https://".$_SERVER['HTTP_HOST']."/offensive/pwreset.php?x=$code
+https://thismight.be/offensive/pwreset.php?x=".urlencode( $code )."
 
 			";
 			
@@ -57,9 +57,21 @@ https://".$_SERVER['HTTP_HOST']."/offensive/pwreset.php?x=$code
 	}
 
 
-	function hashFromUserRow( $row ) {
+	/* the reset code.
+	 *
+	 * $row['password'] is in the input on purpose: the code's whole job is to change
+	 * that value, so using it invalidates it.  no stored nonce needed.
+	 *
+	 * $day defaults to null, which means "not bounded by a date" and produces a code
+	 * that stays valid until the password changes.  Pass a day to get one that
+	 * expires; userRowFromCode() accepts today's and yesterday's, so a code lives at
+	 * least 24 hours and at most 48 depending how close to midnight it was issued.
+	 * Pass gmdate("Y-m-d"), not date(): a timezone change on the host would otherwise
+	 * move the boundary under an outstanding email.
+	 */
+	function hashFromUserRow( $row, $day = null ) {
 		$id = $row[ 'userid' ];
-		$input = $row['username'] . $row['password'] . tmbo_secret("pwreset_salt");
+		$input = $row['username'] . $row['password'] . $day . tmbo_secret("pwreset_salt");
 		$code = tmbohash( $id, $input );
 		return $code;
 	}
@@ -127,8 +139,12 @@ https://".$_SERVER['HTTP_HOST']."/offensive/pwreset.php?x=$code
 			$result = tmbo_query( $sql );
 			if( mysql_num_rows( $result ) == 1 ) {
 				$row = mysql_fetch_assoc( $result );
-				$hash = hashFromUserRow( $row );
-				if( tmbo_hash_equals( $hash, $code ) ) {
+				// a code lives at least 24 hours and at most 48, depending how close
+				// to midnight it was issued.
+				$today = gmdate( "Y-m-d" );
+				$yesterday = gmdate( "Y-m-d", time() - 86400 );
+				if( tmbo_hash_equals( hashFromUserRow( $row, $today ), $code ) ||
+				    tmbo_hash_equals( hashFromUserRow( $row, $yesterday ), $code ) ) {
 					return $row;
 				}
 			}

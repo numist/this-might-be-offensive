@@ -27,7 +27,7 @@
 	function createTopic($topic) {
 		$uid = me()->id();
 		$sql = "INSERT INTO offensive_uploads ( userid, filename, ip, type )
-					VALUES ( $uid, '".sqlEscape($topic)."', '" . $_SERVER['REMOTE_ADDR'] . "', 'topic' )";
+					VALUES ( $uid, '".sqlEscape($topic)."', '" . sqlEscape($_SERVER['REMOTE_ADDR']) . "', 'topic' )";
 		tmbo_query($sql);
 
 	 	$threadid = mysql_insert_id();
