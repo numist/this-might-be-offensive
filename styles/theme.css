@@ -21,7 +21,7 @@
     --link-accent: var(--orange);
 
     /* Backgrounds */
-  --bg-page: var(--purple-dark);
+  --bg-page: var(--color-brand);
   --bg-heading: var(--color-brand-dark);
   --bg-content: var(--color-brand-light);
   --bg-content-alt: var(--color-brand-light-alt);
