@@ -30,7 +30,7 @@ services:
       - ./services/web/src/offensive/uploads:/var/www/html/offensive/uploads:rw
       - ./services/web/src/offensive/zips:/var/www/html/offensive/zips:rw
       - ./services/web/src/offensive/quarantine:/var/www/html/offensive/quarantine:rw
-      - ./admin/.config.docker:/var/www/html/admin/.config:ro
+      - ./admin/.config.generated:/var/www/html/admin/.config:ro
     environment:
       - TMBO_ENV=development
     depends_on:
@@ -89,7 +89,7 @@ services:
       context: .
       dockerfile: services/realtime/Dockerfile
     volumes:
-      - ./admin/.config.docker:/app/admin/.config:ro
+      - ./admin/.config.generated:/app/admin/.config:ro
     environment:
       - NODE_ENV=development
     depends_on:
@@ -109,7 +109,7 @@ services:
       - ./services/web/src/offensive/uploads:/var/www/html/offensive/uploads:rw
       - ./services/web/src/offensive/zips:/var/www/html/offensive/zips:rw
       - ./services/web/src/offensive/quarantine:/var/www/html/offensive/quarantine:rw
-      - ./admin/.config.docker:/var/www/html/admin/.config:ro
+      - ./admin/.config.generated:/var/www/html/admin/.config:ro
     depends_on:
       db:
         condition: service_healthy

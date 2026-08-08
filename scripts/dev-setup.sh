@@ -22,6 +22,33 @@ else
     echo "SSL certificates already exist, skipping generation."
 fi
 
+# Generate the runtime config with fresh auth secrets.
+#
+# admin/.config.docker is committed and holds only non-secret service settings.
+# The auth secrets -- remember_pepper, activation_salt, pwreset_salt -- sign the
+# remember cookie, activation links, and password reset links, so a value that
+# lives in the repository is a value an attacker already has. They are generated
+# per checkout into admin/.config.generated, which is gitignored, and the
+# containers mount that file as admin/.config.
+#
+# Regenerating invalidates outstanding remember cookies and activation/reset
+# links, so an existing file is left alone. Delete it to get new secrets.
+CONFIG_GENERATED="$PROJECT_ROOT/admin/.config.generated"
+if [ ! -f "$CONFIG_GENERATED" ]; then
+    echo "Generating auth secrets..."
+    # umask so the secrets are not world-readable even briefly.
+    (
+        umask 077
+        cat "$PROJECT_ROOT/admin/.config.docker" > "$CONFIG_GENERATED"
+        for secret in remember_pepper activation_salt pwreset_salt; do
+            echo "$secret = \"$(openssl rand -hex 32)\"" >> "$CONFIG_GENERATED"
+        done
+    )
+    echo "Auth secrets generated."
+else
+    echo "Auth secrets already exist, skipping generation."
+fi
+
 # Create upload directories if they don't exist
 mkdir -p "$PROJECT_ROOT/services/web/src/offensive/uploads"
 mkdir -p "$PROJECT_ROOT/services/web/src/offensive/zips"

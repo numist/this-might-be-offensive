@@ -5,6 +5,8 @@ offensive/zips
 realtime/node_modules
 .DS_Store
 admin/.config
+admin/.config.generated
+admin/.config.prod
 admin/certificates
 *.swp
 todo.txt
