@@ -38,7 +38,7 @@
 			$code = hashFromUserRow( $row, gmdate( "Y-m-d" ) );
 			$message = "Someone (hopefully you) wants to reset your [this might be offensive] password. To reset your password, please visit the following link:
 
-https://thismight.be/offensive/pwreset.php?x=$code
+https://thismight.be/offensive/pwreset.php?x=".urlencode( $code )."
 
 			";
 			
