@@ -523,7 +523,7 @@
                                             echo $info[0]." x ".$info[1]." - ".
                                                  floor(filesize($upload->file()) / 1024).
                                                  "k&nbsp;-&nbsp;".
-(substr($upload->filename(), strrpos($upload->filename(), ".") + 1));
+(htmlEscape(substr($upload->filename(), strrpos($upload->filename(), ".") + 1)));
                                         ?>
                                             </div>
                                                 <? } ?>

@@ -93,7 +93,7 @@ $timelimit = 10;
 	<?php include 'includes/meta.inc'; ?>
 	<title><?
 		if( function_exists( 'title' ) ) {
-			echo title();
+			echo htmlEscape(title());
 		}
 		else {
 			echo "[ this might be offensive ]";

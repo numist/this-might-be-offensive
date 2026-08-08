@@ -24,16 +24,19 @@ if(isset($downtime) && time() > $downtime) {
 
 /*****************************************************************************/
 
+// Revoke tokens sent in cleartext
+if(!ssl() && array_key_exists("token", $_REQUEST) && is_string($_REQUEST['token'])) {
+	tmbo_query("DELETE FROM tokens WHERE tokenid = '".sqlEscape($_REQUEST['token'])."'");
+}
+
 // force not www.
 if(substr($_SERVER["HTTP_HOST"], 0, 4) == "www.") {
-	// TODO: if a token was present in the URI, it should be invalidated.
 	header("Location: https://".substr($_SERVER["HTTP_HOST"], 4).$_SERVER["REQUEST_URI"], 301);
 	exit;
 }
 
 // force ssl.
 if(!ssl()) {
-	// TODO: if a token was present in the URI, it should be invalidated.
 	header("Location: https://".$_SERVER["HTTP_HOST"].$_SERVER["REQUEST_URI"], 301);
 	exit;
 }
@@ -45,6 +48,39 @@ if(!ssl()) {
  * |_|\___/ \__, |\__, |_|_| |_|\__, |
  *          |___/ |___/         |___/
  */
+
+/* php finds a session by the cookie named in session.name, so changing that
+ * name orphans every session file already on disk in a single step.  that is
+ * the only lever we have here: session.gc_probability is 0, nothing collects
+ * stale session files, and invalidating them by hand needs root on the box.
+ *
+ * bump the suffix to log the entire site out again.  the three session_start()
+ * calls in the codebase -- here, logn.inc, and logout.php -- must all agree on
+ * the name, and logout.php includes nothing, so it can't share a constant.
+ *
+ * TMBOSESS1: sessions predating the remember-cookie fix could have been created
+ * by a forged cookie, and loginWithSession() runs before loginWithCookie(), so
+ * fixing the cookie did not by itself dislodge them.
+ *
+ * TMBOSESS2: secure and httponly were added to the session cookie below, but php
+ * only emits Set-Cookie when it creates a session -- resuming one from a valid
+ * cookie sends no header at all, so existing sessions would have kept their old
+ * flagless cookies until each browser happened to discard them.  renaming forces
+ * every client to be issued a fresh cookie carrying the flags.
+ */
+session_name("TMBOSESS2");
+
+/* the session cookie never carried secure or httponly: they aren't set in
+ * php.ini and nothing set them in code, so the flags default off.  this site
+ * redirects every request to https a few lines above, and the session cookie is
+ * a login credential, so it has no business travelling in the clear or being
+ * readable from script.  set them here rather than in php.ini because changing
+ * php.ini needs root on the host, which we don't have.
+ *
+ * lifetime 0 and path / preserve the existing behaviour; only the last two
+ * arguments are a change.
+ */
+session_set_cookie_params(0, "/", "", true, true);
 
 // if we are not an admin, buffer output until the end in case of fatal errors.
 session_start();
@@ -108,7 +144,7 @@ function tmbo_error_handler($errno, $errstr, $errfile, $errline, $errcontext) {
 					           $_SESSION['status'] == "admin") {
 						ob_start();
 						var_dump(debug_backtrace());
-						$trace = nl2br(ob_get_contents());
+						$trace = nl2br(htmlspecialchars(ob_get_contents()));
 						ob_end_clean();
 						echo $trace;
 					}
@@ -139,7 +175,7 @@ function tmbo_exception_handler($e) {
 		    ." in <b>".$shortfile."</b> on line <b>".$e->getLine()."</b><br /><br />";
 		ob_start();
 		var_dump(debug_backtrace());
-		$trace = nl2br(ob_get_contents());
+		$trace = nl2br(htmlspecialchars(ob_get_contents()));
 		ob_end_clean();
 		echo $trace;
 	}

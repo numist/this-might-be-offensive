@@ -44,7 +44,7 @@ conditionalGet($lastBuildTime);
 ?>
 
 		<item>
-			<title><![CDATA[<?= $upload->filename() ?> (started by <?= $upload->uploader()->username() ?>)]]></title>
+			<title><?= xmlEscape($upload->filename()) ?> (started by <?= xmlEscape($upload->uploader()->username()) ?>)</title>
 			<link>https://<?= $_SERVER['HTTP_HOST'].Link::thread($upload) ?></link>
 			<description><![CDATA[<?
 				$comments = $upload->getComments();

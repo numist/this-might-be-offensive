@@ -102,7 +102,7 @@
 			
             $encrypted_pw = sha1( $pw );
 		
-			$query = "INSERT INTO users (username,password,email,created,ip,referred_by) VALUES ( '" . $uName . "','" . $encrypted_pw . "', '" . sqlEscape($_POST['email']) . "', now(), '" . $_SERVER['REMOTE_ADDR']. "', $referrerId )";
+			$query = "INSERT INTO users (username,password,email,created,ip,referred_by) VALUES ( '" . $uName . "','" . $encrypted_pw . "', '" . sqlEscape($_POST['email']) . "', now(), '" . sqlEscape($_SERVER['REMOTE_ADDR']). "', $referrerId )";
 			tmbo_query($query); 
 
 			$result = tmbo_query("SELECT userid,account_status from users where username = '$uName'"); 
@@ -178,7 +178,7 @@
 						<table>
 							<tr>
 								<td class="label">desired username:</td>
-								<td><input type="text" name="howsername" size="20" value="<?php echo $username?>"/></td>
+								<td><input type="text" name="howsername" size="20" value="<?php echo htmlEscape($username)?>"/></td>
 							</tr>
 							<tr>
 								<td class="label">password:</td>
@@ -194,7 +194,7 @@
 							</tr>
 							<tr>
 								<td class="label">referral code<?= isOpenRegistration() ? " (if you have one)" : "" ?>:</td>
-								<td><input type="text" name="referralcode" size="20" value="<?php echo $referralcode?>"/></td>
+								<td><input type="text" name="referralcode" size="20" value="<?php echo htmlEscape($referralcode)?>"/></td>
 							</tr>
 							<tr>
 								<td colspan="2" class="submitcell">

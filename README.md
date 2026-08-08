@@ -52,3 +52,9 @@ Help
 Problems with the web site are frequently well-documented by error messages emitted by trigger-error. Administrators see this output as part of the rendered page, but it is also recorded to the httpd's logs. On the VM they are located in `~/logs/`.
 
 If you need anything to get running, help can usually be had in #tmbotech on EFnet.
+
+Further Reading
+---------------
+
+* `HACKING` — house coding standards, and how the include path and page structure work.
+* `DEPLOYING` — how to deploy to a real server, how to get back out again, and the traps that have caused outages. Read it before touching production or the database.

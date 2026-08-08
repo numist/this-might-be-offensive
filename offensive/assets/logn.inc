@@ -73,7 +73,7 @@ function checkUser($myself) {
 		if(strtotime($myself->timestamp()) < time() - 60 ||
 		   $myself->last_login_ip() != $_SERVER['REMOTE_ADDR']) {
 			
-			$sql = "UPDATE users SET last_login_ip='" . $_SERVER['REMOTE_ADDR'] . "', timestamp=NOW() WHERE userid=".$myself->id();
+			$sql = "UPDATE users SET last_login_ip='" . sqlEscape($_SERVER['REMOTE_ADDR']) . "', timestamp=NOW() WHERE userid=".$myself->id();
 			tmbo_query( $sql );
 			
 			// update the User cache with the new data.
@@ -108,8 +108,14 @@ function logInUser($myself, $session=true) {
 	if( $myself->status() == 'normal' || $myself->status() == 'admin') {
 		if($session) {
 			if(session_id() == "") {
+				// must match header.inc; see the note there.  guarded because
+				// session_name() warns if a session is already active.
+				session_name("TMBOSESS2");
+				session_set_cookie_params(0, "/", "", true, true);
 				session_start();
 			}
+			// a session id the client chose must not survive becoming authenticated.
+			session_regenerate_id(true);
 			$_SESSION['userid'] = $myself->id();
 			$_SESSION['status'] = $myself->status();
 			$_SESSION['username'] = $myself->username();
@@ -126,7 +132,7 @@ function logInUser($myself, $session=true) {
  */
 function canLogIn() {
 	// check to see if this person has had too many login attempts in the last 30 minutes already.
-	$ip = $_SERVER['REMOTE_ADDR'];
+	$ip = sqlEscape($_SERVER['REMOTE_ADDR']);
 	$sql = "SELECT count( id ) as numFailed from failed_logins WHERE ip='$ip' AND timestamp > date_sub( now(), interval 30 minute )";
 	$result = tmbo_query( $sql );
 
@@ -143,7 +149,7 @@ function canLogIn() {
  * this is used to determine if a host canLogIn.
  */
 function failedLogIn($name) {
-	$ip = $_SERVER['REMOTE_ADDR'];
+	$ip = sqlEscape($_SERVER['REMOTE_ADDR']);
 	$sql = "insert into failed_logins (username,ip) VALUES ( '".sqlEscape($name)."', '$ip' )";
 	tmbo_query( $sql );
 }
@@ -209,7 +215,7 @@ function login($methods=array()) {
 			case "token":
 				$success = loginWithToken($params);
 				if(!is_null($success)) {
-					return true;
+					return $success;
 				}
 				break;
 		}
@@ -232,23 +238,85 @@ function loginWithSession() {
 }
 
 /*
+ * the rememberme cookie.
+ *
+ * the cookie is "userid.nonce.mac", where the mac is an HMAC over the first two
+ * fields, keyed with the user's stored password hash concatenated with a
+ * site-wide pepper from admin/.config.
+ *
+ * NOTE: revocation is all-or-nothing across a user's devices, and the only
+ * per-user lever is a password change. per-client revocation can be accomplished
+ * by creating (and then using) a token in the settings page for each client.
+ */
+define("REMEMBER_COOKIE", "remember");
+define("REMEMBER_TTL", 60*60*24*365*5);
+
+function rememberCookieMac($userid, $nonce, $pwhash) {
+	return hash_hmac("sha256", $userid.".".$nonce, $pwhash.tmbo_secret("remember_pepper"));
+}
+
+/*
+ * issue a fresh rememberme cookie for a user.
+ */
+function issueRememberCookie($myself) {
+	$uid = $myself->id();
+
+	$sql = "SELECT password FROM users WHERE userid=$uid LIMIT 1";
+	$result = tmbo_query( $sql );
+	if(mysql_num_rows( $result ) != 1) {
+		trigger_error("tried to issue a remember cookie for nonexistent user $uid", E_USER_WARNING);
+		return false;
+	}
+
+	$row = mysql_fetch_assoc( $result );
+
+	/* users.password is nullable, and a null hash would leave the pepper as the
+	 * whole key -- shared by every such account.  no hash, no cookie.
+	 */
+	if(is_null($row['password']) || strlen($row['password']) == 0) {
+		trigger_error("tried to issue a remember cookie for passwordless user $uid", E_USER_WARNING);
+		return false;
+	}
+
+	$nonce = tmbo_random_hex(16);
+	$value = $uid.".".$nonce.".".rememberCookieMac($uid, $nonce, $row['password']);
+
+	// secure: this site is https-only (see header.inc).  httponly: script has no business reading this.
+	setcookie(REMEMBER_COOKIE, $value, time() + REMEMBER_TTL, "/", "", true, true);
+	return true;
+}
+
+/*
  * attempt to log on using the rememberme cookie as credentials.
  * returns a boolean if success/failure, null if not applicable.
  */
 function loginWithCookie() {
 	// attempt logging in using the user's cookie
-	if(isset($_COOKIE['remember'])) {
-		global $salt;
+	// php parses array syntax in cookie names, so this can arrive as an array.
+	if(isset($_COOKIE[REMEMBER_COOKIE]) && is_string($_COOKIE[REMEMBER_COOKIE])) {
+		$parts = explode(".", $_COOKIE[REMEMBER_COOKIE]);
+		if(count($parts) != 3) {
+			return null;
+		}
+		list($uid, $nonce, $mac) = $parts;
 
-		$uid = id_from_hash( $_COOKIE['remember'] );
-		if(is_intger($uid)) {
+		/* this field is attacker-controlled and reaches both a cast and a query,
+		 * so it gets a digits-only check rather than a numeric one: "1e3" casts
+		 * to 1 on php 5 and 1000 on php 7.
+		 */
+		if(ctype_digit($uid) && strlen($nonce) && strlen($mac)) {
+			$uid = (int)$uid;
 			$sql = "SELECT * from users where userid=$uid LIMIT 1";
 			$result = tmbo_query( $sql );
 			if(mysql_num_rows( $result ) == 1) {
 				$row = mysql_fetch_assoc($result);
-				$cookiehash = tmbohash($row['userid'], $row['username'].$salt);
-				if($cookiehash == $_COOKIE['remember']) {
-					return logInUser(new User($row));
+
+				// without a hash there is no key, so there is nothing to compare.
+				if(!is_null($row['password']) && strlen($row['password'])) {
+					$cookiemac = rememberCookieMac($row['userid'], $nonce, $row['password']);
+					if(tmbo_hash_equals($cookiemac, $mac)) {
+						return logInUser(new User($row));
+					}
 				}
 			}
 		}
@@ -261,7 +329,7 @@ function loginWithCookie() {
  * returns a boolean if success/failure, null if not applicable.
  */
 function loginWithUserPass($params) {
-	global $login_message, $salt;
+	global $login_message;
 
 	if(count($params) == 2 && !is_null($params[0]) && !is_null($params[1])) {
 		list($name, $pw) = $params;
@@ -276,10 +344,7 @@ function loginWithUserPass($params) {
 			if(logInUser(new User($userid))) {
 				// set rememberme cookie if the user requested it
 				if(array_key_exists("rememberme", $_REQUEST) && $_REQUEST['rememberme']) {
-					setcookie("remember", 
-					          tmbohash(me()->id(), 
-					                   me()->username().$salt ), 
-					                   time()+60*60*24*365*5, "/" );
+					issueRememberCookie(me());
 				}
 				return true;
 			}

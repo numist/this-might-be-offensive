@@ -63,7 +63,7 @@ conditionalGet($lastBuildTime);
 				<media:thumbnail url="<?= $thumbURL ?>" />
 				<guid isPermaLink="false">tmbo-<?= $upload->id() ?></guid>
 			<? } else { ?>
-				<title><![CDATA[<?= $filename ?> (uploaded by <?= $upload->uploader()->username() ?>)]]></title>
+				<title><?= xmlEscape($filename) ?> (uploaded by <?= xmlEscape($upload->uploader()->username()) ?>)</title>
 				<link>https://<?= $_SERVER['HTTP_HOST'] ?><?= Link::upload($upload) ?></link>
 				<description><![CDATA[<? // TODO: pretty this up like audio
 					if($fileURL != '') { 

@@ -1142,7 +1142,7 @@ function upload_insert_file($postdata) {
 	$sql = "INSERT INTO offensive_uploads ( userid,filename,ip,nsfw,tmbo,hash,type,status )
 			   VALUES ( " . $_SESSION['userid'] . ", '" .
 			                sqlEscape( $postdata['filename'] ) . "', '" .
-			                $_SERVER['REMOTE_ADDR'] . "',
+			                sqlEscape( $_SERVER['REMOTE_ADDR'] ) . "',
 			                $nsfw, $tmbo, '".$postdata['hash']."', '" .
 			                upload_type( $postdata ) . "', 'pending')";
 	tmbo_query($sql);

@@ -40,7 +40,7 @@ server {
         error_page 403 /offensive/403.php;
     }
 
-    location /admin {
+    location ^~ /admin {
         return 403;
     }
 

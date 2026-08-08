@@ -215,14 +215,14 @@
 		</div>
 		<div class="entry">
 		<form action="finduser.php">
-			<input type="text" name="finduser" value="<?= array_key_exists("finduser", $_REQUEST) ? $_REQUEST['finduser'] : "" ?>"/>
+			<input type="text" name="finduser" value="<?= array_key_exists("finduser", $_REQUEST) ? htmlspecialchars($_REQUEST['finduser']) : "" ?>"/>
 			<input type="submit" value="find user"/>
 		</form>
 
 		</div>
 		<div class="entry">
 		<form action="./">
-			<input type="text" name="findfile" value="<?= array_key_exists("findfile", $_REQUEST) ? $_REQUEST['findfile'] : "" ?>"/>
+			<input type="text" name="findfile" value="<?= array_key_exists("findfile", $_REQUEST) ? htmlspecialchars($_REQUEST['findfile']) : "" ?>"/>
 			<input type="hidden" name="c" value="findfile"/>
 			<input type="submit" value="find file or topic"/>
 		</form>

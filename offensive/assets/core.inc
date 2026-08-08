@@ -728,11 +728,10 @@
 			}
 		}
 		
+		// a tokenid is a bearer credential on its own (see loginWithToken), so it
+		// comes from a CSPRNG.
 		do {
-			$tokenid = "";
-			for($i = 0; $i < 32; $i++) {
-				$tokenid .= base_convert(rand(0, 35), 10, 36);
-			}
+			$tokenid = tmbo_random_hex(24);
 			$dupcheck = new Token($tokenid);
 		} while($dupcheck->exists());
 		unset($dupcheck);

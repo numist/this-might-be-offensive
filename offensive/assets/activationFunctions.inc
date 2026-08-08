@@ -1,9 +1,12 @@
 <?
+require_once("offensive/assets/functions.inc");
 
 	$id_offset = 3737;
 	$pad_length = 8;
 	$hash_param_key = "z";
-	$salt = ":woot";
+
+	// tmbo_secret() lives in functions.inc: it serves the remember cookie and
+	// the password reset code as well as activation, so it isn't ours to own.
 
 	// generates a string used in the link
 	// to identify the account to be activated
@@ -42,9 +45,9 @@
 	}
 
 	function activationMessageFor( $id, $email ) {
-		global $hash_param_key, $salt;
+		global $hash_param_key;
 
-		$hash = tmbohash( $id, $email . $salt );
+		$hash = tmbohash( $id, $email . tmbo_secret("activation_salt") );
 		$message = "  Thanks for registering at [ this might be offensive ].
   Please visit this link to activate your account:
   https://thismight.be/offensive/activate.php?$hash_param_key=$hash

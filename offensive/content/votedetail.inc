@@ -10,7 +10,7 @@
 	}
 
 	function body() {
-		$uid = $_REQUEST['userid'];
+		$uid = (int)$_REQUEST['userid'];
 
 		$sql = "SELECT count( offensive_comments.id ) AS thecount,
 						users.username,

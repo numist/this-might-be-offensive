@@ -61,7 +61,7 @@ header( "Content-type: text/xml" );
 		if(!file_exists($upload->file())) continue;
 ?>
 		<item>
-			<title><![CDATA[<?= $filename ?> (uploaded by <?= $upload->uploader()->username() ?>)]]></title>
+			<title><?= xmlEscape($filename) ?> (uploaded by <?= xmlEscape($upload->uploader()->username()) ?>)</title>
 			<link>https://<?= $_SERVER['HTTP_HOST'] ?><?= Link::upload($upload) ?></link>
 			<enclosure url="<?= $fileURL ?>" length="<?= filesize( $upload->file() ) ?>" type="audio/mpeg"/>
 			<description><?
@@ -94,7 +94,7 @@ header( "Content-type: text/xml" );
 						
 					if(array_key_exists('title', $tags)) { ?>
 					<span style="color:#666666">Title: <? 
-						echo trim($tags['title'][0]); 
+						echo htmlEscape(trim($tags['title'][0])); 
 						if(array_key_exists('tracknum', $tags)) {
 							echo "(track ".(int)trim($tags['tracknum'][0]);
 							if(array_key_exists('totaltracks', $tags)) {
@@ -107,11 +107,11 @@ header( "Content-type: text/xml" );
 					<? }
 						
 					if(array_key_exists('artist', $tags)) { ?>
-					<span style="color:#666666">By: <?= trim($tags['artist'][0]); ?></span><br />
+					<span style="color:#666666">By: <?= htmlEscape(trim($tags['artist'][0])); ?></span><br />
 					<? }
 						
 					if(array_key_exists('album', $tags)) { ?>
-					<span style="color:#666666">Album: <?= trim($tags['album'][0]); ?></span><br /><br />
+					<span style="color:#666666">Album: <?= htmlEscape(trim($tags['album'][0])); ?></span><br /><br />
 					<? }
 					?></td></tr></table><?
 						
@@ -130,7 +130,11 @@ header( "Content-type: text/xml" );
 			
 			$string = ob_get_contents();
 			ob_end_clean();
-			echo str_replace(array("<", ">"), array("&lt;", "&gt;"), $string);
+			/* $string mixes markup this file emitted with user text that is already
+			 * html-escaped.  the parser decodes element content, so escaping the whole
+			 * buffer is what leaves the markup renderable and the user text inert.
+			 */
+			echo xmlEscape($string);
 			
 			?>
 			</description>
