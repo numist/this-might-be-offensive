@@ -32,8 +32,7 @@
 	}
 
 	if( is_null( $userid ) ) {
-		header("Location: ".$_SERVER['HTTP_REFERER']);
-	}
+		header("Location: ".Link::content("search"));	}
 	else {
 		header("Location: ".Link::user($userid));
 	}
