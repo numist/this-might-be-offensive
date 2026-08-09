@@ -18,8 +18,8 @@
   <div class="heading">holy shit. look what happened while you were gone.</div>
   <? tabs(); ?>
   <div class="bluebox"><? unread_list() ?></div>
-  <? } ?>
 </div>
+<? } ?>
 
 <?
     function unread_list() {
