@@ -1,4 +1,11 @@
-FROM node:14-alpine
+# Node 22 LTS. The dependency tree is pure JavaScript (no native bindings), so
+# socket.io 0.9 runs unchanged here -- verified end to end: token handshake against
+# MySQL, and Redis pmessage fan-out to a connected client.
+#
+# Note this fixes the *runtime* CVEs only. socket.io/ws/uglify-js/xmlhttprequest in
+# package.json still have advisories against them; those follow any Node version and
+# need a socket.io 4.x upgrade (a breaking protocol change) to clear.
+FROM node:22-alpine
 
 WORKDIR /app
 
