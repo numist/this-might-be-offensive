@@ -124,14 +124,14 @@
 					<div class="heading"><?
 					  // changeblog special header
 						if($upload->id() == "211604") { ?>
-							<a class="heading" id="pic" href="<?= Link::content("changeblog") ?>">changeblog</a>
+							<a class="heading" href="<?= Link::content("changeblog") ?>">changeblog</a>
 							<br/><span style="color:var(--link-user)">beat to fit. paint to match.</span><br/>
 					<? } else if( $upload->type() == 'topic' ) {
 							$prefix = $upload->uploader()->status() == "admin" ? "" : "don't blame me,"; ?>
-							<a class="heading" id="pic" href="<?= Link::thread($upload) ?>"><?= $upload->htmlFilename(); ?></a>
+							<a class="heading" href="<?= Link::thread($upload) ?>"><?= $upload->htmlFilename(); ?></a>
 								<br/><span style="color:var(--link-user)"><?= $prefix ?> <a href="<?= Link::user($upload->uploader()) ?>" style="color:var(--link-user)"><?= $upload->uploader()->username() ?></a> started it.</span><br/>
 					<? } else { ?>
-							<a class="heading" id="pic" href="<?= Link::upload($upload) ?>"><?= $upload->htmlFilename(); ?></a><br/><span style="color:var(--link-user)">uploaded by <?= $upload->uploader()->htmlUsername() ?></span><br/>
+							<a class="heading" href="<?= Link::upload($upload) ?>"><?= $upload->htmlFilename(); ?></a><br/><span style="color:var(--link-user)">uploaded by <?= $upload->uploader()->htmlUsername() ?></span><br/>
 					<? } ?>
 					</div>
 				<div class="entry">

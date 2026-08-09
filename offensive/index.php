@@ -387,20 +387,27 @@ $timelimit = 10;
 </html>
 <?
 	// XXX: this needs to use core
-	function unread() {
+	//
+	// $id distinguishes render sites: this is drawn both in the sidebar and inside
+	// the tabs popover, and two elements sharing id="unread" is invalid HTML that
+	// breaks getElementById and #unread styling for whichever comes second.
+	function unread($id = "unread") {
 		if(!me()) return;
 		$uid = me()->id();
-		
-		$comments = core_unreadcomments(array());
+
+		// Memoized because both render sites call this on the same request and the
+		// query is identical; without this the page pays for it twice.
+		static $comments = null;
+		if($comments === null) $comments = core_unreadcomments(array());
 
 		$isEmpty = count($comments) == 0;
 
 		?>
-		
-		<div id="unread" class="contentbox <?= ($isEmpty ? 'empty' : '')?>">
+
+		<div id="<?= htmlEscape($id) ?>" class="contentbox <?= ($isEmpty ? 'empty' : '')?>">
 			<div class="blackbar"></div>
 			<div class="heading">unread comments:</div>
-			<div id="unread-container" class="bluebox">
+			<div id="<?= htmlEscape($id) ?>-container" class="bluebox">
 
 				<? 
 					if($isEmpty) {
@@ -413,7 +420,7 @@ $timelimit = 10;
 					if($upload->squelched()) continue;
 
 					$css = isset($css) && $css == "evenfile" ? "oddfile" : "evenfile";  ?>
-					<div class="clipper"><a id="unread<?= $comment->upload()->id()?>" class="<?= $css ?>" href="<?= Link::comment($comment) ?>"><?= $upload->htmlFilename() ?></a></div>
+					<div class="clipper"><a id="<?= htmlEscape($id) ?><?= $comment->upload()->id()?>" class="<?= $css ?>" href="<?= Link::comment($comment) ?>"><?= $upload->htmlFilename() ?></a></div>
 				<? } ?>
 			</div>
 			<div class="blackbar"></div>

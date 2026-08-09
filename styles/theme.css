@@ -20,6 +20,15 @@
     --orange: #ff6600;
     --link-accent: var(--orange);
 
+    /* Palette values carried over from styles/old/theme.css. They are defined
+       here rather than imported because that file is not loaded anywhere, which
+       left every var() below resolving to an invalid value. */
+    --purple-dark: #333366;
+    --purple-muted: #7777aa;
+    --purple-soft: #9999cc;
+    --gray-light: #999999;
+    --red-error-bg: #a32d00;
+
     /* Backgrounds */
   --bg-page: var(--color-brand);
   --bg-heading: var(--color-brand-dark);

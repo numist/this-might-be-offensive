@@ -24,6 +24,10 @@ services:
       - zips:/var/www/html/offensive/zips:rw
       - quarantine:/var/www/html/offensive/quarantine:rw
       - ./admin/.config.prod:/var/www/html/admin/.config:ro
+      # Overrides the development php.ini baked into the image: disables
+      # display_errors/expose_php and hardens session cookies. Loaded from
+      # conf.d so it applies after php.ini.
+      - ./services/php/php-production.ini:/usr/local/etc/php/conf.d/zz-production.ini:ro
 
   db:
     restart: always
@@ -53,6 +57,10 @@ services:
       - zips:/var/www/html/offensive/zips:rw
       - quarantine:/var/www/html/offensive/quarantine:rw
       - ./admin/.config.prod:/var/www/html/admin/.config:ro
+      # Overrides the development php.ini baked into the image: disables
+      # display_errors/expose_php and hardens session cookies. Loaded from
+      # conf.d so it applies after php.ini.
+      - ./services/php/php-production.ini:/usr/local/etc/php/conf.d/zz-production.ini:ro
 
 volumes:
   app_code:

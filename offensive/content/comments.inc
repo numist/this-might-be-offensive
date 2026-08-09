@@ -261,7 +261,7 @@
 <?
 	} else {
 ?>
-		<a class="heading" id="pic" href="<?= $href ?>"><?= $upload->htmlFilename() ?></a><br/><span class="blame">uploaded by <?= $uploader->htmlUsername() ?></span><br/>
+		<a class="heading" href="<?= $href ?>"><?= $upload->htmlFilename() ?></a><br/><span class="blame">uploaded by <?= $uploader->htmlUsername() ?></span><br/>
 <?
 	}	
 ?></div>
@@ -345,7 +345,7 @@
 
 					<div>
 					<? if ($upload->type() != "topic") { ?>
-						<a class="heading" id="pic" href="<?= Link::upload($upload) ?>"><?= $upload->htmlFilename(); ?></a><br/>
+						<a class="heading" href="<?= Link::upload($upload) ?>"><?= $upload->htmlFilename(); ?></a><br/>
 					<? }
 						else {
 						 ?>&nbsp;<?

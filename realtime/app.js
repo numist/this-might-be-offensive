@@ -4,7 +4,25 @@ var util = require("util"),
   iniparser = require("iniparser"),
   mysql = require("mysql");
 
-var db_config = iniparser.parseSync(path.normalize(path.join(__dirname, 'admin/.config'))).tmbo;
+// The config lives in a different place depending on how this is started:
+// Docker copies app.js to /app and mounts the config at /app/admin/.config, while
+// the Vagrant/init.d layout runs it from the checkout, where it is one level up.
+// Probe both rather than hardcoding either, so both start paths keep working.
+var fs = require("fs");
+var configPath = [
+  path.join(__dirname, 'admin/.config'),
+  path.join(__dirname, '../admin/.config')
+].find(fs.existsSync);
+
+if (!configPath) {
+  // Failing loudly beats connecting with undefined credentials.
+  console.error("realtime: could not locate admin/.config (looked in " +
+                path.join(__dirname, 'admin') + " and " +
+                path.join(__dirname, '../admin') + ")");
+  process.exit(1);
+}
+
+var db_config = iniparser.parseSync(path.normalize(configPath)).tmbo;
 
 // iniparser returns everything as a literal, so we need to eval strings if they are literal strings
 function checkIniString(data) {

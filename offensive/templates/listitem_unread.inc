@@ -11,5 +11,5 @@ if(!defined("TMBO") || !isset($comment)) {
 ?>
 
 <li>
-    <div class="clipper"><a id="unread<?= $comment->upload()->id()?>" class="<?= $css ?>" href="<?= Link::comment($comment) ?>"><?= $upload->htmlFilename() ?></a></div>
+    <div class="clipper"><a id="unread<?= $comment->upload()->id()?>" class="<?= isset($css) ? htmlEscape($css) : '' ?>" href="<?= Link::comment($comment) ?>"><?= $upload->htmlFilename() ?></a></div>
 </li>

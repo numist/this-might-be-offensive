@@ -35,11 +35,17 @@
 </div>
 
 <div id="youMenu" class="youMenu" popover>
-	<?php include 'content/your_stuff.inc'; ?>
+	<?php include __DIR__ . '/../content/your_stuff.inc'; ?>
 </div>
 
 <div id="unreadMenu" class="unreadMenu" popover>
-<? unread() ?>
+<?
+	/* unread() lives in offensive/index.php, so it is not defined for every
+	   entrypoint that includes this file (gis/index.php includes tabs.inc but
+	   never defines it). Guard rather than fatal, and pass a distinct id so this
+	   copy does not collide with the one rendered in the sidebar. */
+	if(function_exists('unread')) unread('unreadMenu-unread');
+?>
 </div>
 
 <?
