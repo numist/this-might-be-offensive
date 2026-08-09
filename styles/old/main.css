@@ -35,7 +35,7 @@
   overflow:hidden;
   white-space: nowrap;
   padding: 2px;
-  border-left: 2px solid #CCCCFF;
+  border-left: 2px solid var(--border-light);
 }
 #nextpage {
   text-align: right;

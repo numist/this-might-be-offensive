@@ -9,15 +9,43 @@
 ?>
 
 
-<div>
+<div class="tabs">
 	<div class="<?= cssFor('images') ?>"><a href="<?= Link::mainpage() ?>">images</a></div>
 	<div class="<?= cssFor('discussions') ?>"><a href="<?= Link::content("discussions") ?>">discussions</a></div>
+	<? /* <div class="<?= cssFor('unread') ?>"><a href="<?= Link::content("unread") ?>">unread</a></div> */ ?>
 	<div class="<?= cssFor('hof') ?>"><a href="<?= Link::content("hof") ?>">hall of fame</a></div>	
 	<div class="<?= cssFor('audio') ?>"><a href="<?= Link::content("audio") ?>">audio</a></div>	
 	<div class="<?= cssFor('yearbook') ?>"><a href="<?= Link::content("yearbook") ?>">yearbook</a></div>	
-	<div class="<?= cssFor('search') ?>"><a href="<?= Link::content("search") ?>">search</a></div>	
+	<div class="<?= cssFor('search') ?>"><a href="<?= Link::content("search") ?>">search</a></div>
+	
+	<button class="menuButton moreButton <?= cssFor($activeTab) ?>" popovertarget="moreMenu" popovertargetaction="toggle"><?= $activeTab ?></button>
+	<button class="menuButton youButton" popovertarget="youMenu" popovertargetaction="toggle">you</button>
 
-	<div class="tabspacer">&nbsp;</div>
+	<button class="menuButton unreadButton" popovertarget="unreadMenu" popovertargetaction="toggle">unread</button>
+</div>
+
+<div id="moreMenu" class="moreMenu" popover>
+	<div class="<?= cssFor('images') ?>"><a href="<?= Link::mainpage() ?>">images</a></div>
+	<div class="<?= cssFor('discussions') ?>"><a href="<?= Link::content("discussions") ?>">discussions</a></div>
+	<? /* <div class="<?= cssFor('unread') ?>"><a href="<?= Link::content("unread") ?>">unread</a></div> */ ?>
+	<div class="<?= cssFor('hof') ?>"><a href="<?= Link::content("hof") ?>">hall of fame</a></div>	
+	<div class="<?= cssFor('audio') ?>"><a href="<?= Link::content("audio") ?>">audio</a></div>	
+	<div class="<?= cssFor('yearbook') ?>"><a href="<?= Link::content("yearbook") ?>">yearbook</a></div>	
+	<div class="<?= cssFor('search') ?>"><a href="<?= Link::content("search") ?>">search</a></div>
+</div>
+
+<div id="youMenu" class="youMenu" popover>
+	<?php include __DIR__ . '/../content/your_stuff.inc'; ?>
+</div>
+
+<div id="unreadMenu" class="unreadMenu" popover>
+<?
+	/* unread() lives in offensive/index.php, so it is not defined for every
+	   entrypoint that includes this file (gis/index.php includes tabs.inc but
+	   never defines it). Guard rather than fatal, and pass a distinct id so this
+	   copy does not collide with the one rendered in the sidebar. */
+	if(function_exists('unread')) unread('unreadMenu-unread');
+?>
 </div>
 
 <?

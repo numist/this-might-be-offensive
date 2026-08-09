@@ -57,7 +57,7 @@
 		$result = tmbo_query($sql);
 
 ?>
-				<tr style="background:#bbbbee;">
+				<tr style="background:var(--bg-content-alt);">
 					<td><div class="clipper">newb</div></td>
 					<td>joined</td>
 					<td style="text-align:right;white-space:nowrap">thanks to</td>

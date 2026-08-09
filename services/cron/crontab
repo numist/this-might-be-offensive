@@ -1,0 +1,14 @@
+THEMAXX=/var/www/html
+
+# m     h       dom     mon     dow     cmd
+# Delete old zip files (older than 7 days)
+5 0 * * * www-data $THEMAXX/offensive/deleteOldFiles.pl 7 zips > /dev/null 2>&1
+
+# Create zip files from yesterday's uploads
+2 0 * * * www-data $THEMAXX/offensive/zipYesterday.pl zips > /dev/null 2>&1
+
+# Delete old quarantine files (older than 2 days)
+3 1 * * * www-data $THEMAXX/offensive/deleteOldFiles.pl 2 quarantine > /dev/null 2>&1
+
+# Run comment indexer hourly
+0 * * * * www-data /usr/bin/nice /usr/bin/php $THEMAXX/admin/commentIndexer.php > /dev/null 2>&1

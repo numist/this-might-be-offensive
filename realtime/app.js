@@ -2,10 +2,27 @@ var util = require("util"),
   io = require("socket.io").listen(1337),
   path = require("path"),
   iniparser = require("iniparser"),
-  mysql = require("mysql"),
-  redis = require("redis").createClient();
+  mysql = require("mysql");
 
-var db_config = iniparser.parseSync(path.normalize(path.join(__dirname, '../admin/.config'))).tmbo;
+// The config lives in a different place depending on how this is started:
+// Docker copies app.js to /app and mounts the config at /app/admin/.config, while
+// the Vagrant/init.d layout runs it from the checkout, where it is one level up.
+// Probe both rather than hardcoding either, so both start paths keep working.
+var fs = require("fs");
+var configPath = [
+  path.join(__dirname, 'admin/.config'),
+  path.join(__dirname, '../admin/.config')
+].find(fs.existsSync);
+
+if (!configPath) {
+  // Failing loudly beats connecting with undefined credentials.
+  console.error("realtime: could not locate admin/.config (looked in " +
+                path.join(__dirname, 'admin') + " and " +
+                path.join(__dirname, '../admin') + ")");
+  process.exit(1);
+}
+
+var db_config = iniparser.parseSync(path.normalize(configPath)).tmbo;
 
 // iniparser returns everything as a literal, so we need to eval strings if they are literal strings
 function checkIniString(data) {
@@ -14,6 +31,10 @@ function checkIniString(data) {
   else
     return data;
 }
+
+var redis_host = checkIniString(db_config.redis_host) || 'localhost';
+// Old redis module (0.8.x) uses positional args: createClient(port, host)
+var redis = require("redis").createClient(6379, redis_host);
 
 var db = mysql.createConnection({
   user: checkIniString(db_config.database_user),

@@ -54,7 +54,7 @@
 		}
 		
 		while( $row = mysql_fetch_assoc( $result ) ) {
-			$style = (isset($style) && $style == "") ? "background:#bbbbee;" : "";
+			$style = (isset($style) && $style == "") ? "background:var(--bg-content-alt);" : "";
 			$css = (isset($css) && $css == "evenfile") ? "oddfile" : "evenfile";
 			
 			$upload = new Upload($row);

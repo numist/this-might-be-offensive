@@ -90,6 +90,7 @@ $timelimit = 10;
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<?php include 'includes/meta.inc'; ?>
 	<title><?
 		if( function_exists( 'title' ) ) {
 			echo htmlEscape(title());
@@ -103,6 +104,10 @@ $timelimit = 10;
 	<link rel="shortcut icon" href="/favicon.ico" />
 	<script type="text/javascript" src="/socket.io/socket.io.js"></script>
 	<?
+	CSS::add("/styles/theme.css");
+	if(getenv('TMBO_ENV') === 'development') {
+		CSS::add("/styles/theme.dev.css");
+	}
 	CSS::add("/styles/filepilestyle.css");
 	CSS::add("/styles/oldskool.css");
 	CSS::add("/styles/index.css");
@@ -175,7 +180,7 @@ $timelimit = 10;
 </script>
 </head>
 
-<body bgcolor="#333366" link="#000066" vlink="#000033">
+<body>
 
 <?php 
 	if($upgrading) {
@@ -199,22 +204,8 @@ $timelimit = 10;
 		<div id="leftcol">
 
 			<? if (login()) { // log in --> get info restricted block ?>
-				<div class="contentbox">
-					<div class="blackbar"></div>
-						<div class="heading">your stuff:</div>
-						<div class="bluebox">
-							<p>hi <b><?= me()->htmlUsername() ?></b>!</p>
-							
-							<p><a href="<?= Link::content("upload") ?>">upload</a></p>
-							
-							<p><a href="<?= Link::content("subscriptions") ?>">subscribed threads</a></p>
-							
-							<p><a href="<?= Link::content("settings") ?>">settings</a></p>
-            	
-							<p><a href="logout.php">log out</a></p>
-						</div>
-					<div class="blackbar"></div>
-				</div>
+				<?php include 'content/your_stuff.inc'; ?>
+
 				<?
 					if(function_exists('sidebar')) {
 						sidebar();
@@ -351,16 +342,16 @@ $timelimit = 10;
 	</div>
 
 <br clear="all">
-<div class="textlinks" style="text-align:center">
+<div class="textlinks">
 
 	<? require('includes/footer.txt'); ?>
 
-	<div class="textlinks">portions &copy; 1997-<?= date("Y") ?>.
+	<div>portions &copy; 1997-<?= date("Y") ?>.
 		site development by
-		<a href="/contact/" class="textlinks" onmouseover='window.status="[ connect ]"; return true' onmouseout='window.status=""'>ray hatfield</a>,
+		<a href="/contact/" onmouseover='window.status="[ connect ]"; return true' onmouseout='window.status=""'>ray hatfield</a>,
 		<a href="mailto:thismightbe@numist.net">scott perry</a>,
 		and <a href="https://github.com/numist/this-might-be-offensive/contributors">others</a>.</div>
-	<div class="textlinks" style="margin: 1em;">Ingredients:
+	<div style="margin: 1em;">Ingredients:
 		<a href="http://php.net/" title="to talk to the computer">PHP</a>,
 		<a href="http://www.mysql.com/" title="for things of importance">MySQL</a>,
 		<a href="http://redis.io/" title="for things that need to be fast">Redis</a>,
@@ -376,7 +367,7 @@ $timelimit = 10;
 	
 	if(me()->status() == "admin") {
 		?>
-		<div class="textlinks"><?= number_format(time_end($ptime), 3)."s php, ".number_format($querytime, 3)."s sql, ".count($queries)." queries\n\n <!-- query statistics: \n";
+		<div><?= number_format(time_end($ptime), 3)."s php, ".number_format($querytime, 3)."s sql, ".count($queries)." queries\n\n <!-- query statistics: \n";
 			var_dump($queries);
 			echo "\n\n-->\n\n"; ?></div>
 		<?
@@ -384,7 +375,7 @@ $timelimit = 10;
 		if(file_exists($loadavg) && is_readable($loadavg)) {
 			$load = file_get_contents($loadavg);
 			?>
-			<div class="textlinks"><?= $load ?></div>
+			<div><?= $load ?></div>
 			<?
 		}
 	}
@@ -396,28 +387,40 @@ $timelimit = 10;
 </html>
 <?
 	// XXX: this needs to use core
-	function unread() {
+	//
+	// $id distinguishes render sites: this is drawn both in the sidebar and inside
+	// the tabs popover, and two elements sharing id="unread" is invalid HTML that
+	// breaks getElementById and #unread styling for whichever comes second.
+	function unread($id = "unread") {
 		if(!me()) return;
 		$uid = me()->id();
-		
-		$comments = core_unreadcomments(array());
 
-		if(count($comments) == 0) {
-			$hidden = "none";
-		} else {
-			$hidden = "block";
-		} ?>
-		
-		<div id="unread" class="contentbox" style="display: <?= $hidden ?>;">
+		// Memoized because both render sites call this on the same request and the
+		// query is identical; without this the page pays for it twice.
+		static $comments = null;
+		if($comments === null) $comments = core_unreadcomments(array());
+
+		$isEmpty = count($comments) == 0;
+
+		?>
+
+		<div id="<?= htmlEscape($id) ?>" class="contentbox <?= ($isEmpty ? 'empty' : '')?>">
 			<div class="blackbar"></div>
 			<div class="heading">unread comments:</div>
-			<div id="unread-container" class="bluebox">
+			<div id="<?= htmlEscape($id) ?>-container" class="bluebox">
+
+				<? 
+					if($isEmpty) {
+						?>all caught up.<?
+					}
+				?>
+
 				<? foreach ($comments as $comment) {
 					$upload = $comment->upload();
 					if($upload->squelched()) continue;
 
 					$css = isset($css) && $css == "evenfile" ? "oddfile" : "evenfile";  ?>
-					<div class="clipper"><a id="unread<?= $comment->upload()->id()?>" class="<?= $css ?>" href="<?= Link::comment($comment) ?>"><?= $upload->htmlFilename() ?></a></div>
+					<div class="clipper"><a id="<?= htmlEscape($id) ?><?= $comment->upload()->id()?>" class="<?= $css ?>" href="<?= Link::comment($comment) ?>"><?= $upload->htmlFilename() ?></a></div>
 				<? } ?>
 			</div>
 			<div class="blackbar"></div>

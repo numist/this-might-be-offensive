@@ -5,7 +5,18 @@ offensive/zips
 realtime/node_modules
 .DS_Store
 admin/.config
+admin/.config.generated
+admin/.config.prod
 admin/certificates
 *.swp
 todo.txt
 .vagrant/
+
+# Docker runtime/generated files
+services/temp/
+services/web/src/
+services/nginx/certs/
+services/nginx/private/
+
+# Claude Code
+.claude/

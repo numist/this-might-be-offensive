@@ -1,0 +1,70 @@
+:root {
+    /* Single source of truth - change this to re-theme the site */
+    --color-brand: #333366;
+
+    --color-brand-medium: #666699;
+    --color-brand-dark: #000033;
+    --color-brand-dark-tab: #7777aa;
+    --color-brand-light-alt: #bbbbee;
+    --color-brand-light: #ccccff;
+    --color-link: #000099;
+
+    /* Modern browsers: derive from brand color */
+    /* --color-brand-dark: oklch(from var(--color-brand) 0.15 c h); */
+    --color-brand-dark-tab: oklch(from var(--color-brand) 0.57 c h);
+    --color-brand-light-alt: oklch(from var(--color-brand) 0.80 c h);
+    --color-brand-light: oklch(from var(--color-brand) 0.86 c h);
+    --color-link: oklch(from var(--color-brand) 0.35 0.15 h);
+
+    /* maybe trying to derive the palette from a single color isn't a good idea. */
+    --orange: #ff6600;
+    --link-accent: var(--orange);
+
+    /* Palette values carried over from styles/old/theme.css. They are defined
+       here rather than imported because that file is not loaded anywhere, which
+       left every var() below resolving to an invalid value. */
+    --purple-dark: #333366;
+    --purple-muted: #7777aa;
+    --purple-soft: #9999cc;
+    --gray-light: #999999;
+    --red-error-bg: #a32d00;
+
+    /* Backgrounds */
+  --bg-page: var(--color-brand);
+  --bg-heading: var(--color-brand-dark);
+  --bg-content: var(--color-brand-light);
+  --bg-content-alt: var(--color-brand-light-alt);
+  --bg-box: var(--purple-soft);
+  --bg-tab-off: var(--purple-muted);
+  --bg-highlight: var(--purple-dark);
+  --bg-admin: var(--gray-light);
+  --bg-error: var(--red-error-bg);
+  --bg-overlay: #aaaaaa;
+
+  --link-accent: var(--orange);
+  --text-muted: #9999cc;
+
+    font-size: 10px;
+    line-height: 1.5;
+
+    --spacing: 1rem;
+
+    @media (width < 800px) {
+        /* --spacing: 4rem; */
+        font-size: 14px;
+    }
+
+    --spacing-xs: calc(var(--spacing) * 0.2);
+    --spacing-sm: calc(var(--spacing) * 0.5);
+    --spacing-md: calc(var(--spacing) * 1.2);
+    --spacing-lg: calc(var(--spacing) * 1.5);
+    --spacing-xl: calc(var(--spacing) * 2);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+textarea {
+    width: 100%;
+}

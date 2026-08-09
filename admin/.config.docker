@@ -1,0 +1,7 @@
+[tmbo]
+database_host = "db"
+database_user = "tmbo"
+database_pass = "shortbus"
+database_name = "tmbo"
+redis_host = "redis"
+use_isk = 0

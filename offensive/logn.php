@@ -59,6 +59,7 @@
 <html>
 <head>
 	<title><?= $_SERVER['HTTP_HOST'] ?> : do we know you?</title>
+	<?php include 'includes/meta.inc'; ?>
 	<link rel="stylesheet" type="text/css" href="/styles/sparse.css"/>
 	<?
 		include_once("analytics.inc");

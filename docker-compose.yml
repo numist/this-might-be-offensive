@@ -1,0 +1,129 @@
+services:
+  nginx:
+    build:
+      context: .
+      dockerfile: services/nginx/Dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./:/var/www/html:ro
+      - ./services/web/src/offensive/uploads:/var/www/html/offensive/uploads:rw
+      - ./services/web/src/offensive/zips:/var/www/html/offensive/zips:rw
+      - ./services/web/src/offensive/quarantine:/var/www/html/offensive/quarantine:rw
+      - ./services/nginx/certs:/etc/ssl/certs:ro
+      - ./services/nginx/private:/etc/ssl/private:ro
+    depends_on:
+      php:
+        condition: service_healthy
+      realtime:
+        condition: service_started
+    networks:
+      - tmbo-network
+
+  php:
+    build:
+      context: .
+      dockerfile: services/php/Dockerfile
+    volumes:
+      - ./:/var/www/html
+      - ./services/web/src/offensive/uploads:/var/www/html/offensive/uploads:rw
+      - ./services/web/src/offensive/zips:/var/www/html/offensive/zips:rw
+      - ./services/web/src/offensive/quarantine:/var/www/html/offensive/quarantine:rw
+      - ./admin/.config.generated:/var/www/html/admin/.config:ro
+    environment:
+      - TMBO_ENV=development
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - tmbo-network
+    healthcheck:
+      test: ["CMD-SHELL", "php-fpm -t 2>/dev/null || exit 1"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+  db:
+    image: mysql:8.0
+    command: >
+      --default-authentication-plugin=mysql_native_password
+      --character-set-server=utf8
+      --collation-server=utf8_general_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: shortbus
+      MYSQL_DATABASE: tmbo
+      MYSQL_USER: tmbo
+      MYSQL_PASSWORD: shortbus
+    volumes:
+      - ./services/data/db-setup:/docker-entrypoint-initdb.d:ro
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3307:3306"
+    networks:
+      - tmbo-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pshortbus"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    networks:
+      - tmbo-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+  realtime:
+    build:
+      context: .
+      dockerfile: services/realtime/Dockerfile
+    volumes:
+      - ./admin/.config.generated:/app/admin/.config:ro
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - tmbo-network
+
+  cron:
+    build:
+      context: .
+      dockerfile: services/cron/Dockerfile
+    volumes:
+      - ./:/var/www/html
+      - ./services/web/src/offensive/uploads:/var/www/html/offensive/uploads:rw
+      - ./services/web/src/offensive/zips:/var/www/html/offensive/zips:rw
+      - ./services/web/src/offensive/quarantine:/var/www/html/offensive/quarantine:rw
+      - ./admin/.config.generated:/var/www/html/admin/.config:ro
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - tmbo-network
+    profiles:
+      - full
+
+volumes:
+  mysql_data:
+  redis_data:
+
+networks:
+  tmbo-network:
+    driver: bridge

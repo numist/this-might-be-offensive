@@ -1,4 +1,4 @@
-<div style="text-align:center">
+<div>
 	<p>
 		<a href="/offensive/">[ this might be offensive ]</a>
 	</p>

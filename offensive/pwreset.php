@@ -161,6 +161,7 @@ https://thismight.be/offensive/pwreset.php?x=".urlencode( $code )."
 <html>
 <head>
 	<title>tmbo.org : do we know you?</title>
+	<?php include 'includes/meta.inc'; ?>
 	<link rel="stylesheet" type="text/css" href="/styles/sparse.css"/>
 </head>
 

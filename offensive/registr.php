@@ -130,8 +130,9 @@
 <html>
 <head>
 	<title></title>
+	<?php include 'includes/meta.inc'; ?>
 	<meta name="generator" content="BBEdit 6.0.2">
-	
+
 	<link rel="stylesheet" type="text/css" href="/includes/style.css">
 	<link rel="stylesheet" type="text/css" href="/styles/sparse.css"/>
 

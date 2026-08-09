@@ -75,6 +75,7 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+		<?php include 'includes/meta.inc'; ?>
 		<META NAME="ROBOTS" CONTENT="NOARCHIVE" />
 		<title>[<?= $upload->type() ?>] : <?= htmlEscape($upload->filename()) ?> </title>
 		<!-- <? if($upload->next_filtered()) { ?>
@@ -166,6 +167,10 @@
 		</script>
 		<script type="text/javascript" src="/socket.io/socket.io.js"></script>
 <?
+	CSS::add("/styles/theme.css");
+	if(getenv('TMBO_ENV') === 'development') {
+		CSS::add("/styles/theme.dev.css");
+	}
 	CSS::add("/styles/jquery-ui-1.8.17.custom.css");
 	CSS::add("/styles/pic.css");
 	CSS::emit();
@@ -201,7 +206,7 @@
 					if (comment.tmbo) {
 						var tmbo_span = stats_row.find('#count_tmbo');
 						if (tmbo_span.length == 0) {
-							stats_row.find("#count_bad").after(' x<span id="count_tmbo" style="color:#990000">0</span>');
+							stats_row.find("#count_bad").after(' x<span id="count_tmbo" style="color:var(--state-warning)">0</span>');
 							tmbo_span = stats_row.find('#count_tmbo');
 						}
 						var tmbo_count = parseInt(tmbo_span.text()) + 1;
@@ -273,12 +278,13 @@
 		</div>
 
 		<div id="content">
-			<div id="heading" style="white-space:nowrap;">
+			<div id="heading" style="white-space:nowrap;" class="scrollcontainer">
+				<div class="scroll-hint"><div class="scroll-hint-icon">→</div></div>
 				&nbsp;&nbsp;<span id="navigation_controls">
 				<?
 				/*
-				 * navigation buttons, prev index next are dependant on type
-				 */
+				* navigation buttons, prev index next are dependant on type
+				*/
 				$index="";
 				switch($upload->type()) {
 					case "avatar":
@@ -312,8 +318,8 @@
 				-->
 				<span id="voting_stats">
 					<a style="margin-left:48px;"
-					   id="comments"
-					   href="<?= Link::thread($upload) ?>">comments</a>
+					id="comments"
+					href="<?= Link::thread($upload) ?>">comments</a>
 					(<span id="count_comment"><?= $upload->comments() ?></span>c
 					+<span id="count_good"><?= $upload->goods() ?></span>
 					-<span id="count_bad"><?= $upload->bads() ?></span><?
@@ -358,24 +364,24 @@
 				</span>
 
 				<!--
-				    filter block
+					filter block
 				-->
 				<span id="filter_controls">
 					<span style="margin-left:48px;">filters:</span>
 					<span style="margin-left:5px;"><?
-					        if(me()->getPref("hide_nsfw") == 1) { ?>
-					                <a href="<?= Link::setPref("hide_nsfw", "") ?>">nsfw(on)</a>
-					        <? } else { ?>
-					                <a href="<?= Link::setPref("hide_nsfw", 1) ?>">nsfw(off)</a>
-					        <? } ?>
+							if(me()->getPref("hide_nsfw") == 1) { ?>
+									<a href="<?= Link::setPref("hide_nsfw", "") ?>">nsfw(on)</a>
+							<? } else { ?>
+									<a href="<?= Link::setPref("hide_nsfw", 1) ?>">nsfw(off)</a>
+							<? } ?>
 					</span>
-        	
+			
 					<span style="margin-left:5px;"><?
-					        if(me()->getPref("hide_tmbo") == 1) { ?>
-					                        <a href="<?= Link::setPref("hide_tmbo", "") ?>">tmbo(on)</a>
-					        <? } else { ?>
-					                        <a href="<?= Link::setPref("hide_tmbo", 1) ?>">tmbo(off)</a>
-					        <? } ?>
+							if(me()->getPref("hide_tmbo") == 1) { ?>
+											<a href="<?= Link::setPref("hide_tmbo", "") ?>">tmbo(on)</a>
+							<? } else { ?>
+											<a href="<?= Link::setPref("hide_tmbo", 1) ?>">tmbo(off)</a>
+							<? } ?>
 					</span>
 				</span>
 			</div>
@@ -471,7 +477,7 @@
 						$tags = $info['id3v2']['comments'];
 
 						if(array_key_exists('title', $tags)) { ?>
-						<span style="color:#666666">Title: <?= htmlEscape(trim($tags['title'][0])); ?>
+						<span style="color:var(--text-secondary)">Title: <?= htmlEscape(trim($tags['title'][0])); ?>
 							<?
 							if(array_key_exists('tracknum', $tags)) {
 								echo "(track ".(int)trim($tags['tracknum'][0]);
@@ -485,11 +491,11 @@
 						<? }
 
 						if(array_key_exists('artist', $tags)) { ?>
-						<span style="color:#666666">By: <?= htmlEscape(trim($tags['artist'][0])); ?></span><br />
+							<span style="color:var(--text-secondary)">By: <?= htmlEscape(trim($tags['artist'][0])); ?></span><br />
 						<? }
 
 						if(array_key_exists('album', $tags)) { ?>
-						<span style="color:#666666">Album: <?= htmlEscape(trim($tags['album'][0])); ?></span><br /><br />
+							<span style="color:var(--text-secondary)">Album: <?= htmlEscape(trim($tags['album'][0])); ?></span><br /><br />
 						<? }
 					}
 					?></td></tr></table><?
@@ -515,7 +521,7 @@
 					<table><tr><td style="text-align:right" width="480px">
 							&nbsp;
 							<? if(!array_key_exists('loop', $_REQUEST)) { ?>
-									<a style="color:#999999; text-decoration:underline" href="<?= Link::upload($upload) ?>&loop">loop</a>
+									<a style="color:var(--bg-admin); text-decoration:underline" href="<?= Link::upload($upload) ?>&loop">loop</a>
 							<? } ?>
 					</td></tr></table>
 					<?
