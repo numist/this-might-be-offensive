@@ -1,4 +1,4 @@
-<?
+<?php
 
 //$tmboroot = "~/sites/tmbo/";
 $tmboroot = "";
@@ -230,9 +230,9 @@ if($get_examples) {
 <p>The API supports <?= count($ptypes) ?> distinct data types for parameters, as described below.</p>
 
 <ul>
-<? foreach($ptypes as $type => $description) { ?>
+<?php  foreach($ptypes as $type => $description) { ?>
 	<li><em><?= $type ?></em> - <?= $description ?></li>
-<? } ?>
+<?php  } ?>
 </ul>
 
 
@@ -241,18 +241,18 @@ if($get_examples) {
 <p>The API supports <?= count($rtypes) ?> formats, which are determined by the server by the filetype extension of the request.</p>
 
 <ul>
-<? foreach($rtypes as $type => $description) { ?>
+<?php  foreach($rtypes as $type => $description) { ?>
 	<li><em><?= $type ?></em> - <?= $description ?></li>
-<? } ?>
+<?php  } ?>
 </ul>
 
 <hr/>
 <h3>Status Codes</h3>
 <p>The following error codes are used by the site as return values:</p>
 <ul>
-<? foreach($codes as $code => $description) { ?>
+<?php  foreach($codes as $code => $description) { ?>
 	<li><b><?= $code ?></b> <?= $description ?></li>
-<? } ?>
+<?php  } ?>
 </ul>
 
 <hr/>
@@ -281,67 +281,67 @@ If you are developing an application, please <a href="#Errata">send an email or 
 
 <p>To jump to a function, click its link below:</p>
 <ul>
-<? foreach($methods as $method => $data) { ?>
+<?php  foreach($methods as $method => $data) { ?>
 	<li><a href="#<?= $method ?>"><?= $method ?></a></li>
-<? } ?>
+<?php  } ?>
 </ul>
 
-<? foreach($methods as $method => $data) { ?>
+<?php  foreach($methods as $method => $data) { ?>
 <hr/>
 <a name="<?= $method ?>">
 <h3><?= $method ?></h3>
 <p><?= nl2br(trim($data["desc"])) ?></p>
 
-<? if(count($data["params"])) { ?>
+<?php  if(count($data["params"])) { ?>
 <h4>Arguments:</h4>
 <ul>
-	<? foreach($data["params"] as $name => $info) { ?>
+	<?php  foreach($data["params"] as $name => $info) { ?>
     <li><b><?= $name ?></b> (<?= $info["type"] ?>) - <?= $info["req"] ?>.
-			<? if(strlen($info["values"])) { ?>
+			<?php  if(strlen($info["values"])) { ?>
 				Can be any of <?= $info["values"]?>.
-			<? } ?>
+			<?php  } ?>
 			<?= nl2br(trim($info["desc"])) ?></li>
-	<? } ?>
+	<?php  } ?>
 </ul>
 
-<? } else { ?>
+<?php  } else { ?>
 <p>This method takes no arguments.</p>
-<? } ?>
+<?php  } ?>
 
 <h4>Returns:</h4>
-<? if(!array_key_exists("return", $data)) {
+<?php  if(!array_key_exists("return", $data)) {
 	trigger_error("method $method does not have @return documentation", E_USER_ERROR);
 } ?>
 <p><?= $data["return"] ?></p>
 
-<? if(count($data["examples"])) { ?>
+<?php  if(count($data["examples"])) { ?>
 <h4>Examples:</h4>
-<? if(!count($data["examples"])) {
+<?php  if(!count($data["examples"])) {
 	trigger_error("method $method does not have any examples", E_USER_ERROR);
 }
 foreach($data["examples"] as $example) { ?>
 <p><code><?= "$method.xxx?$example" ?></code>: 
-	<? foreach($rtypes as $type => $desc) { ?>
+	<?php  foreach($rtypes as $type => $desc) { ?>
 		<a href="/offensive/docs/<?= urlencode("$method.$type?$example"); ?>"><?= $type ?></a>
-	<? } ?>
+	<?php  } ?>
 </p>
-<? }
+<?php  }
 }?>
 
-<? if(count($data["see"])) { ?>
+<?php  if(count($data["see"])) { ?>
 <h4>See Also:</h4>
 
-	<? foreach($data["see"] as $see) {
+	<?php  foreach($data["see"] as $see) {
 		if (!array_key_exists($see, $methods)) {
 			trigger_error("$see is not a valid method, referenced by @see in $method", E_USER_ERROR);
 		} ?>
 		<p><a href="#<?= $see ?>"><?= $see ?></a> - <?= strpos("\n", $methods[$see]["desc"]) === false ?
 		                                               $methods[$see]["desc"] :
 		                                               substr($methods[$see]["desc"], 0, strpos("\n", $methods[$see]["desc"])) ?></p>
-	<? } ?>
-<? } ?>
+	<?php  } ?>
+<?php  } ?>
 
-<? } ?>
+<?php  } ?>
 
 
 <hr />

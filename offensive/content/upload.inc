@@ -1,4 +1,4 @@
-<?
+<?php
 
 	require_once( "offensive/assets/activationFunctions.inc" );
 	require_once( "offensive/assets/tabs.inc" );
@@ -25,7 +25,7 @@
 		?>
 		<div class="contentbox">
 			<div class="blackbar"></div>
-			<div class="heading"><?
+			<div class="heading"><?php
 				if($fileuploaded && $uploadsRemaining !== 0) {
 					echo "thank you, sir, may i have another?";
 				} else if ($uploadsRemaining !== 0) {
@@ -45,7 +45,7 @@
 
 				?>
 
-						<!--<p>You have <? echo $remaining ?> upload<? echo $remaining === 1 ? "" : "s"?> left.</p>-->
+						<!--<p>You have <?php  echo $remaining ?> upload<?php  echo $remaining === 1 ? "" : "s"?> left.</p>-->
 
 						<p>If you haven't already, please take a look at <a href="<?= Link::content("faq") ?>">the rules</a> before uploading.</p>
 
@@ -73,9 +73,9 @@
 								<tr>
 									<td></td>
 									<td>
-<? if($avatar) {?>
+<?php  if($avatar) {?>
 										<input type="hidden" name="avatar" value=""/>
-<?}?>
+<?php }?>
 										<input type="hidden" name="filename" value=""/>
 										<input type="hidden" name="c" value="upload"/>
 										<input type="submit" value="upload"/>
@@ -85,16 +85,16 @@
 
 					</form>
 
-				<? } else { ?>
+				<?php  } else { ?>
 
 						<p>Save some for later, man.</p>
 						<p><a href="<?= Link::mainpage() ?>">index</a></p>
 
-				<? } ?>
+				<?php  } ?>
 			</div>		
 		</div>
 		<div class="blackbar"></div>
 	</div>
-	<?
+	<?php
 	}
 ?>

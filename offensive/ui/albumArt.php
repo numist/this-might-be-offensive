@@ -1,4 +1,4 @@
-<?
+<?php
 
 set_include_path("../..");
 require_once("offensive/assets/header.inc");

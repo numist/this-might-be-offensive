@@ -56,7 +56,7 @@
 		$filter .= me()->getPref("hide_tmbo") ? " AND tmbo = 0" : "";
 		$sql = "SELECT id FROM offensive_uploads WHERE type='".$upload->type()."' AND status='normal' AND id < ".(int)min($pickuplinks).$filter." ORDER BY RAND() LIMIT 1";
 		$res = tmbo_query($sql);
-		$row = mysql_fetch_assoc( $res );
+		$row = mysqli_fetch_assoc( $res );
 		return($row['id']);
 	}
 
@@ -77,16 +77,16 @@
 		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 		<META NAME="ROBOTS" CONTENT="NOARCHIVE" />
 		<title>[<?= $upload->type() ?>] : <?= htmlEscape($upload->filename()) ?> </title>
-		<!-- <? if($upload->next_filtered()) { ?>
+		<!-- <?php  if($upload->next_filtered()) { ?>
 			<link rel="prefetch" href="<?= $_SERVER['PHP_SELF'] ?>?id=<?= $upload->next_filtered()->id() ?>"/>
-		<? } ?> -->
+		<?php  } ?> -->
 
 		<script type="text/javascript">
 			// handle a keybased event. this code was incorporated from offensive.js, which has now been deprecated
 			function handle_keypress(e)
 			{
 				// keycode translation
-	      <? require("offensive/data/keynav.inc"); ?>
+	      <?php  require("offensive/data/keynav.inc"); ?>
 	      function composite_keycode(e)
 	      {
 	        var keycode = (e.which == null) ? e.keyCode : e.which;
@@ -129,7 +129,7 @@
 				if(e == null)  return true;
         var keycode = composite_keycode(e);
 
-        <?// get the user's keyboard navigation preferences
+        <?php // get the user's keyboard navigation preferences
 				$prefs = array();
 				foreach($key_options as $option => $foo) {
 					if($option == "noselect") continue;
@@ -148,24 +148,24 @@
             if($code <= KEY_CODE_MASK) {
               // code is modifier-agnostic ?>
             if(<?= (int)$code ?> == (keycode & <?= KEY_CODE_MASK ?>)) {
-            <? } else {
+            <?php  } else {
               // code is modifier-strict ?>
             if(<?= (int)$code ?> == keycode) {
-            <? } ?>
+            <?php  } ?>
               
               e.preventDefault();
               <?= $action ?>();
               return false;
             }
         
-        <?}
+        <?php }
         }?>
 
 				return true;
 			}
 		</script>
 		<script type="text/javascript" src="/socket.io/socket.io.js"></script>
-<?
+<?php
 	CSS::add("/styles/jquery-ui-1.8.17.custom.css");
 	CSS::add("/styles/pic.css");
 	CSS::emit();
@@ -216,29 +216,29 @@
 	<body id="pic">
 		<!-- message -->
 		<div id="pic_header">
-			<? if(count($prefs) == 0) { ?>
+			<?php  if(count($prefs) == 0) { ?>
 				<div id="instruction_link"><a href="#">?</a></div>
-			<? } ?>
+			<?php  } ?>
 			<div>consciousness doesn't really exist. it's just another one of our ideas.</div>
 		</div>
-		<? if(count($prefs) == 0) { ?>
+		<?php  if(count($prefs) == 0) { ?>
 			<div id="instructions">
 				keyboard commands:<br />
 				← = newer. ↑ = index. → = older. ↓ = comments . + or = votes [ this is good ]. - votes [ this is bad ] .<br />
 				q = quick comment, Esc closes quick comment box, ? = random image.<br />
 				( change 'em in your <a href="<?= Link::content("settings") ?>">settings</a>. )
 			</div>
-		<? } ?>
+		<?php  } ?>
 		
 		<!-- quick comment box -->
 		<div id="qc_dialog" style="display: none;">
 			<a name="form"></a>
-			<form id="qc_form"<? if(!$upload->canComment()) { ?> style="display: none;"<? } ?>>
+			<form id="qc_form"<?php  if(!$upload->canComment()) { ?> style="display: none;"<?php  } ?>>
 					<input type="hidden" value="329310" name="fileid" id="qc_fileid">
 					<input type="hidden" name="c" value="comments">
 					<textarea cols="64" rows="6" name="comment" id="qc_comment"></textarea>
 
-					<? if($upload->canVote()) { ?>
+					<?php  if($upload->canVote()) { ?>
 						<div id="qc_vote" style="text-align:left;margin-left:14%">
 							<table><tbody><tr><td width="200px">
 							<input class="qc_tigtib" id="qc_novote" type="radio" value="novote" name="vote" checked="">
@@ -261,7 +261,7 @@
 							</td></tr></tbody></table>
           	
 						</div>
-					<? } ?>
+					<?php  } ?>
 					<div id="qc_go" style="text-align: center">
 						<input type="submit" name="submit" value="go">
 					</div>
@@ -275,7 +275,7 @@
 		<div id="content">
 			<div id="heading" style="white-space:nowrap;">
 				&nbsp;&nbsp;<span id="navigation_controls">
-				<?
+				<?php
 				/*
 				 * navigation buttons, prev index next are dependant on type
 				 */
@@ -295,16 +295,16 @@
 				if($upload->next_filtered()) {
 					$style = ($upload->next_filtered()->is_nsfw() || $upload->next_filtered()->is_tmbo() ? 'class="warning_link"' : "") ?>
 					<a id="next" <?= $style ?> href="<?= Link::upload($upload->next_filtered()) ?>" title="<?= str_replace('"', '\\"', $upload->next_filtered()->filename()) ?>">newer</a>
-				<? } else { ?>
+				<?php  } else { ?>
 					<a href="<?= Link::content($index) ?>" id="next" style="visibility:hidden">newer</a>
-				<? } ?>
+				<?php  } ?>
 				. <a id="index" href="<?= Link::content($index) ?>">index</a> .
-				<? if($upload->prev_filtered()) {
+				<?php  if($upload->prev_filtered()) {
 					$style = ($upload->prev_filtered()->is_nsfw() || $upload->prev_filtered()->is_tmbo() ? 'class="warning_link"' : "") ?>
 					<a id="previous" <?= $style ?> href="<?= Link::upload($upload->prev_filtered()) ?>" title="<?= str_replace('"', '\\"', $upload->prev_filtered()->filename()) ?>">older</a>
-				<? } else { ?>
+				<?php  } else { ?>
 					<a id="previous" href="<?= Link::content($index) ?>" style="visibility:hidden">older</a>
-				<? } ?>
+				<?php  } ?>
 				</span>
 
 				<!--
@@ -316,10 +316,10 @@
 					   href="<?= Link::thread($upload) ?>">comments</a>
 					(<span id="count_comment"><?= $upload->comments() ?></span>c
 					+<span id="count_good"><?= $upload->goods() ?></span>
-					-<span id="count_bad"><?= $upload->bads() ?></span><?
+					-<span id="count_bad"><?= $upload->bads() ?></span><?php
 					if($upload->tmbos() > 0) { ?>
 						x<span id="count_tmbo"><?= $upload->tmbos() ?></span>
-					<? } ?>)
+					<?php  } ?>)
 					<span id="quicklink">&nbsp;(<a id="quickcomment" href="#">quick</a>)</span>
 				</span>
 
@@ -327,7 +327,7 @@
 					voting block
 				-->
 				<span id="voting_controls" style="margin-left:40px;">
-					<?
+					<?php
 					if($upload->canVote()) {
 						// TODO: clean up
 						$good_href = "href=\"/offensive/?c=comments&submit=submit&fileid=$id&vote=this%20is%20good&redirect=true\"";
@@ -349,12 +349,12 @@
 					subscribe block
 				-->
 				<span id="subscribe" style="margin-left:48px;">
-					<?
+					<?php
 					if($upload->subscribed()) { ?>
 						<a class="subscribe_toggle" id="unsubscribeLink" href="/offensive/subscribe.php?un=1&fileid=<?= $id ?>" title="take this file off my 'unread comments' watch list.">unsubscribe</a>
-					<?	} else { ?>
+					<?php 	} else { ?>
 						<a class="subscribe_toggle" id="subscribeLink" href="/offensive/subscribe.php?fileid=<?= $id ?>" title="watch this thread for new comments.">subscribe</a>
-					<?	} ?>
+					<?php 	} ?>
 				</span>
 
 				<!--
@@ -362,20 +362,20 @@
 				-->
 				<span id="filter_controls">
 					<span style="margin-left:48px;">filters:</span>
-					<span style="margin-left:5px;"><?
+					<span style="margin-left:5px;"><?php
 					        if(me()->getPref("hide_nsfw") == 1) { ?>
 					                <a href="<?= Link::setPref("hide_nsfw", "") ?>">nsfw(on)</a>
-					        <? } else { ?>
+					        <?php  } else { ?>
 					                <a href="<?= Link::setPref("hide_nsfw", 1) ?>">nsfw(off)</a>
-					        <? } ?>
+					        <?php  } ?>
 					</span>
         	
-					<span style="margin-left:5px;"><?
+					<span style="margin-left:5px;"><?php
 					        if(me()->getPref("hide_tmbo") == 1) { ?>
 					                        <a href="<?= Link::setPref("hide_tmbo", "") ?>">tmbo(on)</a>
-					        <? } else { ?>
+					        <?php  } else { ?>
 					                        <a href="<?= Link::setPref("hide_tmbo", 1) ?>">tmbo(off)</a>
-					        <? } ?>
+					        <?php  } ?>
 					</span>
 				</span>
 			</div>
@@ -388,21 +388,21 @@
 			<br />
 			<?php if($upload->is_nsfw() || $upload->is_tmbo()) { ?>
 			  <span class="warning_tags">
-			  <?
+			  <?php
 			  	if($upload->is_nsfw()) { ?>
-			  		<a href="<?= Link::setPref("hide_nsfw", (me()->getPref("hide_nsfw") == 1 ? "" : "1")) ?>" title="<?= me()->getPref("hide_nsfw") == 1 ? "show" : "hide" ?> images that are not safe for work">[nsfw]</a><?
+			  		<a href="<?= Link::setPref("hide_nsfw", (me()->getPref("hide_nsfw") == 1 ? "" : "1")) ?>" title="<?= me()->getPref("hide_nsfw") == 1 ? "show" : "hide" ?> images that are not safe for work">[nsfw]</a><?php
 			  	}
 			  	if($upload->is_tmbo()) { ?>
-			  		<a href="<?= Link::setPref("hide_tmbo", (me()->getPref("hide_tmbo") == 1 ? "" : "1")) ?>" title="<?= me()->getPref("hide_tmbo") == 1 ? "show" : "hide" ?> images that might be offensive">[tmbo]</a><?
+			  		<a href="<?= Link::setPref("hide_tmbo", (me()->getPref("hide_tmbo") == 1 ? "" : "1")) ?>" title="<?= me()->getPref("hide_tmbo") == 1 ? "show" : "hide" ?> images that might be offensive">[tmbo]</a><?php
 			  	}
 			  	?>
 			  </span>
-			<? }
+			<?php  }
 
 				echo "<a href=\"".$upload->URL()."\" target=\"_blank\">" . htmlEscape($upload->filename()) . "</a>";
 
 			?>
-			<span id="dimensions" class="info"><?
+			<span id="dimensions" class="info"><?php
 				if($upload->file() != "")
 					echo getFileSize($upload->file());
 			?></span>
@@ -419,7 +419,7 @@
 			<!--
 				file block
 			-->
-			<? 
+			<?php  
 
 			if($upload->type() == "audio") {
 				require_once("offensive/assets/id3.inc");
@@ -448,31 +448,31 @@
 				if(file_exists($upload->file())) {
 					$fp = fopen($upload->file(), 'r');
 					$id3 = new getid3_id3v2($fp, $info);
-					?><table><tr><td height="100px" width="100px" align="right"><?
+					?><table><tr><td height="100px" width="100px" align="right"><?php
 					if(array_key_exists('id3v2', $info) && array_key_exists('comments', $info['id3v2'])) {
 						if(file_exists($upload->thumb())) {
 							?>
 							<a href="/offensive/ui/albumArt.php?id=<?= $upload->id() ?>"
-								<? if($upload->filtered()) { ?>
+								<?php  if($upload->filtered()) { ?>
 									onMouseOver='changesrc("th<?= $upload->id()?>","<?= $upload->thumbURL() ?>")'
 							 		onMouseOut='changesrc("th<?= $upload->id() ?>","/offensive/graphics/th-filtered.gif")'
-								<? } ?> target="_blank"
+								<?php  } ?> target="_blank"
 							><img name="th<?= $upload->id()?>"
 								src="<?= $upload->filtered()
 									? "/offensive/graphics/th-filtered.gif" 
 									: $upload->thumbURL() ?>"
 								alt="album art" border="0"
 							/></a>
-							<?
+							<?php
 						}
 
-						?></td><td><?
+						?></td><td><?php
 
 						$tags = $info['id3v2']['comments'];
 
 						if(array_key_exists('title', $tags)) { ?>
 						<span style="color:#666666">Title: <?= htmlEscape(trim($tags['title'][0])); ?>
-							<?
+							<?php
 							if(array_key_exists('tracknum', $tags)) {
 								echo "(track ".(int)trim($tags['tracknum'][0]);
 								if(array_key_exists('totaltracks', $tags)) {
@@ -482,21 +482,21 @@
 							}
 							?>
 						</span><br />
-						<? }
+						<?php  }
 
 						if(array_key_exists('artist', $tags)) { ?>
 						<span style="color:#666666">By: <?= htmlEscape(trim($tags['artist'][0])); ?></span><br />
-						<? }
+						<?php  }
 
 						if(array_key_exists('album', $tags)) { ?>
 						<span style="color:#666666">Album: <?= htmlEscape(trim($tags['album'][0])); ?></span><br /><br />
-						<? }
+						<?php  }
 					}
-					?></td></tr></table><?
+					?></td></tr></table><?php
 
 					?>
 
-						<!--<audio src="<?= $upload->URL() ?>" controls<?
+						<!--<audio src="<?= $upload->URL() ?>" controls<?php
 							if($autoplay) {
 								echo " autoplay";
 							}
@@ -514,17 +514,17 @@
 
 					<table><tr><td style="text-align:right" width="480px">
 							&nbsp;
-							<? if(!array_key_exists('loop', $_REQUEST)) { ?>
+							<?php  if(!array_key_exists('loop', $_REQUEST)) { ?>
 									<a style="color:#999999; text-decoration:underline" href="<?= Link::upload($upload) ?>&loop">loop</a>
-							<? } ?>
+							<?php  } ?>
 					</td></tr></table>
-					<?
+					<?php
 				} else { ?>
-					<div style="padding:128px;">[ got nothin' for ya ]</div><?
+					<div style="padding:128px;">[ got nothin' for ya ]</div><?php
 				}
 			} else if($upload->type() == "image" || $upload->type() == "avatar") {
 				if( $upload->filtered() ) {
-					?><div style="padding:128px;">[ <a id="imageLink" href="<?= $upload->URL() ?>" target="_blank">filtered</a>:<?
+					?><div style="padding:128px;">[ <a id="imageLink" href="<?= $upload->URL() ?>" target="_blank">filtered</a>:<?php
 						if($upload->squelched()) {
 							echo " squelched <!-- ".$upload->uploader()->id()
 							     ." - ".$upload->uploader()->username()." -->";
@@ -538,23 +538,23 @@
 						if($upload->filtered_bad()) {
 							echo " bad";
 						}
-					?> ]</div><?
+					?> ]</div><?php
 				} else { ?>
 					<div class="<?php echo $upload->is_nsfw() == 1 ? 'nsfw' : 'image' ?> u<?= $upload->uploader()->id() ?>">
-						<? if($upload->file() != "") {
+						<?php  if($upload->file() != "") {
 							$dimensions = $upload->dimensions(); ?>
 							<a id="imageLink" href="<?= $upload->URL() ?>"><img src="<?= $upload->URL() ?>" style="border:none" id="image"
 								 max-width="<?= $dimensions[0] ?>px" max-height="<?= $dimensions[1] ?>px"/></a>
-						<? } else { ?>
+						<?php  } else { ?>
 							<div style="padding:128px;">[ got nothin' for ya ]</div>
-						<? } ?>
+						<?php  } ?>
 					</div>
-					<?
+					<?php
 				} 
 			} ?>
 		</div>
     	
-		<?
+		<?php
 		if(me()->status() == "admin") {
 			?>
 			<!--
@@ -565,16 +565,16 @@
 			<center><div class="ghost"><?= number_format(time_end($ptime), 3)."s php, ".number_format($querytime, 3)."s sql, ".count($queries)." queries\n\n <!--\n\n";
 				var_dump($queries);
 				echo "\n\n-->\n\n"; ?></div>
-			<?
+			<?php
 			$loadavg = "/proc/loadavg";
 			if(file_exists($loadavg) && is_readable($loadavg)) {
 				$load = file_get_contents($loadavg);
 				?>
 				<div class="ghost"><?= $load ?></div>
-				<?
+				<?php
 			}
 ?>			</center>
-			<?
+			<?php
 		}
 		?>
 	</body>

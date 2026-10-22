@@ -1,4 +1,4 @@
-<? 
+<?php  
 	/* this is probably something we shouldn't be exposing so easily */
 	exit; 
 ?>
@@ -12,7 +12,7 @@
 </head>
 <body>
 
-<? 
+<?php  
 	require_once( "assets/activationFunctions.inc" );
 	echo activationMessageFor( $_REQUEST['userid'], $_REQUEST['email'] );
 ?>

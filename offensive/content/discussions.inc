@@ -1,4 +1,4 @@
-<?
+<?php
 	// Include, and check we've got a connection to the database.
 	require_once( 'admin/mysqlConnectionInfo.inc' );
 	if(!isset($link) || !$link) $link = openDbConnection();
@@ -17,7 +17,7 @@
 		JS::add("/offensive/js/lazyload_bottom.js");
 		?>
 		<link rel="alternate" type="application/rss+xml" title="discussions" href="<?= Link::rss("discuss") ?>" />
-		<?
+		<?php
 	}
 
 	function head_post_js() {
@@ -78,7 +78,7 @@
 <div class="contentbox">
 	<div class="blackbar"></div>
 	<div class="heading">we need to talk.</div>
-<?
+<?php
 		tabs();
 ?>
 		<div class="bluebox">
@@ -88,7 +88,7 @@
 						<a href="<?= Link::content("newtopic") ?>">new topic</a>
 					</div>
 				</div>
-<?
+<?php
 
 			$args = $_REQUEST;
 			if(!array_key_exists("sort", $args)) {
@@ -130,7 +130,7 @@
 												: 'latest comment' ) ?>
 							</div>
 						</li>
-<?
+<?php
 						$pickuplinks = PickupLink::get();
 						$first = array_key_exists("p", $args) && $args["p"] > 0 ? false : true;
 						foreach( $result as $upload ) {
@@ -146,7 +146,7 @@
 					</ul>
 				</div>
 				<div id="bottom">
-					<?
+					<?php
 						// next page!
 						$args = $_GET;
 						if(array_key_exists("p", $args)) {
@@ -161,7 +161,7 @@
 		</div>
 		<div class="blackbar"></div>
 	</div>
-<?
+<?php
 	}
 	
 	function defaultSort() {

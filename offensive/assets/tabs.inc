@@ -1,4 +1,4 @@
-<? 
+<?php  
 	if( ! isset( $activeTab ) ) {
 		$activeTab = array_key_exists("c", $_REQUEST) ? $_REQUEST['c'] : "images";
 	}
@@ -20,7 +20,7 @@
 	<div class="tabspacer">&nbsp;</div>
 </div>
 
-<?
+<?php
 	}
 
 	function cssFor( $name ) {

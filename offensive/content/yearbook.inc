@@ -1,4 +1,4 @@
-<?
+<?php
 	// Include, and check we've got a connection to the database.
 	require_once( 'admin/mysqlConnectionInfo.inc' );
 	if(!isset($link) || !$link) $link = openDbConnection();
@@ -14,7 +14,7 @@
 		$sql = "SELECT timestamp FROM offensive_uploads	WHERE type='avatar'
 		        ORDER BY timestamp DESC LIMIT 1";
 		$result = tmbo_query($sql);
-		$tstamp = mysql_fetch_array($result);
+		$tstamp = mysqli_fetch_array($result);
 		require_once("offensive/assets/conditionalGet.inc");
 		conditionalGet(strtotime($tstamp[0]));
 	}
@@ -30,15 +30,15 @@
 <div class="contentbox">
 	<div class="blackbar"></div>
 	<div class="heading">the beautiful people.</div>
-<?
+<?php
 		tabs();
 ?>
 		<div class="bluebox">
-			<? yearbook(); ?>
+			<?php  yearbook(); ?>
 		</div>
 		<div class="blackbar"></div>
 	</div>
-<?
+<?php
 	}
 
 	function yearbook() {
@@ -75,19 +75,19 @@
 ?>
 		<div id="grid-container">
 			<div id="commands">
-				<div class="floatleft"><? PickupLink::emit() ?></div>
+				<div class="floatleft"><?php  PickupLink::emit() ?></div>
 				<div class="floatright">
-					<? if($args["sort"] !== 'uname_asc') { ?>
+					<?php  if($args["sort"] !== 'uname_asc') { ?>
 					<a href="./?c=yearbook&sort=uname_asc">sort by username</a>
-					<? } ?>
-					<? if($args["sort"] !== 'date_desc') { ?>
+					<?php  } ?>
+					<?php  if($args["sort"] !== 'date_desc') { ?>
 						<a href="./?c=yearbook&sort=date_desc">sort by date</a>
-					<? } ?>
+					<?php  } ?>
 				</div>
 			</div>
 			<div class="grid_thumbs" id="yearbook">
 				<ul>
-			<?
+			<?php
 
 		// output loop
 		foreach($result as $upload) {
@@ -96,7 +96,7 @@
 				</ul>
 			</div>
 			<div id="bottom">
-				<?
+				<?php
 					// next page!
 					$args = $_GET;
 					if(array_key_exists("p", $args)) {
@@ -108,6 +108,6 @@
 				<p id="morelink"><a href="<?= $_SERVER['PHP_SELF'] ?>?<?= http_build_query($args) ?>">more…</a></p>
 			</div>
 		</div>
-<?
+<?php
 	}
 ?>

@@ -1,4 +1,4 @@
-<?
+<?php
 	// Include, and check we've got a connection to the database.
 	require_once( 'admin/mysqlConnectionInfo.inc' );
 	if(!isset($link) || !$link) $link = openDbConnection();
@@ -23,7 +23,7 @@
 		<link id="gallery" rel="alternate" href="<?= Link::rss("pic") ?>&gallery=true" type="application/rss+xml" title="PicLens feed" />
 		<link rel="alternate" type="application/rss+xml" title="image stream" href="<?= Link::rss("pic") ?>" />
 		<link rel="alternate" type="application/rss+xml" title="daily archives" href="<?= Link::rss("zip") ?>" />
-		<?
+		<?php
 		CSS::add("/styles/grid.css");
 		JS::add("/offensive/js/pickuplink_visibility.js");
 		JS::add("/offensive/js/prep_evenodd.js");
@@ -119,7 +119,7 @@
 <div class="blackbar"></div>
 <div class="heading">
 
-	<?
+	<?php
 		require("offensive/data/quips.inc");
 		echo $quip;
 
@@ -132,7 +132,7 @@
 
 </div>
 
-<?
+<?php
 	global $activeTab;
 	$activeTab = "images";
 	tabs();
@@ -141,7 +141,7 @@
 <div class="bluebox">
 	<div id="grid-container">
 		<div id="commands">
-			<div class="floatleft"><? PickupLink::emit(); ?></div>
+			<div class="floatleft"><?php  PickupLink::emit(); ?></div>
 			<div class="floatright"><a href="<?= Link::content("thumbs").query_string("c p", "&") ?>">thumbnail view</a></div>
 		</div>
 		<div class="grid" id="main">
@@ -156,7 +156,7 @@
 			</ul>
 		</div>
 		<div id="bottom">
-			<?
+			<?php
 				// next page!
 				$args = $_GET;
 				if(array_key_exists("p", $args)) {
@@ -171,6 +171,6 @@
 </div>
 <div class="blackbar"></div>
 </div>
-<?
+<?php
 }
 ?>

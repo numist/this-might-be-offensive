@@ -79,13 +79,13 @@ if(count($possearr) == 0) {
 			</tr>
 		</table>
 		<?= $refer ?>
-		<? if($posse != "") echo $posse; ?>
+		<?php  if($posse != "") echo $posse; ?>
 	</div>
-	<? if(count($possearr)) : ?>
+	<?php  if(count($possearr)) : ?>
 	<div style="margin: 5px 0 0 0; font-size: 10px; line-height: 18px; text-decoration: none; <?= $overflow ?>">
 		<ul>
 		<?= $posse_list ?>
 		</ul>
 	</div>
-	<? endif; ?>
+	<?php  endif; ?>
 </div>

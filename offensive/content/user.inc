@@ -1,4 +1,4 @@
-<?
+<?php
 
 	require_once( 'offensive/assets/tabs.inc' );
 	require_once( 'offensive/assets/functions.inc' );
@@ -43,7 +43,7 @@
 
 		</form>
 	</div>
-<?
+<?php
 	}
 
 	function title() {
@@ -101,56 +101,56 @@
 				<div class="contentbox">
 					<div class="blackbar"></div>
 					<div class="heading">
-						<? echo $accountMessage ?><br/>
+						<?php  echo $accountMessage ?><br/>
 						<span style="color:#666699">
-							<? echo "$name has been around since $accountDateMessage."?>
-							<? if( $referredby ) { ?>
+							<?php  echo "$name has been around since $accountDateMessage."?>
+							<?php  if( $referredby ) { ?>
 								(thanks to <?= $referredby->htmlUsername() ?>.)
-							<? } ?>
-							<? if( isset( $ip ) ) { ?>
-								<br/>Last seen on <?= date( "F d, Y", strtotime($timestamp) ) ?><? if( me()->status() == "admin" ) { ?> from <?= $ip ?> (<a href="<?= Link::content("iphistory") ?>&uid=<?= $usrid ?>">view history</a>)<? } ?>.
-								<?
+							<?php  } ?>
+							<?php  if( isset( $ip ) ) { ?>
+								<br/>Last seen on <?= date( "F d, Y", strtotime($timestamp) ) ?><?php  if( me()->status() == "admin" ) { ?> from <?= $ip ?> (<a href="<?= Link::content("iphistory") ?>&uid=<?= $usrid ?>">view history</a>)<?php  } ?>.
+								<?php
 									if( me()->status() == "admin" ) {
 										$sql = "SELECT DISTINCT * FROM users WHERE last_login_ip = '$ip' AND userid != $usrid" ;
 										$result = tmbo_query( $sql );
-										if( mysql_num_rows( $result ) > 0 ) {
-											?><br/>Other users with the same ip:<br/><?
-											while( $row = mysql_fetch_assoc( $result ) ) {
+										if( mysqli_num_rows( $result ) > 0 ) {
+											?><br/>Other users with the same ip:<br/><?php
+											while( $row = mysqli_fetch_assoc( $result ) ) {
 												echo id(new User($row))->htmlUsername()."<br/>";
 											}
 										}
 									}
 								?>
-							<? } ?>
+							<?php  } ?>
 						</span>
 					</div>
-					<? tabs(); ?>
+					<?php  tabs(); ?>
 					<div class="bluebox">
 						
-						<?
+						<?php
 							if( me()->status() == "admin" ) {
 								?>
-								<div class="adminControls"><?
+								<div class="adminControls"><?php
 									setStatusForm( $usrid, $status, $email );
 								?>
 									<a href="mailto:<?= htmlEscape($email) ?>"><?= htmlEscape($email) ?></a>
 								</div>
-								<?
+								<?php
 							}
 						?>
 						
 						<div style="float:right">
-							<?
+							<?php
 								if(me()->squelched($usrid)) {
-									?><a href="/offensive/setPref.php?unsq=<?= $usrid ?>">unsquelch</a><?
+									?><a href="/offensive/setPref.php?unsq=<?= $usrid ?>">unsquelch</a><?php
 								} else {
-									?><a href="/offensive/setPref.php?sq=<?= $usrid ?>">squelch</a><?
+									?><a href="/offensive/setPref.php?sq=<?= $usrid ?>">squelch</a><?php
 								}
 							?>
 
 						</div>
 
-						<?
+						<?php
 							if($avatar) {
 // XXX: avatar history
 								if($avatar->file() && !$avatar->squelched()) {
@@ -159,7 +159,7 @@
 										<a href="<?= Link::upload($avatar) ?>"><?= $name ?> is gorgeous.</a>
 									</div>
 									<!-- next onclick="img.src=arr[i]" -->
-								<?
+								<?php
 								}
 							}
 							
@@ -171,7 +171,7 @@
 							$sql = "SELECT count(*) as thecount FROM users
 										WHERE referred_by=$usrid AND userid != $usrid";
 							$res = tmbo_query( $sql );
-							list( $possecount ) = mysql_fetch_array( $res );
+							list( $possecount ) = mysqli_fetch_array( $res );
 							
 							if( $possecount > 0 ) {
 							
@@ -180,22 +180,22 @@
 									<a href="<?= Link::content("posse")."&userid=".$usrid ?>"><?= $name ?> has a posse.</a>
 								</div>
 
-						<?
+						<?php
 							}
-						?><div style="clear:both"></div><?
+						?><div style="clear:both"></div><?php
 
 							// XXX: wow this is old
 							if( file_exists( "map/users/$usrid.jpg" ) ) {
-								?><div style="text-align:center;margin-bottom:12px;"><a href="map/"><img src="map/users/<?= $usrid?>.jpg" width="500" height="250"/></a></div><?
+								?><div style="text-align:center;margin-bottom:12px;"><a href="map/"><img src="map/users/<?= $usrid?>.jpg" width="500" height="250"/></a></div><?php
 							}
 						?>
 
-						<?
+						<?php
 							votingRecord( $usrid, $name );
 						?>
 
 						<table width="100%" border="0" cellpadding="0" cellspacing="0">
-									<? 
+									<?php  
 										recentComments($usrid);
 										contributions($usrid)
 									?>
@@ -203,7 +203,7 @@
 					</div>
 					<div class="blackbar"></div>
 				</div>
-<?
+<?php
 }
 
 function recentComments( $uid ) {
@@ -214,7 +214,7 @@ function recentComments( $uid ) {
 ?><tr><td>
 	<div class="piletitle">the smartypants' most recent remarks:</div>
 	<div style="padding:8px;"><table width="535px">
-<?
+<?php
 
 	// TODO: THIS IS REALLY SLOW
 	//$comments = core_getcomments(array("limit" => 100, "userid" => $uid, "votefilter" => "c", "sort" => "date_desc"));
@@ -230,7 +230,7 @@ function recentComments( $uid ) {
 	
 	$seen = array();
 	$count = 0;
-	while( false !== ($row = mysql_fetch_assoc( $result )) && $count < 15) {
+	while( ($row = mysqli_fetch_assoc( $result )) && $count < 15) {
 		$upload = new Upload($row);
 		
 		if(array_key_exists($upload->id(), $seen)) continue;
@@ -239,12 +239,12 @@ function recentComments( $uid ) {
 
 		$css = isset($css) && strpos($css, "even") !== false ? "oddfile odd_row" : "evenfile even_row";
 		// XXX: rejigger the query and use Link::comment
-		?><tr class="<?= $css ?>"><td><div style="white-space:nowrap; width:535px; overflow:hidden;"><a class="<?= $css ?>" href="<?= Link::thread($upload) ?>#<?= $row['commentid'] ?>"><?= $upload->htmlFilename() ?></a></div></td></tr><?
+		?><tr class="<?= $css ?>"><td><div style="white-space:nowrap; width:535px; overflow:hidden;"><a class="<?= $css ?>" href="<?= Link::thread($upload) ?>#<?= $row['commentid'] ?>"><?= $upload->htmlFilename() ?></a></div></td></tr><?php
 
 	}
 ?>
 	</table></div></td></tr>
-<?
+<?php
 
 }
 
@@ -286,7 +286,7 @@ function handleSetStatusSubmission() {
 function setStatusForm( $id, $status, $email ) {
 	$sql = "SHOW COLUMNS FROM users LIKE 'account_status'";
 	$result = tmbo_query( $sql );
-	$row = mysql_fetch_row($result);
+	$row = mysqli_fetch_row($result);
 	$options = explode("','",preg_replace("/(enum|set)\('(.+?)'\)/","\\2",$row[1]));
 	
 	?>
@@ -296,12 +296,12 @@ function setStatusForm( $id, $status, $email ) {
 				<input type="hidden" name="csrf" value="<?= htmlEscape(csrfToken()) ?>"/>
 				<input type="hidden" name="userid" value="<?= $id ?>"/>
 				<select name="set_account_status">
-				<?
+				<?php
 				foreach( $options as $option ) {
 					$selected = ($option == $status ) ? "selected=\"selected\"" : "";
 					?>		
 						<option value="<?=$option?>" <?= $selected ?>><?=$option?></option>
-					<?
+					<?php
 				}
 				?>
 				</select>
@@ -309,7 +309,7 @@ function setStatusForm( $id, $status, $email ) {
 				<input type="submit" value="update account"/>
 			</form>
 		</div>
-	<?
+	<?php
 
 }
 
@@ -320,27 +320,27 @@ function votingRecord( $id, $name ) {
 	
 	$sql = "SELECT COUNT(*) FROM offensive_comments WHERE userid = $id";
 	$result = tmbo_query( $sql );
-	$comments = mysql_fetch_row($result);
+	$comments = mysqli_fetch_row($result);
 	$comments = $comments[0];
 
 	if($comments > 1000) {
-		?><div class="piletitle" style="margin-bottom:12px;"><?echo $name ?> has made <?= $comments ?>  votes/comments<?
+		?><div class="piletitle" style="margin-bottom:12px;"><?php echo $name ?> has made <?= $comments ?>  votes/comments<?php
 	} else {
 		$sql = "SELECT COUNT(*) FROM offensive_comments WHERE userid = $id AND vote = 'this is good'";
 		$result = tmbo_query( $sql );
-		$good = mysql_fetch_row($result);
+		$good = mysqli_fetch_row($result);
 		$good = $good[0];
 		
 		$sql = "SELECT COUNT(*) FROM offensive_comments WHERE userid = $id AND vote = 'this is bad'";
 		$result = tmbo_query( $sql );
-		$bad = mysql_fetch_row($result);
+		$bad = mysqli_fetch_row($result);
 		$bad = $bad[0];
 		
-		?><div class="piletitle" style="margin-bottom:12px;"><?echo $name ?>'s voting record: +<?= $good ?> -<?= $bad ?><?
+		?><div class="piletitle" style="margin-bottom:12px;"><?php echo $name ?>'s voting record: +<?= $good ?> -<?= $bad ?><?php
 	}
 
 ?> (<a href="<?= Link::content("votedetail")."&userid=".$id ?>">click for details</a>)</div>
-<?
+<?php
 
 }
 
@@ -359,7 +359,7 @@ function contributions($usrid) {
 			<div style="padding:8px;">								
 				<table style="width:100%">
 
-<?
+<?php
 	$uploads = core_getuploads(array("userid" => $usrid));
 	$class = 'evenfile';
 	foreach($uploads as $upload) {
@@ -372,13 +372,13 @@ function contributions($usrid) {
 				</td>
 				<td style="text-align:right;white-space:nowrap;width:100%" class="<?= $css?>"><?= $upload->timestamp() ?></td>
 			</tr>
-		<?
+		<?php
 	}
 ?>
 
 				</table>
 			</div>
-		</td></tr><?
+		</td></tr><?php
 }
 
 ?>

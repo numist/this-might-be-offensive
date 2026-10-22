@@ -1,4 +1,4 @@
-<?
+<?php
 
 // sanity
 if(!defined("TMBO") || !isset($upload)) {

@@ -1,11 +1,11 @@
-<?
+<?php
 	require_once( '../mysqlConnectionInfo.php' );	
 	if(!isset($link) || !$link) $link = openDbConnection();
 
 	if( $_REQUEST['action'] == "shipped" ) {
 		$orderid = $_REQUEST['orderid'];
 		$sql = "UPDATE merch_orders set status='shipped' WHERE id=$orderid LIMIT 1";
-		mysql_query( $sql );
+		mysqli_query($link, $sql );
 		header( "Location: " . $_SERVER['PHP_SELF'] );		
 	}
 
@@ -50,7 +50,7 @@
 	
 	<table border="1">
 	
-	<?
+	<?php
 
 		if( $_REQUEST['status'] ) {
 			$status = $_REQUEST['status'];
@@ -73,30 +73,30 @@
 
 		$sql .=	" GROUP BY order_id";
 	
-		$result = mysql_query( $sql ) ;
+		$result = mysqli_query($link, $sql ) ;
 	
-		while( $row = mysql_fetch_assoc( $result ) ) {
+		while( $row = mysqli_fetch_assoc( $result ) ) {
 	?>
-			<tr class="<? echo $row['status'] ?>">
-				<td><? echo $row['orderid'] ?></td>
-				<td><? echo $row['timestamp'] ?></td>
+			<tr class="<?php  echo $row['status'] ?>">
+				<td><?php  echo $row['orderid'] ?></td>
+				<td><?php  echo $row['timestamp'] ?></td>
 				<td>
-					<a href="mailto:<? echo $row['email']?>?subject=[themaxx] Your order"><? echo $row['address_name']?></a><br/>
-					<? echo $row['street'] ?><br/>
-					<? echo $row['city'] ?>, <? echo $row['state'] ?> <? echo $row['zip'] ?><br/>
+					<a href="mailto:<?php  echo $row['email']?>?subject=[themaxx] Your order"><?php  echo $row['address_name']?></a><br/>
+					<?php  echo $row['street'] ?><br/>
+					<?php  echo $row['city'] ?>, <?php  echo $row['state'] ?> <?php  echo $row['zip'] ?><br/>
 				</td>
-				<td><? echo $row['description'] ?></td>
-				<td><? echo $row['option_value'] ?></td>
-				<td><? echo $row['amount'] ?></td>
-				<td><? echo $row['status'] ?></td>				
+				<td><?php  echo $row['description'] ?></td>
+				<td><?php  echo $row['option_value'] ?></td>
+				<td><?php  echo $row['amount'] ?></td>
+				<td><?php  echo $row['status'] ?></td>				
 				<td>
-					<? if( $row['status'] != "shipped" ) { ?>
+					<?php  if( $row['status'] != "shipped" ) { ?>
 						<a href="orders.php?action=shipped&orderid=<?php echo $row['orderid'] ?>">mark shipped</a>
-					<? } ?>
+					<?php  } ?>
 				</td>
 			</tr>
 
-	<?	
+	<?php 	
 		}
 	
 	?>

@@ -1,4 +1,4 @@
-<?
+<?php
 
 class Upload {
 	private static $gdata = array();
@@ -73,10 +73,10 @@ class Upload {
 			$result = tmbo_query($sql);
 			
 			// if the upload doesn't exist...  well what can we do?
-			if(mysql_num_rows($result) != 1) {
+			if(mysqli_num_rows($result) != 1) {
 				$this->data['exists'] = false;
 			} else {
-				$row = mysql_fetch_assoc($result);
+				$row = mysqli_fetch_assoc($result);
 				foreach($row as $key => $val) {
 					$this->data[$key] = $val;
 				}
@@ -149,9 +149,9 @@ class Upload {
 			$result = tmbo_query($sql);
         	
 			// if the upload doesn't exist...  well what can we do?
-			if(mysql_num_rows($result) != 1) return false;
+			if(mysqli_num_rows($result) != 1) return false;
         	
-			$row = mysql_fetch_assoc($result);
+			$row = mysqli_fetch_assoc($result);
 			foreach($row as $key => $val) {
 				$this->data[$key] = $val;
 			}
@@ -233,11 +233,11 @@ class Upload {
             WHERE fileid = {$this->id()} AND commentid IS NULL";
 		$result = tmbo_query($sql);
 		$user_ids = array();
-    while($row = mysql_fetch_assoc($result)) {
+    while($row = mysqli_fetch_assoc($result)) {
 			$user_ids[] = $row['userid'];
 		}
 
-		$user_ids_string = implode($user_ids, ',');
+		$user_ids_string = implode(',', $user_ids);
 		// Do the DB stuff
 		$sql = "UPDATE offensive_subscriptions SET commentid = {$comment->id()}
 		        WHERE fileid = {$this->id()} AND userid IN ({$user_ids_string})";
@@ -274,11 +274,11 @@ class Upload {
 				
 				/* this error should be impossible.  if we ever hit it, we have a
 				 * datastore inconsistency problem on our hands. */
-				if(mysql_num_rows($result) !== 1) {
+				if(mysqli_num_rows($result) !== 1) {
 					throw new Exception("user failure, user for this upload does not exist?");
 				}
 				
-				$this->data["uploader"] = new User(mysql_fetch_assoc($result));
+				$this->data["uploader"] = new User(mysqli_fetch_assoc($result));
 			}
 		}
 		
@@ -305,7 +305,7 @@ class Upload {
 			        WHERE u.userid = com.userid AND fileid = ".$this->data["id"].
 			       " ORDER BY timestamp ASC";
 			$result = tmbo_query($sql);
-			while(false !== ($row = mysql_fetch_assoc($result))) {
+			while($row = mysqli_fetch_assoc($result)) {
 				$this->data["thecomments"][] = new Comment($row);
 			}
 		}
@@ -327,10 +327,10 @@ class Upload {
 			        $blocksql
               ORDER BY id ASC LIMIT 1";	
 			$result = tmbo_query($sql);
-			if(mysql_num_rows($result) == 0) {
+			if(mysqli_num_rows($result) == 0) {
 				$this->data["next"] = false;
 			} else {
-				$this->data["next"] = new Upload(mysql_fetch_assoc($result));
+				$this->data["next"] = new Upload(mysqli_fetch_assoc($result));
 			}
 		}
 		
@@ -351,10 +351,10 @@ class Upload {
 					AND userid NOT IN (SELECT squelched FROM offensive_squelch WHERE userid = {$me->id()})
 					ORDER BY id ASC LIMIT 1";
 			$result = tmbo_query($sql);
-			if(mysql_num_rows($result) == 0) {
+			if(mysqli_num_rows($result) == 0) {
 				$this->data["next_filtered"] = false;
 			} else {
-				$this->data["next_filtered"] = new Upload(mysql_fetch_assoc($result));
+				$this->data["next_filtered"] = new Upload(mysqli_fetch_assoc($result));
 			}
 		}
 		
@@ -371,10 +371,10 @@ class Upload {
 			       $blocksql
 			       ORDER BY id DESC LIMIT 1";
 			$result = tmbo_query($sql);
-			if(mysql_num_rows($result) == 0) {
+			if(mysqli_num_rows($result) == 0) {
 				$this->data["prev"] = false;
 			} else {
-				$this->data["prev"] = new Upload(mysql_fetch_assoc($result));
+				$this->data["prev"] = new Upload(mysqli_fetch_assoc($result));
 			}
 		}
 		
@@ -395,10 +395,10 @@ class Upload {
 					AND userid NOT IN (SELECT squelched FROM offensive_squelch WHERE userid = {$me->id()} )
 					ORDER BY id DESC LIMIT 1";
 			$result = tmbo_query($sql);
-			if(mysql_num_rows($result) == 0) {
+			if(mysqli_num_rows($result) == 0) {
 				$this->data["prev_filtered"] = false;
 			} else {
-				$this->data["prev_filtered"] = new Upload(mysql_fetch_assoc($result));
+				$this->data["prev_filtered"] = new Upload(mysqli_fetch_assoc($result));
 			}
 		}
 		

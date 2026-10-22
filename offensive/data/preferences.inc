@@ -1,4 +1,4 @@
-<?
+<?php
 
 $prefnames = array(
 	// indicates the user wants to hide content that is not safe for work

@@ -1,4 +1,4 @@
-<?
+<?php
 	header('HTTP/1.0 403 Forbidden');
 	header('Content-type: text/html');
 	
@@ -27,7 +27,7 @@
 			font-size:10px;
 		}
 	</style>
-	<? include_once("analytics.inc"); ?>
+	<?php  include_once("analytics.inc"); ?>
 </head>
 
 
@@ -39,17 +39,17 @@
 	
 				<p>no can do.</p>
 				
-				<? if(isset($upload) && is_object($upload) && me()) { ?>
+				<?php  if(isset($upload) && is_object($upload) && me()) { ?>
 					<p>
 						<a id="index" href="<?= Link::listFor($upload) ?>">up</a>
 					</p>
-				<? } ?>
+				<?php  } ?>
 			</td>
 		</tr>
 	</table>
 	
-<? include 'includes/footer.txt' ?>
+<?php  include 'includes/footer.txt' ?>
 
 </body>
 </html>
-<? exit; ?>
+<?php  exit; ?>

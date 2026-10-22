@@ -1,4 +1,4 @@
-<?
+<?php
 
 class Link {
 	static function setPref($key, $value) {

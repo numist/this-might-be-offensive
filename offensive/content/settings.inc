@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once( 'offensive/assets/tabs.inc' );
 	require_once( 'admin/mysqlConnectionInfo.inc' );
 	if(!isset($link) || !$link) $link = openDbConnection();
@@ -67,7 +67,7 @@
 	<div class="heading">
 			set things up how you like 'em.
 	</div>
-	<?
+	<?php
 		global $activeTab;
 		tabs();
 	?>
@@ -75,28 +75,28 @@
 	<div class="bluebox">
 		<p>use the nsfw and tmbo filters to block images that are not safe for work or potentially offensive.  <br />use the bad filter if you trust the judgement of your fellow maxxers.  10 [this is bad] votes and a ratio of 9 bad for every [this is good] causes the bad filter to activate.</p>
 		<div style="text-align:center">
-			<span><?
+			<span><?php
 				if(me()->getPref("hide_nsfw") == 1) { ?>
 					<a href="<?= Link::setPref("hide_nsfw", "") ?>">turn nsfw filter off</a>
-				<? } else { ?>
+				<?php  } else { ?>
 					<a href="<?= Link::setPref("hide_nsfw", 1) ?>">turn nsfw filter on</a>
-				<? } ?>
+				<?php  } ?>
 			</span>
 						
-			<span style="margin-left:48px;"><?
+			<span style="margin-left:48px;"><?php
 				if(me()->getPref("hide_tmbo") == 1) { ?>
 					<a href="<?= Link::setPref("hide_tmbo", "") ?>">turn tmbo filter off</a>
-				<? } else { ?>
+				<?php  } else { ?>
 					<a href="<?= Link::setPref("hide_tmbo", 1) ?>">turn tmbo filter on</a>
-				<? } ?>
+				<?php  } ?>
 			</span>
 			
-			<span style="margin-left:48px;"><?
+			<span style="margin-left:48px;"><?php
 				if(me()->getPref("hide_bad") == 1) { ?>
 					<a href="<?= Link::setPref("hide_bad", "") ?>">turn bad filter off</a>
-				<? } else { ?>
+				<?php  } else { ?>
 					<a href="<?= Link::setPref("hide_bad", 1) ?>">turn bad filter on</a>
-				<? } ?>
+				<?php  } ?>
 			</span>
 		</div>
 	</div>
@@ -111,8 +111,8 @@
 				</td>
 				<td class='keytype'>
 					<select>
-						<?foreach($key_options as $name => $desc) {
-							?><option value="<?= $name ?>"><?= $desc ?></option><?
+						<?php foreach($key_options as $name => $desc) {
+							?><option value="<?= $name ?>"><?= $desc ?></option><?php
 						}?>
 					</select>
 				</td>
@@ -128,7 +128,7 @@
 				<table style="margin-left: 140px;">
 					<!-- this should be changed to PHP with data from the backend -->
 					<!-- you can forget about the name/id, that'll be set on submit  -->
-					<?/*LOOPY LOOP*/
+					<?php /*LOOPY LOOP*/
 					
 					// has the user customized their key layout?
 					$custom = false;
@@ -175,7 +175,7 @@
 		<p>RSS feeds, the web site, and external applications use tokens to log in as you. Here you can see all of your tokens, when they were issued, for whom they were issued, and when they were last used. You can also revoke them here.</p>
 
 			<div align="center" style="padding:1em;">
-			<?
+			<?php
 				$tokens = core_gettokens();
 				foreach($tokens as $token) {
 			?>
@@ -194,12 +194,12 @@
 					<td colspan="2" style="text-align: center;"><a href="<?= $_SERVER["REQUEST_URI"] ?>&revoke=<?= $token->tokenid() ?>">revoke this token</a></td>
 				</tr>
 			</table>
-			<? } ?>
+			<?php  } ?>
 			</div>
 	</div>
 	<div class="blackbar"></div>
 </div>
-<?
+<?php
 	}
 	
 	function emitRow($prefname, $keycode) {
@@ -210,8 +210,8 @@
 			</td>
 			<td class="keytype">
 				<select>
-					<? foreach($key_options as $name => $desc) {
-						?><option value="<?= $name ?>"<?= $name == $prefname ? " selected" : "" ?>><?= $desc ?></option><?
+					<?php  foreach($key_options as $name => $desc) {
+						?><option value="<?= $name ?>"<?= $name == $prefname ? " selected" : "" ?>><?= $desc ?></option><?php
 					} ?>
 				</select>
 			</td>
@@ -219,5 +219,5 @@
 			<td><span class="key_notification"></span></td>
 			<td><input type="hidden" class="registered_key" value="<?= (int)$keycode ?>" /></td>
 		</tr>
-	<? }
+	<?php  }
 ?>

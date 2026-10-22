@@ -27,7 +27,7 @@ function poast($comment, $image, $upload) {
 				<blockquote>
 					<span class="abbr">Comment too long. Click <a href="<?= Link::comment($comment) ?>">here</a> to view the full text.</span>
 				</blockquote>
-			<?
+			<?php
 		}
 	}
 }
@@ -62,7 +62,7 @@ function changesrc(a,im)
 }
 </script>
 
-<? include_once("analytics.inc"); ?>
+<?php  include_once("analytics.inc"); ?>
 </head>
 <body bgcolor="#FFFFEE" text="#800000" link="#0000EE" vlink="#0000EE">
 <div id="header"><span id="navtop">
@@ -174,7 +174,7 @@ ORDER BY offensive_uploads.timestamp DESC, offensive_uploads.id DESC
 LIMIT $page_limit_clause, 15";
 
 $result = tmbo_query($sql);
-while( $image = mysql_fetch_assoc( $result ) ) 
+while( $image = mysqli_fetch_assoc( $result ) ) 
 {
 	$upload = new Upload($image);
 	$filepath = $upload->file();
@@ -183,7 +183,7 @@ while( $image = mysql_fetch_assoc( $result ) )
 
 <!-- loopy -->
 <span class="filesize">
-	File: <a href="<?= Link::upload($upload) ?>"><?= htmlEscape($upload->filename()) ?></a> - (<?= byte_format(filesize($filepath))?>, <?
+	File: <a href="<?= Link::upload($upload) ?>"><?= htmlEscape($upload->filename()) ?></a> - (<?= byte_format(filesize($filepath))?>, <?php
 
 $info = getimagesize($filepath);
 echo $info[0]."x".$info[1];
@@ -196,16 +196,16 @@ echo $info[0]."x".$info[1];
 
 
 <a href="<?= $upload->URL() ?>"
-	<? if($upload->filtered()) { ?>
+	<?php  if($upload->filtered()) { ?>
 		onMouseOver='changesrc("th<?= $upload->id()?>","<?= $upload->thumbURL() ?>")'
  		onMouseOut='changesrc("th<?= $upload->id() ?>","/offensive/graphics/th-filtered.gif")'
-	<? } ?>
+	<?php  } ?>
 ><img name="th<?= $upload->id()?>"
 	src="<?= $upload->filtered()
 		? "/offensive/graphics/th-filtered.gif" 
 		: $upload->thumbURL() ?>"
  	border=0 align=left hspace=20 title="<?= byte_format(filesize($filepath)); ?>" /></a>
-<?
+<?php
 
 ?><a name="im<?= $upload->id() ?>"></a>
 <!-- voting goes here -->
@@ -222,7 +222,7 @@ echo $info[0]."x".$info[1];
 
 <!-- if(replies) -->
 
-<?
+<?php
 	$sql = "SELECT offensive_comments.*, offensive_comments.id as commentid, offensive_comments.timestamp AS comment_timestamp, users.*
 				FROM offensive_uploads, offensive_comments, users
 				WHERE users.userid = offensive_comments.userid
@@ -231,11 +231,11 @@ echo $info[0]."x".$info[1];
 				ORDER BY comment_timestamp";
 	
 	$res = tmbo_query( $sql );
-	$rows = mysql_num_rows($res);
+	$rows = mysqli_num_rows($res);
 	$op = 0;
 	$fetch = 0;
 
-	$comment = mysql_fetch_assoc($res);
+	$comment = mysqli_fetch_assoc($res);
 	++$fetch;
 	if($comment['userid'] == $upload->uploader()->id()) {
 		$op = 1;
@@ -246,18 +246,18 @@ echo $info[0]."x".$info[1];
 	if($rows - $op > 3) {
 ?>
 <span class="omittedposts"><?= ($rows - 3 - $op) ?> post<?= ($rows - 3 - $op) == 1 ? "" : "s" ?> omitted. Click Reply to view.</span>
-<?
+<?php
 	}
 
 	if($op == 1) {
-		if(!($comment = mysql_fetch_assoc($res))) {
+		if(!($comment = mysqli_fetch_assoc($res))) {
 			$comment = false;
 		}
 		++$fetch;
 	}
 
 	while($fetch <= $rows - 3) {
-		$comment = mysql_fetch_assoc($res);
+		$comment = mysqli_fetch_assoc($res);
 		++$fetch;
 	}
 
@@ -277,14 +277,14 @@ echo $info[0]."x".$info[1];
 			<span id="norep<?= $comment['commentid'] ?>">
 				<a href="<?= Link::comment($comment['commentid']) ?>" class="quotejs">No.<?= $comment['commentid'] ?></a>
 			</span>
-			<? poast($comment, $image, $upload); ?>
+			<?php  poast($comment, $image, $upload); ?>
 		</td>
 	</tr>
 </table>
 
-<?
+<?php
 	++$fetch;
-	} while($comment = mysql_fetch_assoc($res));
+	} while($comment = mysqli_fetch_assoc($res));
 ?>
 
 <!-- /if -->
@@ -309,7 +309,7 @@ echo $info[0]."x".$info[1];
 	<tr>
 		<td>Previous</td>
 		<td>
-<?
+<?php
 for($i = 0; $i < 10; $i++) {
 	if($p == $i) {
 		echo "[<b>".($i + 1)."</b>]";

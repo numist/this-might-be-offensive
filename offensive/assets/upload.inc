@@ -1,4 +1,4 @@
-<?
+<?php
 
 require_once("offensive/assets/id3.inc");
 require_once("offensive/assets/xmlrpc.inc");
@@ -58,7 +58,7 @@ function numUploadsToday() {
 	if(!me()) return 0;
 	$sql = "SELECT count( id ) as thecount FROM offensive_uploads WHERE userid = ".me()->id()." AND timestamp > DATE_SUB( NOW(), INTERVAL 1 DAY ) AND type='image'";
 	$result = tmbo_query( $sql );
-	$row = mysql_fetch_assoc( $result );
+	$row = mysqli_fetch_assoc( $result );
 	return $row[ 'thecount' ];
 }
 
@@ -91,7 +91,7 @@ function numAllowedUploads() {
 	$good = 0;
 	$bad = 0;
 
-	while( $row = mysql_fetch_assoc( $result ) ) {
+	while( $row = mysqli_fetch_assoc( $result ) ) {
 		switch( $row['vote'] ) {
 			case "this is good":
 				$good += $row['thecount'];
@@ -623,7 +623,7 @@ function upload_type(&$postdata) {
 		$bytewordlen = strlen($byteword);
 		$intvalue = 0;
 		for ($i = 0; $i < $bytewordlen; $i++) {
-				$intvalue = $intvalue | (ord($byteword{$i}) & 0x7F) << (($bytewordlen - 1 - $i) * 7);
+				$intvalue = $intvalue | (ord($byteword[$i]) & 0x7F) << (($bytewordlen - 1 - $i) * 7);
 		}
 		$dataoffset += 10; // length of ID3v2 tag in 10-byte header doesn't include 10-byte header length
 	}
@@ -899,7 +899,7 @@ function upload_checkisk(&$postdata) {
 			
 	$result = tmbo_query( $sql );
 	
-	if( mysql_num_rows( $result ) == 0 ) return false;
+	if( mysqli_num_rows( $result ) == 0 ) return false;
 	
 	?>
 <div class="contentbox">
@@ -909,20 +909,20 @@ function upload_checkisk(&$postdata) {
 	<div style="text-align:center">
 	Your file looks similar to:
 	<br /><center>
-	<table><?	
-	while($row = mysql_fetch_assoc($result)) {
+	<table><?php 	
+	while($row = mysqli_fetch_assoc($result)) {
 		$upload = new Upload($row);
 		$css = (isset($css) && $css == "even_row") ? "odd_row" : "even_row";
 		
-		?><tr class="<?= $css ?>"><?
+		?><tr class="<?= $css ?>"><?php
 			if(upload_type($postdata) == "image" || upload_type($postdata) == "avatar") { ?>
 				<td height="100px" width="100px">
 
 					<a href="<?= Link::upload($upload) ?>"
-						<? if($upload->filtered()) { ?>
+						<?php  if($upload->filtered()) { ?>
 							onMouseOver='changesrc("th<?= $upload->id()?>","<?= $upload->thumbURL() ?>")'
 							onMouseOut='changesrc("th<?= $upload->id() ?>","/offensive/graphics/th-filtered.gif")'
-						<? } ?>
+						<?php  } ?>
 						><img name="th<?= $upload->id()?>"
 							src="<?= $upload->filtered()
 							? "/offensive/graphics/th-filtered.gif" 
@@ -930,9 +930,9 @@ function upload_checkisk(&$postdata) {
 					/></a>
 
 				</td>
-			<? } ?>
+			<?php  } ?>
 		<td><a href="<?= Link::thread($upload); ?>" target="_blank"><?= htmlEscape($upload->filename()) ?></a></td>
-		</tr><?
+		</tr><?php
 	}
 	?></table></center><br />
 	<form action="<?= $_SERVER['PHP_SELF'] ?>" method="POST">
@@ -945,7 +945,7 @@ function upload_checkisk(&$postdata) {
 	<div class="blackbar"></div>
 </div>
 
-	<?
+	<?php
 	$_SESSION['postdata'] = serialize($postdata);
 	return true;
 }
@@ -969,7 +969,7 @@ function upload_checkrepost(&$postdata) {
 			WHERE hash = '".$postdata['hash']."' AND type = '".upload_type($postdata)."'
 			ORDER by timestamp DESC";
 	$result = tmbo_query( $sql );
-	if( mysql_num_rows( $result ) == 0 ) return false;
+	if( mysqli_num_rows( $result ) == 0 ) return false;
 
 	$filePath=dirname(realpath($_SERVER['SCRIPT_FILENAME']));
 
@@ -981,20 +981,20 @@ function upload_checkrepost(&$postdata) {
 	<div style="text-align:center">
 	Your file appears to be a repost of:
 	<br /><center>
-	<table><?
-	while($row = mysql_fetch_assoc($result)) {
+	<table><?php
+	while($row = mysqli_fetch_assoc($result)) {
 		$upload = new Upload($row);
 		$css = (isset($css) && $css == "even_row") ? "odd_row" : "even_row";
 
-		?><tr class="<?= $css ?>"><?
+		?><tr class="<?= $css ?>"><?php
 			if(upload_type($postdata) == "image" || upload_type($postdata) == "avatar") { ?>
 				<td height="100px" width="100px">
 
 					<a href="<?= Link::upload($upload) ?>"
-						<? if($upload->filtered()) { ?>
+						<?php  if($upload->filtered()) { ?>
 							onMouseOver='changesrc("th<?= $upload->id()?>","<?= $upload->thumbURL() ?>")'
 							onMouseOut='changesrc("th<?= $upload->id() ?>","/offensive/graphics/th-filtered.gif")'
-						<? } ?>
+						<?php  } ?>
 						><img name="th<?= $upload->id()?>"
 							src="<?= $upload->filtered()
 							? "/offensive/graphics/th-filtered.gif" 
@@ -1002,9 +1002,9 @@ function upload_checkrepost(&$postdata) {
 					/></a>
 
 				</td>
-			<? } ?>
+			<?php  } ?>
 		<td><a href="<?= Link::thread($upload); ?>" target="_blank"><?= htmlEscape($upload->filename()) ?></a></td>
-		</tr><?
+		</tr><?php
 	}
 	?></table></center><br />
 	<form action="<?= $_SERVER['PHP_SELF'] ?>" method="POST">
@@ -1017,7 +1017,7 @@ function upload_checkrepost(&$postdata) {
 	<div class="blackbar"></div>
 </div>
 
-	<?
+	<?php
 	$_SESSION['postdata'] = serialize($postdata);
 	return true;
 }
@@ -1117,13 +1117,14 @@ function upload_largerthan($postdata, $bytes) {
 
 ###############################################################################
 function upload_insert_file($postdata) {
+	global $link;
 	global $tmpdir;
 
 	// it's possible (it's happened in the past!) for the time in sql to differ from PHP
 	// use the SQL server's time as the trusted source
 	$sql = "SELECT NOW()";
 	$res = tmbo_query($sql);
-	list($now) = mysql_fetch_array($res);
+	list($now) = mysqli_fetch_array($res);
 
 	// basePath()
 	$timestamp = strtotime($now);
@@ -1146,7 +1147,7 @@ function upload_insert_file($postdata) {
 			                $nsfw, $tmbo, '".$postdata['hash']."', '" .
 			                upload_type( $postdata ) . "', 'pending')";
 	tmbo_query($sql);
-	$fileid = mysql_insert_id();
+	$fileid = mysqli_insert_id($link);
 
 	ensureDirExists("$path");
 

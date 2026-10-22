@@ -1,4 +1,4 @@
-<?
+<?php
 
 	$defaultpath = ini_get('include_path');
 	set_include_path("..");
@@ -48,15 +48,15 @@
 	
 	    // output correct pickuplink
 	    if($dbpic !== false && $dbpic == $cookiepic) {
-		    ?><a href="<?= Link::upload($dbpic) ?>" id="pickUp">Pick up where you left off...</a><?
+		    ?><a href="<?= Link::upload($dbpic) ?>" id="pickUp">Pick up where you left off...</a><?php
 	    } else if ($dbpic && $cookiepic){
 		    ?>Pick up where you left off 
 			    (<a href="<?= Link::upload($cookiepic) ?>" id="pickUp">on this computer</a> | 
-			    <a href="<?= Link::upload($dbpic) ?>" id="pickUp">on this account</a>)<?
+			    <a href="<?= Link::upload($dbpic) ?>" id="pickUp">on this account</a>)<?php
 	    } else if ($cookiepic) {
-		    ?><a href="<?= Link::upload($cookiepic) ?>" id="pickUp">Pick up where you left off...</a><?
+		    ?><a href="<?= Link::upload($cookiepic) ?>" id="pickUp">Pick up where you left off...</a><?php
 	    } else if ($dbpic) {
-	    	?><a href="<?= Link::upload($dbpic) ?>" id="pickUp">Pick up where you left off...</a><?
+	    	?><a href="<?= Link::upload($dbpic) ?>" id="pickUp">Pick up where you left off...</a><?php
 	    }
     }
 
@@ -323,7 +323,7 @@
 
             div, table {font-size:13px}
         </style>
-				<? include_once("analytics.inc") ?>
+				<?php  include_once("analytics.inc") ?>
     </head>
     <body id="gsr" topmargin="3" marginheight="3" class="   ">
         <textarea id="csi" style="display:none">
@@ -408,7 +408,7 @@
                                         SafeSearch:&nbsp;
                                     </div>
                                     <div id="ss-status" style="float:left;position:relative">
-                                        <a class="gb3" style="cursor:pointer;padding-bottom:0" href="<?= Link::content("settings") ?>"><u><?
+                                        <a class="gb3" style="cursor:pointer;padding-bottom:0" href="<?= Link::content("settings") ?>"><u><?php
     if(me()->getPref("hide_tmbo") && me()->getPref("hide_nsfw")) echo "Strict";
     else if(!me()->getPref("hide_tmbo") && !me()->getPref("hide_nsfw")) echo "Off";
     else echo "Moderate";
@@ -488,7 +488,7 @@
                             <div id="ImgContent">
                                 <table width="100%" class="ts" id="imgtb">
                                     <tbody>
-                                        <?
+                                        <?php
                                             $first = true;
                                             $total = 0;
                                             foreach($output as $row) {
@@ -501,7 +501,7 @@
                                                     <img style="border:1px solid;vertical-align:bottom" src="<?= ($upload->filtered() ? "/offensive/graphics/th-filtered.gif" : $upload->thumbURL()) ?>">
                                                 </a>
                                             </td>
-                                        <?      }
+                                        <?php       }
                                                 for(;$col < 6; $col++) {
                                                     echo "<td></td>";
                                                 }
@@ -511,14 +511,14 @@
                                         ?>
                                             <td id="tDataText0" align="left" valign="top" width="16.666666%">
                                                 <div class="std">
-                                                    <?
+                                                    <?php
                                                         $filename = substr($upload->filename(), 0, strrpos($upload->filename(), "."));
 							$filename = str_replace(array("<", ">"), array("[", "]"), strip_tags(str_replace(array("[", "]"), array("<", ">"), $filename)));
                                                         echo (strlen($filename) > 22 ? substr($filename, 0, 22) : $filename);
                                                     if($upload->file()) {
                                                     ?>
                                                     <div class="f">
-                                        <?
+                                        <?php
                                             $info = getimagesize($upload->file());
                                             echo $info[0]." x ".$info[1]." - ".
                                                  floor(filesize($upload->file()) / 1024).
@@ -526,7 +526,7 @@
 (htmlEscape(substr($upload->filename(), strrpos($upload->filename(), ".") + 1)));
                                         ?>
                                             </div>
-                                                <? } ?>
+                                                <?php  } ?>
                                                     <div class="a">
                                                         <cite style="font-style:normal">
                                                             <?= strtolower($upload->uploader()->username()).randtld($upload->uploader()->username()) ?>
@@ -534,7 +534,7 @@
                                                     </div>
                                                 </div>
                                             </td>
-                                        <?      }
+                                        <?php       }
                                                 for(;$col < 6; $col++) {
                                                     echo "<td></td>";
                                                 }
@@ -564,17 +564,17 @@
                     <tbody>
                         <tr valign="top">
                             <td class="b">
-<?
+<?php
     $newargs = $args;
     if($args['p'] == 0) {
 ?>
                                 <span class="csb" style="background-position:-26px 0;width:18px">
                                 </span>
-<? } else { ?>
+<?php  } else { ?>
                                 <a href="./?<?= http_build_query($newargs) ?>"><span class="csb" style="background-position:0 0;margin-left:auto;width:44px"></span><div style="margin-right: 8px;">Previous</div></a>
-<? } ?>
+<?php  } ?>
                             </td>
-<?
+<?php
     for($i = max(1, $args['p'] - 9); $i <= max(10, $args['p'] + 10); $i++) {
         $newargs['p'] = $i;
         if($i == $args['p'] + 1) {
@@ -584,14 +584,14 @@
                                 </span>
 <?= $i ?>
                             </td>
-<?      } else { ?>
+<?php       } else { ?>
                             <td>
                                 <a href="./?<?= http_build_query($newargs) ?>"><span class="csb ch" style="background-position:-60px 0;width:16px"></span><?= $i ?></a>
                             </td>
-<?      }
+<?php       }
     } ?>
                             <td class="b">
-<?
+<?php
     $newargs['p'] = $args['p'] + 2;
 ?>
                                 <a href="./?<?= http_build_query($newargs) ?>"><span class="csb ch" style="background-position:-76px 0;margin-right:34px;width:66px"></span>Next</a>

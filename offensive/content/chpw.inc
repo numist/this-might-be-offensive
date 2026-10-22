@@ -1,4 +1,4 @@
-<?
+<?php
 require_once( 'admin/mysqlConnectionInfo.inc' );
 if(!isset($link) || !$link) $link = openDbConnection();
 
@@ -17,7 +17,7 @@ if(!isset($link) || !$link) $link = openDbConnection();
 	<div class="blackbar"></div>
 	<div class="heading">ooo! top secret codeword spy stuff!</div>
 	<div class="bluebox">
-<?
+<?php
 	
 		if( array_key_exists("old", $_REQUEST) ) {
 			$old = $_REQUEST['old'];
@@ -31,18 +31,18 @@ if(!isset($link) || !$link) $link = openDbConnection();
 							AND password = '$encrypted_pw'";
 	
 				$result = tmbo_query( $query );
-				if( mysql_num_rows( $result ) == 1 ) {
+				if( mysqli_num_rows( $result ) == 1 ) {
 					$encrypted_pw = sha1( $new );
 					$sql = "UPDATE users SET timestamp = timestamp, password='$encrypted_pw' WHERE userid=$uid LIMIT 1";
 					$result = tmbo_query( $sql );
-					?>done.<br/><br/><?
+					?>done.<br/><br/><?php
 				}
 				else {
-					?>nope.<?
+					?>nope.<?php
 				}
 			}
 			else {
-				?>new password is invalid.<?
+				?>new password is invalid.<?php
 			}
 		}
 
@@ -56,7 +56,7 @@ if(!isset($link) || !$link) $link = openDbConnection();
 	</div>
 	<div class="blackbar"></div>
 </div>
-<?
+<?php
 	}
 
 ?>

@@ -100,7 +100,7 @@ function var_info($var) {
 	return $str;
 }
 
-function tmbo_error_handler($errno, $errstr, $errfile, $errline, $errcontext) {
+function tmbo_error_handler($errno, $errstr, $errfile, $errline, $errcontext = null) {
         $errortype = array (
                 E_ERROR              => 'Error',
                 E_WARNING            => 'Warning',
@@ -113,19 +113,24 @@ function tmbo_error_handler($errno, $errstr, $errfile, $errline, $errcontext) {
                 E_USER_ERROR         => 'User Error',
                 E_USER_WARNING       => 'User Warning',
                 E_USER_NOTICE        => 'User Notice',
-                E_STRICT             => 'Runtime Notice',
                 E_RECOVERABLE_ERROR  => 'Catchable Fatal Error',
 				        E_DEPRECATED         => 'Deprecated'
                 );
         $critical = E_ERROR | E_WARNING | E_PARSE | E_CORE_ERROR | E_CORE_WARNING | 
                     E_COMPILE_ERROR | E_COMPILE_WARNING | E_USER_ERROR | E_USER_WARNING;
 
-        $shortfile = (strlen($errfile) > 25 ? 
+        $shortfile = (strlen($errfile) > 25 ?
 	             "...".substr($errfile, -22) : $errfile);
 
         error_log("$shortfile:$errline:[".$errortype[$errno]."] ".$errstr);
 
 		if(!($errno & error_reporting())) return;
+
+		// me() reports through this handler when called before login(), so calling
+		// it below would recurse forever. Errors raised while handling one just get logged.
+		static $handling = false;
+		if($handling) return;
+		$handling = true;
 
         if(me() && me()->status() == "admin" && $errno & $critical) {
                 echo "<br />\n".
@@ -139,6 +144,8 @@ function tmbo_error_handler($errno, $errstr, $errfile, $errline, $errcontext) {
 						while(ob_get_level() > 0) {
 							ob_end_clean();
 						}
+						// the failing code may have changed the include path (search.inc does)
+						set_include_path(dirname(__DIR__, 2));
 						require("offensive/index.outoforder.php");
 					} else if (array_key_exists("status", $_SESSION) &&
 					           $_SESSION['status'] == "admin") {
@@ -150,9 +157,11 @@ function tmbo_error_handler($errno, $errstr, $errfile, $errline, $errcontext) {
 					}
 					exit;
         }
+
+		$handling = false;
 }
 set_error_handler("tmbo_error_handler");
-error_reporting(E_STRICT | E_ALL);
+error_reporting(E_ALL);
 
 function tmbo_exception_handler($e) {
 	if(is_null($e)) return;
@@ -164,7 +173,11 @@ function tmbo_exception_handler($e) {
 	
 	if((!me() || me()->status() != "admin") && ob_get_level() > 0) {
 		ob_end_clean();
-		if(file_exists("offensive/".$e->getCode().".php")) {
+		// the failing code may have changed the include path (search.inc does), and
+		// file_exists() doesn't use it anyway
+		$root = dirname(__DIR__, 2);
+		set_include_path($root);
+		if(file_exists("$root/offensive/".$e->getCode().".php")) {
 			require("offensive/".$e->getCode().".php");
 			exit;
 		}
@@ -229,8 +242,8 @@ function tmbo_query($sql, $timeout=2) {
 
 	time_start($time);
 		
-	$result = mysql_query($sql, $link) or 
-		tmbo_error_handler(E_USER_ERROR, mysql_error()." query '$sql'", 
+	$result = mysqli_query($link, $sql) or 
+		tmbo_error_handler(E_USER_ERROR, mysqli_error($link)." query '$sql'", 
 		                   $trace['file'], $trace['line'], null);
 	$time = time_end($time);
 	$querytime += $time;

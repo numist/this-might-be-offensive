@@ -1,4 +1,4 @@
-<? 
+<?php  
 set_include_path("../..");
 require_once( 'offensive/assets/header.inc' );
 mustLogIn(array("prompt" => "http", "token" => null));
@@ -6,7 +6,7 @@ mustLogIn(array("prompt" => "http", "token" => null));
 header( "Content-type: text/xml" ); ?>
 <itemList version="1.0">
 
-<?
+<?php
 	require_once( 'admin/mysqlConnectionInfo.inc' );
 	
 	
@@ -33,9 +33,9 @@ header( "Content-type: text/xml" ); ?>
 			ORDER BY offensive_uploads.timestamp DESC
 			LIMIT $startNum, $numItems";
 
-	$result = mysql_query( $sql );
+	$result = mysqli_query($link, $sql );
 
-	while( $row = mysql_fetch_assoc( $result ) ) {
+	while( $row = mysqli_fetch_assoc( $result ) ) {
 	
 		$nsfw = $row['nsfw'] == 1 ? "[nsfw]" : "";
 		
@@ -51,7 +51,7 @@ header( "Content-type: text/xml" ); ?>
 
 		<item id="<?= $row['id'] ?>">
 			<title><?= xmlEscape($nsfw . $filename) ?> (uploaded by <?= xmlEscape($row['username']) ?>)</title>
-			<date><? echo date( "r", strtotime( $row['timestamp'] ) ) ?></date>			
+			<date><?php  echo date( "r", strtotime( $row['timestamp'] ) ) ?></date>			
 			<imgUrl><?= "http://tmbo.org/offensive/uploads/$year/$month/$day/image/" . rawurlencode( $row['filename'] ) ?></imgUrl>
 			<thumbUrl><?= "http://tmbo.org/offensive/uploads/$year/$month/$day/image/thumbs/th" . $row['id'] . $extension ?></thumbUrl>
 			<username><![CDATA[<?= $row['username'] ?>]]></username>
@@ -63,7 +63,7 @@ header( "Content-type: text/xml" ); ?>
 			<tmbo><?= $row['tmbo']?></tmbo>
 			<repost><?= $row['repost']?></repost>
 		</item>
-<?
+<?php
 	}
 ?>
 

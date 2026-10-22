@@ -1,4 +1,4 @@
-<?
+<?php
 set_include_path("..");
 require_once("offensive/assets/header.inc");
 // Include, and check we've got a connection to the database.
@@ -22,7 +22,7 @@ $sql = "SELECT offensive_uploads.timestamp
  		ORDER BY timestamp DESC
 		LIMIT 1";
 $res = tmbo_query($sql);
-$row = mysql_fetch_array($res);
+$row = mysqli_fetch_array($res);
 $lastBuildDate = array_pop($row);
 $lastBuildTime = strtotime($lastBuildDate);
 conditionalGet($lastBuildTime);
@@ -36,9 +36,9 @@ header( "Content-type: text/xml" );
 		<title>[ this might be offensive ] : audio</title>
 		<link>https://<?= $_SERVER['HTTP_HOST'] ?>/offensive/</link>
 		<description>[ this might be offensive ]</description>
-		<lastBuildDate><? echo date("r"); ?></lastBuildDate>
+		<lastBuildDate><?php  echo date("r"); ?></lastBuildDate>
 
-<?	
+<?php 	
 	$args = $_REQUEST;
 	if(!array_key_exists("type", $args)) {
 		$args["type"] = "audio";
@@ -64,7 +64,7 @@ header( "Content-type: text/xml" );
 			<title><?= xmlEscape($filename) ?> (uploaded by <?= xmlEscape($upload->uploader()->username()) ?>)</title>
 			<link>https://<?= $_SERVER['HTTP_HOST'] ?><?= Link::upload($upload) ?></link>
 			<enclosure url="<?= $fileURL ?>" length="<?= filesize( $upload->file() ) ?>" type="audio/mpeg"/>
-			<description><?
+			<description><?php
 			
 				ob_start();
 				
@@ -85,15 +85,15 @@ header( "Content-type: text/xml" );
 				$id3 = new getid3_id3v2($fp, $info);
 				
 				if(array_key_exists('id3v2', $info) && array_key_exists('comments', $info['id3v2'])) {
-					?><table><tr><td><?
+					?><table><tr><td><?php
 					if(file_exists(dirname($upload->file())."/thumbs/th".$upload->id())) {
-						?><img src="<?= $server.dirname($upload->URL()) ?>/thumbs/th<?= $upload->id() ?>"></td><td><?
+						?><img src="<?= $server.dirname($upload->URL()) ?>/thumbs/th<?= $upload->id() ?>"></td><td><?php
 					}
 						
 					$tags = $info['id3v2']['comments'];
 						
 					if(array_key_exists('title', $tags)) { ?>
-					<span style="color:#666666">Title: <? 
+					<span style="color:#666666">Title: <?php  
 						echo htmlEscape(trim($tags['title'][0])); 
 						if(array_key_exists('tracknum', $tags)) {
 							echo "(track ".(int)trim($tags['tracknum'][0]);
@@ -104,16 +104,16 @@ header( "Content-type: text/xml" );
 						}
 						?>
 					</span><br />
-					<? }
+					<?php  }
 						
 					if(array_key_exists('artist', $tags)) { ?>
 					<span style="color:#666666">By: <?= htmlEscape(trim($tags['artist'][0])); ?></span><br />
-					<? }
+					<?php  }
 						
 					if(array_key_exists('album', $tags)) { ?>
 					<span style="color:#666666">Album: <?= htmlEscape(trim($tags['album'][0])); ?></span><br /><br />
-					<? }
-					?></td></tr></table><?
+					<?php  }
+					?></td></tr></table><?php
 						
 				} else {
 					echo $upload->htmlFilename();
@@ -126,7 +126,7 @@ header( "Content-type: text/xml" );
 			    <param name="bgcolor" value="#ffffff" />
 			    <param name="FlashVars" value="<?= $args ?>" />
 			</object>
-			<?
+			<?php
 			
 			$string = ob_get_contents();
 			ob_end_clean();
@@ -138,10 +138,10 @@ header( "Content-type: text/xml" );
 			
 			?>
 			</description>
-			<pubDate><? echo date( "r", strtotime( $upload->timestamp() ) ) ?></pubDate>			
+			<pubDate><?php  echo date( "r", strtotime( $upload->timestamp() ) ) ?></pubDate>			
 			<comments><![CDATA[https://<?= $_SERVER['HTTP_HOST'].Link::thread($upload) ?>]]></comments>
 		</item>
-<?
+<?php
 	}
 ?>
 

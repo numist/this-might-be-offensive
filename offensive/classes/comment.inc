@@ -1,4 +1,4 @@
-<?
+<?php
 
 class Comment {
 	private static $gdata = array();
@@ -85,10 +85,10 @@ class Comment {
 			$result = tmbo_query($sql);
 			
 			// if the upload doesn't exist...  well what can we do?
-			if(mysql_num_rows($result) != 1) {
+			if(mysqli_num_rows($result) != 1) {
 				$this->data['exists'] = false;
 			} else {
-				$row = mysql_fetch_assoc($result);
+				$row = mysqli_fetch_assoc($result);
 				foreach($row as $key => $val) {
 					$this->data[$key] = $val;
 				}
@@ -225,11 +225,11 @@ class Comment {
 				
 				/* this error should be impossible.  if we ever hit it, we have a
 				 * datastore inconsistency problem on our hands. */
-				if(mysql_num_rows($result) !== 1) {
+				if(mysqli_num_rows($result) !== 1) {
 					trigger_error("upload failure, upload for this comment does not exist?", E_USER_ERROR);
 				}
 				
-				$this->data["upload"] = new Upload(mysql_fetch_assoc($result));
+				$this->data["upload"] = new Upload(mysqli_fetch_assoc($result));
 			}
 		}
 		
@@ -257,9 +257,9 @@ class Comment {
 				        WHERE u.userid = com.userid AND com.id = ".$this->data["id"];
 				
 				$result = tmbo_query($sql);
-				if(mysql_num_rows($result) !== 1)
+				if(mysqli_num_rows($result) !== 1)
 					trigger_error("user failure, user for this comment does not exist?", E_USER_ERROR);
-				$this->data["commenter"] = new User(mysql_fetch_assoc($result));
+				$this->data["commenter"] = new User(mysqli_fetch_assoc($result));
 			}
 		}
 		

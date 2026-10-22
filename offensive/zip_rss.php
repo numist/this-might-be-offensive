@@ -1,4 +1,4 @@
-<?
+<?php
 	set_include_path("..");
 	require_once("offensive/assets/header.inc");
 	// Include, and check we've got a connection to the database.
@@ -42,10 +42,10 @@
 ?>
 	<item>
 		<title><?php echo $file?></title>
-		<link><? echo $url ?></link>
+		<link><?php  echo $url ?></link>
 		<description><![CDATA[
-			<a href="<?= $url ?>"><b><?= $url ?></b></a> (<? echo byte_format(filesize($path . "/" . $file))?>)<br/><hr/>
-			<?
+			<a href="<?= $url ?>"><b><?= $url ?></b></a> (<?php  echo byte_format(filesize($path . "/" . $file))?>)<br/><hr/>
+			<?php
 				$manifest = str_replace( ".zip", "_MANIFEST.txt", "$path/$file" );
 				if( file_exists( $manifest ) ) {
 					$lines = file( $manifest );
@@ -56,8 +56,8 @@
 			?>
 		]]>
 		</description>
-		<pubDate><? echo date( $dateFormat, filemtime( "$path/$file" ) ) ?></pubDate>
-		<enclosure url="<? echo $url ?>" length="<? echo filesize( "$path/$file" )?>" type="application/zip" />			
+		<pubDate><?php  echo date( $dateFormat, filemtime( "$path/$file" ) ) ?></pubDate>
+		<enclosure url="<?php  echo $url ?>" length="<?php  echo filesize( "$path/$file" )?>" type="application/zip" />			
 	</item>
 <?php
 	}

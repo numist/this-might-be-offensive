@@ -1,4 +1,4 @@
-<?
+<?php
 
 // sanity
 if(!defined("TMBO") || !isset($upload)) {
@@ -23,7 +23,7 @@ if(isset($css) && substr($css, 0, 1) != " ") {
 		<a href="<?= Link::upload($upload) ?>" title="uploaded by <?= htmlEscape($upload->uploader()->username()) ?>">
 			<?= $upload->htmlFilename() ?>
 		</a>
-		<? if(!file_exists($upload->file())) { echo "(expired)"; } ?>
+		<?php  if(!file_exists($upload->file())) { echo "(expired)"; } ?>
 	</div>
 	<div class="col col2<?= $row_class ?>">
 		<span class="score">

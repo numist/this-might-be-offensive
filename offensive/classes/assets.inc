@@ -1,4 +1,4 @@
-<?
+<?php
 
 abstract class Asset {
 	abstract public function file();

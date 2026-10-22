@@ -1,4 +1,4 @@
-<?	
+<?php 	
 	// Include, and check we've got a connection to the database.
 	require_once( 'admin/mysqlConnectionInfo.inc' );
 	if(!isset($link) || !$link) $link = openDbConnection();
@@ -72,12 +72,12 @@
 			<table width="100%">
 				<tr>
 					<td width="200px">
-						<? if( $page > 0 ) { ?>
+						<?php  if( $page > 0 ) { ?>
 							<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'] ?>&find=<?= urlencode($_REQUEST['find']) ?>&p=<?= $page - 1 ?>">&laquo;&nbsp;<b>previous&nbsp;page</b></a></td>
-						<? } ?>
+						<?php  } ?>
 					</td>
 					<td style="text-align:center">
-						<?
+						<?php
 							if ($matches->get_matches_estimated() > 0) {
 								// pagination
 								echo ($start + 1)." - ".min($start + $numperpage ,$matches->get_matches_estimated()).
@@ -88,14 +88,14 @@
 						?>
 					</td>
 					<td style="text-align:right" width="200px">
-						<? if( $start + $numperpage < $matches->get_matches_estimated() ) { ?>
+						<?php  if( $start + $numperpage < $matches->get_matches_estimated() ) { ?>
 							<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'] ?>&find=<?= urlencode($_REQUEST['find']) ?>&p=<?= $page + 1 ?>"><b>next&nbsp;page</b></a>&nbsp;&raquo;
-						<? } ?>
+						<?php  } ?>
 					</td>
 				</tr>        
 			</table>
 			
-			</div></div><?
+			</div></div><?php
 		
 			// d'oh this is not going to be very efficient, is it…
 			
@@ -121,18 +121,18 @@
 			foreach($comments as $comment) {
 				$upload = $comment->upload(); ?>
 				<div class="contentbox">
-					<div class="heading"><?
+					<div class="heading"><?php
 					  // changeblog special header
 						if($upload->id() == "211604") { ?>
 							<a class="heading" id="pic" href="<?= Link::content("changeblog") ?>">changeblog</a>
 							<br/><span style="color:#666699">beat to fit. paint to match.</span><br/>
-					<? } else if( $upload->type() == 'topic' ) {
+					<?php  } else if( $upload->type() == 'topic' ) {
 							$prefix = $upload->uploader()->status() == "admin" ? "" : "don't blame me,"; ?>
 							<a class="heading" id="pic" href="<?= Link::thread($upload) ?>"><?= $upload->htmlFilename(); ?></a>
 								<br/><span style="color:#666699"><?= $prefix ?> <a href="<?= Link::user($upload->uploader()) ?>" style="color:#666699"><?= $upload->uploader()->username() ?></a> started it.</span><br/>
-					<? } else { ?>
+					<?php  } else { ?>
 							<a class="heading" id="pic" href="<?= Link::upload($upload) ?>"><?= $upload->htmlFilename(); ?></a><br/><span style="color:#666699">uploaded by <?= $upload->uploader()->htmlUsername() ?></span><br/>
-					<? } ?>
+					<?php  } ?>
 					</div>
 				<div class="entry">
 				<?= $comment->HTMLcomment(); ?><br/>
@@ -140,7 +140,7 @@
 	 	 			<div class="timestamp"><?= $result['match'] ?>% <a href="<?= Link::comment($comment) ?>"><?= $comment->timestamp() ?></a></div>
 					&raquo; <?= $comment->commenter()->htmlUsername() ?>
 	
-				<?
+				<?php
 
 				if( $comment->vote() ) {
 					echo "<span class='vote'> [ " . $comment->vote() . " ]</span>";
@@ -155,7 +155,7 @@
 				}
 				?>
 				</div></div>
-				<?
+				<?php
 			}
 			
 			?>
@@ -165,24 +165,24 @@
 			<table width="100%">
 				<tr>
 					<td width="200px">
-						<? if( $page > 0 ) { ?>
+						<?php  if( $page > 0 ) { ?>
 							<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'] ?>&find=<?= urlencode($_REQUEST['find']) ?>&p=<?= $page - 1 ?>">&laquo;&nbsp;<b>previous&nbsp;page</b></a></td>
-						<? } ?>
+						<?php  } ?>
 					</td>
 					<td style="text-align:center">
-						<?
+						<?php
 							// pagination.
 						?>
 					</td>
 					<td style="text-align:right" width="200px">
-						<? if( $start + $numperpage < $matches->get_matches_estimated() ) { ?>
+						<?php  if( $start + $numperpage < $matches->get_matches_estimated() ) { ?>
 							<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'] ?>&find=<?= urlencode($_REQUEST['find']) ?>&p=<?= $page + 1 ?>"><b>next&nbsp;page</b></a>&nbsp;&raquo;
-						<? } ?>
+						<?php  } ?>
 					</td>
 				</tr>        
 			</table>
 
-			<?
+			<?php
 		
 		} catch (Exception $e) {
 			flock($fp, LOCK_UN);
@@ -199,10 +199,10 @@
 <div class="contentbox">
 	<div class="blackbar"></div>
 	<div class="heading">both hands and a flashlight.</div>
-	<? tabs(); ?>
+	<?php  tabs(); ?>
 	<div class="bluebox">
 
-<?
+<?php
 		$find = trim(array_key_exists("find", $_REQUEST) ? $_REQUEST['find'] : "");
 
 		?>
@@ -227,7 +227,7 @@
 			<input type="submit" value="find file or topic"/>
 		</form>
 		</div>
-		<?
+		<?php
 		if( strlen( $find ) > 0 ) {
 			doSearch( $find );
 		}
@@ -237,6 +237,6 @@
 	</div>
 	<div class="blackbar"></div>
 </div>	
-<?
+<?php
 	}
 ?>

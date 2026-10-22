@@ -1,4 +1,4 @@
-<?
+<?php
 require_once( 'admin/mysqlConnectionInfo.inc' );
 if(!isset($link) || !$link) $link = openDbConnection();
 
@@ -42,6 +42,6 @@ function body() {
 	</div>
 	<div class="blackbar"></div>
 </div>
-<?
+<?php
 }
 ?>

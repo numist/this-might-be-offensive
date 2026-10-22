@@ -1,4 +1,4 @@
-<?
+<?php
 		set_include_path("..");
 		require_once("offensive/assets/header.inc");
 		// Include, and check we've got a connection to the database.
@@ -21,8 +21,8 @@
 
 		$result = tmbo_query( $sql );
 		
-		if( mysql_num_rows( $result ) == 0 ) {
-			?><div>none</div><?
+		if( mysqli_num_rows( $result ) == 0 ) {
+			?><div>none</div><?php
 			return;
 		}
 	
@@ -31,13 +31,13 @@
 				<div class="blackbar"></div>
 					<div class="heading">unread comments:</div>
 					<div class="bluebox">
-	<?
+	<?php
 	
-		while( $row = mysql_fetch_assoc( $result ) ) {
+		while( $row = mysqli_fetch_assoc( $result ) ) {
 			$css = $css == "evenfile" ? "oddfile" : "evenfile";
 			// XXX: rejigger the query and use Link::comment ?>
 			<div class="clipper"><a class="<?= $css ?>" href="<?= Link::thread(new Upload($row)) ?>#<?= $row['commentid']?>"><?= htmlspecialchars( $row['filename'] ) ?></a></div>
-	<?
+	<?php
 	
 		}
 	?>

@@ -85,7 +85,7 @@ function fetch_db_images($dbuser = "", $dbpass = "", $database= "", $dbhost = ""
 	if (!$result) {
 	    die('Could not fetch data: ' . mysql_error());
 	}
-	while($row = mysql_fetch_assoc($result)) {
+	while($row = mysqli_fetch_assoc($result)) {
 		$rows[] = $row;
 	}
 	mysql_close();

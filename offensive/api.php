@@ -1,4 +1,4 @@
-<?
+<?php
 	set_include_path("..");
 	// set up the normal TMBO environment
 	require_once( 'offensive/assets/header.inc' );
@@ -9,7 +9,7 @@
 	require_once("offensive/assets/classes.inc");
 	require_once("offensive/assets/core.inc");
 
-	class Error {
+	class ApiError {
 		private $msg;
 
 		function __construct($errmsg) {
@@ -46,7 +46,7 @@
 		$code = array_key_exists("{$e->getCode()}", $responses) ? $e->getCode() : 500;
 		header($responses["$code"]);
 		if($code != 500) {
-			send(new Error($e->getMessage()));
+			send(new ApiError($e->getMessage()));
 		} else {
 			send("kaboom.");
 		}
@@ -272,7 +272,7 @@
 		if($ret->exists()) {
 			send($ret);
 		} else {
-			send(new Error("user $userid does not exist"));
+			send(new ApiError("user $userid does not exist"));
 		}
 	}
 

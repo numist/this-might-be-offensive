@@ -1,4 +1,4 @@
-<?
+<?php
 	require_once( 'admin/mysqlConnectionInfo.inc' );
 	if(!isset($link) || !$link) $link = openDbConnection();
 
@@ -17,24 +17,24 @@
 	$fp = fsockopen ('www.paypal.com', 80, $errno, $errstr, 30);
 	
 	// assign posted variables to local variables
-	$item_name = mysql_real_escape_string( $_POST['item_name'] );
-	$option_name = mysql_real_escape_string( $_POST['option_name1'] );
-	$size = mysql_real_escape_string( $_POST['option_selection1'] );	
-	$item_number = mysql_real_escape_string( $_POST['item_number'] );
-	$payment_status = mysql_real_escape_string( $_POST['payment_status'] );
-	$payment_amount = mysql_real_escape_string( $_POST['mc_gross'] );
-	$payment_currency = mysql_real_escape_string( $_POST['mc_currency'] );
-	$txn_id = mysql_real_escape_string( $_POST['txn_id'] );
-	$receiver_email = mysql_real_escape_string( $_POST['receiver_email'] );
-	$payer_email = mysql_real_escape_string( $_POST['payer_email'] );
+	$item_name = mysqli_real_escape_string($link, $_POST['item_name'] );
+	$option_name = mysqli_real_escape_string($link, $_POST['option_name1'] );
+	$size = mysqli_real_escape_string($link, $_POST['option_selection1'] );	
+	$item_number = mysqli_real_escape_string($link, $_POST['item_number'] );
+	$payment_status = mysqli_real_escape_string($link, $_POST['payment_status'] );
+	$payment_amount = mysqli_real_escape_string($link, $_POST['mc_gross'] );
+	$payment_currency = mysqli_real_escape_string($link, $_POST['mc_currency'] );
+	$txn_id = mysqli_real_escape_string($link, $_POST['txn_id'] );
+	$receiver_email = mysqli_real_escape_string($link, $_POST['receiver_email'] );
+	$payer_email = mysqli_real_escape_string($link, $_POST['payer_email'] );
 	
-	$first_name = mysql_real_escape_string( $_POST['first_name'] );	
-	$last_name = mysql_real_escape_string( $_POST['last_name'] );	
-	$street = mysql_real_escape_string( $_POST['address_street'] );	
-	$city = mysql_real_escape_string( $_POST['address_city'] );	
-	$state = mysql_real_escape_string( $_POST['address_state'] );	
-	$zip = mysql_real_escape_string( $_POST['address_zip'] );
-	$country = mysql_real_escape_string( $_POST['address_country'] );	
+	$first_name = mysqli_real_escape_string($link, $_POST['first_name'] );	
+	$last_name = mysqli_real_escape_string($link, $_POST['last_name'] );	
+	$street = mysqli_real_escape_string($link, $_POST['address_street'] );	
+	$city = mysqli_real_escape_string($link, $_POST['address_city'] );	
+	$state = mysqli_real_escape_string($link, $_POST['address_state'] );	
+	$zip = mysqli_real_escape_string($link, $_POST['address_zip'] );
+	$country = mysqli_real_escape_string($link, $_POST['address_country'] );	
 	$amount = $_POST['mc_gross'];	
 
 	if (!$fp) {
@@ -62,52 +62,52 @@
 VALUES ( '$first_name', '$last_name', '$address_name', '$street', '$city', '$state', '$zip', '$country', '$payer_email', '$notify_version' )
 				";
 				
-				$result = mysql_query( $sql );
+				$result = mysqli_query($link, $sql );
 
-				$err = mysql_error();
+				$err = mysqli_error($link);
 
 				if( $err != "" ) {
 					reportError( $err, $sql );
 					die;
 				}
 
-				$buyer_id = mysql_insert_id();
+				$buyer_id = mysqli_insert_id($link);
 
 				$sql = "INSERT INTO merch_orders ( transaction_id, amount, buyer_id, payment_status )
 						VALUES ( '$txn_id', $amount, $buyer_id, '$payment_status' )
 				";
 
-				$result = mysql_query( $sql );
+				$result = mysqli_query($link, $sql );
 
-				$err = mysql_error();
+				$err = mysqli_error($link);
 
 				if( $err != "" ) {
 					reportError( $err, $sql );
 					die;
 				}
 
-				$order_id = mysql_insert_id();
+				$order_id = mysqli_insert_id($link);
 				
 				$sql = "INSERT INTO merch_order_items ( order_id, item_id )
 						VALUES ( $order_id, $item_number )";
 
-				$result = mysql_query( $sql );
+				$result = mysqli_query($link, $sql );
 
-				$err = mysql_error();
+				$err = mysqli_error($link);
 
 				if( $err != "" ) {
 					reportError( $err, $sql );
 					die;
 				}
 				
-				$order_item_id = mysql_insert_id();
+				$order_item_id = mysqli_insert_id($link);
 
 				$sql = "INSERT INTO merch_order_item_options ( order_item_id, option_name, option_value )
 						VALUES ( $order_item_id, '$option_name', '$size' )";
 
-				$result = mysql_query( $sql );
+				$result = mysqli_query($link, $sql );
 
-				$err = mysql_error();
+				$err = mysqli_error($link);
 
 				if( $err != "" ) {
 					reportError( $err, $sql );

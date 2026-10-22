@@ -1,4 +1,4 @@
-<?
+<?php
 
 error_reporting(E_ERROR | E_USER_ERROR | E_USER_WARNING);
 
@@ -102,7 +102,7 @@ try {
 		       ." ORDER BY id ASC";
 		$res = tmbo_query($sql);
 		
-		while($row = mysql_fetch_assoc($res)) {
+		while($row = mysqli_fetch_assoc($res)) {
 			// update the last comment we've seen
 			$lastc = $row["id"];
 			

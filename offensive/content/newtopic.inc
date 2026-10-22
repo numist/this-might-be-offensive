@@ -1,4 +1,4 @@
-<?
+<?php
 	// Include, and check we've got a connection to the database.
 	require_once( 'admin/mysqlConnectionInfo.inc' );
 	if(!isset($link) || !$link) $link = openDbConnection();
@@ -25,12 +25,14 @@
 	}
 	
 	function createTopic($topic) {
+	
+		global $link;
 		$uid = me()->id();
 		$sql = "INSERT INTO offensive_uploads ( userid, filename, ip, type )
 					VALUES ( $uid, '".sqlEscape($topic)."', '" . sqlEscape($_SERVER['REMOTE_ADDR']) . "', 'topic' )";
 		tmbo_query($sql);
 
-	 	$threadid = mysql_insert_id();
+	 	$threadid = mysqli_insert_id($link);
 	
 		$sql = "INSERT INTO offensive_count_cache(threadid, good, bad, tmbo, comments, repost) VALUES($threadid, 0, 0, 0, 0, 0)";
 		tmbo_query($sql);
@@ -50,7 +52,7 @@
 	<div class="blackbar"></div>
 		<div class="heading">we need to talk.</div>
 
-<?
+<?php
 		global $activeTab;
 		
 		$activeTab = "discussions";
@@ -76,6 +78,6 @@
 		</div>
 		<div class="blackbar"></div>
 	</div>
-<?
+<?php
 	}
 ?>

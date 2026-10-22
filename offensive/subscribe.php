@@ -1,4 +1,4 @@
-<?
+<?php
 	set_include_path("..");
 	require_once("offensive/assets/header.inc");
 	// Include, and check we've got a connection to the database.

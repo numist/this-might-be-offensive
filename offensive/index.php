@@ -1,4 +1,4 @@
-<?
+<?php
 
 // how many users to display in the online list
 $userlimit = 20;
@@ -90,7 +90,7 @@ $timelimit = 10;
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
-	<title><?
+	<title><?php
 		if( function_exists( 'title' ) ) {
 			echo htmlEscape(title());
 		}
@@ -102,7 +102,7 @@ $timelimit = 10;
 	<link rel="icon" href="/favicon.ico" />
 	<link rel="shortcut icon" href="/favicon.ico" />
 	<script type="text/javascript" src="/socket.io/socket.io.js"></script>
-	<?
+	<?php
 	CSS::add("/styles/filepilestyle.css");
 	CSS::add("/styles/oldskool.css");
 	CSS::add("/styles/index.css");
@@ -198,7 +198,7 @@ $timelimit = 10;
 	
 		<div id="leftcol">
 
-			<? if (login()) { // log in --> get info restricted block ?>
+			<?php  if (login()) { // log in --> get info restricted block ?>
 				<div class="contentbox">
 					<div class="blackbar"></div>
 						<div class="heading">your stuff:</div>
@@ -215,7 +215,7 @@ $timelimit = 10;
 						</div>
 					<div class="blackbar"></div>
 				</div>
-				<?
+				<?php
 					if(function_exists('sidebar')) {
 						sidebar();
 					}
@@ -234,7 +234,7 @@ $timelimit = 10;
 						</div>
 					<div class="blackbar"></div>
 				</div>
-			<? } // log in --> get info restricted block ?>
+			<?php  } // log in --> get info restricted block ?>
 
 			<div class="contentbox">
 				<div class="blackbar"></div>
@@ -260,7 +260,7 @@ $timelimit = 10;
 					</div>
 				<div class="blackbar"></div>
 			</div>
-			<? if(login()) { // archive <--> bottom restricted block ?>
+			<?php  if(login()) { // archive <--> bottom restricted block ?>
 				<div class="contentbox">
 					<div class="blackbar"></div>
 					<div class="heading">archives:</div>
@@ -306,7 +306,7 @@ $timelimit = 10;
 						<a href="mailto:ray.hatfield@gmail.com?subject=[tmbo]">ray.hatfield@gmail.com</a>
 					</div>
 					<div class="blackbar"></div>
-				</div><?
+				</div><?php
 					if($c != "comments" && $c != "online" && me()->status() == "admin") { whosOn(); }
 					else if($c == "comments") {
 						if(!array_key_exists("fileid", $_REQUEST)
@@ -321,7 +321,7 @@ $timelimit = 10;
 		
 		<div id="rightcol">
 		
-		<?
+		<?php
 		if(isset($downtime)) {
 		  $left = $downtime - time();
 		  if($left >= 0 && $left < 14400) { // 4h
@@ -341,7 +341,7 @@ $timelimit = 10;
 	    }
 		} ?>
 
-					<?
+					<?php
 						if( function_exists( 'body' ) ) {
 							body();
 						}
@@ -353,7 +353,7 @@ $timelimit = 10;
 <br clear="all">
 <div class="textlinks" style="text-align:center">
 
-	<? require('includes/footer.txt'); ?>
+	<?php  require('includes/footer.txt'); ?>
 
 	<div class="textlinks">portions &copy; 1997-<?= date("Y") ?>.
 		site development by
@@ -372,20 +372,20 @@ $timelimit = 10;
 		natural flavor.<br />
 		Not a significant source of calcium, iron, dietary fiber, vitamin D, and sanity.
 	</div>
-	<?
+	<?php
 	
 	if(me()->status() == "admin") {
 		?>
 		<div class="textlinks"><?= number_format(time_end($ptime), 3)."s php, ".number_format($querytime, 3)."s sql, ".count($queries)." queries\n\n <!-- query statistics: \n";
 			var_dump($queries);
 			echo "\n\n-->\n\n"; ?></div>
-		<?
+		<?php
 		$loadavg = "/proc/loadavg";
 		if(file_exists($loadavg) && is_readable($loadavg)) {
 			$load = file_get_contents($loadavg);
 			?>
 			<div class="textlinks"><?= $load ?></div>
-			<?
+			<?php
 		}
 	}
 	
@@ -394,7 +394,7 @@ $timelimit = 10;
 <br />
 </body>
 </html>
-<?
+<?php
 	// XXX: this needs to use core
 	function unread() {
 		if(!me()) return;
@@ -412,17 +412,17 @@ $timelimit = 10;
 			<div class="blackbar"></div>
 			<div class="heading">unread comments:</div>
 			<div id="unread-container" class="bluebox">
-				<? foreach ($comments as $comment) {
+				<?php  foreach ($comments as $comment) {
 					$upload = $comment->upload();
 					if($upload->squelched()) continue;
 
 					$css = isset($css) && $css == "evenfile" ? "oddfile" : "evenfile";  ?>
 					<div class="clipper"><a id="unread<?= $comment->upload()->id()?>" class="<?= $css ?>" href="<?= Link::comment($comment) ?>"><?= $upload->htmlFilename() ?></a></div>
-				<? } ?>
+				<?php  } ?>
 			</div>
 			<div class="blackbar"></div>
 		</div>
-	<? }
+	<?php  }
 
 	// XXX: this needs to use core
 	function whosOn() {
@@ -432,42 +432,42 @@ $timelimit = 10;
 		// get the total number of users online
 		$sql = "SELECT COUNT(*) FROM users WHERE timestamp > DATE_SUB( now( ) , INTERVAL $timelimit MINUTE)";
 		$result = tmbo_query($sql);
-		list($nonline) = mysql_fetch_array($result);
+		list($nonline) = mysqli_fetch_array($result);
 
 		// start us off. ?>
 	<div class="contentbox">
 		<div class="blackbar"></div>
 		<div class="heading">who's on:</div>
 		<div class="bluebox">
-			<table style="width:100%"><?
+			<table style="width:100%"><?php
 				$uid = me() ? me()->id() : 0;
 				// list out the latest people to do something
 				$sql = "SELECT * FROM users WHERE timestamp > DATE_SUB( now( ) , INTERVAL $timelimit MINUTE) && userid != $uid ORDER BY timestamp DESC LIMIT $userlimit";
 				$result = tmbo_query($sql);
-				while(false !== ($row = mysql_fetch_array($result))) {
+				while($row = mysqli_fetch_array($result)) {
 					$css = (!isset($css) || $css == "odd") ? "even" : "odd"; ?>
 					<tr class="<?= $css ?>_row"><td class="<?= $css ?>file"><?= id(new User($row))->htmlUsername() ?></td></tr>
-				<? }
+				<?php  }
 
 				$css = (!isset($css) || $css == "odd") ? "even" : "odd";
 				// obviously, we're online.
 				if($nonline < $userlimit) {
-					?><tr class="<?= $css ?>_row"><td class="<?= $css ?>file">you.</td></tr><?
+					?><tr class="<?= $css ?>_row"><td class="<?= $css ?>file">you.</td></tr><?php
 				} else if($nonline > $userlimit) {
-					?><tr><td><a href="<?= Link::content("online") ?>">and <?= ($nonline - $userlimit) ?> more</a></td></tr><?
+					?><tr><td><a href="<?= Link::content("online") ?>">and <?= ($nonline - $userlimit) ?> more</a></td></tr><?php
 				} ?>
 			</table>
 		</div>
 		<div class="blackbar"></div>
 	</div>
-	<? }
+	<?php  }
 
 	function whosubscribed($upload) {
 		$sql = "SELECT DISTINCT u.* FROM offensive_subscriptions sub JOIN users u ON sub.userid = u.userid WHERE fileid = ".$upload->id()." ORDER BY u.username ASC";
 		$result = tmbo_query($sql);
 		
 		$watchers = array();
-		while(false !== ($row = mysql_fetch_array($result))) {
+		while($row = mysqli_fetch_array($result)) {
 			$watcher = new User($row);
 			if(!me()->squelched($watcher)) {
 				$watchers[] = $watcher;
@@ -476,7 +476,7 @@ $timelimit = 10;
 
 		if(count($watchers) == 0) { ?>
 			<div class="heading">no watchers :(</div>
-			<? return;
+			<?php  return;
 		}
 
 		// start us off. ?>
@@ -485,12 +485,12 @@ $timelimit = 10;
 		<div class="heading">subscribers:</div>
 		<div class="bluebox">
 			<table style="width:100%">
-				<? foreach($watchers as $user) {
+				<?php  foreach($watchers as $user) {
 					$css = (!isset($css) || $css == "odd") ? "even" : "odd"; ?>
 					<tr class="<?= $css?>_row"><td class="<?= $css ?>file"><?= $user->htmlUsername() ?></td></tr>
-				<? } ?>
+				<?php  } ?>
 			</table>
 		</div>
 		<div class="blackbar"></div>
 	</div>
-	<? } ?>
+	<?php  } ?>

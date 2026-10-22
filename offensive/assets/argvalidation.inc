@@ -1,4 +1,4 @@
-<?
+<?php
 
 /* if the called_by_api function is already defined (and returns true)
  * then errors due to argument type/formatting will be output to the
@@ -179,7 +179,7 @@ function handle_errors() {
 			
 		$errors = array();
 		foreach($validation_errors as $error) {
-			$errors[] = new Error($error);
+			$errors[] = new ApiError($error);
 		}
 		send($errors);
 	}

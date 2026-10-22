@@ -1,4 +1,4 @@
-<?
+<?php
 
 	$quips = array(
 		"By the hairy taint of DarkStalker, I curse you all.",

@@ -1,4 +1,4 @@
-<?
+<?php
 	set_include_path("..");
 	require_once( 'offensive/assets/header.inc' );
 
@@ -33,8 +33,8 @@
 		$username = sqlEscape( $username );
 		$sql = "SELECT * FROM users WHERE username='$username'";
 		$result = tmbo_query( $sql );
-		if( mysql_num_rows( $result ) == 1 ) {
-			$row = mysql_fetch_assoc( $result );
+		if( mysqli_num_rows( $result ) == 1 ) {
+			$row = mysqli_fetch_assoc( $result );
 			$code = hashFromUserRow( $row, gmdate( "Y-m-d" ) );
 			$message = "Someone (hopefully you) wants to reset your [this might be offensive] password. To reset your password, please visit the following link:
 
@@ -103,7 +103,7 @@ https://thismight.be/offensive/pwreset.php?x=".urlencode( $code )."
 			</form>
 		
 		</span>
-		<?
+		<?php
 	}
 
 	
@@ -128,7 +128,7 @@ https://thismight.be/offensive/pwreset.php?x=".urlencode( $code )."
 			</form>
 		
 		</span>
-		<?
+		<?php
 	}
 	
 	function userRowFromCode( $code ) {
@@ -137,8 +137,8 @@ https://thismight.be/offensive/pwreset.php?x=".urlencode( $code )."
 		if( is_intger( $id ) && $id > 1 ) {
 			$sql = "SELECT * FROM users WHERE userid = $id";
 			$result = tmbo_query( $sql );
-			if( mysql_num_rows( $result ) == 1 ) {
-				$row = mysql_fetch_assoc( $result );
+			if( mysqli_num_rows( $result ) == 1 ) {
+				$row = mysqli_fetch_assoc( $result );
 				// a code lives at least 24 hours and at most 48, depending how close
 				// to midnight it was issued.
 				$today = gmdate( "Y-m-d" );
@@ -173,7 +173,7 @@ https://thismight.be/offensive/pwreset.php?x=".urlencode( $code )."
 	
 				<p>
 
-					<? 
+					<?php  
 						
 						if( isset($_REQUEST['username']) ) {
 							sendResetEmail( $_REQUEST['username'] );
@@ -191,7 +191,7 @@ https://thismight.be/offensive/pwreset.php?x=".urlencode( $code )."
 		</tr>
 	</table>
 	
-<? include '../includes/footer.txt' ?>
+<?php  include '../includes/footer.txt' ?>
 
 </body>
 </html>
