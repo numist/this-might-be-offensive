@@ -1,7 +1,7 @@
-<?
+<?php
 	class statusMessage {
 		
-		function statusMessage( $status, $message = "" ) {
+		function __construct( $status, $message = "" ) {
 			$this->status = $status;
 			$this->message = $message;
 		}

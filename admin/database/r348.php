@@ -1,4 +1,4 @@
-<?
+<?php
 /* this file is used to populate an initial comment index
  * it may take a long time, and the results might be undefined */
 

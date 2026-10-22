@@ -1,4 +1,4 @@
-<?
+<?php
 	// Include, and check we've got a connection to the database.
 	require_once( 'admin/mysqlConnectionInfo.inc' );
 	if(!isset($link) || !$link) $link = openDbConnection();
@@ -48,12 +48,12 @@
 <table width="100%">
 
 
-<?
-		if( mysql_num_rows( $result ) == 0 ) {
+<?php
+		if( mysqli_num_rows( $result ) == 0 ) {
 			echo "<div class=\"piletitle\">No dice, but thanks for playing.</div>";
 		}
 		
-		while( $row = mysql_fetch_assoc( $result ) ) {
+		while( $row = mysqli_fetch_assoc( $result ) ) {
 			$style = (isset($style) && $style == "") ? "background:var(--bg-content-alt);" : "";
 			$css = (isset($css) && $css == "evenfile") ? "oddfile" : "evenfile";
 			
@@ -64,50 +64,50 @@
 			$expired = $upload->expired() ? "(expired)" : "";
 ?>
 	
-			<tr class="<? echo $css ?>" style="<?= $style ?>">
-				<? if( $upload->type() == 'topic') { ?>
-					<td width="100px"><? echo date( "Y-m-d", strtotime( $upload->timestamp() ) ) ?></td>
-					<td><a class="<?echo $css ?>" href="<?= Link::thread($upload) ?>"><?= $filename ?></a></td>
-					<td width="100px" align="center"><a class="<?echo $css ?>" href="<?= Link::thread($upload) ?>"><?=
+			<tr class="<?php echo $css ?>" style="<?= $style ?>">
+				<?php if( $upload->type() == 'topic') { ?>
+					<td width="100px"><?php echo date( "Y-m-d", strtotime( $upload->timestamp() ) ) ?></td>
+					<td><a class="<?php echo $css ?>" href="<?= Link::thread($upload) ?>"><?= $filename ?></a></td>
+					<td width="100px" align="center"><a class="<?php echo $css ?>" href="<?= Link::thread($upload) ?>"><?=
 						$upload->commentLabel(false);
 						?></td>
-				<? } else { ?>
+				<?php } else { ?>
 					<td width="100px" height="100px">
 					<a href="<?= Link::upload($upload) ?>"
-						<? if($upload->filtered()) { ?>
+						<?php if($upload->filtered()) { ?>
 							onMouseOver='changesrc("th<?= $upload->id()?>","<?= $upload->thumbURL() ?>")'
 					 		onMouseOut='changesrc("th<?= $upload->id() ?>","/offensive/graphics/th-filtered.gif")'
-						<? } ?>
+						<?php } ?>
 					><img name="th<?= $upload->id()?>"
 						src="<?= $upload->filtered()
 							? "/offensive/graphics/th-filtered.gif" 
 							: $upload->thumbURL() ?>"
 					/></a>
 					</td>
-					<td><a class="<?echo $css ?>" href="<?= Link::upload($upload) ?>"><?= $filename ?></a> (uploaded by <?= htmlEscape($upload->uploader()->username()) ?>)<? echo  $expired ?></td>
+					<td><a class="<?php echo $css ?>" href="<?= Link::upload($upload) ?>"><?= $filename ?></a> (uploaded by <?= htmlEscape($upload->uploader()->username()) ?>)<?php echo  $expired ?></td>
 					<td width="170px" align="center"><a class="<?= $css ?>" href="<?= Link::thread($upload) ?>"><nobr><?= 
 						$upload->commentLabel();
 					?></nobr><br /><?=
 						date( "Y-m-d", strtotime( $upload->timestamp() ) )
 					?></td>
-				<? } ?>
+				<?php } ?>
 			</tr>
 	
-<?	
+<?php 	
 		}
 ?>
 
 	<tr>
 		<td>
-			<? if( $page > 0 ) { ?>
+			<?php if( $page > 0 ) { ?>
 				<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'] ?>&findfile=<?= urlencode($_REQUEST['findfile']) ?>&p=<?= $page - 1 ?>">&laquo; <b>previous page</b></a></td>
-			<? } ?>
+			<?php } ?>
 		</td>
 		<td></td>
 		<td style="text-align:right">
-			<? if( mysql_num_rows( $result ) == $numPerPage ) { ?>
+			<?php if( mysqli_num_rows( $result ) == $numPerPage ) { ?>
 				<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'] ?>&findfile=<?= urlencode($_REQUEST['findfile']) ?>&p=<?= $page + 1 ?>"><b>next page</b></a> &raquo;
-			<? } ?>
+			<?php } ?>
 		</td>
 	</tr>
 
@@ -119,7 +119,7 @@
 	</div>
 	<div class="blackbar"></div>
 </div>
-<?
+<?php
 		
 	}
 

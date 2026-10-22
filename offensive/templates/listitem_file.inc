@@ -1,4 +1,4 @@
-<?
+<?php
 
 // sanity
 if(!defined("TMBO") || !isset($upload)) {
@@ -26,7 +26,7 @@ if(isset($css) && substr($css, 0, 1) != " ") {
     >
       <?= $upload->htmlFilename() ?>
     </a>
-    <? if(!file_exists($upload->file())) { echo "(expired)"; } ?>
+    <?php if(!file_exists($upload->file())) { echo "(expired)"; } ?>
   </div>
   <div class="col<?= $row_class ?>">
     <span class="score">

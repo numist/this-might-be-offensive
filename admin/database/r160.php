@@ -1,4 +1,4 @@
-<?
+<?php
 /* this script will migrate a live database from the version <= r159
  * to the current version supported in r160+.
  * if you created your database with the schema from r161 or later,

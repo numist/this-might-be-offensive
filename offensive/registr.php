@@ -66,8 +66,8 @@
 
 		$sql = "SELECT * FROM referrals WHERE referral_code = '".sqlEscape($refcode)."' LIMIT 1";
 		$result = tmbo_query( $sql );
-		if( mysql_num_rows( $result ) == 1 ) {
-			$row = mysql_fetch_assoc( $result );
+		if( mysqli_num_rows( $result ) == 1 ) {
+			$row = mysqli_fetch_assoc( $result );
 			return $row['userid'];
 		}
 
@@ -77,6 +77,9 @@
 
 
 	function createAccount( $uName, $pw, $referral ) {
+
+
+		global $link;
 	
 		$returnMessage = "OK";
 		
@@ -96,7 +99,7 @@
 	    $result = tmbo_query($query);
 
 		// get the results of the query as an associative array, indexed by column name
-		$row = mysql_fetch_array( $result, MYSQL_ASSOC );
+		$row = mysqli_fetch_array( $result, MYSQLI_ASSOC );
 		
 		if( $row['theCount'] == 0 ) {
 			
@@ -106,7 +109,7 @@
 			tmbo_query($query); 
 
 			$result = tmbo_query("SELECT userid,account_status from users where username = '$uName'"); 
-			$row = mysql_fetch_assoc( $result );
+			$row = mysqli_fetch_assoc( $result );
 			assert($row['account_status'] == 'awaiting activation');			
 			$activationMessage = activationMessageFor( $row['userid'], $_POST['email'] );
 			
@@ -114,7 +117,7 @@
 			
 			/* this query not changed to tmbo_query
 			 * because it should be non-fatal if the query fails. */
-			mysql_query( "DELETE FROM referrals WHERE referral_code = '$referral' AND userid=$referrerId LIMIT 1" ) or trigger_error(mysql_error(), E_USER_WARNING);
+			mysqli_query($link, "DELETE FROM referrals WHERE referral_code = '$referral' AND userid=$referrerId LIMIT 1" ) or trigger_error(mysqli_error($link), E_USER_WARNING);
 #			mail( "ray@mysocalled.com", "[" . $_SERVER["REMOTE_ADDR"] . "] - [ this might be offensive ] account created: $uName", $_POST['email'], "From: offensive@thismight.be (this might be offensive)");
 		} else {
 		 	$returnMessage = "The username you've chosen, \"" . $uName . "\", is not available.";
@@ -174,7 +177,7 @@
 			<?php if( ! $accountCreated ) { ?>
 				<span class="small" >
 					<div style="width:400px;margin-bottom:12px;"><?= $message != null ? $message->message : "" ?></div>
-					<form name="newaccount" action="<? echo $_SERVER['PHP_SELF']?>" method="post" onSubmit="return checkPasswords()" method="post">
+					<form name="newaccount" action="<?php echo $_SERVER['PHP_SELF']?>" method="post" onSubmit="return checkPasswords()" method="post">
 						<table>
 							<tr>
 								<td class="label">desired username:</td>
@@ -223,7 +226,7 @@
 	</tr>
 </table>
 	
-<? include '../includes/footer.txt' ?>
+<?php include '../includes/footer.txt' ?>
 
 </body>
 

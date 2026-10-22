@@ -1,4 +1,4 @@
-<?
+<?php
 
 function tmbo_xml_encode($data) {
 	format_data($data);

@@ -1,4 +1,4 @@
-<? 
+<?php 
 header( "Content-type: text/xml" ); 
 set_include_path("..");
 require_once("offensive/assets/header.inc");
@@ -22,20 +22,20 @@ $sql = "SELECT offensive_uploads.timestamp
  		ORDER BY timestamp DESC
 		LIMIT 1";
 $res = tmbo_query($sql);
-$row = mysql_fetch_array($res);
+$row = mysqli_fetch_array($res);
 $lastBuildDate = array_pop($row);
 $lastBuildTime = strtotime($lastBuildDate);
 conditionalGet($lastBuildTime);
 
 ?>
-<rss <? if( isset($_GET['gallery']) ) { echo 'xmlns:media="http://search.yahoo.com/mrss"'; } ?> version="2.0">
+<rss <?php if( isset($_GET['gallery']) ) { echo 'xmlns:media="http://search.yahoo.com/mrss"'; } ?> version="2.0">
 	<channel>
-		<? if( ! isset($_GET['gallery']) ) { ?>
+		<?php if( ! isset($_GET['gallery']) ) { ?>
 			<title>[ this might be offensive ] : images</title>
 			<link>https://<?= $_SERVER['HTTP_HOST'] ?>/offensive/</link>
 			<description>[ this might be offensive ]</description>
 			<lastBuildDate><?= gmdate('r', $lastBuildTime);	?></lastBuildDate>
-		<? } 
+		<?php } 
 	
     $args = $_REQUEST;
 	if(!array_key_exists("type", $args)) {
@@ -58,25 +58,25 @@ conditionalGet($lastBuildTime);
 		if($upload->URL() == "") continue;
 ?>
 		<item>
-			<? if( isset($_GET['gallery']) ) { ?>
+			<?php if( isset($_GET['gallery']) ) { ?>
 				<media:content url="<?= $fileURL ?>" />
 				<media:thumbnail url="<?= $thumbURL ?>" />
 				<guid isPermaLink="false">tmbo-<?= $upload->id() ?></guid>
-			<? } else { ?>
+			<?php } else { ?>
 				<title><?= xmlEscape($filename) ?> (uploaded by <?= xmlEscape($upload->uploader()->username()) ?>)</title>
 				<link>https://<?= $_SERVER['HTTP_HOST'] ?><?= Link::upload($upload) ?></link>
-				<description><![CDATA[<? // TODO: pretty this up like audio
+				<description><![CDATA[<?php // TODO: pretty this up like audio
 					if($fileURL != '') { 
-						?><img src="<?= $fileURL ?>"/><?
+						?><img src="<?= $fileURL ?>"/><?php
 					} else {
 						echo "(expired)";
 					}
 				?>]]></description>
-				<pubDate><? echo gmdate( "r", strtotime( $upload->timestamp() ) ) ?></pubDate>			
+				<pubDate><?php echo gmdate( "r", strtotime( $upload->timestamp() ) ) ?></pubDate>			
 				<comments><![CDATA[https://<?= $_SERVER['HTTP_HOST'].Link::thread($upload) ?>]]></comments>
-			<? } ?>
+			<?php } ?>
 		</item>
-<?
+<?php
 	}
 ?>
 	

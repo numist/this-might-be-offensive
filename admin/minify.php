@@ -1,4 +1,4 @@
-<?
+<?php
 
 // do not allow this file to run other than on the command line
 if (php_sapi_name() != "cli") {

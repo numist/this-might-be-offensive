@@ -1,4 +1,4 @@
-<?
+<?php
 	header("HTTP/1.0 502 Bad Gateway");
 	header('Content-type: text/html');
 	
@@ -28,7 +28,7 @@
 			font-size:10px;
 		}
 	</style>
-	<? include_once("analytics.inc"); ?>
+	<?php include_once("analytics.inc"); ?>
 </head>
 
 
@@ -45,7 +45,7 @@
 		</tr>
 	</table>
 	
-<? include 'includes/footer.txt' ?>
+<?php include 'includes/footer.txt' ?>
 
 </body>
 </html>

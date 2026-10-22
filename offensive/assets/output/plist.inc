@@ -1,4 +1,4 @@
-<?
+<?php
 /* plist.inc
 # vim:set syntax=php:
  * converts between plists (as xml strings) and php native data
@@ -20,7 +20,7 @@ function tmbo_plist_encode($data, $send_html) {
 	if(is_array($data)) {
 		foreach($data as $key => $var) {
 			if(is_object($var)) {
-				if(get_class($var) == "Error") {
+				if(get_class($var) == "ApiError") {
 					if(!array_key_exists("errors", $data)) $data["errors"] = array();
 					$data["errors"][] = "ERROR: ".$var->api_data($send_html);
 					unset($data[$key]);
@@ -30,7 +30,7 @@ function tmbo_plist_encode($data, $send_html) {
 			}
 		}
 	} else if(is_object($data)) {
-		if(get_class($data) == "Error") {
+		if(get_class($data) == "ApiError") {
 			$data = array("errors" => $data->api_data($send_html));
 		} else {
 			$data = $data->api_data($send_html);

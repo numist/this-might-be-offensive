@@ -1,4 +1,4 @@
-<?
+<?php
 
 if(!defined("KEY_SHIFT"))      define("KEY_SHIFT",      1 << 8);
 if(!defined("KEY_ALT"))        define("KEY_ALT",        1 << 9);

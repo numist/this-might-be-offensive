@@ -44,7 +44,7 @@
 			subscriptions.
 		</div>
 
-<?
+<?php
 		global $activeTab;
 		$activeTab = "discussions";
 		tabs();
@@ -54,8 +54,8 @@
 			<div id="grid-container">
 				<div class="grid" id="subscriptions">
 					<ul>
-<?
-		while( $row = mysql_fetch_assoc( $result ) ) {
+<?php
+		while( $row = mysqli_fetch_assoc( $result ) ) {
 			$row['filename'] = htmlEscape($row['filename']);
 			$css = (isset($css) && $css == "odd_row") ? "even_row" : "odd_row";
 			?>
@@ -67,11 +67,11 @@
 								<a href="subscribe.php?un=1&fileid=<?= $row['fileid'] ?>" title="take this thread off my 'unread comments' watch list.">unsubscribe</a>
 							</div>
 						</li>
-			<? } ?>
+			<?php } ?>
 					</ul>
 				</div>
 				<div id="bottom">
-					<?
+					<?php
 						// next page!
 						$args = $_GET;
 						if(array_key_exists("p", $args)) {
@@ -86,6 +86,6 @@
 		</div>
 		<div class="blackbar"></div>
 	</div>
-	<?
+	<?php
 	}
 ?>

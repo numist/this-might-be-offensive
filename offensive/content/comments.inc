@@ -221,14 +221,14 @@
 	}
 	
 	function toggleThumbnailLink() {
-		?><div style="margin:4px;font-weight:bold"><?
+		?><div style="margin:4px;font-weight:bold"><?php
 			if(me()->getPref("thumbnails_in_comments") == 1) {
-				?><a href="<?= Link::setPref("thumbnails_in_comments", 0) ?>">hide thumbnail</a><?
+				?><a href="<?= Link::setPref("thumbnails_in_comments", 0) ?>">hide thumbnail</a><?php
 			}
 			else {
-				?><a href="<?= Link::setPref("thumbnails_in_comments", 1) ?>">show thumbnail</a><?
+				?><a href="<?= Link::setPref("thumbnails_in_comments", 1) ?>">show thumbnail</a><?php
 			}
-		?></div><?
+		?></div><?php
 
 	}
 
@@ -245,28 +245,28 @@
 
 <div class="contentbox">
 	<div class="blackbar"></div>
-		<div class="heading"><?
+		<div class="heading"><?php
     // changeblog special header
 	if($upload->id() == "211604") {
 		?>
 		changeblog
 		<br/><span style="color:var(--link-user)">beat to fit. paint to match.</span><br/>
-		<?
+		<?php
 	} else if( $upload->type() == 'topic' ) {
 		$prefix = $uploader->status() == "admin" ? "" : "don't blame me,";
 
 		echo htmlEscape($upload->filename());
 
 		?><br/><span class="blame"><?= $prefix ?> <?= $uploader->htmlUsername() ?> started it.</span><br/>
-<?
+<?php
 	} else {
 ?>
 		<a class="heading" href="<?= $href ?>"><?= $upload->htmlFilename() ?></a><br/><span class="blame">uploaded by <?= $uploader->htmlUsername() ?></span><br/>
-<?
+<?php
 	}	
 ?></div>
 	
-<?
+<?php
 		global $activeTab;
 		$activeTab = "discussions";
 		tabs();
@@ -293,7 +293,7 @@
 	}
 	?>
 	<script>
-		lastcomment = <? echo $lastcomment ?>;
+		lastcomment = <?php echo $lastcomment ?>;
 	</script>
 	<?php
 	
@@ -301,30 +301,30 @@
 		if( $upload->type() != 'topic' && ($upload->type() != "audio" || $upload->thumb())) {
 			?>
 				<div id="thumbnail" style="background:var(--bg-content); border-top:1px solid var(--bg-heading)">
-					<div style="float:right"><? toggleThumbnailLink() ?></div>
-					<?
+					<div style="float:right"><?php toggleThumbnailLink() ?></div>
+					<?php
 						if(me()->getPref("thumbnails_in_comments") == 1) {
 							?>
 							
 							<a href="<?= $href ?>"
-								<? if($upload->filtered()) { ?>
+								<?php if($upload->filtered()) { ?>
 									onMouseOver='changesrc("th<?= $upload->id()?>","<?= $upload->thumbURL() ?>")'
 							 		onMouseOut='changesrc("th<?= $upload->id() ?>","/offensive/graphics/th-filtered.gif")'
-								<? } ?>
+								<?php } ?>
 							><img name="th<?= $upload->id()?>" style="margin:12px;"
 								src="<?= $upload->filtered()
 									? "/offensive/graphics/th-filtered.gif" 
 									: $upload->thumbURL() ?>" border="0"
 							/></a>
 							
-							<?
+							<?php
 						}
 					?>
 					
 				</div>
 				<div style="clear:both">
 				</div>
-			<?
+			<?php
 		}
 
 	?>
@@ -334,21 +334,21 @@
 			</div>
 			<div class="heading">
 				<div style="float:right">					
-					<? if( $upload->subscribed() ) { ?>
+					<?php if( $upload->subscribed() ) { ?>
 						<b><a id="subscribeLink" href="subscribe.php?un=1&fileid=<?= $upload->id() ?>" title="take this thread off my 'unread comments' watch list." class="orange">unsubscribe</a></b>
-					<? }
+					<?php }
 						else { ?>
 						<b><a id="subscribeLink" href="subscribe.php?fileid=<?= $upload->id() ?>" title="watch this thread for new comments." class="orange">subscribe</a></b>
-					<?	}
+					<?php 	}
 					?>
 				</div>
 
 					<div>
-					<? if ($upload->type() != "topic") { ?>
+					<?php if ($upload->type() != "topic") { ?>
 						<a class="heading" href="<?= Link::upload($upload) ?>"><?= $upload->htmlFilename(); ?></a><br/>
-					<? }
+					<?php }
 						else {
-						 ?>&nbsp;<?
+						 ?>&nbsp;<?php
 						}
 					?>
 					</div>
@@ -421,7 +421,7 @@
 		</div>
 			
 
-<?
+<?php
     }
 }
 ?>

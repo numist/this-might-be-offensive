@@ -1,4 +1,4 @@
-<?
+<?php
 
 	require_once( 'offensive/assets/tabs.inc' );	
 	require_once( 'admin/mysqlConnectionInfo.inc' );
@@ -20,24 +20,24 @@
 							<?= $them->htmlUsername() ?> has a posse.
 						</span>
 					</div>
-					<? tabs(); ?>
+					<?php tabs(); ?>
 					<div class="bluebox">
 						<div class="piletitle">
 							<?= $them->htmlUsername() ?> has a posse.
 						</div>
 						<ol>
-<?
+<?php
 			
 			$posse = $them->posse();
 			foreach($posse as $accomplice) {
 				?><li><?= $accomplice->htmlUsername() ?> (<?= $accomplice->status() ?>)</li>
-<?
+<?php
 			}
 ?>											
 					</ol>
 					</div>
 					<div class="blackbar"></div>
 				</div>
-<?
+<?php
 }
 ?>

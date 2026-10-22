@@ -1,4 +1,4 @@
-<? 
+<?php 
 header( "Content-type: text/xml" ); 
 set_include_path("..");
 require_once("offensive/assets/header.inc");
@@ -20,7 +20,7 @@ $sql = "SELECT offensive_uploads.timestamp
 		ORDER BY timestamp DESC
 		LIMIT 1";
 $res = tmbo_query($sql);
-$row = mysql_fetch_array($res);
+$row = mysqli_fetch_array($res);
 $lastBuildDate = array_pop($row);
 $lastBuildTime = strtotime($lastBuildDate);
 conditionalGet($lastBuildTime);
@@ -32,7 +32,7 @@ conditionalGet($lastBuildTime);
 		<link>https://<?= $_SERVER['HTTP_HOST'] ?>/offensive/</link>
 		<description>[ this might be offensive ]</description>
 		<lastBuildDate><?= gmdate('r', $lastBuildTime); ?></lastBuildDate>
-<?
+<?php
 	$args = $_REQUEST;
 	if(!array_key_exists("type", $args)) {
 		$args["type"] = "topic";
@@ -46,7 +46,7 @@ conditionalGet($lastBuildTime);
 		<item>
 			<title><?= xmlEscape($upload->filename()) ?> (started by <?= xmlEscape($upload->uploader()->username()) ?>)</title>
 			<link>https://<?= $_SERVER['HTTP_HOST'].Link::thread($upload) ?></link>
-			<description><![CDATA[<?
+			<description><![CDATA[<?php
 				$comments = $upload->getComments();
 				if(count($comments) > 0) {
 					echo $comments[0]->HTMLcomment();
@@ -57,7 +57,7 @@ conditionalGet($lastBuildTime);
 			<pubDate><?= date( "r", strtotime( $upload->timestamp() ) ) ?></pubDate>			
 			<comments><![CDATA[https://<?= $_SERVER['HTTP_HOST'].Link::thread($upload) ?>]]></comments>
 		</item>
-<?
+<?php
 	}
 ?>
 

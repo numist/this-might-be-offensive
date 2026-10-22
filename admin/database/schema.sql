@@ -26,7 +26,7 @@ CREATE TABLE `failed_logins` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(50) NOT NULL DEFAULT '',
   `password` varchar(50) NOT NULL DEFAULT '',
-  `ip` varchar(15) NOT NULL DEFAULT '',
+  `ip` varchar(45) NOT NULL DEFAULT '',
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `ip_timestamp` (`ip`,`timestamp`),
@@ -164,7 +164,7 @@ CREATE TABLE `offensive_comments` (
   `offensive` smallint(6) DEFAULT NULL,
   `repost` smallint(6) DEFAULT NULL,
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `user_ip` varchar(20) DEFAULT NULL,
+  `user_ip` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `fileid` (`fileid`),
   KEY `vote` (`vote`),
@@ -172,7 +172,7 @@ CREATE TABLE `offensive_comments` (
   KEY `userid_fileid` (`userid`,`fileid`),
   KEY `userid_timestamp` (`userid`,`timestamp`),
   KEY `userid_fileid_commentid` (`id`,`userid`,`fileid`)
-) ENGINE=MyISAM AUTO_INCREMENT=276172016 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=276172016 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -243,7 +243,7 @@ CREATE TABLE `offensive_uploads` (
   `userid` int(11) NOT NULL DEFAULT '0',
   `filename` varchar(255) NOT NULL DEFAULT '',
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `ip` varchar(16) DEFAULT NULL,
+  `ip` varchar(45) DEFAULT NULL,
   `nsfw` tinyint(4) NOT NULL DEFAULT 0,
   `hash` varchar(32) DEFAULT NULL,
   `tmbo` tinyint(4) NOT NULL DEFAULT '0',
@@ -314,8 +314,8 @@ CREATE TABLE `users` (
   `username` varchar(50) DEFAULT NULL,
   `created` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `account_status` set('admin','normal','locked','awaiting activation','memoriam') NOT NULL DEFAULT 'awaiting activation',
-  `ip` varchar(16) DEFAULT NULL,
-  `last_login_ip` varchar(15) DEFAULT NULL,
+  `ip` varchar(45) DEFAULT NULL,
+  `last_login_ip` varchar(45) DEFAULT NULL,
   `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `referred_by` int(11) DEFAULT NULL,
   PRIMARY KEY (`userid`),

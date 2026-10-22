@@ -1,4 +1,4 @@
-<?
+<?php
 
 // sanity
 if(!defined("TMBO") || !isset($comment)) {
@@ -13,7 +13,7 @@ $commenter = $comment->commenter();
 global $numgood, $numbad;
 
 ?>
-<div class="entry u<? echo $commenter->id();
+<div class="entry u<?php echo $commenter->id();
 	if($comment->vote() == "this is good") echo " tig";
 	if($comment->vote() == "this is bad") echo " tib";
 	if($comment->tiar()) echo " tiar";
@@ -27,7 +27,7 @@ global $numgood, $numbad;
 
 		&raquo; <?= $commenter->htmlUsername() ?>
 
-		<?
+		<?php
 		if( $comment->vote() ) {
 			$thevote = $comment->vote();
 			$numgood += ($thevote == 'this is good') ? 1 : 0;

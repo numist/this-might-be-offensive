@@ -1,4 +1,4 @@
-<?
+<?php
 
 class TMBO {
 	private static $readonly = false;

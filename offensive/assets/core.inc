@@ -1,4 +1,4 @@
-<?
+<?php
 	// XXX: check that we actually need all these
 	require_once( 'offensive/assets/header.inc' );
 	require_once( "offensive/assets/activationFunctions.inc" );
@@ -192,7 +192,7 @@
 
 		$result = tmbo_query($sql);
 		$ret = array();
-		while($row = mysql_fetch_assoc($result)) {
+		while($row = mysqli_fetch_assoc($result)) {
 			$upload = new Upload($row);
 			if(!$upload->squelched()) {
 				$ret[] = $upload;
@@ -218,15 +218,15 @@
 		
 		$sql = uploadsql()." AND up.id = $id";
 		$result = tmbo_query($sql);
-		if(mysql_num_rows($result) == 0) {
+		if(mysqli_num_rows($result) == 0) {
 			if(!$upload->exists()) {
 				throw new Exception("that upload doesn't exist", 404);
 			} else {
 				updateCommentCount($id, 0, 0, 0, 0, 0);
 			}
 		} else {
-			assert('mysql_num_rows($result) == 1');
-			$upload = new Upload(mysql_fetch_assoc($result));
+			assert('mysqli_num_rows($result) == 1');
+			$upload = new Upload(mysqli_fetch_assoc($result));
 		}
 		
 		
@@ -261,11 +261,11 @@
 			
 			$sql .= " AND u.userid = $userid";
 			$result = tmbo_query($sql);
-			if(mysql_num_rows($result) == 0) {
+			if(mysqli_num_rows($result) == 0) {
 				throw new Exception("that user has no yearbook photo", 404);
 			}
 			
-			return new Upload(mysql_fetch_assoc($result));
+			return new Upload(mysqli_fetch_assoc($result));
 		}
 		
 		// double check date sub
@@ -303,10 +303,10 @@
         
 		$ret = array();
         
-		if(mysql_num_rows($result) == 0)
+		if(mysqli_num_rows($result) == 0)
 			return $ret;
 		
-		while($row = mysql_fetch_assoc($result)) {
+		while($row = mysqli_fetch_assoc($result)) {
 			$upload = new Upload($row);
 			if(!$upload->squelched()) {
 				$ret[] = $upload;
@@ -409,7 +409,7 @@
 		
 		$ret = array();
 		
-		while($row = mysql_fetch_assoc($result)) {
+		while($row = mysqli_fetch_assoc($result)) {
 			$ret[] = new Comment($row);
 		}
 		
@@ -441,12 +441,12 @@
 		}
 
 		$result = tmbo_query($sql);
-		if(mysql_num_rows($result) == 0 && $singleton) {
+		if(mysqli_num_rows($result) == 0 && $singleton) {
 			throw new Exception("that comment doesn't exist", 404);
 		}
 
 		$ret = array();
-		while($row = mysql_fetch_assoc($result)) {
+		while($row = mysqli_fetch_assoc($result)) {
 			$ret[] = new Comment($row);
 		}
 		if($singleton) {
@@ -457,6 +457,8 @@
 	}
 
 	function core_postcomment($args) {
+
+		global $link;
 		$fileid = check_arg("fileid", "integer", $args);
 		$comment = check_arg("comment", "string", $args, false);
 		$vote = check_arg("vote", "string", $args, false, array("this is good", "this is bad", "novote"));
@@ -515,7 +517,7 @@
 		        FROM offensive_comments 
 		        WHERE userid = $userid ORDER BY timestamp DESC LIMIT 1";
 		$res = tmbo_query($sql);
-		$row = mysql_fetch_assoc($res);
+		$row = mysqli_fetch_assoc($res);
 		if($row['fileid'] == $fileid &&
 		   $row['comment'] == $comment && 
 		   $comment != "" &&
@@ -543,7 +545,7 @@
 		$sql = "INSERT INTO offensive_comments ( userid, fileid, comment, vote, offensive, repost, user_ip )
 		        VALUES ( $userid, $fileid, '$comment', $vote_sql, $offensive, $repost, '".sqlEscape($_SERVER['REMOTE_ADDR'])."')";
 		tmbo_query($sql);
-		$commentid = mysql_insert_id();
+		$commentid = mysqli_insert_id($link);
 
 		if($comment) {
 			// update subscriptions
@@ -600,7 +602,7 @@
 		$result = tmbo_query($sql);
 		
 		$ret = array();
-		while($row = mysql_fetch_assoc($result)) {
+		while($row = mysqli_fetch_assoc($result)) {
 			$ret[] = new User($row);
 		}
 		return $ret;
@@ -626,7 +628,7 @@
 		
 		$ret = array();
 		
-		while($row = mysql_fetch_assoc($result)) {
+		while($row = mysqli_fetch_assoc($result)) {
 			$upload = new Upload($row);
 			if(!$upload->squelched()) {
 				$ret[] = $upload;
@@ -682,7 +684,7 @@
 
 		$ret = array();
 
-		while($row = mysql_fetch_assoc($result)) {
+		while($row = mysqli_fetch_assoc($result)) {
 			$comment = new Comment($row);
 			if(!$comment->upload()->squelched()) {
 				$ret[] = $comment;
@@ -696,7 +698,7 @@
 		$sql = "SELECT * FROM users WHERE account_status = 'admin'";
 		$result = tmbo_query($sql);
 		$ret = array();
-		while($row = mysql_fetch_assoc($result)) {
+		while($row = mysqli_fetch_assoc($result)) {
 			$ret[] = new User($row);
 		}
 		return $ret;
@@ -752,7 +754,7 @@
 
 		$ret = array();
 
-		while($row = mysql_fetch_assoc($result)) {
+		while($row = mysqli_fetch_assoc($result)) {
 			$ret[] = new Token($row);
 		}
 
@@ -823,7 +825,7 @@
 		$result = tmbo_query($sql);
 		
 		$rows = array();
-		while($row = mysql_fetch_assoc($result)) {
+		while($row = mysqli_fetch_assoc($result)) {
 			if(!me()->squelched($row["userid"])) {
 				$rows[] = $row;
 			}

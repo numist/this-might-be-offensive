@@ -1,4 +1,4 @@
-<?
+<?php
 
 	require_once( 'offensive/assets/tabs.inc' );
 	require_once( 'admin/mysqlConnectionInfo.inc' );
@@ -13,12 +13,12 @@
 	function head()
 	{ 	?>
 		<script src="https://maps.googleapis.com/maps/api/js?sensor=false" type="text/javascript"></script>
-		<?
+		<?php
 		CSS::add("/styles/map.css");
 		JS::add("/offensive/js/markermanager-1.2.js");
 		JS::add("/offensive/js/maps-3.0.js");
 		?>
-		<?
+		<?php
 	}
 
 	function body()
@@ -28,7 +28,7 @@
 		<div class="blackbar"></div>
 		<div class="heading">
 			long time no see. do YOU know where YOUR maxxers are?
-		</div><?
+		</div><?php
 		
 		global $activeTab;
 		$activeTab = "map";
@@ -55,6 +55,6 @@
 		<div class="blackbar"></div>
 	</div>
 		
-<?
+<?php
 	}
 ?>

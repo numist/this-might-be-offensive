@@ -36,10 +36,15 @@ var redis_host = checkIniString(db_config.redis_host) || 'localhost';
 // Old redis module (0.8.x) uses positional args: createClient(port, host)
 var redis = require("redis").createClient(6379, redis_host);
 
+var db_host = checkIniString(db_config.database_host);
+
+// Like PHP's mysqli, treat "localhost" as the unix socket. Over TCP we'd show up
+// as 127.0.0.1, which the 'user'@'localhost' grant doesn't cover.
 var db = mysql.createConnection({
   user: checkIniString(db_config.database_user),
   password: checkIniString(db_config.database_pass),
-  host: checkIniString(db_config.database_host),
+  host: db_host,
+  socketPath: db_host === "localhost" ? "/run/mysqld/mysqld.sock" : undefined,
   database: checkIniString(db_config.database_name)
 });
 

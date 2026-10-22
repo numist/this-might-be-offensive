@@ -28,4 +28,4 @@
 		header( "Location: " . $_SERVER['HTTP_REFERER'] );
 	} else { ?>
 		<html><head><script type="text/javascript">history.go(-1);</script></head><body /></html>
-	<? } ?>
+	<?php } ?>

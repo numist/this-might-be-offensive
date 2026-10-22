@@ -1,4 +1,4 @@
-<?
+<?php
 	// Include, and check we've got a connection to the database.
 	require_once( 'admin/mysqlConnectionInfo.inc' );
 	if(!isset($link) || !$link) $link = openDbConnection();
@@ -19,7 +19,7 @@
 		?>
 		<link id="gallery" rel="alternate" href="<?= Link::rss("audio") ?>" type="application/rss+xml" title="audio stream" />
 		<link rel="alternate" type="application/rss+xml" title="daily archives" href="<?= Link::rss("zip") ?>" />
-		<?
+		<?php
 	}
 
 	function head_post_js() {
@@ -92,7 +92,7 @@
 		alright. listen up.
 	</div>
 	
-	<?
+	<?php
 		global $activeTab;
 		$activeTab = "audio";
 		tabs();
@@ -102,13 +102,13 @@
 		<div id="grid-container">
 			<div id="commands">
 				<div class="floatleft">
-					<? PickupLink::emit(); ?>
+					<?php PickupLink::emit(); ?>
 				</div>
 				<div class="floatright">&nbsp;</div>
 			</div>
 			<div class="grid" id="main">
 				<ul>
-	<?
+	<?php
 				$result = core_getuploads($args);
 				foreach( $result as $upload ) {
 					$css = (isset($css) && strpos($css, "odd_row") !== false) ? "even_row" : "odd_row";
@@ -117,7 +117,7 @@
 				</ul>
 			</div>
 			<div id="bottom">
-				<?
+				<?php
 					// next page!
 					$args = $_GET;
 					if(array_key_exists("p", $args)) {
@@ -132,6 +132,6 @@
 	</div>
 	<div class="blackbar"></div>
 </div>
-<?
+<?php
 }
 ?>

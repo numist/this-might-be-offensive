@@ -61,7 +61,7 @@
 	<title><?= $_SERVER['HTTP_HOST'] ?> : do we know you?</title>
 	<?php include 'includes/meta.inc'; ?>
 	<link rel="stylesheet" type="text/css" href="/styles/sparse.css"/>
-	<?
+	<?php
 		include_once("analytics.inc");
 		JS::add("/offensive/js/jquery-1.7.1.min.js");
 		JS::emit();
@@ -85,7 +85,7 @@
 							<tr>
 								<td colspan="2"><p><?php echo $login_message ?></p></td>
 							</tr>
-							<? if($prompt) { ?>
+							<?php if($prompt) { ?>
 							<tr>
 								<td class="label"><p>user name:</p></td>
 								<td><input type="text" name="howsername" size="12"/></td>
@@ -103,17 +103,17 @@
 									<input type="submit" class="button" value="log in"/>
 								</td>
 							</tr>
-							<? } ?>
+							<?php } ?>
 						</table>
-						<? if (isOpenRegistration()) { ?>
+						<?php if (isOpenRegistration()) { ?>
 							<p id="signup_link" style="text-align: center; opacity: 0;">
 								new here? it's your lucky day.<br />
 								<a href="/offensive/registr.php">create an account</a>
 							</p>
-						<? } ?>
-						<? if($redirect) { ?>
+						<?php } ?>
+						<?php if($redirect) { ?>
 							<input type="hidden" name="redirect" value="<?= htmlEscape($redirect) ?>" />
-						<? } ?>
+						<?php } ?>
 					</form>
 				
 				</span>
@@ -126,9 +126,9 @@
 
 	
 	
-<? include 'includes/footer.txt' ?>
+<?php include 'includes/footer.txt' ?>
 
-<? 
+<?php 
    // If the non-referred registration of the day hasn't been
    // taken yet, fade the registration link in after 3 seconds
    // of non-activity.
@@ -151,7 +151,7 @@
 			}, 3000);
 		}
 	</script>
-<? } ?>
+<?php } ?>
 
 </body>
 </html>

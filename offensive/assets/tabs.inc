@@ -1,4 +1,4 @@
-<? 
+<?php 
 	if( ! isset( $activeTab ) ) {
 		$activeTab = array_key_exists("c", $_REQUEST) ? $_REQUEST['c'] : "images";
 	}
@@ -12,7 +12,7 @@
 <div class="tabs">
 	<div class="<?= cssFor('images') ?>"><a href="<?= Link::mainpage() ?>">images</a></div>
 	<div class="<?= cssFor('discussions') ?>"><a href="<?= Link::content("discussions") ?>">discussions</a></div>
-	<? /* <div class="<?= cssFor('unread') ?>"><a href="<?= Link::content("unread") ?>">unread</a></div> */ ?>
+	<?php /* <div class="<?= cssFor('unread') ?>"><a href="<?= Link::content("unread") ?>">unread</a></div> */ ?>
 	<div class="<?= cssFor('hof') ?>"><a href="<?= Link::content("hof") ?>">hall of fame</a></div>	
 	<div class="<?= cssFor('audio') ?>"><a href="<?= Link::content("audio") ?>">audio</a></div>	
 	<div class="<?= cssFor('yearbook') ?>"><a href="<?= Link::content("yearbook") ?>">yearbook</a></div>	
@@ -27,7 +27,7 @@
 <div id="moreMenu" class="moreMenu" popover>
 	<div class="<?= cssFor('images') ?>"><a href="<?= Link::mainpage() ?>">images</a></div>
 	<div class="<?= cssFor('discussions') ?>"><a href="<?= Link::content("discussions") ?>">discussions</a></div>
-	<? /* <div class="<?= cssFor('unread') ?>"><a href="<?= Link::content("unread") ?>">unread</a></div> */ ?>
+	<?php /* <div class="<?= cssFor('unread') ?>"><a href="<?= Link::content("unread") ?>">unread</a></div> */ ?>
 	<div class="<?= cssFor('hof') ?>"><a href="<?= Link::content("hof") ?>">hall of fame</a></div>	
 	<div class="<?= cssFor('audio') ?>"><a href="<?= Link::content("audio") ?>">audio</a></div>	
 	<div class="<?= cssFor('yearbook') ?>"><a href="<?= Link::content("yearbook") ?>">yearbook</a></div>	
@@ -39,7 +39,7 @@
 </div>
 
 <div id="unreadMenu" class="unreadMenu" popover>
-<?
+<?php
 	/* unread() lives in offensive/index.php, so it is not defined for every
 	   entrypoint that includes this file (gis/index.php includes tabs.inc but
 	   never defines it). Guard rather than fatal, and pass a distinct id so this
@@ -48,7 +48,7 @@
 ?>
 </div>
 
-<?
+<?php
 	}
 
 	function cssFor( $name ) {

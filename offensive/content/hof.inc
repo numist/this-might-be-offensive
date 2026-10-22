@@ -1,4 +1,4 @@
-<?
+<?php
 
 	// Include, and check we've got a connection to the database.
 	require_once( 'admin/mysqlConnectionInfo.inc' );
@@ -25,7 +25,7 @@
 <div class="contentbox">
 	<div class="blackbar"></div>
 		<div class="heading">hall of fame: the coolest files of all time (according to you).</div>
-		<? tabs(); ?>
+		<?php tabs(); ?>
 
 		<div class="tabs subtabs">
 			<div class="<?= ($view == 'hof' ? 'tabon' : 'taboff') ?>"><a href="<?= Link::content("hof") ?>">all time</a></div>
@@ -43,10 +43,10 @@
 							<div class="col col3">uploaded by</div>
 							<div class="col col4">comments</div>
 							<div class="col col5">votes</div>
-							<div class="col col6"><? if($view=="today") { ?> hours <? } else { ?> weeks <? } ?></div>
+							<div class="col col6"><?php if($view=="today") { ?> hours <?php } else { ?> weeks <?php } ?></div>
 						</li>
 
-<?
+<?php
 		$numPerPage = 100;
 		$page = isset($_REQUEST['p']) && is_intger($_REQUEST['p']) ?
 			    $_REQUEST['p'] : 0;
@@ -87,7 +87,7 @@
 ?>
 						<li fileid="<?= $upload->id() ?>">
 							<div class="col col1 <?= $cssw ?>">
-								<? echo ++$count ?>.
+								<?php echo ++$count ?>.
 							</div>
 							<div class="col col2 <?= $cssw ?>">
 								<a href="<?= Link::upload($upload) ?>"><?= $upload->htmlFilename()?></a>
@@ -105,13 +105,13 @@
 								<?= $timeSince ?>
 							</div>
 						</li>
-						<?
+						<?php
 								}
 						?>
 					</ul>
 				</div>
 				<div id="bottom">
-					<?
+					<?php
 						// next page!
 						$args = $_GET;
 						if(array_key_exists("p", $args)) {
@@ -126,7 +126,7 @@
 	</div>
 	<div class="blackbar"></div>
 </div>
-<?
+<?php
 	}
 
 	function weeksSince( $timestamp ) {

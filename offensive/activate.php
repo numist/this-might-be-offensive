@@ -1,4 +1,4 @@
-<?
+<?php
 	set_include_path("..");
 	require_once( 'offensive/assets/header.inc' );
 	require_once( 'offensive/classes/assets.inc' );
@@ -14,9 +14,9 @@
 	
 	$result = tmbo_query( $sql );
 	
-	if( mysql_num_rows( $result ) == 1 ) {
+	if( mysqli_num_rows( $result ) == 1 ) {
 		
-		$row = mysql_fetch_assoc( $result );
+		$row = mysqli_fetch_assoc( $result );
 		
 		$email = $row['email'];
 		$username = $row['username'];		
@@ -26,7 +26,7 @@
 		if( tmbo_hash_equals( $rehash, $_REQUEST[ $hash_param_key ] ) ) {
 			$sql = "UPDATE users SET timestamp = timestamp, account_status='normal' WHERE userid=$id AND account_status='awaiting activation' limit 1";
 			tmbo_query( $sql );
-			if( mysql_affected_rows() == 1 ) {
+			if( mysqli_affected_rows($link) == 1 ) {
 				$message = "Your account is now active. <a href=\"./\">Click here</a> to log in.";
 			}
 		}		
@@ -41,7 +41,7 @@
 <head>
 	<title></title>
 	<?php include 'includes/meta.inc'; ?>
-	<?
+	<?php
 	CSS::add("/styles/theme.css");
 	if(getenv('TMBO_ENV') === 'development') {
 		CSS::add("/styles/theme.dev.css");
@@ -121,7 +121,7 @@
 		<div class="bluebox" style="text-align:left">	
 			<div class="entry">
 			
-				<? echo $message ?>
+				<?php echo $message ?>
 			
 			</div>	
 		</div>

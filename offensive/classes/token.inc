@@ -1,4 +1,4 @@
-<?
+<?php
 
 class Token {
 	private static $gdata = array();
@@ -70,10 +70,10 @@ class Token {
 			$result = tmbo_query($sql);
 			
 			// if the upload doesn't exist...  well what can we do?
-			if(mysql_num_rows($result) != 1) {
+			if(mysqli_num_rows($result) != 1) {
 				// there should never be more than one result for a token that matches either
 				// query of "userid issued by ' tmbo'" or "tokenid".
-				assert('mysql_num_rows($result) == 0');
+				assert('mysqli_num_rows($result) == 0');
 				if(!array_key_exists("tokenid", $this->data) &&
 				   array_key_exists("userid", $this->data) &&
 				   array_key_exists("issued_to", $this->data)) {
@@ -84,7 +84,7 @@ class Token {
 					$this->data['exists'] = false;
 				}
 			} else {
-				$row = mysql_fetch_assoc($result);
+				$row = mysqli_fetch_assoc($result);
 				foreach($row as $key => $val) {
 					$this->data[$key] = $val;
 				}

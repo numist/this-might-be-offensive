@@ -1,4 +1,4 @@
-<?
+<?php
 	// Include, and check we've got a connection to the database.
 	require_once( 'admin/mysqlConnectionInfo.inc' );
 	if(!isset($link) || !$link) $link = openDbConnection();
@@ -14,16 +14,16 @@
 <div class="contentbox">
 	<div class="blackbar"></div>
 	<div class="heading">fresh meat.</div>
-<?
+<?php
 		tabs();
 ?>
 		<div class="bluebox">
-			<? newbs(); ?>
+			<?php newbs(); ?>
 		</div>
 		<div class="blackbar"></div>
 	</div>
 		
-<?
+<?php
 	}
 
 	function newbs() {
@@ -32,7 +32,7 @@
 
 <table width="100%">
 
-<?
+<?php
 
 		$numPerPage = 100;
 		$page = array_key_exists("p", $_REQUEST) ? $_REQUEST['p'] : 0;
@@ -62,9 +62,9 @@
 					<td>joined</td>
 					<td style="text-align:right;white-space:nowrap">thanks to</td>
 				</tr>
-<?
+<?php
 
-		while( $row = mysql_fetch_assoc( $result ) ) {
+		while( $row = mysqli_fetch_assoc( $result ) ) {
 			$newb = new User($row);
 			$css = (isset($css) && $css == "even_row") ? "odd_row" : "even_row";
 
@@ -74,7 +74,7 @@
 					<td><?= $newb->created() ?></td>
 					<td style="text-align:right;white-space:nowrap"><?= $newb->referred_by()->htmlUsername() ?></td>
 				</tr>
-			<?
+			<?php
 		}
 
 		
@@ -83,6 +83,6 @@
 	</table>
 
 
-<?
+<?php
 	}
 ?>

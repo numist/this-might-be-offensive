@@ -1,4 +1,4 @@
-<?
+<?php
 // Include, and check we've got a connection to the database.
 require_once( 'admin/mysqlConnectionInfo.inc' );
 if(!isset($link) || !$link) $link = openDbConnection();
@@ -136,7 +136,7 @@ function canLogIn() {
 	$sql = "SELECT count( id ) as numFailed from failed_logins WHERE ip='$ip' AND timestamp > date_sub( now(), interval 30 minute )";
 	$result = tmbo_query( $sql );
 
-	$row = @mysql_fetch_assoc( $result );
+	$row = @mysqli_fetch_assoc( $result );
 
 	if( $row['numFailed'] > 5 ) {
 		return false;
@@ -263,12 +263,12 @@ function issueRememberCookie($myself) {
 
 	$sql = "SELECT password FROM users WHERE userid=$uid LIMIT 1";
 	$result = tmbo_query( $sql );
-	if(mysql_num_rows( $result ) != 1) {
+	if(mysqli_num_rows( $result ) != 1) {
 		trigger_error("tried to issue a remember cookie for nonexistent user $uid", E_USER_WARNING);
 		return false;
 	}
 
-	$row = mysql_fetch_assoc( $result );
+	$row = mysqli_fetch_assoc( $result );
 
 	/* users.password is nullable, and a null hash would leave the pepper as the
 	 * whole key -- shared by every such account.  no hash, no cookie.
@@ -308,8 +308,8 @@ function loginWithCookie() {
 			$uid = (int)$uid;
 			$sql = "SELECT * from users where userid=$uid LIMIT 1";
 			$result = tmbo_query( $sql );
-			if(mysql_num_rows( $result ) == 1) {
-				$row = mysql_fetch_assoc($result);
+			if(mysqli_num_rows( $result ) == 1) {
+				$row = mysqli_fetch_assoc($result);
 
 				// without a hash there is no key, so there is nothing to compare.
 				if(!is_null($row['password']) && strlen($row['password'])) {
@@ -338,8 +338,8 @@ function loginWithUserPass($params) {
    	$encrypted_pw = sha1( $pw );
 		$query = "SELECT userid FROM users WHERE username = '" . sqlEscape($name) . "' AND password = '" . $encrypted_pw . "'";
 		$result = tmbo_query($query);
-		if(mysql_num_rows($result) > 0) {
-			$userid = array_top(mysql_fetch_assoc($result));
+		if(mysqli_num_rows($result) > 0) {
+			$userid = array_top(mysqli_fetch_assoc($result));
 
 			if(logInUser(new User($userid))) {
 				// set rememberme cookie if the user requested it

@@ -1,4 +1,4 @@
-<?
+<?php
 
 require_once("offensive/assets/functions.inc");
 require_once("offensive/assets/core.inc");

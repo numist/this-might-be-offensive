@@ -1,4 +1,4 @@
-<?
+<?php
 
 function conditionalGet($timestamp) {
 	if(!(is_numeric($timestamp) && floor($timestamp) == ceil($timestamp))) {

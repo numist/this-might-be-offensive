@@ -1,4 +1,4 @@
-<?
+<?php
 
 // sanity
 if(!defined("TMBO") || !isset($upload)) {
@@ -13,10 +13,10 @@ if(!defined("TMBO") || !isset($upload)) {
 <li fileid="<?= $upload->id() ?>">
 	<div class="thumbcontainer">
 		<div><a href="<?= Link::upload($upload) ?>"
-			<? if($upload->filtered()) { ?>
+			<?php if($upload->filtered()) { ?>
 			onMouseOver='changesrc("th<?= $upload->id()?>","<?= $upload->thumbURL() ?>")'
 			onMouseOut='changesrc("th<?= $upload->id() ?>","/offensive/graphics/th-filtered.gif")'
-			<? } ?>
+			<?php } ?>
 		><img name="th<?= $upload->id()?>"
 			src="<?= $upload->filtered()
 				? "/offensive/graphics/th-filtered.gif"
