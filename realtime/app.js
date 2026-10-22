@@ -1,5 +1,16 @@
+// Listen on loopback by default: nginx on the same host proxies /socket.io to us, and
+// nothing else should reach this port. Docker sets REALTIME_HOST=0.0.0.0 because its
+// nginx runs in a separate container. socket.io 0.9's listen(port) takes no host, so
+// create the server ourselves, with the same fallback handler socket.io would install.
+var server = require("http").createServer(function(req, res) {
+  res.writeHead(200);
+  res.end("Welcome to socket.io.");
+});
+server.listen(1337, process.env.REALTIME_HOST || "127.0.0.1");
+
+
 var util = require("util"),
-  io = require("socket.io").listen(1337),
+  io = require("socket.io").listen(server),
   path = require("path"),
   iniparser = require("iniparser"),
   mysql = require("mysql");
@@ -12,7 +23,7 @@ var fs = require("fs");
 var configPath = [
   path.join(__dirname, 'admin/.config'),
   path.join(__dirname, '../admin/.config')
-].find(fs.existsSync);
+].filter(fs.existsSync)[0];
 
 if (!configPath) {
   // Failing loudly beats connecting with undefined credentials.
