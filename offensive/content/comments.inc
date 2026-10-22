@@ -87,7 +87,10 @@
 					var docViewTop = $(window).scrollTop();
 					var docViewBottom = docViewTop + $(window).height();
 					
-					var elemTop = $(latest_comment).offset().top;
+                                        var offset = $(latest_comment).offset();
+                                        if (!offset)
+                                                return false;
+                                        var elemTop = offset.top;
 					var elemBottom = elemTop + $(latest_comment).height();
 					
 					return ((elemBottom >= docViewTop) && (elemTop <= docViewBottom)
@@ -127,18 +130,25 @@
 					if(commentExists(comment))
 						return;
 					var html = $(comment.html);
+                                        // Find the entry by class: the template's top-level node layout has changed before.
+                                        var entry = html.filter('.entry');
+                                        if (entry.length == 0)
+                                                entry = html.find('.entry');
+                                        entry = entry.first();
 					if($.inArray(comment.userid, me.squelched) != -1)
-						$(html[2]).find('.comment_body').html('<div class="squelched">[ squelched ]</div>');
+                                                entry.find('.comment_body').html('<div class="squelched">[ squelched ]</div>');
 					if ($('#thumbnail').length > 0)
 						$('#thumbnail').before(html);
 					else
 						$("#commentList").append(html);
-					$(html[2]).hide();
+                                        if (entry.length == 0)
+                                                return;
+                                        entry.hide();
 					var currentScroll = $(window).scrollTop();
 					var slideUp = $('textarea').is(':focus');
 					var propTotals = {};
-					latest_comment = $(html[2]);
-					$(html[2]).animate({
+                                        latest_comment = entry;
+                                        entry.animate({
     				"height": "show",
     				"marginTop": "show",
     				"marginBottom": "show",
@@ -291,11 +301,6 @@
 		}
 	// end of "are there any comments"
 	}
-	?>
-	<script>
-		lastcomment = <?php echo $lastcomment ?>;
-	</script>
-	<?php
 	
 		// thumbnail
 		if( $upload->type() != 'topic' && ($upload->type() != "audio" || $upload->thumb())) {
@@ -332,6 +337,10 @@
 		
 
 			</div>
+                        <?php // outside #commentList so it doesn't throw off the .entry:nth-child striping ?>
+                        <script>
+                                lastcomment = <?php echo $lastcomment ?>;
+                        </script>
 			<div class="heading">
 				<div style="float:right">					
 					<?php if( $upload->subscribed() ) { ?>
