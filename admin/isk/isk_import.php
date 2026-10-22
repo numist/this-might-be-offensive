@@ -2,7 +2,18 @@
 <?php
 
 // import images from TMBO into imgSeek
-// run from documentroot  'admin/isk/isk_import.php XX' where XX is number of months to import, default=1
+// run from documentroot  'admin/isk/isk_import.php STARTID ENDID' to import the images whose
+// upload ids are in that range (inclusive)
+
+if (php_sapi_name() != "cli") {
+	trigger_error("this script can only be run from the command line", E_USER_ERROR);
+	exit(1);
+}
+
+if ($argc != 3 || !ctype_digit($argv[1]) || !ctype_digit($argv[2])) {
+	fwrite(STDERR, "usage: php {$argv[0]} STARTID ENDID\n");
+	exit(1);
+}
 
 if(!($config = parse_ini_file("admin/.config"))) {
         trigger_error("No configuration file found", E_USER_ERROR);
@@ -31,6 +42,7 @@ echo "Done.\n";
 
 // add the path to the images array, we need that to tell ISK where the image is
 function add_image_path($images = array()) {
+	$new_images = array();
 	foreach($images as $image) {
 		$path = imgPath($image['timestamp'], $image['id'], $image['filename']);
 		if(!file_exists($path)) continue;
@@ -58,37 +70,41 @@ function imgPath($timestamp, $id, $filename) {
 function fetch_db_images($dbuser = "", $dbpass = "", $database= "", $dbhost = "") {
   
 	// connect to database
-	$db = mysql_connect($dbhost, $dbuser, $dbpass);
+	mysqli_report(MYSQLI_REPORT_OFF);
+	$db = mysqli_connect($dbhost, $dbuser, $dbpass);
 	if (!$db) {
-	    die('Could not connect: ' . mysql_error());
+	    die('Could not connect: ' . mysqli_connect_error());
+	}
+
+	// the tables are latin1 but hold UTF-8 bytes; talking latin1 passes them through
+	// untouched, so filenames match what's on disk
+	if (!mysqli_set_charset($db, "latin1")) {
+	    die('Could not set charset: ' . mysqli_error($db));
 	}
 
 	// select DB
-	$db_selected = mysql_select_db($database, $db);
+	$db_selected = mysqli_select_db($db, $database);
 	if (!$db_selected) {
-	    die ("Can't use $database : " . mysql_error());
+	    die ("Can't use $database : " . mysqli_error($db));
 	}
 
-	// read images from database
-	assert('$_SERVER["argc"] == 3');
-	assert('is_numeric($_SERVER["argv"][1])');
-	assert('is_numeric($_SERVER["argv"][2])');
-	
-	$startid = $_SERVER['argv'][1];
-	$endid = $_SERVER['argv'][2];
-	
+	// read images from database (both ids were checked to be digits on startup)
+	$startid = (int)$_SERVER['argv'][1];
+	$endid = (int)$_SERVER['argv'][2];
+
 	$sql = "SELECT * FROM offensive_uploads WHERE type='image' AND status='normal'
 	                                        AND id >= $startid AND id <= $endid
 	                                        ORDER by timestamp ASC";
-	                                        
-	$result = mysql_query($sql);
+
+	$result = mysqli_query($db, $sql);
 	if (!$result) {
-	    die('Could not fetch data: ' . mysql_error());
+	    die('Could not fetch data: ' . mysqli_error($db));
 	}
+	$rows = array();
 	while($row = mysqli_fetch_assoc($result)) {
 		$rows[] = $row;
 	}
-	mysql_close();
+	mysqli_close($db);
 	return $rows;
 }
 

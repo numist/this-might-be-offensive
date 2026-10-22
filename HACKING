@@ -27,7 +27,8 @@ function blah()
 Opening braces can and should share the line with their opening condition.  
 If the brace opens a function, the opening brace should have its own line.
 
-PHP is a templating language, so there are <? ?> and <?= ?> blocks all over the place.  
+PHP is a templating language, so there are <?php ?> and <?= ?> blocks all over the place.
+Don't use short open tags (<? ?>): short_open_tag is off by default, and with it off PHP prints the block as text instead of running it.
 As the site currently stands, it is not egregiously bad, and as iterative changes take place, the appearance of the code has been improving.
 
 ###############################################################################
@@ -40,7 +41,7 @@ As the site currently stands, it is not egregiously bad, and as iterative change
 ###############################################################################
 User navigable files end in .php, and files included into these files end in .inc and, in general, live in /offensive/assets/.
 
-All files that contain strictly php code must have no leading or trailing whitespace outside of the <? ?> block.
+All files that contain strictly php code must have no leading or trailing whitespace outside of the <?php ?> block.
 
 -------------------------------------------------------------------------------
                                       _           
