@@ -1,30 +1,35 @@
-FROM devilbox/php-fpm:5.6-prod
+# PHP 8.4, matching production since the PHP 8.4 / MariaDB port.
+FROM php:8.4-fpm
 
-# The devilbox image already includes most extensions including imagick
-# No additional apt-get needed
+# mysqli for the app, gd + imagick for thumbnails (Upload::thumb() uses Imagick).
+# imagick is pinned so builds are reproducible. Note that `pecl install`
+# regenerates its arginfo headers with a script that downloads PHP-Parser from
+# GitHub, so building this image needs GitHub access.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        libmagickwand-dev \
+        libpng-dev \
+        libjpeg62-turbo-dev \
+        libfreetype6-dev \
+    && docker-php-ext-configure gd --with-jpeg --with-freetype \
+    && docker-php-ext-install -j"$(nproc)" mysqli gd exif \
+    && pecl install imagick-3.8.0 \
+    && docker-php-ext-enable imagick \
+    && rm -rf /var/lib/apt/lists/* /tmp/pear
 
-# Copy PHP configuration - devilbox uses /usr/local/etc paths
+# Copy PHP configuration
 COPY services/php/php.ini /usr/local/etc/php/php.ini
 COPY services/php/www.conf /usr/local/etc/php-fpm.d/www.conf
 
 # Set working directory
 WORKDIR /var/www/html
 
-# Create upload directories with proper permissions.
-#
-# devilbox is correct here, even though www.conf says user/group = www-data:
-# php-fpm.conf re-declares [www] user/group AFTER its include of php-fpm.d/*.conf
-# ("the following settings overwrite any includes again"), so the pool always runs
-# as devilbox (uid 1000). Verified with ps: workers run as devilbox.
-#
-# In development these paths are bind mounts, so the host's ownership wins over
-# anything set here and the chown only matters for non-mounted deployments.
+# Create upload directories with proper permissions. The pool runs as www-data
+# (see www.conf). In development these paths are bind mounts, so the host's
+# ownership wins over anything set here and the chown only matters for
+# non-mounted deployments.
 RUN mkdir -p /var/www/html/offensive/uploads \
              /var/www/html/offensive/zips \
              /var/www/html/offensive/quarantine \
-    && chown -R devilbox:devilbox /var/www/html/offensive
+    && chown -R www-data:www-data /var/www/html/offensive
 
 EXPOSE 9000
-
-# Use the default entrypoint and command from devilbox image
-# The devilbox image runs php-fpm automatically via its entrypoint
