@@ -29,7 +29,7 @@ rebuild and start over with a fresh database. This deletes your local database:
 ```bash
 docker compose exec db mysqldump -uroot -pshortbus tmbo > backup.sql   # optional, to keep data
 ./scripts/dev-setup.sh   # safe to rerun; on Linux it adds the override below
-docker compose down -v
+docker compose --profile full down -v --remove-orphans
 docker compose --profile full up --build
 ```
 
