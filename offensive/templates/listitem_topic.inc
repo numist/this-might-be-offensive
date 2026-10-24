@@ -18,7 +18,7 @@ if(isset($css) && substr($css, 0, 1) != " ") {
 }
 
 ?>
-<li fileid="<?= $upload->id() ?>">
+<li data-fileid="<?= $upload->id() ?>">
 	<div class="col col1<?= $row_class ?>">
 		<a href="<?= Link::upload($upload) ?>" title="started by <?= htmlEscape($upload->uploader()->username()) ?>">
 			<?= $upload->htmlFilename() ?>
