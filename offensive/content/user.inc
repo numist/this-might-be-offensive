@@ -194,12 +194,10 @@
 							votingRecord( $usrid, $name );
 						?>
 
-						<table width="100%" border="0" cellpadding="0" cellspacing="0">
-									<?php 
-										recentComments($usrid);
-										contributions($usrid)
-									?>
-						</table>
+						<?php
+							recentComments($usrid);
+							contributions($usrid);
+						?>
 					</div>
 					<div class="blackbar"></div>
 				</div>
@@ -211,9 +209,8 @@ function recentComments( $uid ) {
 		return;
 	}
 	
-?><tr><td>
-	<div class="piletitle">the smartypants' most recent remarks:</div>
-	<div style="padding:8px;"><table width="535px">
+?><h3>the smartypants' most recent remarks:</h3>
+	<ul class="imagelist">
 <?php
 
 	// TODO: THIS IS REALLY SLOW
@@ -237,13 +234,12 @@ function recentComments( $uid ) {
 		$seen[$upload->id()] = true;
 		$count++;
 
-		$css = isset($css) && strpos($css, "even") !== false ? "oddfile odd_row" : "evenfile even_row";
 		// XXX: rejigger the query and use Link::comment
-		?><tr class="<?= $css ?>"><td><div style="white-space:nowrap; width:535px; overflow:hidden;"><a class="<?= $css ?>" href="<?= Link::thread($upload) ?>#<?= $row['commentid'] ?>"><?= $upload->htmlFilename() ?></a></div></td></tr><?php
+		?><li><div><a href="<?= Link::thread($upload) ?>#<?= $row['commentid'] ?>"><?= $upload->htmlFilename() ?></a></div></li><?php
 
 	}
 ?>
-	</table></div></td></tr>
+	</ul>
 <?php
 
 }
@@ -324,7 +320,7 @@ function votingRecord( $id, $name ) {
 	$comments = $comments[0];
 
 	if($comments > 1000) {
-		?><div class="piletitle" style="margin-bottom:12px;"><?php echo $name ?> has made <?= $comments ?>  votes/comments<?php
+		?><h3><?php echo $name ?> has made <?= $comments ?>  votes/comments<?php
 	} else {
 		$sql = "SELECT COUNT(*) FROM offensive_comments WHERE userid = $id AND vote = 'this is good'";
 		$result = tmbo_query( $sql );
@@ -336,10 +332,10 @@ function votingRecord( $id, $name ) {
 		$bad = mysqli_fetch_row($result);
 		$bad = $bad[0];
 		
-		?><div class="piletitle" style="margin-bottom:12px;"><?php echo $name ?>'s voting record: +<?= $good ?> -<?= $bad ?><?php
+		?><h3><?php echo $name ?>'s voting record: +<?= $good ?> -<?= $bad ?><?php
 	}
 
-?> (<a href="<?= Link::content("votedetail")."&userid=".$id ?>">click for details</a>)</div>
+?> (<a href="<?= Link::content("votedetail")."&userid=".$id ?>">click for details</a>)</h3>
 <?php
 
 }
@@ -350,35 +346,23 @@ function contributions($usrid) {
 		return;
 	}
 	
-	?><tr><td>
-	<div class="piletitle">
+	?><h3>
 		<a href="<?= Link::mainpage() ?>&userid=<?= $usrid?>"><?= $them->username() ?>'<?= substr($them->username(), -1) == "s" ? "" : "s" ?> contributions to society:</a>
-		<!-- +<?php echo isset($good_votes) ? $good_votes : 0; ?> -<?php echo isset($bad_votes) ? $bad_votes : 0; ?> (<a href="./?c=uservotedetail&userid=<?= $usrid ?>">click for details</a>)--></div>
-		</td></tr>
-		<tr><td valign="top">
-			<div style="padding:8px;">								
-				<table style="width:100%">
-
+		<!-- +<?php echo isset($good_votes) ? $good_votes : 0; ?> -<?php echo isset($bad_votes) ? $bad_votes : 0; ?> (<a href="./?c=uservotedetail&userid=<?= $usrid ?>">click for details</a>)--></h3>
+	<ul class="imagelist">
 <?php
 	$uploads = core_getuploads(array("userid" => $usrid));
-	$class = 'evenfile';
 	foreach($uploads as $upload) {
-		$css = isset($css) && strpos($css, "even") !== false ? "oddfile odd_row" : "evenfile even_row";
 		?>
-			<tr class="<?= $css ?>">
-				<td style="width:100%"><div style="overflow:hidden;white-space:nowrap;width:285px;"><a class="<?= $css ?>" href="<?= Link::upload($upload) ?>"><?= $upload->htmlFilename(true) ?></div></td>
-				<td class="<?= $css?>" style="text-align:right;white-space:nowrap;width:100%">
-					<a href="<?= Link::thread($upload) ?>" class="<?= $css?>"><?=$upload->commentLabel(!($upload->type() == 'topic'));?></a>
-				</td>
-				<td style="text-align:right;white-space:nowrap;width:100%" class="<?= $css?>"><?= $upload->timestamp() ?></td>
-			</tr>
+		<li>
+			<div><a href="<?= Link::upload($upload) ?>"><?= $upload->htmlFilename(true) ?></a></div>
+			<div><a href="<?= Link::thread($upload) ?>" title="<?= $upload->timestamp() ?>"><?=$upload->commentLabel(!($upload->type() == 'topic'));?></a></div>
+		</li>
 		<?php
 	}
 ?>
-
-				</table>
-			</div>
-		</td></tr><?php
+	</ul>
+<?php
 }
 
 ?>
