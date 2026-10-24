@@ -2,8 +2,9 @@
 FROM php:8.4-fpm
 
 # mysqli for the app, gd + imagick for thumbnails (Upload::thumb() uses Imagick).
-# imagick is pinned: 3.8.1's install regenerates arginfo headers with a script
-# that downloads PHP-Parser from GitHub, so it fails without GitHub access.
+# imagick is pinned so builds are reproducible. Note that `pecl install`
+# regenerates its arginfo headers with a script that downloads PHP-Parser from
+# GitHub, so building this image needs GitHub access.
 RUN apt-get update && apt-get install -y --no-install-recommends \
         libmagickwand-dev \
         libpng-dev \
