@@ -41,7 +41,7 @@
 				}
 
 				socket.on('comment', function(comment) {
-					var old_row = $("li[fileid=" + comment.fileid +"]");
+					var old_row = $("li[data-fileid=" + comment.fileid +"]");
 					if (old_row.length > 0) {
 						var count = parseInt(old_row.find('.comments').text()) + 1;
 						var label = count == 1 ? 'comment' : 'comments';

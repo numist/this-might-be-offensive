@@ -67,15 +67,15 @@ var infScrLoadingFeedback = 'loading…';
           },
           success: function(data) {
             // use nodetype to grab elements
-            var filteredData = $(data).find("li[fileid]");
+            var filteredData = $(data).find("li[data-fileid]");
 
             if(filteredData.length > 0) {
               // append unique items (determined by fileid=xxxx)
               $.each(filteredData, function(i, item) {
-                if($('li[fileid="'+$(item).attr("fileid")+'"]').length == 0) {
+                if($('li[data-fileid="'+$(item).attr("data-fileid")+'"]').length == 0) {
                   if(typeof prep_item == "function") {
                     // if needed, prep the item (for css)
-                    item = prep_item(item, $('li[fileid]').last());
+                    item = prep_item(item, $('li[data-fileid]').last());
                   }
                   $('#grid-container ul').append(item);
                 }
