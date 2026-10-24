@@ -95,6 +95,8 @@ services:
       - ./admin/.config.generated:/app/admin/.config:ro
     environment:
       - NODE_ENV=development
+      # app.js listens on loopback unless told otherwise; nginx is in another container.
+      - REALTIME_HOST=0.0.0.0
     depends_on:
       db:
         condition: service_healthy
