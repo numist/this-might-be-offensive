@@ -209,7 +209,7 @@ function recentComments( $uid ) {
 		return;
 	}
 	
-?><div class="piletitle">the smartypants' most recent remarks:</div>
+?><h3>the smartypants' most recent remarks:</h3>
 	<ul class="imagelist">
 <?php
 
@@ -320,7 +320,7 @@ function votingRecord( $id, $name ) {
 	$comments = $comments[0];
 
 	if($comments > 1000) {
-		?><div class="piletitle" style="margin-bottom:12px;"><?php echo $name ?> has made <?= $comments ?>  votes/comments<?php
+		?><h3><?php echo $name ?> has made <?= $comments ?>  votes/comments<?php
 	} else {
 		$sql = "SELECT COUNT(*) FROM offensive_comments WHERE userid = $id AND vote = 'this is good'";
 		$result = tmbo_query( $sql );
@@ -332,10 +332,10 @@ function votingRecord( $id, $name ) {
 		$bad = mysqli_fetch_row($result);
 		$bad = $bad[0];
 		
-		?><div class="piletitle" style="margin-bottom:12px;"><?php echo $name ?>'s voting record: +<?= $good ?> -<?= $bad ?><?php
+		?><h3><?php echo $name ?>'s voting record: +<?= $good ?> -<?= $bad ?><?php
 	}
 
-?> (<a href="<?= Link::content("votedetail")."&userid=".$id ?>">click for details</a>)</div>
+?> (<a href="<?= Link::content("votedetail")."&userid=".$id ?>">click for details</a>)</h3>
 <?php
 
 }
@@ -346,9 +346,9 @@ function contributions($usrid) {
 		return;
 	}
 	
-	?><div class="piletitle">
+	?><h3>
 		<a href="<?= Link::mainpage() ?>&userid=<?= $usrid?>"><?= $them->username() ?>'<?= substr($them->username(), -1) == "s" ? "" : "s" ?> contributions to society:</a>
-		<!-- +<?php echo isset($good_votes) ? $good_votes : 0; ?> -<?php echo isset($bad_votes) ? $bad_votes : 0; ?> (<a href="./?c=uservotedetail&userid=<?= $usrid ?>">click for details</a>)--></div>
+		<!-- +<?php echo isset($good_votes) ? $good_votes : 0; ?> -<?php echo isset($bad_votes) ? $bad_votes : 0; ?> (<a href="./?c=uservotedetail&userid=<?= $usrid ?>">click for details</a>)--></h3>
 	<ul class="imagelist">
 <?php
 	$uploads = core_getuploads(array("userid" => $usrid));
