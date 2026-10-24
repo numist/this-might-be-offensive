@@ -18,11 +18,31 @@ To include cron jobs (for zip file creation, cleanup, and comment indexing):
 docker compose --profile full up
 ```
 
+The stack matches production: PHP 8.4 and MariaDB 10.11. On first start, with an
+empty database volume, the db container loads `admin/database/schema.sql` and
+`populate.sql` (see `services/db/init.sh`).
+
+**Upgrading from the old PHP 5.6 / MySQL 8.0 setup:** MariaDB can't start on a
+volume MySQL 8.0 created, and the schema is only loaded into an empty volume, so
+rebuild and start over with a fresh database. This deletes your local database:
+
+```bash
+docker compose exec db mysqldump -uroot -pshortbus tmbo > backup.sql   # optional, to keep data
+./scripts/dev-setup.sh   # safe to rerun; on Linux it adds the override below
+docker compose --profile full down -v --remove-orphans
+docker compose --profile full up --build
+```
+
+**Linux hosts:** the bind-mounted files belong to you, and `admin/.config.generated`
+is readable only by you. `dev-setup.sh` writes a gitignored
+`docker-compose.override.yml` that runs PHP-FPM as your uid, so no permission
+changes are needed. Docker Desktop on macOS doesn't need it and skips it.
+
 **Services:**
 
 - **nginx** - Web server (ports 80/443)
-- **php** - PHP-FPM for application code
-- **db** - MySQL 8.0 (exposed on port 3307 for local access)
+- **php** - PHP 8.4 FPM for application code
+- **db** - MariaDB 10.11 (exposed on port 3307 for local access)
 - **redis** - Session and cache storage
 - **realtime** - Node.js WebSocket server
 - **cron** - Scheduled tasks (only with `--profile full`)
