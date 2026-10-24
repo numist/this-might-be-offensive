@@ -2,6 +2,8 @@
 FROM php:8.4-fpm
 
 # mysqli for the app, gd + imagick for thumbnails (Upload::thumb() uses Imagick).
+# imagick is pinned: 3.8.1's install regenerates arginfo headers with a script
+# that downloads PHP-Parser from GitHub, so it fails without GitHub access.
 RUN apt-get update && apt-get install -y --no-install-recommends \
         libmagickwand-dev \
         libpng-dev \
@@ -9,7 +11,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libfreetype6-dev \
     && docker-php-ext-configure gd --with-jpeg --with-freetype \
     && docker-php-ext-install -j"$(nproc)" mysqli gd exif \
-    && pecl install imagick \
+    && pecl install imagick-3.8.0 \
     && docker-php-ext-enable imagick \
     && rm -rf /var/lib/apt/lists/* /tmp/pear
 
