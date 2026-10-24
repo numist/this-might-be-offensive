@@ -158,6 +158,10 @@ label {
         grid-column: 1 / -1;
         grid-template-columns: subgrid;
         padding: var(--spacing-xs);
+        /* unbroken filenames otherwise spill into the comments column */
+        > :first-child {
+            overflow-wrap: anywhere;
+        }
 
         @media (width < 800px) {
             /* .commentlabel {
@@ -170,37 +174,6 @@ label {
             background: var(--color-brand-light-alt);
         }
     }
-}
-
-/* profile page lists (user.inc) */
-.userlist {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0 var(--spacing-sm);
-    margin-block: var(--spacing-xs) var(--spacing);
-
-    &.contributions {
-        grid-template-columns: minmax(0, 1fr) max-content max-content;
-
-        /* the filename is what matters; drop the timestamp on phones */
-        @media (width < 800px) {
-            grid-template-columns: minmax(0, 1fr) max-content;
-
-            li > :nth-child(3) {
-                display: none;
-            }
-        }
-    }
-
-    li > :not(:first-child) {
-        text-align: right;
-        white-space: nowrap;
-    }
-}
-
-.clipper {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .piletitle {

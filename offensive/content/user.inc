@@ -210,7 +210,7 @@ function recentComments( $uid ) {
 	}
 	
 ?><div class="piletitle">the smartypants' most recent remarks:</div>
-	<ul class="imagelist userlist">
+	<ul class="imagelist">
 <?php
 
 	// TODO: THIS IS REALLY SLOW
@@ -235,7 +235,7 @@ function recentComments( $uid ) {
 		$count++;
 
 		// XXX: rejigger the query and use Link::comment
-		?><li><div class="clipper"><a href="<?= Link::thread($upload) ?>#<?= $row['commentid'] ?>"><?= $upload->htmlFilename() ?></a></div></li><?php
+		?><li><div><a href="<?= Link::thread($upload) ?>#<?= $row['commentid'] ?>"><?= $upload->htmlFilename() ?></a></div></li><?php
 
 	}
 ?>
@@ -349,15 +349,14 @@ function contributions($usrid) {
 	?><div class="piletitle">
 		<a href="<?= Link::mainpage() ?>&userid=<?= $usrid?>"><?= $them->username() ?>'<?= substr($them->username(), -1) == "s" ? "" : "s" ?> contributions to society:</a>
 		<!-- +<?php echo isset($good_votes) ? $good_votes : 0; ?> -<?php echo isset($bad_votes) ? $bad_votes : 0; ?> (<a href="./?c=uservotedetail&userid=<?= $usrid ?>">click for details</a>)--></div>
-	<ul class="imagelist userlist contributions">
+	<ul class="imagelist">
 <?php
 	$uploads = core_getuploads(array("userid" => $usrid));
 	foreach($uploads as $upload) {
 		?>
 		<li>
-			<div class="clipper"><a href="<?= Link::upload($upload) ?>"><?= $upload->htmlFilename(true) ?></a></div>
-			<div><a href="<?= Link::thread($upload) ?>"><?=$upload->commentLabel(!($upload->type() == 'topic'));?></a></div>
-			<div><?= $upload->timestamp() ?></div>
+			<div><a href="<?= Link::upload($upload) ?>"><?= $upload->htmlFilename(true) ?></a></div>
+			<div><a href="<?= Link::thread($upload) ?>" title="<?= $upload->timestamp() ?>"><?=$upload->commentLabel(!($upload->type() == 'topic'));?></a></div>
 		</li>
 		<?php
 	}
