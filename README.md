@@ -28,19 +28,15 @@ rebuild and start over with a fresh database. This deletes your local database:
 
 ```bash
 docker compose exec db mysqldump -uroot -pshortbus tmbo > backup.sql   # optional, to keep data
+./scripts/dev-setup.sh   # safe to rerun; on Linux it adds the override below
 docker compose down -v
 docker compose --profile full up --build
 ```
 
-**Linux hosts:** PHP-FPM runs as `www-data` (uid 33). `dev-setup.sh` creates
-`admin/.config.generated` readable only by you, and the upload directories are
-owned by you, so PHP can't read its config ("No configuration file found") or
-write uploads. Docker Desktop on macOS hides this. On Linux, run:
-
-```bash
-chmod 644 admin/.config.generated
-sudo chown -R 33:33 services/web/src/offensive
-```
+**Linux hosts:** the bind-mounted files belong to you, and `admin/.config.generated`
+is readable only by you. `dev-setup.sh` writes a gitignored
+`docker-compose.override.yml` that runs PHP-FPM as your uid, so no permission
+changes are needed. Docker Desktop on macOS doesn't need it and skips it.
 
 **Services:**
 
