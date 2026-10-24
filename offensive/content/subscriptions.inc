@@ -59,7 +59,7 @@
 			$row['filename'] = htmlEscape($row['filename']);
 			$css = (isset($css) && $css == "odd_row") ? "even_row" : "odd_row";
 			?>
-						<li class="grid_row" fileid="<?= $row['fileid'] ?>">
+						<li class="grid_row" data-fileid="<?= $row['fileid'] ?>">
 							<div class="col col1 <?= $css ?>">
 								<a href="<?= Link::thread($row['fileid']) ?>"><?= $row['filename'] ?></a>
 							</div>

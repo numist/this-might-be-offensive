@@ -10,7 +10,7 @@ if(!defined("TMBO") || !isset($upload)) {
 }
 
 ?>
-<li fileid="<?= $upload->id() ?>">
+<li data-fileid="<?= $upload->id() ?>">
 	<div class="thumbcontainer">
 		<div><a href="<?= Link::upload($upload) ?>"
 			<?php if($upload->filtered()) { ?>
