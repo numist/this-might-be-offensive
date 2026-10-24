@@ -27,7 +27,7 @@ a:visited {
 	padding: 10px;
 	font-size: 1.1rem;
 	line-height: 2;
-	word-wrap: break-word;
+	overflow-wrap: break-word;
 }
 
 .blocked, a.blocked {
@@ -71,14 +71,15 @@ label {
 
 #content {
     display: grid;
-    grid-template-columns: 175px 1fr;
+    /* minmax(0, …) so a long unbroken word can't stretch the column past max-width */
+    grid-template-columns: 175px minmax(0, 1fr);
     /* gap: 12px; */
     gap: var(--spacing-lg);
     max-width: 775px;
     margin: 0 auto;
 
     @media (width < 800px) {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
 
         #leftcol {
             display: none;
