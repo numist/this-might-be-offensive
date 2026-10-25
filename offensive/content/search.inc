@@ -73,7 +73,7 @@
 				<tr>
 					<td width="200px">
 						<?php if( $page > 0 ) { ?>
-							<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'] ?>&find=<?= urlencode($_REQUEST['find']) ?>&p=<?= $page - 1 ?>">&laquo;&nbsp;<b>previous&nbsp;page</b></a></td>
+							<a href="<?= $_SERVER['SCRIPT_NAME'] ?>?c=<?= $_REQUEST['c'] ?>&find=<?= urlencode($_REQUEST['find']) ?>&p=<?= $page - 1 ?>">&laquo;&nbsp;<b>previous&nbsp;page</b></a></td>
 						<?php } ?>
 					</td>
 					<td style="text-align:center">
@@ -89,7 +89,7 @@
 					</td>
 					<td style="text-align:right" width="200px">
 						<?php if( $start + $numperpage < $matches->get_matches_estimated() ) { ?>
-							<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'] ?>&find=<?= urlencode($_REQUEST['find']) ?>&p=<?= $page + 1 ?>"><b>next&nbsp;page</b></a>&nbsp;&raquo;
+							<a href="<?= $_SERVER['SCRIPT_NAME'] ?>?c=<?= $_REQUEST['c'] ?>&find=<?= urlencode($_REQUEST['find']) ?>&p=<?= $page + 1 ?>"><b>next&nbsp;page</b></a>&nbsp;&raquo;
 						<?php } ?>
 					</td>
 				</tr>        
@@ -166,7 +166,7 @@
 				<tr>
 					<td width="200px">
 						<?php if( $page > 0 ) { ?>
-							<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'] ?>&find=<?= urlencode($_REQUEST['find']) ?>&p=<?= $page - 1 ?>">&laquo;&nbsp;<b>previous&nbsp;page</b></a></td>
+							<a href="<?= $_SERVER['SCRIPT_NAME'] ?>?c=<?= $_REQUEST['c'] ?>&find=<?= urlencode($_REQUEST['find']) ?>&p=<?= $page - 1 ?>">&laquo;&nbsp;<b>previous&nbsp;page</b></a></td>
 						<?php } ?>
 					</td>
 					<td style="text-align:center">
@@ -176,7 +176,7 @@
 					</td>
 					<td style="text-align:right" width="200px">
 						<?php if( $start + $numperpage < $matches->get_matches_estimated() ) { ?>
-							<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'] ?>&find=<?= urlencode($_REQUEST['find']) ?>&p=<?= $page + 1 ?>"><b>next&nbsp;page</b></a>&nbsp;&raquo;
+							<a href="<?= $_SERVER['SCRIPT_NAME'] ?>?c=<?= $_REQUEST['c'] ?>&find=<?= urlencode($_REQUEST['find']) ?>&p=<?= $page + 1 ?>"><b>next&nbsp;page</b></a>&nbsp;&raquo;
 						<?php } ?>
 					</td>
 				</tr>        

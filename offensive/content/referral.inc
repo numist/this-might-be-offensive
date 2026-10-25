@@ -17,7 +17,7 @@
 				exit;
 			}
 			sendInvitation( $_REQUEST['invite'] );
-			header( "Location: " . $_SERVER['PHP_SELF'] . "?c=referral&s=1" );
+			header( "Location: " . $_SERVER['SCRIPT_NAME'] . "?c=referral&s=1" );
 			exit;
 		}
 	}
@@ -144,7 +144,7 @@ Enjoy.
 			please use it wisely.</p>
 
 			<p>
-				<form action="<?= $_SERVER['PHP_SELF'] ?>">
+				<form action="<?= $_SERVER['SCRIPT_NAME'] ?>">
 					<input type="hidden" name="c" value="referral"/>
 					<input type="text" name="invite"/>
 					<input type="submit" value="this dude is cool. i promise."/>

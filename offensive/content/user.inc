@@ -30,7 +30,7 @@
 ?>
 	<div style="margin-bottom:12px">
 		<form method="post"
-				action="<?php echo $_SERVER['PHP_SELF']?>"
+				action="<?php echo $_SERVER['SCRIPT_NAME']?>"
 				enctype="multipart/form-data"
 				onsubmit="return (this.elements['image'].value != '')">
 
@@ -283,7 +283,7 @@ function setStatusForm( $id, $status, $email ) {
 	
 	?>
 		<div style="margin:8px 0px;">
-			<form action="<?= $_SERVER['PHP_SELF']?>" method="post">
+			<form action="<?= $_SERVER['SCRIPT_NAME']?>" method="post">
 				<input type="hidden" name="c" value="user"/>
 				<input type="hidden" name="csrf" value="<?= htmlEscape(csrfToken()) ?>"/>
 				<input type="hidden" name="userid" value="<?= $id ?>"/>

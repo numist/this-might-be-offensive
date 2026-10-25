@@ -79,7 +79,7 @@ https://thismight.be/offensive/pwreset.php?x=".urlencode( $code )."
 	function emitResetForm( $code ) {
 	?>
 		<span class="small">
-			<form action="<?= $_SERVER['PHP_SELF']?>" method="post">
+			<form action="<?= $_SERVER['SCRIPT_NAME']?>" method="post">
 				<input type="hidden" name="x2" value="<?= $code ?>"/>
 				<input type="hidden" name="x" value="<?= $code ?>"/>
 				<table>
@@ -110,7 +110,7 @@ https://thismight.be/offensive/pwreset.php?x=".urlencode( $code )."
 	function sendMessageForm() {
 	?>
 		<span class="small">
-			<form action="<?= $_SERVER['PHP_SELF']?>" method="post">
+			<form action="<?= $_SERVER['SCRIPT_NAME']?>" method="post">
 				<table>
 					<tr>
 						<td colspan="2"><?php echo isset($login_message) ? $login_message : ""; ?></td>

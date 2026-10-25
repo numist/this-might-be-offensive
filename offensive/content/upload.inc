@@ -57,7 +57,7 @@
 
 
 					<form id="uploadform" method="post"
-					      action="<?php echo $_SERVER['PHP_SELF']?>"
+					      action="<?php echo $_SERVER['SCRIPT_NAME']?>"
 					      enctype="multipart/form-data">
 						<!-- the file input shows only its button (styles/upload.css); once a
 						     file is picked, the title field and extension take the place of

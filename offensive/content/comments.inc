@@ -376,7 +376,7 @@
 			<div class="heading"><?= $add_comment_heading?></div>
 			<div class="bluebox" style="text-align:center">			
 			<a name="form"></a>
-			<form method="POST" id="comment_form" action="<?php echo $_SERVER['PHP_SELF']?>">
+			<form method="POST" id="comment_form" action="<?php echo $_SERVER['SCRIPT_NAME']?>">
 
 			
 				<p>

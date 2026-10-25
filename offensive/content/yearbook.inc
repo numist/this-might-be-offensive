@@ -105,7 +105,7 @@
 						$args["p"] = 1;
 					}
 				?>
-				<p id="morelink"><a href="<?= $_SERVER['PHP_SELF'] ?>?<?= http_build_query($args) ?>">more…</a></p>
+				<p id="morelink"><a href="<?= $_SERVER['SCRIPT_NAME'] ?>?<?= http_build_query($args) ?>">more…</a></p>
 			</div>
 		</div>
 <?php
