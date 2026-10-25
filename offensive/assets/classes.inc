@@ -38,5 +38,6 @@ require_once("offensive/classes/comment.inc");
 require_once("offensive/classes/user.inc");
 require_once("offensive/classes/link.inc");
 require_once("offensive/classes/token.inc");
+require_once("offensive/classes/linkPreview.inc");
 
 ?>

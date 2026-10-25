@@ -68,3 +68,64 @@
 textarea {
     width: 100%;
 }
+
+/* link previews (LinkPreview): hidden until the link is hovered or focused.
+   absolutely positioned so showing one never moves the page. */
+.comment_body a {
+    position: relative;
+
+    > span {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        z-index: 10;
+        width: min(32rem, 80vw);
+        padding: var(--spacing-xs);
+        background: var(--bg-content);
+        border: 1px solid var(--color-brand-medium);
+        color: var(--color-brand-dark);
+        font-size: 1.1rem;
+        line-height: 1.4;
+    }
+
+    img {
+        display: block;
+        width: 100%;
+        aspect-ratio: 16 / 9;
+        object-fit: cover;
+        margin-bottom: var(--spacing-xs);
+    }
+
+    small {
+        display: block;
+        color: var(--color-brand-medium);
+    }
+}
+
+/* phones have no hover; a tap should just follow the link */
+@media (hover: hover) {
+    .comment_body a:hover > span {
+        display: block;
+    }
+}
+
+.comment_body a:focus-visible > span {
+    display: block;
+}
+
+/* where supported, escape scrolling containers (the quick comment dialog) and
+   flip away from the edge of the screen */
+@supports (anchor-name: --a) {
+    .comment_body a:is(:hover, :focus-visible) {
+        anchor-name: --link-preview;
+    }
+
+    .comment_body a > span {
+        position: fixed;
+        position-anchor: --link-preview;
+        top: anchor(bottom);
+        left: anchor(left);
+        position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;
+    }
+}

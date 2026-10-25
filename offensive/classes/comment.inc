@@ -168,7 +168,9 @@ class Comment {
 		return $comment;
 	}
 	
-	public function HTMLcomment() {
+	/* $previews adds hover previews to links that have one (see LinkPreview),
+	 * for pages that load the css for them. */
+	public function HTMLcomment($previews = false) {
 		$comment = $this->text();
 		if($comment == "") return "";
 
@@ -190,8 +192,10 @@ class Comment {
 		// linkify all bare URLs
 		$comment = " ".$comment." ";
 		$p = '/(http[s]?:\\/\\/[^\s<>]+)/i';
-		$r = '<a href="$1" rel="nofollow">$1</a>';
-		$comment = preg_replace( $p, $r, $comment );
+		$comment = preg_replace_callback( $p, function($m) use ($previews) {
+			$preview = $previews ? LinkPreview::html(html_entity_decode($m[1], ENT_QUOTES)) : "";
+			return '<a href="'.$m[1].'" rel="nofollow">'.$m[1].$preview.'</a>';
+		}, $comment );
 		$comment = trim($comment);
 
 		$comment = nl2br($comment);
