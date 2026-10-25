@@ -20,6 +20,33 @@
         --columns: repeat(6, max-content);
     }
 
+    /* on a phone the title column gives way and wraps, so rows fit the screen */
+    @media (width < 800px) {
+        --columns: minmax(0, 1fr) max-content;
+
+        /* topic title on its own line, comment count and latest comment below it */
+        #discussions {
+            --columns: minmax(0, 1fr) max-content;
+
+            .col1 {
+                grid-column: 1 / -1;
+            }
+        }
+
+        /* filename on its own line next to the rank, the other columns below it */
+        #hof {
+            --columns: max-content minmax(0, 1fr) repeat(3, max-content);
+
+            .col2 {
+                grid-column: 2 / -1;
+            }
+
+            .col3 {
+                grid-column: 2;
+            }
+        }
+    }
+
     .grid {
         margin: 5px 0 15px 0;
 
@@ -40,6 +67,7 @@
                 grid-column: 1 / -1;
                 grid-template-columns: subgrid;
                 padding: var(--spacing-xs);
+                overflow-wrap: break-word;
         
                 /* @media (width < 800px) {
                     .commentlabel {

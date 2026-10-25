@@ -244,7 +244,7 @@
 					<textarea cols="64" rows="6" name="comment" id="qc_comment"></textarea>
 
 					<?php if($upload->canVote()) { ?>
-						<div id="qc_vote" style="text-align:left;margin-left:14%">
+						<div id="qc_vote">
 							<table><tbody><tr><td width="200px">
 							<input class="qc_tigtib" id="qc_novote" type="radio" value="novote" name="vote" checked="">
 							<br>
