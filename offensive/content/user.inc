@@ -155,9 +155,7 @@
 // XXX: avatar history
 								if($avatar->file() && !$avatar->squelched()) {
 								?>
-									<div class="piletitle" style="margin-bottom:12px;">
-										<a href="<?= Link::upload($avatar) ?>"><?= $name ?> is gorgeous.</a>
-									</div>
+									<p><a href="<?= Link::upload($avatar) ?>"><?= $name ?> is gorgeous.</a></p>
 									<!-- next onclick="img.src=arr[i]" -->
 								<?php
 								}
@@ -176,9 +174,7 @@
 							if( $possecount > 0 ) {
 							
 						?>
-								<div class="piletitle" style="margin-bottom:12px;">
-									<a href="<?= Link::content("posse")."&userid=".$usrid ?>"><?= $name ?> has a posse.</a>
-								</div>
+								<p><a href="<?= Link::content("posse")."&userid=".$usrid ?>"><?= $name ?> has a posse.</a></p>
 
 						<?php
 							}
