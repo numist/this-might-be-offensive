@@ -26,7 +26,7 @@ define('GETID3_JPG_EOI',     "\xD9"); // End Of Image (end of datastream)
 class getid3_lib
 {
 
-	function PrintHexBytes($string, $hex=true, $spaces=true, $htmlsafe=true) {
+	static function PrintHexBytes($string, $hex=true, $spaces=true, $htmlsafe=true) {
 		$returnstring = '';
 		for ($i = 0; $i < strlen($string); $i++) {
 			if ($hex) {
@@ -44,7 +44,7 @@ class getid3_lib
 		return $returnstring;
 	}
 
-	function SafeStripSlashes($text) {
+	static function SafeStripSlashes($text) {
 		if (false) { // magic_quotes_gpc was removed in PHP 5.4
 			return stripslashes($text);
 		}
@@ -85,14 +85,14 @@ class getid3_lib
 	}
 
 
-	function DecimalBinary2Float($binarynumerator) {
+	static function DecimalBinary2Float($binarynumerator) {
 		$numerator   = getid3_lib::Bin2Dec($binarynumerator);
 		$denominator = getid3_lib::Bin2Dec('1'.str_repeat('0', strlen($binarynumerator)));
 		return ($numerator / $denominator);
 	}
 
 
-	function NormalizeBinaryPoint($binarypointnumber, $maxbits=52) {
+	static function NormalizeBinaryPoint($binarypointnumber, $maxbits=52) {
 		// http://www.scri.fsu.edu/~jac/MAD3401/Backgrnd/binary.html
 		if (strpos($binarypointnumber, '.') === false) {
 			$binarypointnumber = '0.'.$binarypointnumber;
@@ -116,7 +116,7 @@ class getid3_lib
 	}
 
 
-	function Float2BinaryDecimal($floatvalue) {
+	static function Float2BinaryDecimal($floatvalue) {
 		// http://www.scri.fsu.edu/~jac/MAD3401/Backgrnd/binary.html
 		$maxbits = 128; // to how many bits of precision should the calculations be taken?
 		$intpart   = getid3_lib::trunc($floatvalue);
@@ -132,7 +132,7 @@ class getid3_lib
 	}
 
 
-	function Float2String($floatvalue, $bits) {
+	static function Float2String($floatvalue, $bits) {
 		// http://www.scri.fsu.edu/~jac/MAD3401/Backgrnd/ieee-expl.html
 		switch ($bits) {
 			case 32:
@@ -163,12 +163,12 @@ class getid3_lib
 	}
 
 
-	function LittleEndian2Float($byteword) {
+	static function LittleEndian2Float($byteword) {
 		return getid3_lib::BigEndian2Float(strrev($byteword));
 	}
 
 
-	function BigEndian2Float($byteword) {
+	static function BigEndian2Float($byteword) {
 		// ANSI/IEEE Standard 754-1985, Standard for Binary Floating Point Arithmetic
 		// http://www.psc.edu/general/software/packages/ieee/ieee.html
 		// http://www.scri.fsu.edu/~jac/MAD3401/Backgrnd/ieee.html
@@ -275,12 +275,12 @@ class getid3_lib
 	}
 
 
-	function LittleEndian2Int($byteword, $signed=false) {
+	static function LittleEndian2Int($byteword, $signed=false) {
 		return getid3_lib::BigEndian2Int(strrev($byteword), false, $signed);
 	}
 
 
-	function BigEndian2Bin($byteword) {
+	static function BigEndian2Bin($byteword) {
 		$binvalue = '';
 		$bytewordlen = strlen($byteword);
 		for ($i = 0; $i < $bytewordlen; $i++) {
@@ -290,7 +290,7 @@ class getid3_lib
 	}
 
 
-	function BigEndian2String($number, $minbytes=1, $synchsafe=false, $signed=false) {
+	static function BigEndian2String($number, $minbytes=1, $synchsafe=false, $signed=false) {
 		if ($number < 0) {
 			return false;
 		}
@@ -311,7 +311,7 @@ class getid3_lib
 	}
 
 
-	function Dec2Bin($number) {
+	static function Dec2Bin($number) {
 		while ($number >= 256) {
 			$bytes[] = (($number / 256) - (floor($number / 256))) * 256;
 			$number = floor($number / 256);
@@ -325,7 +325,7 @@ class getid3_lib
 	}
 
 
-	function Bin2Dec($binstring, $signed=false) {
+	static function Bin2Dec($binstring, $signed=false) {
 		$signmult = 1;
 		if ($signed) {
 			if ($binstring[0] == '1') {
@@ -341,7 +341,7 @@ class getid3_lib
 	}
 
 
-	function Bin2String($binstring) {
+	static function Bin2String($binstring) {
 		// return 'hi' for input of '0110100001101001'
 		$string = '';
 		$binstringreversed = strrev($binstring);
@@ -352,7 +352,7 @@ class getid3_lib
 	}
 
 
-	function LittleEndian2String($number, $minbytes=1, $synchsafe=false) {
+	static function LittleEndian2String($number, $minbytes=1, $synchsafe=false) {
 		$intstring = '';
 		while ($number > 0) {
 			if ($synchsafe) {
@@ -367,7 +367,7 @@ class getid3_lib
 	}
 
 
-	function array_merge_clobber($array1, $array2) {
+	static function array_merge_clobber($array1, $array2) {
 		// written by kcÿhireability*com
 		// taken from http://www.php.net/manual/en/function.array-merge-recursive.php
 		if (!is_array($array1) || !is_array($array2)) {
@@ -385,7 +385,7 @@ class getid3_lib
 	}
 
 
-	function array_merge_noclobber($array1, $array2) {
+	static function array_merge_noclobber($array1, $array2) {
 		if (!is_array($array1) || !is_array($array2)) {
 			return false;
 		}
@@ -401,7 +401,7 @@ class getid3_lib
 	}
 
 
-	function fileextension($filename, $numextensions=1) {
+	static function fileextension($filename, $numextensions=1) {
 		if (strstr($filename, '.')) {
 			$reversedfilename = strrev($filename);
 			$offset = 0;
@@ -417,7 +417,7 @@ class getid3_lib
 	}
 
 
-	function PlaytimeString($playtimeseconds) {
+	static function PlaytimeString($playtimeseconds) {
 		$contentseconds = round((($playtimeseconds / 60) - floor($playtimeseconds / 60)) * 60);
 		$contentminutes = floor($playtimeseconds / 60);
 		if ($contentseconds >= 60) {
@@ -428,7 +428,7 @@ class getid3_lib
 	}
 
 
-	function image_type_to_mime_type($imagetypeid) {
+	static function image_type_to_mime_type($imagetypeid) {
 		// only available in PHP v4.3.0+
 		static $image_type_to_mime_type = array();
 		if (empty($image_type_to_mime_type)) {
@@ -451,30 +451,30 @@ class getid3_lib
 	}
 
 
-	function DateMac2Unix($macdate) {
+	static function DateMac2Unix($macdate) {
 		// Macintosh timestamp: seconds since 00:00h January 1, 1904
 		// UNIX timestamp:      seconds since 00:00h January 1, 1970
 		return getid3_lib::CastAsInt($macdate - 2082844800);
 	}
 
 
-	function FixedPoint8_8($rawdata) {
+	static function FixedPoint8_8($rawdata) {
 		return getid3_lib::BigEndian2Int(substr($rawdata, 0, 1)) + (float) (getid3_lib::BigEndian2Int(substr($rawdata, 1, 1)) / pow(2, 8));
 	}
 
 
-	function FixedPoint16_16($rawdata) {
+	static function FixedPoint16_16($rawdata) {
 		return getid3_lib::BigEndian2Int(substr($rawdata, 0, 2)) + (float) (getid3_lib::BigEndian2Int(substr($rawdata, 2, 2)) / pow(2, 16));
 	}
 
 
-	function FixedPoint2_30($rawdata) {
+	static function FixedPoint2_30($rawdata) {
 		$binarystring = getid3_lib::BigEndian2Bin($rawdata);
 		return getid3_lib::Bin2Dec(substr($binarystring, 0, 2)) + (float) (getid3_lib::Bin2Dec(substr($binarystring, 2, 30)) / 1073741824);
 	}
 
 
-	function CreateDeepArray($ArrayPath, $Separator, $Value) {
+	static function CreateDeepArray($ArrayPath, $Separator, $Value) {
 		// assigns $Value to a nested array path:
 		//   $foo = getid3_lib::CreateDeepArray('/path/to/my', '/', 'file.txt')
 		// is the same as:
@@ -492,7 +492,7 @@ class getid3_lib
 		return $ReturnedArray;
 	}
 
-	function array_max($arraydata, $returnkey=false) {
+	static function array_max($arraydata, $returnkey=false) {
 		$maxvalue = false;
 		$maxkey = false;
 		foreach ($arraydata as $key => $value) {
@@ -506,7 +506,7 @@ class getid3_lib
 		return ($returnkey ? $maxkey : $maxvalue);
 	}
 
-	function array_min($arraydata, $returnkey=false) {
+	static function array_min($arraydata, $returnkey=false) {
 		$minvalue = false;
 		$minkey = false;
 		foreach ($arraydata as $key => $value) {
@@ -521,7 +521,7 @@ class getid3_lib
 	}
 
 
-	function md5_file($file) {
+	static function md5_file($file) {
 
 		// md5_file() exists in PHP 4.2.0+.
 		if (function_exists('md5_file')) {
@@ -554,7 +554,7 @@ class getid3_lib
 	}
 
 
-	function sha1_file($file) {
+	static function sha1_file($file) {
 
 		// sha1_file() exists in PHP 4.3.0+.
 		if (function_exists('sha1_file')) {
@@ -591,7 +591,7 @@ class getid3_lib
 
 	// Allan Hansen <ahÿartemis*dk>
 	// getid3_lib::md5_data() - returns md5sum for a file from startuing position to absolute end position
-	function hash_data($file, $offset, $end, $algorithm) {
+	static function hash_data($file, $offset, $end, $algorithm) {
 
 		switch ($algorithm) {
 			case 'md5':
@@ -702,7 +702,7 @@ class getid3_lib
 	}
 
 	// ISO-8859-1 => UTF-8
-	function iconv_fallback_iso88591_utf8($string, $bom=false) {
+	static function iconv_fallback_iso88591_utf8($string, $bom=false) {
 		if (function_exists('utf8_encode')) {
 			return utf8_encode($string);
 		}
@@ -719,7 +719,7 @@ class getid3_lib
 	}
 
 	// ISO-8859-1 => UTF-16BE
-	function iconv_fallback_iso88591_utf16be($string, $bom=false) {
+	static function iconv_fallback_iso88591_utf16be($string, $bom=false) {
 		$newcharstring = '';
 		if ($bom) {
 			$newcharstring .= "\xFE\xFF";
@@ -731,7 +731,7 @@ class getid3_lib
 	}
 
 	// ISO-8859-1 => UTF-16LE
-	function iconv_fallback_iso88591_utf16le($string, $bom=false) {
+	static function iconv_fallback_iso88591_utf16le($string, $bom=false) {
 		$newcharstring = '';
 		if ($bom) {
 			$newcharstring .= "\xFF\xFE";
@@ -743,12 +743,12 @@ class getid3_lib
 	}
 
 	// ISO-8859-1 => UTF-16LE (BOM)
-	function iconv_fallback_iso88591_utf16($string) {
+	static function iconv_fallback_iso88591_utf16($string) {
 		return getid3_lib::iconv_fallback_iso88591_utf16le($string, true);
 	}
 
 	// UTF-8 => ISO-8859-1
-	function iconv_fallback_utf8_iso88591($string) {
+	static function iconv_fallback_utf8_iso88591($string) {
 		if (function_exists('utf8_decode')) {
 			return utf8_decode($string);
 		}
@@ -792,7 +792,7 @@ class getid3_lib
 	}
 
 	// UTF-8 => UTF-16BE
-	function iconv_fallback_utf8_utf16be($string, $bom=false) {
+	static function iconv_fallback_utf8_utf16be($string, $bom=false) {
 		$newcharstring = '';
 		if ($bom) {
 			$newcharstring .= "\xFE\xFF";
@@ -835,7 +835,7 @@ class getid3_lib
 	}
 
 	// UTF-8 => UTF-16LE
-	function iconv_fallback_utf8_utf16le($string, $bom=false) {
+	static function iconv_fallback_utf8_utf16le($string, $bom=false) {
 		$newcharstring = '';
 		if ($bom) {
 			$newcharstring .= "\xFF\xFE";
@@ -878,12 +878,12 @@ class getid3_lib
 	}
 
 	// UTF-8 => UTF-16LE (BOM)
-	function iconv_fallback_utf8_utf16($string) {
+	static function iconv_fallback_utf8_utf16($string) {
 		return getid3_lib::iconv_fallback_utf8_utf16le($string, true);
 	}
 
 	// UTF-16BE => UTF-8
-	function iconv_fallback_utf16be_utf8($string) {
+	static function iconv_fallback_utf16be_utf8($string) {
 		if (substr($string, 0, 2) == "\xFE\xFF") {
 			// strip BOM
 			$string = substr($string, 2);
@@ -897,7 +897,7 @@ class getid3_lib
 	}
 
 	// UTF-16LE => UTF-8
-	function iconv_fallback_utf16le_utf8($string) {
+	static function iconv_fallback_utf16le_utf8($string) {
 		if (substr($string, 0, 2) == "\xFF\xFE") {
 			// strip BOM
 			$string = substr($string, 2);
@@ -911,7 +911,7 @@ class getid3_lib
 	}
 
 	// UTF-16BE => ISO-8859-1
-	function iconv_fallback_utf16be_iso88591($string) {
+	static function iconv_fallback_utf16be_iso88591($string) {
 		if (substr($string, 0, 2) == "\xFE\xFF") {
 			// strip BOM
 			$string = substr($string, 2);
@@ -925,7 +925,7 @@ class getid3_lib
 	}
 
 	// UTF-16LE => ISO-8859-1
-	function iconv_fallback_utf16le_iso88591($string) {
+	static function iconv_fallback_utf16le_iso88591($string) {
 		if (substr($string, 0, 2) == "\xFF\xFE") {
 			// strip BOM
 			$string = substr($string, 2);
@@ -939,7 +939,7 @@ class getid3_lib
 	}
 
 	// UTF-16 (BOM) => ISO-8859-1
-	function iconv_fallback_utf16_iso88591($string) {
+	static function iconv_fallback_utf16_iso88591($string) {
 		$bom = substr($string, 0, 2);
 		if ($bom == "\xFE\xFF") {
 			return getid3_lib::iconv_fallback_utf16be_iso88591(substr($string, 2));
@@ -950,7 +950,7 @@ class getid3_lib
 	}
 
 	// UTF-16 (BOM) => UTF-8
-	function iconv_fallback_utf16_utf8($string) {
+	static function iconv_fallback_utf16_utf8($string) {
 		$bom = substr($string, 0, 2);
 		if ($bom == "\xFE\xFF") {
 			return getid3_lib::iconv_fallback_utf16be_utf8(substr($string, 2));
@@ -960,7 +960,7 @@ class getid3_lib
 		return $string;
 	}
 
-	function iconv_fallback($in_charset, $out_charset, $string) {
+	static function iconv_fallback($in_charset, $out_charset, $string) {
 
 		if ($in_charset == $out_charset) {
 			return $string;
@@ -1032,7 +1032,7 @@ class getid3_lib
 	}
 
 
-	function MultiByteCharString2HTML($string, $charset='ISO-8859-1') {
+	static function MultiByteCharString2HTML($string, $charset='ISO-8859-1') {
 		$HTMLstring = '';
 
 		switch ($charset) {
@@ -1125,7 +1125,7 @@ class getid3_lib
 
 
 
-	function RGADnameLookup($namecode) {
+	static function RGADnameLookup($namecode) {
 		static $RGADname = array();
 		if (empty($RGADname)) {
 			$RGADname[0] = 'not set';
@@ -1137,7 +1137,7 @@ class getid3_lib
 	}
 
 
-	function RGADoriginatorLookup($originatorcode) {
+	static function RGADoriginatorLookup($originatorcode) {
 		static $RGADoriginator = array();
 		if (empty($RGADoriginator)) {
 			$RGADoriginator[0] = 'unspecified';
@@ -1150,7 +1150,7 @@ class getid3_lib
 	}
 
 
-	function RGADadjustmentLookup($rawadjustment, $signbit) {
+	static function RGADadjustmentLookup($rawadjustment, $signbit) {
 		$adjustment = $rawadjustment / 10;
 		if ($signbit == 1) {
 			$adjustment *= -1;
@@ -1159,7 +1159,7 @@ class getid3_lib
 	}
 
 
-	function RGADgainString($namecode, $originatorcode, $replaygain) {
+	static function RGADgainString($namecode, $originatorcode, $replaygain) {
 		if ($replaygain < 0) {
 			$signbit = '1';
 		} else {
@@ -1174,12 +1174,12 @@ class getid3_lib
 		return $gainstring;
 	}
 
-	function RGADamplitude2dB($amplitude) {
+	static function RGADamplitude2dB($amplitude) {
 		return 20 * log10($amplitude);
 	}
 
 
-	function GetURLImageSize($urlpic) {
+	static function GetURLImageSize($urlpic) {
 		if ($fd = @fopen($urlpic, 'rb')){
 			$imgData = fread($fd, filesize($urlpic));
 			fclose($fd);
@@ -1189,7 +1189,7 @@ class getid3_lib
 	}
 
 
-	function GetDataImageSize($imgData) {
+	static function GetDataImageSize($imgData) {
 		$height = '';
 		$width  = '';
 		$type   = '';
@@ -1257,7 +1257,7 @@ class getid3_lib
 	} // end function
 
 
-	function ImageTypesLookup($imagetypeid) {
+	static function ImageTypesLookup($imagetypeid) {
 		static $ImageTypesLookup = array();
 		if (empty($ImageTypesLookup)) {
 			$ImageTypesLookup[1]  = 'gif';
@@ -1278,7 +1278,7 @@ class getid3_lib
 		return (isset($ImageTypesLookup[$imagetypeid]) ? $ImageTypesLookup[$imagetypeid] : '');
 	}
 
-	function CopyTagsToComments(&$ThisFileInfo) {
+	static function CopyTagsToComments(&$ThisFileInfo) {
 		// Copy all entries from ['tags'] into common ['comments'] and ['comments_html']
 		if (!empty($ThisFileInfo['tags'])) {
 			foreach ($ThisFileInfo['tags'] as $tagtype => $tagarray) {
@@ -1455,11 +1455,11 @@ class getid3_id3v1
 		return true;
 	}
 
-	function cutfield($str) {
+	static function cutfield($str) {
 		return trim(substr($str, 0, strcspn($str, "\x00")));
 	}
 
-	function ArrayOfGenres($allowSCMPXextended=false) {
+	static function ArrayOfGenres($allowSCMPXextended=false) {
 		static $GenreLookup = array(
 			0    => 'Blues',
 			1    => 'Classic Rock',
@@ -1643,7 +1643,7 @@ class getid3_id3v1
 		return ($allowSCMPXextended ? $GenreLookupSCMPX : $GenreLookup);
 	}
 
-	function LookupGenreName($genreid, $allowSCMPXextended=true) {
+	static function LookupGenreName($genreid, $allowSCMPXextended=true) {
 		switch ($genreid) {
 			case 'RX':
 			case 'CR':
@@ -1656,7 +1656,7 @@ class getid3_id3v1
 		return (isset($GenreLookup[$genreid]) ? $GenreLookup[$genreid] : false);
 	}
 
-	function LookupGenreID($genre, $allowSCMPXextended=false) {
+	static function LookupGenreID($genre, $allowSCMPXextended=false) {
 		$GenreLookup = getid3_id3v1::ArrayOfGenres($allowSCMPXextended);
 		$LowerCaseNoSpaceSearchTerm = strtolower(str_replace(' ', '', $genre));
 		foreach ($GenreLookup as $key => $value) {
@@ -1670,14 +1670,14 @@ class getid3_id3v1
 		return (isset($GenreLookup[$genreid]) ? $GenreLookup[$genreid] : false);
 	}
 
-	function StandardiseID3v1GenreName($OriginalGenre) {
+	static function StandardiseID3v1GenreName($OriginalGenre) {
 		if (($GenreID = getid3_id3v1::LookupGenreID($OriginalGenre)) !== false) {
 			return getid3_id3v1::LookupGenreName($GenreID);
 		}
 		return $OriginalGenre;
 	}
 
-	function GenerateID3v1Tag($title, $artist, $album, $year, $genreid, $comment, $track='') {
+	static function GenerateID3v1Tag($title, $artist, $album, $year, $genreid, $comment, $track='') {
 		$ID3v1Tag  = 'TAG';
 		$ID3v1Tag .= str_pad(trim(substr($title,  0, 30)), 30, "\x00", STR_PAD_RIGHT);
 		$ID3v1Tag .= str_pad(trim(substr($artist, 0, 30)), 30, "\x00", STR_PAD_RIGHT);
