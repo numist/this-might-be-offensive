@@ -50,7 +50,7 @@
 
 <?php
 		if( mysqli_num_rows( $result ) == 0 ) {
-			echo "<div class=\"piletitle\">No dice, but thanks for playing.</div>";
+			echo "<p>No dice, but thanks for playing.</p>";
 		}
 		
 		while( $row = mysqli_fetch_assoc( $result ) ) {
