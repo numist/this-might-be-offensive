@@ -22,9 +22,7 @@
 					</div>
 					<?php tabs(); ?>
 					<div class="bluebox">
-						<div class="piletitle">
-							<?= $them->htmlUsername() ?> has a posse.
-						</div>
+						<h3><?= $them->htmlUsername() ?> has a posse.</h3>
 						<ol>
 <?php
 			

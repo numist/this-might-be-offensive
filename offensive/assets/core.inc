@@ -138,8 +138,10 @@
 				// $sql = str_replace("offensive_uploads up", "offensive_uploads up USE KEY (t_t_id)", $sql);
 				// $sql = str_replace("users u", "users u USE KEY (PRIMARY)", $sql);
 				break;
+			// count_cache sorts tie-break on ca.id so LIMIT paging doesn't skip or repeat rows.
+			// ca.id rather than up.id: InnoDB secondary keys end in the primary key, so the forced index still covers the order.
 			case "votes_asc":
-				$sql .= " ORDER BY ca.good ASC";
+				$sql .= " ORDER BY ca.good ASC, ca.id ASC";
 				// force the correct index usage
 				$sql = $after ? str_replace("offensive_uploads up", "offensive_uploads up USE KEY (t_t_id)", $sql)
 				              : str_replace("offensive_uploads up", "offensive_uploads up USE KEY (status_type_id)", $sql);
@@ -147,7 +149,7 @@
 				$sql = str_replace("users u", "users u USE KEY (PRIMARY)", $sql);
 				break;
 			case "votes_desc":
-				$sql .= " ORDER BY ca.good DESC";
+				$sql .= " ORDER BY ca.good DESC, ca.id DESC";
 				// force the correct index usage
 				$sql = $after ? str_replace("offensive_uploads up", "offensive_uploads up USE KEY (t_t_id)", $sql)
 				              : str_replace("offensive_uploads up", "offensive_uploads up USE KEY (status_type_id)", $sql);
@@ -156,19 +158,19 @@
 				break;
 			// these sorting options are slow due to insufficient indices.  average query time over 1s.  luckily they are uncommon.
 			case "comments_asc":
-				$sql .= " ORDER BY ca.comments ASC";
+				$sql .= " ORDER BY ca.comments ASC, ca.id ASC";
 				$sql = str_replace("offensive_count_cache ca", "offensive_count_cache ca USE KEY (ca_comments)", $sql);
 				break;
 			case "comments_desc":
-				$sql .= " ORDER BY ca.comments DESC";
+				$sql .= " ORDER BY ca.comments DESC, ca.id DESC";
 				$sql = str_replace("offensive_count_cache ca", "offensive_count_cache ca USE KEY (ca_comments)", $sql);
 				break;
 			case "activity_asc":
-				$sql .= " ORDER BY ca.timestamp ASC";
+				$sql .= " ORDER BY ca.timestamp ASC, ca.id ASC";
 				$sql = str_replace("offensive_count_cache ca", "offensive_count_cache ca USE KEY (ca_timestamp)", $sql);
 				break;
 			case "activity_desc":
-				$sql .= " ORDER BY ca.timestamp DESC";
+				$sql .= " ORDER BY ca.timestamp DESC, ca.id DESC";
 				$sql = str_replace("offensive_count_cache ca", "offensive_count_cache ca USE KEY (ca_timestamp)", $sql);
 				break;
 			default:
