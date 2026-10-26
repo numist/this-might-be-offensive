@@ -47,7 +47,8 @@ body {
 }
 
 #image {
-	max-width: 100vw;
+	/* 100%, not 100vw: #content's 8px margin would push the page 8px wider than the screen */
+	max-width: 100%;
 	max-height: calc(100vh - 105px);
 }
 
@@ -180,6 +181,12 @@ audio {
 
 #qc_dialog div#qc_vote {
   margin-top: 1em;
+	text-align: left;
+	margin-left: 14%;
+
+	@media (width < 800px) {
+		margin-left: 0;
+	}
 }
 
 #qc_dialog #qc_commentrows {
@@ -195,10 +202,20 @@ audio {
   margin-bottom: 0em;
 }
 
+/* picui.js gives the dialog a fixed 500px width; keep it on a phone screen */
+.ui-dialog:has(#qc_dialog) {
+	max-width: calc(100vw - 16px);
+}
+
 #qc_dialog {
   padding-top: 10px;
   padding-bottom: 10px;
 	overflow: hidden;
+
+	textarea {
+		max-width: 100%;
+		box-sizing: border-box;
+	}
 }
 
 #pic {
