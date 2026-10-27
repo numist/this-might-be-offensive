@@ -168,7 +168,7 @@ class Comment {
 		return $comment;
 	}
 	
-	/* $previews adds hover previews to links that have one (see LinkPreview),
+	/* $previews adds previews to links that have one (see LinkPreview),
 	 * for pages that load the css for them. */
 	public function HTMLcomment($previews = false) {
 		$comment = $this->text();
@@ -192,9 +192,12 @@ class Comment {
 		// linkify all bare URLs
 		$comment = " ".$comment." ";
 		$p = '/(http[s]?:\\/\\/[^\s<>]+)/i';
-		$comment = preg_replace_callback( $p, function($m) use ($previews) {
-			$preview = $previews ? LinkPreview::html(html_entity_decode($m[1], ENT_QUOTES)) : "";
-			return '<a href="'.$m[1].'" rel="nofollow">'.$m[1].$preview.'</a>';
+		$n = 0;
+		$id = $this->id();
+		$comment = preg_replace_callback( $p, function($m) use ($previews, $id, &$n) {
+			$link = '<a href="'.$m[1].'" rel="nofollow">'.$m[1].'</a>';
+			if(!$previews) return $link;
+			return LinkPreview::html(html_entity_decode($m[1], ENT_QUOTES), "lp".$id."-".$n++, $link);
 		}, $comment );
 		$comment = trim($comment);
 

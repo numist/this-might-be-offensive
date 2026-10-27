@@ -1,7 +1,8 @@
 <?php
 
 /*
- * hover previews for links in comments.
+ * previews for links in comments, shown on hover, on tapping the button
+ * before the link, or inline for everything (see theme.css).
  *
  * each provider maps urls it recognizes to a canonical url and an oEmbed
  * endpoint.  previews are only ever read from redis while rendering; a miss
@@ -76,18 +77,20 @@ class LinkPreview {
 	}
 
 	/*
-	 * markup for the preview of $url, to go inside its <a>.  empty if there
-	 * is no preview.  styled by .comment_body a > span in theme.css.
+	 * $link (the <a> for $url, unescaped) with its preview: a button before it
+	 * that opens the preview as a popover, and the preview after it.  $id must
+	 * be unique on the page.  $link alone if there is no preview.
 	 */
-	public static function html($url) {
+	public static function html($url, $id, $link) {
 		$preview = self::get($url);
-		if(!$preview) return "";
+		if(!$preview) return $link;
 
 		$img = "";
 		if(isset($preview["thumbnail"])) {
 			$img = '<img src="'.htmlEscape($preview["thumbnail"]).'" alt="" loading="lazy" referrerpolicy="no-referrer" />';
 		}
-		return "<span>$img".htmlEscape($preview["title"])." <small>".htmlEscape($preview["provider"])."</small></span>";
+		return '<button type="button" popovertarget="'.$id.'" aria-label="preview"></button>'.$link.
+		       '<span id="'.$id.'" popover>'.$img.htmlEscape($preview["title"])." <small>".htmlEscape($preview["provider"])."</small></span>";
 	}
 
 	private static function enqueue($key, $match) {
