@@ -133,3 +133,40 @@ function changesrc(a,im)
 	x = eval("document."+a);
 	x.src=im;
 }
+
+/* "show link previews": shows every link preview inline (theme.css). kept per
+   device, so a phone and a desktop can differ. this runs in <head> so the page
+   doesn't render with previews hidden and then jump. */
+(function() {
+	var key = "link_previews";
+	var root = document.documentElement;
+	var selector = "input[name=link_previews]";
+
+	try {
+		if(localStorage.getItem(key) == "inline") {
+			root.dataset.linkPreviews = "inline";
+		}
+	} catch(e) {}
+
+	document.addEventListener("DOMContentLoaded", function() {
+		document.querySelectorAll(selector).forEach(function(input) {
+			input.checked = root.dataset.linkPreviews == "inline";
+		});
+	});
+
+	document.addEventListener("change", function(e) {
+		if(!e.target.matches(selector)) return;
+		if(e.target.checked) {
+			root.dataset.linkPreviews = "inline";
+		} else {
+			delete root.dataset.linkPreviews;
+		}
+		try {
+			if(e.target.checked) {
+				localStorage.setItem(key, "inline");
+			} else {
+				localStorage.removeItem(key);
+			}
+		} catch(e) {}
+	});
+})();

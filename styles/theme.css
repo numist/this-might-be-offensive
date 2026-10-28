@@ -69,63 +69,177 @@ textarea {
     width: 100%;
 }
 
-/* link previews (LinkPreview): hidden until the link is hovered or focused.
-   absolutely positioned so showing one never moves the page. */
-.comment_body a {
-    position: relative;
+/* link previews (LinkPreview): a button before the link opens the preview as
+   a popover, and hovering or focusing the link shows it too. it floats over
+   the page, so neither moves anything. with "show link previews" checked
+   (tmbolib.js keeps the choice per device) every preview is shown inline. */
+.comment_body {
+    /* the icon stays quiet until it's wanted */
+    [popovertarget] {
+        min-width: 24px;
+        min-height: 24px;
+        padding: 0;
+        margin: -6px -4px -6px -6px;
+        border: 0;
+        background: none;
+        color: var(--color-brand-medium);
+        font: inherit;
+        font-size: 0.9em;
+        line-height: 1;
+        cursor: pointer;
 
-    > span {
-        display: none;
-        position: absolute;
-        top: 100%;
-        left: 0;
-        z-index: 10;
+        &::before {
+            content: "\25A3" / "";
+        }
+
+        &:is(:hover, :focus-visible),
+        &:has(+ a + :popover-open) {
+            color: var(--color-link);
+        }
+    }
+
+    [popover] {
         width: min(32rem, 80vw);
-        padding: var(--spacing-xs);
+        padding: var(--spacing-sm);
         background: var(--bg-content);
         border: 1px solid var(--color-brand-medium);
+        box-shadow: 0 2px 8px rgb(0 0 51 / 0.3);
         color: var(--color-brand-dark);
         font-size: 1.1rem;
-        line-height: 1.4;
-    }
+        line-height: 1.35;
+        overflow-wrap: break-word;
 
-    img {
-        display: block;
-        width: 100%;
-        aspect-ratio: 16 / 9;
-        object-fit: cover;
-        margin-bottom: var(--spacing-xs);
-    }
+        img {
+            display: block;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            object-fit: cover;
+            margin-bottom: var(--spacing-sm);
+            background: var(--color-brand-light-alt);
+        }
 
-    small {
-        display: block;
-        color: var(--color-brand-medium);
+        > span {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+            overflow: hidden;
+        }
+
+        small {
+            display: block;
+            margin-top: 2px;
+            color: var(--color-brand-medium);
+        }
     }
 }
 
-/* phones have no hover; a tap should just follow the link */
+/* hover and focus show the preview without opening it. phones have no
+   hover, so tapping a link just follows it. */
 @media (hover: hover) {
-    .comment_body a:hover > span {
+    .comment_body :is(a:hover + [popover], [popover]:hover) {
         display: block;
     }
 }
 
-.comment_body a:focus-visible > span {
+.comment_body a:focus-visible + [popover] {
     display: block;
 }
 
-/* where supported, escape scrolling containers (the quick comment dialog) and
-   flip away from the edge of the screen */
+/* without anchor positioning, a hover preview sits where it would have been
+   in the text and an opened one in the middle of the screen */
+@supports not (anchor-name: --a) {
+    .comment_body [popover]:not(:popover-open) {
+        position: absolute;
+        z-index: 10;
+        inset: auto;
+        margin: 0;
+    }
+}
+
+/* where supported, put the preview under the link (or the button that opened
+   it), above it if there's no room below, and keep it on screen. hover previews also
+   escape scrolling containers, like the quick comment dialog, this way. */
 @supports (anchor-name: --a) {
     .comment_body a:is(:hover, :focus-visible) {
         anchor-name: --link-preview;
     }
 
-    .comment_body a > span {
+    .comment_body [popover] {
         position: fixed;
         position-anchor: --link-preview;
+        inset: auto;
         top: anchor(bottom);
-        left: anchor(left);
-        position-try-fallbacks: flip-block, flip-inline, flip-block flip-inline;
+        left: clamp(0px, anchor(left), 100vw - min(32rem, 80vw));
+        margin: 0;
+        z-index: 10;
+        position-try-fallbacks: flip-block;
+
+        &:popover-open {
+            position-anchor: auto;
+        }
+    }
+}
+
+/* every preview inline, as a compact row under its link: a small thumbnail
+   with the title beside it, set off by a rule instead of a box so it sits
+   quietly on either stripe */
+:root:is([data-link-previews="inline"], :has(input[name="link_previews"]:checked)) .comment_body {
+    [popovertarget] {
+        display: none;
+    }
+
+    [popover] {
+        display: grid;
+        grid-template-columns: min(9.6rem, 35%) minmax(0, 1fr);
+        grid-template-rows: auto 1fr;
+        column-gap: var(--spacing-sm);
+        position: static;
+        width: auto;
+        max-width: 40rem;
+        margin: var(--spacing-xs) 0 var(--spacing-sm);
+        padding: 0 0 0 var(--spacing-sm);
+        background: none;
+        border: 0;
+        border-left: 2px solid var(--color-brand-medium);
+        box-shadow: none;
+
+        img {
+            grid-row: span 2;
+            margin-bottom: 0;
+        }
+    }
+}
+
+/* a preview that ends its comment is already a block; the <br> after the
+   comment would only add an empty line under it */
+:root:is([data-link-previews="inline"], :has(input[name="link_previews"]:checked)) .comment_body:has(> [popover]:last-child) + br {
+    display: none;
+}
+
+/* the "show link previews" box only matters when there are previews */
+#commentList:not(:has([popover])) label:has(input[name="link_previews"]) {
+    display: none;
+}
+
+#commentList > div:has(> label input[name="link_previews"]) {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    column-gap: var(--spacing);
+}
+
+label:has(> input[name="link_previews"]) {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    color: var(--color-brand-medium);
+    font-weight: normal;
+    white-space: nowrap;
+    cursor: pointer;
+
+    input {
+        margin: 0;
+        accent-color: var(--color-brand);
     }
 }
