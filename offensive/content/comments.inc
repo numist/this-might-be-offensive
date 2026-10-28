@@ -291,7 +291,7 @@
         // changeblog doesn't say anything demeaning about the people who posted.
         if($upload->id() != "211604") { 
 			// one element, so it doesn't throw off the .entry:nth-child striping
-			?><div><b><?= $comments_heading ?></b><label style="float:right"><input type="checkbox" name="link_previews" /> show link previews</label></div><?php
+			?><div><b><?= $comments_heading ?></b><label><input type="checkbox" name="link_previews" /> show link previews</label></div><?php
         }
 
 		$numgood = 0;

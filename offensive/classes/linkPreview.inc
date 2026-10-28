@@ -90,7 +90,7 @@ class LinkPreview {
 			$img = '<img src="'.htmlEscape($preview["thumbnail"]).'" alt="" loading="lazy" referrerpolicy="no-referrer" />';
 		}
 		return '<button type="button" popovertarget="'.$id.'" aria-label="preview"></button>'.$link.
-		       '<span id="'.$id.'" popover>'.$img.htmlEscape($preview["title"])." <small>".htmlEscape($preview["provider"])."</small></span>";
+		       '<span id="'.$id.'" popover>'.$img."<span>".htmlEscape($preview["title"])."</span><small>".htmlEscape($preview["provider"])."</small></span>";
 	}
 
 	private static function enqueue($key, $match) {

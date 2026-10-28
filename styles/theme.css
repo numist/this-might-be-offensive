@@ -74,45 +74,62 @@ textarea {
    the page, so neither moves anything. with "show link previews" checked
    (tmbolib.js keeps the choice per device) every preview is shown inline. */
 .comment_body {
+    /* the icon stays quiet until it's wanted */
     [popovertarget] {
         min-width: 24px;
         min-height: 24px;
         padding: 0;
-        margin: -6px 0 -6px -4px;
+        margin: -6px -4px -6px -6px;
         border: 0;
         background: none;
-        color: var(--color-link);
+        color: var(--color-brand-medium);
         font: inherit;
+        font-size: 0.9em;
         line-height: 1;
         cursor: pointer;
 
         &::before {
             content: "\25A3" / "";
         }
+
+        &:is(:hover, :focus-visible),
+        &:has(+ a + :popover-open) {
+            color: var(--color-link);
+        }
     }
 
     [popover] {
         width: min(32rem, 80vw);
-        padding: var(--spacing-xs);
+        padding: var(--spacing-sm);
         background: var(--bg-content);
         border: 1px solid var(--color-brand-medium);
+        box-shadow: 0 2px 8px rgb(0 0 51 / 0.3);
         color: var(--color-brand-dark);
         font-size: 1.1rem;
-        line-height: 1.4;
+        line-height: 1.35;
         overflow-wrap: break-word;
-    }
 
-    img {
-        display: block;
-        width: 100%;
-        aspect-ratio: 16 / 9;
-        object-fit: cover;
-        margin-bottom: var(--spacing-xs);
-    }
+        img {
+            display: block;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            object-fit: cover;
+            margin-bottom: var(--spacing-sm);
+            background: var(--color-brand-light-alt);
+        }
 
-    small {
-        display: block;
-        color: var(--color-brand-medium);
+        > span {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+            overflow: hidden;
+        }
+
+        small {
+            display: block;
+            margin-top: 2px;
+            color: var(--color-brand-medium);
+        }
     }
 }
 
@@ -163,7 +180,9 @@ textarea {
     }
 }
 
-/* every preview inline, as a compact row under its link */
+/* every preview inline, as a compact row under its link: a small thumbnail
+   with the title beside it, set off by a rule instead of a box so it sits
+   quietly on either stripe */
 :root:is([data-link-previews="inline"], :has(input[name="link_previews"]:checked)) .comment_body {
     [popovertarget] {
         display: none;
@@ -171,26 +190,56 @@ textarea {
 
     [popover] {
         display: grid;
-        grid-template-columns: 8rem minmax(0, 1fr);
-        align-content: start;
-        column-gap: var(--spacing-xs);
+        grid-template-columns: min(9.6rem, 35%) minmax(0, 1fr);
+        grid-template-rows: auto 1fr;
+        column-gap: var(--spacing-sm);
         position: static;
         width: auto;
-        max-width: 32rem;
-        margin: var(--spacing-xs) 0;
-    }
+        max-width: 40rem;
+        margin: var(--spacing-xs) 0 var(--spacing-sm);
+        padding: 0 0 0 var(--spacing-sm);
+        background: none;
+        border: 0;
+        border-left: 2px solid var(--color-brand-medium);
+        box-shadow: none;
 
-    img {
-        grid-row: span 2;
-        margin-bottom: 0;
+        img {
+            grid-row: span 2;
+            margin-bottom: 0;
+        }
     }
+}
 
-    small {
-        grid-column: 2;
-    }
+/* a preview that ends its comment is already a block; the <br> after the
+   comment would only add an empty line under it */
+:root:is([data-link-previews="inline"], :has(input[name="link_previews"]:checked)) .comment_body:has(> [popover]:last-child) + br {
+    display: none;
 }
 
 /* the "show link previews" box only matters when there are previews */
 #commentList:not(:has([popover])) label:has(input[name="link_previews"]) {
     display: none;
+}
+
+#commentList > div:has(> label input[name="link_previews"]) {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    column-gap: var(--spacing);
+}
+
+label:has(> input[name="link_previews"]) {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    color: var(--color-brand-medium);
+    font-weight: normal;
+    white-space: nowrap;
+    cursor: pointer;
+
+    input {
+        margin: 0;
+        accent-color: var(--color-brand);
+    }
 }
