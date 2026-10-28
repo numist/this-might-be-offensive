@@ -19,16 +19,18 @@
  */
 class LinkPreview {
 	const TTL = 2592000;         // 30 days
-	const MISS_TTL = 86400;      // retry deleted/private/broken links daily
+	const MISS_TTL = 86400;      // the provider says no (deleted, private): retry daily
+	const RETRY_TTL = 900;       // timeouts, rate limits, outages: retry soon
 	const FETCH_TIMEOUT = 2;
-	const MAX_FETCHES = 10;      // per request
+	const MAX_FETCHES = 50;      // per request, fetched all at once
+	const MAX_SERIAL_FETCHES = 10; // per request, one at a time without curl
 
 	private static $queue = array();
 
 	private static function providers() {
 		return array(
 			"youtube" => array(
-				"pattern" => '/^https?:\/\/(?:(?:www|m|music)\.)?(?:youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/|live\/)|youtu\.be\/)([A-Za-z0-9_-]{11})(?![A-Za-z0-9_-])/i',
+				"pattern" => '/^https?:\/\/(?:(?:www|m|music)\.)?(?:youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/|live\/|v\/)|youtu\.be\/)([A-Za-z0-9_-]{11})(?![A-Za-z0-9_-])/i',
 				"url" => "https://www.youtube.com/watch?v=%s",
 				"oembed" => "https://www.youtube.com/oembed?format=json&url=",
 			),
@@ -111,41 +113,98 @@ class LinkPreview {
 		if(session_status() == PHP_SESSION_ACTIVE) session_write_close();
 		fastcgi_finish_request();
 
+		$parallel = function_exists("curl_multi_init");
+		$max = $parallel ? self::MAX_FETCHES : self::MAX_SERIAL_FETCHES;
 		$providers = self::providers();
-		foreach(array_slice(self::$queue, 0, self::MAX_FETCHES, true) as $key => $match) {
-			list($name, $id) = $match;
-			try {
+		$urls = array();
+		try {
+			foreach(self::$queue as $key => $match) {
+				if(count($urls) >= $max) break;
 				// another request is already fetching this one
 				if(!$redis->set("$key:lock", 1, "EX", 60, "NX")) continue;
 
-				$preview = self::fetch($name, $providers[$name], $id);
-				$redis->setex($key, $preview ? self::TTL : self::MISS_TTL,
-				              json_encode($preview ? $preview : new stdClass()));
-			} catch(Exception $e) {
-				trigger_error("link preview cache: ".$e->getMessage(), E_USER_NOTICE);
-				return;
+				list($name, $id) = $match;
+				$urls[$key] = $providers[$name]["oembed"].rawurlencode(sprintf($providers[$name]["url"], $id));
 			}
+
+			$responses = $parallel ? self::requestAll($urls) : array_map(array("LinkPreview", "request"), $urls);
+			foreach($responses as $key => $response) {
+				list($status, $body) = $response;
+				$preview = $status == 200 ? self::parse(self::$queue[$key][0], $body) : null;
+				if($preview) {
+					$redis->setex($key, self::TTL, json_encode($preview));
+				} else {
+					// a bad id, a private video, or a deleted one won't change
+					// soon.  anything else (no answer, 429, 5xx) might.
+					$gone = $status == 200 || in_array($status, array(400, 401, 404));
+					$redis->setex($key, $gone ? self::MISS_TTL : self::RETRY_TTL, json_encode(new stdClass()));
+				}
+			}
+		} catch(Exception $e) {
+			trigger_error("link preview cache: ".$e->getMessage(), E_USER_NOTICE);
 		}
 	}
 
-	private static function fetch($name, $provider, $id) {
-		$url = sprintf($provider["url"], $id);
+	/*
+	 * GETs every url at once.  returns array(status, body) by the same keys;
+	 * status is 0 if there was no response in time.  handles are freed when
+	 * they go out of scope (curl_close() does nothing since php 8).
+	 */
+	private static function requestAll($urls) {
+		$multi = curl_multi_init();
+		$handles = array();
+		foreach($urls as $key => $url) {
+			$handle = curl_init($url);
+			curl_setopt_array($handle, array(
+				CURLOPT_RETURNTRANSFER => true,
+				CURLOPT_FOLLOWLOCATION => true,
+				CURLOPT_MAXREDIRS => 3,
+				CURLOPT_PROTOCOLS => CURLPROTO_HTTPS,
+				CURLOPT_REDIR_PROTOCOLS => CURLPROTO_HTTPS,
+				CURLOPT_TIMEOUT => self::FETCH_TIMEOUT,
+				CURLOPT_HTTPHEADER => array("Accept: application/json"),
+			));
+			curl_multi_add_handle($multi, $handle);
+			$handles[$key] = $handle;
+		}
+
+		do {
+			$status = curl_multi_exec($multi, $running);
+			if($running) curl_multi_select($multi);
+		} while($running && $status == CURLM_OK);
+
+		$responses = array();
+		foreach($handles as $key => $handle) {
+			// the response code is 0 when there was no response
+			$responses[$key] = array(curl_getinfo($handle, CURLINFO_RESPONSE_CODE),
+			                         (string)curl_multi_getcontent($handle));
+			curl_multi_remove_handle($multi, $handle);
+		}
+		return $responses;
+	}
+
+	// GETs $url without curl.  returns array(status, body) like requestAll().
+	private static function request($url) {
 		$context = stream_context_create(array("http" => array(
 			"timeout" => self::FETCH_TIMEOUT,
 			"ignore_errors" => true,
 			"header" => "Accept: application/json\r\n",
 		)));
-		$body = @file_get_contents($provider["oembed"].rawurlencode($url), false, $context);
+		$body = @file_get_contents($url, false, $context);
 		// $http_response_header holds every response along any redirects;
 		// the status line we care about is the last one.
 		$status = array();
 		if(isset($http_response_header)) {
 			$status = preg_grep('/^HTTP\//', $http_response_header);
 		}
-		if($body === false || !preg_match('/^HTTP\/\S+ 200\b/', (string)end($status))) {
-			return null;
+		if($body === false || !preg_match('/^HTTP\/\S+ (\d{3})\b/', (string)end($status), $m)) {
+			return array(0, "");
 		}
+		return array((int)$m[1], $body);
+	}
 
+	// the preview in an oEmbed response, or null if it doesn't have one.
+	private static function parse($name, $body) {
 		$data = json_decode($body, true);
 		if(!is_array($data) || !isset($data["title"]) || !is_string($data["title"])) {
 			return null;
