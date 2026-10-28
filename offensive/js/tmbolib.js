@@ -140,23 +140,31 @@ function changesrc(a,im)
 (function() {
 	var key = "link_previews";
 	var root = document.documentElement;
+	var selector = "input[name=link_previews]";
+
 	try {
 		if(localStorage.getItem(key) == "inline") {
-			root.setAttribute("data-link-previews", "inline");
+			root.dataset.linkPreviews = "inline";
 		}
 	} catch(e) {}
 
-	$(function() {
-		$("input[name=link_previews]").prop("checked", root.hasAttribute("data-link-previews"));
+	document.addEventListener("DOMContentLoaded", function() {
+		document.querySelectorAll(selector).forEach(function(input) {
+			input.checked = root.dataset.linkPreviews == "inline";
+		});
 	});
 
-	$(document).on("change", "input[name=link_previews]", function() {
+	document.addEventListener("change", function(e) {
+		if(!e.target.matches(selector)) return;
+		if(e.target.checked) {
+			root.dataset.linkPreviews = "inline";
+		} else {
+			delete root.dataset.linkPreviews;
+		}
 		try {
-			if(this.checked) {
-				root.setAttribute("data-link-previews", "inline");
+			if(e.target.checked) {
 				localStorage.setItem(key, "inline");
 			} else {
-				root.removeAttribute("data-link-previews");
 				localStorage.removeItem(key);
 			}
 		} catch(e) {}
