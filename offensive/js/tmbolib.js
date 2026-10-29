@@ -154,6 +154,23 @@ function changesrc(a,im)
 		});
 	});
 
+	// "hide" in an inline preview is a label for the toggle, which works
+	// without javascript, but clicking it focuses the checkbox at the top of
+	// the thread and the browser scrolls up to it.  with javascript, flip the
+	// box here instead, and since every preview above collapses too, keep the
+	// comment where it was on screen.
+	var anchor = null;
+	document.addEventListener("click", function(e) {
+		var label = e.target.closest("[popover] label");
+		var input = label && document.getElementById(label.htmlFor);
+		if(!input) return;
+		e.preventDefault();
+		var entry = label.closest(".entry") || label;
+		anchor = { entry: entry, top: entry.getBoundingClientRect().top };
+		input.checked = !input.checked;
+		input.dispatchEvent(new Event("change", { bubbles: true }));
+	});
+
 	document.addEventListener("change", function(e) {
 		if(!e.target.matches(selector)) return;
 		if(e.target.checked) {
@@ -168,5 +185,9 @@ function changesrc(a,im)
 				localStorage.removeItem(key);
 			}
 		} catch(e) {}
+		if(anchor) {
+			window.scrollBy(0, anchor.entry.getBoundingClientRect().top - anchor.top);
+			anchor = null;
+		}
 	});
 })();

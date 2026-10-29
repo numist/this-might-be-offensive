@@ -130,6 +130,17 @@ textarea {
             margin-top: 2px;
             color: var(--color-brand-medium);
         }
+
+        /* "hide" turns inline previews off from wherever you are (it's a
+           label for the toggle's checkbox), so it's only shown inline */
+        label {
+            display: none;
+            margin-left: 0.5em;
+            color: var(--color-link);
+            font-weight: normal;
+            text-decoration: underline;
+            cursor: pointer;
+        }
     }
 }
 
@@ -207,13 +218,29 @@ textarea {
             grid-row: span 2;
             margin-bottom: 0;
         }
+
+        label {
+            display: inline;
+        }
     }
 }
 
-/* a preview that ends its comment is already a block; the <br> after the
-   comment would only add an empty line under it */
-:root:is([data-link-previews="inline"], :has(input[name="link_previews"]:checked)) .comment_body:has(> [popover]:last-child) + br {
+/* the quick comment dialog shows previews inline too but has no toggle for
+   "hide" to work */
+:root:not(:has(#link_previews)) .comment_body [popover] label {
     display: none;
+}
+
+/* a preview that ends its comment is a block, so the <br> after the comment
+   would only add an empty line under it.  :last-child can't tell whether text
+   follows the preview, so make every comment a block, which ends its line
+   the way the <br> did, and drop the <br>. */
+:root:is([data-link-previews="inline"], :has(input[name="link_previews"]:checked)) .comment_body {
+    display: block;
+
+    + br {
+        display: none;
+    }
 }
 
 /* the "show link previews" box only matters when there are previews */
