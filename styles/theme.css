@@ -229,17 +229,33 @@ textarea {
     column-gap: var(--spacing);
 }
 
+/* a toggle in the tmbo style: link-like text that says what clicking it will
+   do.  the checkbox stays for keyboards and screen readers (its aria-label
+   names it, and checked says whether previews are showing) but isn't drawn. */
 label:has(> input[name="link_previews"]) {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4em;
-    color: var(--color-brand-medium);
+    color: var(--color-link);
     font-weight: normal;
+    text-decoration: underline;
     white-space: nowrap;
     cursor: pointer;
 
+    &:has(> input:focus-visible) {
+        outline: 2px solid var(--color-link);
+        outline-offset: 2px;
+    }
+
     input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
         margin: 0;
-        accent-color: var(--color-brand);
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
+
+    input:checked + span,
+    input:not(:checked) + span + span {
+        display: none;
     }
 }
