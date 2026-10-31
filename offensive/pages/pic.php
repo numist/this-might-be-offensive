@@ -181,6 +181,7 @@
 	JS::add("/offensive/js/subscriptions.js");
 	JS::add("/offensive/js/irsz.js");
 	JS::add("/offensive/js/picui.js");
+	JS::add("/offensive/js/swipenav.js");
 	JS::add("/offensive/js/analytics.js");
 	JS::emit();
 ?>
