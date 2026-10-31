@@ -315,3 +315,42 @@ audio {
 		right: 0px;
 	}
 }
+
+/* swipenav.js tags pic-to-pic navigations "newer"/"older"; slide the new page in from that side */
+@view-transition {
+	navigation: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	@view-transition {
+		navigation: none;
+	}
+}
+
+html:active-view-transition-type(older)::view-transition-old(root) {
+	animation: 180ms ease-in both swipenav-slide-out-left;
+}
+
+html:active-view-transition-type(older)::view-transition-new(root) {
+	animation: 180ms ease-out both swipenav-slide-in-right;
+}
+
+html:active-view-transition-type(newer)::view-transition-old(root) {
+	animation: 180ms ease-in both swipenav-slide-out-right;
+}
+
+html:active-view-transition-type(newer)::view-transition-new(root) {
+	animation: 180ms ease-out both swipenav-slide-in-left;
+}
+
+@keyframes swipenav-slide-out-left { to { transform: translateX(-100%); } }
+@keyframes swipenav-slide-out-right { to { transform: translateX(100%); } }
+@keyframes swipenav-slide-in-right { from { transform: translateX(100%); } }
+@keyframes swipenav-slide-in-left { from { transform: translateX(-100%); } }
+
+/* the phone nav bar is fixed; keep it in place while the page slides */
+@media (width < 800px) {
+	#pic #heading {
+		view-transition-name: pic-nav;
+	}
+}
