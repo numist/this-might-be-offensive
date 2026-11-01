@@ -854,7 +854,7 @@ function upload_checksize(&$postdata) {
 
 	$filesize_k = round($filesize / 1024);
 
-	$message = "This image has a pretty big filesize for its dimensions. Expected file size: ${expectedFileSize}k. Your file: ${filesize_k}k.<br />If you want, I can resample it as an 90% quality JPG image.<br /><br />
+	$message = "This image has a pretty big filesize for its dimensions. Expected file size: {$expectedFileSize}k. Your file: {$filesize_k}k.<br />If you want, I can resample it as an 90% quality JPG image.<br /><br />
 		<form action=\"{$_SERVER['PHP_SELF']}\" method=\"POST\">
 			<input type=\"hidden\" name=\"c\" value=\"upload\">
 			<input type=\"submit\" name=\"killit\" value=\"Cancel this upload.\"/>
