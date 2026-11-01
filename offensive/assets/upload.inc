@@ -9,7 +9,7 @@ require_once("offensive/assets/isk.inc");
 global $upload_display_prompt, $tmpdir, $filetypes;
 $upload_display_prompt = true;
 $tmpdir = "quarantine";
-$filetypes = array("jpg", "jpeg", "gif", "png");
+$filetypes = array("jpg", "jpeg", "gif", "png", "webp", "heic", "avif");
 
 
 /*
@@ -280,7 +280,12 @@ function upload() {
 		}
 	}
 
-	switch(upload_type($postdata)) {
+	$type = upload_type($postdata);
+	if(($type == "image" || $type == "avatar") && !upload_convert_to_jpeg($postdata)) {
+		return false;
+	}
+
+	switch($type) {
 		case "image":
 			return upload_image($postdata);
 		case "avatar":
@@ -318,6 +323,29 @@ function upload_type(&$postdata) {
 	}
 
 	$format_info = array(
+		// These container formats come first: the generic RIFF and QuickTime
+		// patterns below would match them too, and the first match wins.
+
+		// WebP - still or animated image - stored as uploaded
+		'webp' => array(
+					'pattern'    => '^RIFF.{4}WEBP',
+					'group'      => 'image',
+					'extensions' => array('.webp', ),
+				  ),
+
+		// HEIF/HEIC and AVIF - still image - ISO-BMFF, identified by the ftyp brand.
+		// Browsers can't show HEIC, so upload_convert_to_jpeg() converts both on arrival.
+		'heif' => array(
+					'pattern'    => '^.{4}ftyp(heic|heix|hevc|hevx|heim|heis|mif1|msf1)',
+					'group'      => 'image',
+					'extensions' => array('.heic', '.heif', '.hif', ),
+				  ),
+		'avif' => array(
+					'pattern'    => '^.{4}ftyp(avif|avis)',
+					'group'      => 'image',
+					'extensions' => array('.avif', ),
+				  ),
+
 
 		// Audio formats
 
@@ -653,7 +681,7 @@ function upload_type(&$postdata) {
 					$postdata['filename'] = $postdata['filename'].".".$format_name;
 					$postdata['file_extension'] = ".".$format_name;
 				} else if(!in_array($current_extension, $info['extensions'])) {
-					if(in_array($current_extension, array(".jpg", ".jpeg", ".jpe", ".jfif", ".jif", ".gif", ".png", ".tiff", ".tif", ".bmp", ".dib"))) {
+					if(in_array($current_extension, array(".jpg", ".jpeg", ".jpe", ".jfif", ".jif", ".gif", ".png", ".tiff", ".tif", ".bmp", ".dib", ".webp", ".heic", ".heif", ".hif", ".avif"))) {
 						// replace the extension if the upload already has an image extension
 						$postdata['filename'] = substr($postdata['filename'], 0, strrpos($postdata['filename'], ".")).".".$format_name;
 					} else {
@@ -690,6 +718,70 @@ function upload_type(&$postdata) {
 	}
 
 	return "";
+}
+
+###############################################################################
+/*
+ * HEIC (what iPhones shoot) and AVIF can't be shown by most browsers, so they
+ * are converted to JPEG as soon as they're identified. Everything after this
+ * sees an ordinary JPEG.
+ *
+ * libheif has already applied the container's rotation by the time Imagick has
+ * the pixels, so the result is upright. EXIF/XMP/IPTC (camera details, GPS) are
+ * dropped; the ICC profile is kept, because iPhone photos are Display P3 and
+ * would lose colour without it. The long edge is capped so a 48MP photo
+ * doesn't come out over the size limit.
+ *
+ * Returns false (having told the user) if the file can't be decoded.
+ */
+function upload_convert_to_jpeg(&$postdata)
+{
+	global $tmpdir;
+
+	$format = array_key_exists('format_name', $postdata) ? $postdata['format_name'] : "";
+	if($format != "heif" && $format != "avif") {
+		return true;
+	}
+
+	$src = "$tmpdir/{$postdata['tmpname']}";
+	$newtmp = preg_replace('/\.[^.]*$/', "", $postdata['tmpname']).".jpg";
+
+	try {
+		// name the coder so Imagick can't be talked into another delegate
+		$image = new Imagick("heic:$src");
+		$image->setFirstIterator();
+		$image = $image->getImage();
+		$image->autoOrient();
+		foreach($image->getImageProfiles("*", false) as $profile) {
+			if($profile != "icc" && $profile != "icm") {
+				$image->removeImageProfile($profile);
+			}
+		}
+		if(max($image->getImageWidth(), $image->getImageHeight()) > 2048) {
+			$image->resizeImage(2048, 2048, Imagick::FILTER_LANCZOS, 1, true);
+		}
+		$image->setImageDepth(8);
+		$image->setImageFormat("jpeg");
+		$image->setImageCompression(Imagick::COMPRESSION_JPEG);
+		$image->setImageCompressionQuality(90);
+		$image->writeImage("$tmpdir/$newtmp");
+		$image->destroy();
+	} catch(ImagickException $e) {
+		trigger_error("HEIF/AVIF conversion failed: ".$e->getMessage(), E_USER_WARNING);
+		killUpload($postdata);
+		box("couldn't read that image. try saving it as a JPEG first?", "sorry.");
+		uploadForm();
+		return false;
+	}
+
+	if($newtmp != $postdata['tmpname']) {
+		unlink($src);
+	}
+	$postdata['tmpname'] = $newtmp;
+	$postdata['filename'] = preg_replace('/\.[^.]*$/', "", $postdata['filename']).".jpg";
+	$postdata['file_extension'] = ".jpg";
+	$postdata['format_name'] = "jpg";
+	return true;
 }
 
 ###############################################################################
