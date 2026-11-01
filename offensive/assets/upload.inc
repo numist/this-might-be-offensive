@@ -240,15 +240,21 @@ function upload() {
 		$postdata['tmpname'] = explode("/", $_FILES['image']['tmp_name']);
 		$postdata['tmpname'] = array_pop($postdata['tmpname']);
 		// having the file extension helps ImageMagick do its thing.
-		$postdata['file_extension'] = getFileExtension($_FILES['image']['name']);
+		// only a short alphanumeric one, though; it ends up in a path.
+		$postdata['file_extension'] = strtolower((string)getFileExtension($_FILES['image']['name']));
+		if(!preg_match('/^\.[a-z0-9]{1,8}$/', $postdata['file_extension'])) {
+			$postdata['file_extension'] = "";
+		}
 		$postdata['tmpname'] = $postdata['tmpname'].$postdata['file_extension'];
-		// rename filename if filename field is submitted on the form. 
-		if(array_key_exists('filename', $_POST) && !empty($_POST['filename'])) {
-			$postdata['filename'] = $_POST['filename'];
-		} else {
-			$postdata['filename'] = $_FILES['image']['name'];
-		}				
-		$postdata['filename'] = str_replace(array("&", "/", "\\", "?", "#", '"', "'"), '_', $postdata['filename']);
+		// the title the uploader typed wins over the name of the file they picked.
+		// it doubles as the stored file name, so it has to be sanitized either way.
+		$title = array_key_exists('filename', $_POST) && is_string($_POST['filename'])
+		         ? sanitizeUploadTitle($_POST['filename'])
+		         : "";
+		if($title == "") {
+			$title = sanitizeUploadTitle($_FILES['image']['name']);
+		}
+		$postdata['filename'] = $title == "" ? "upload" : $title;
 		if(array_key_exists('nsfw', $_POST) || strpos(strtolower($postdata['filename']), "[nsfw]") !== false)
 			$postdata['nsfw'] = $_POST['nsfw'];
 		if(array_key_exists('tmbo', $_POST) || strpos(strtolower($postdata['filename']), "[tmbo]") !== false)
@@ -674,6 +680,10 @@ function upload_type(&$postdata) {
 
 	$foo = new getid3_id3v2($fp, $inf);
 	if(count($inf) > 0 && preg_match('/\.mp3$/i', $filename)) {
+		// the title may have come from the form without an extension
+		if(!preg_match('/\.mp3$/i', $postdata['filename'])) {
+			$postdata['filename'] .= ".mp3";
+		}
 		$upload_identified_key = "mp3";
 		$upload_identified_type = "audio";
 		return $upload_identified_type;

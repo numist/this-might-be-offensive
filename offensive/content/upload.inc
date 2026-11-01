@@ -16,6 +16,10 @@
 		
 	}
 	
+	function head() {
+		JS::add("/offensive/js/upload.js");
+	}
+
 	function body() {
 		return upload();
 	}
@@ -62,6 +66,12 @@
 									<td><input type="file" name="image" id="image" /></td>
 								</tr>
 								<tr>
+									<td style="text-align:right"><label for="filename">title:</label></td>
+									<td><input type="text" name="filename" id="filename" maxlength="120"
+									           placeholder="defaults to the file name"
+									           autocomplete="off" enterkeyhint="send" /></td>
+								</tr>
+								<tr>
 									<td></td>
 									<td><input type="checkbox" id="nsfw" name="nsfw" value="1"/><label for="nsfw">[ nsfw ]</label></td>
 								</tr>
@@ -76,7 +86,6 @@
 <?php if($avatar) {?>
 										<input type="hidden" name="avatar" value=""/>
 <?php }?>
-										<input type="hidden" name="filename" value=""/>
 										<input type="hidden" name="c" value="upload"/>
 										<input type="submit" value="upload"/>
 									</td>
