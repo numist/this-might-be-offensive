@@ -119,59 +119,6 @@ function requestDetail() {
 	return $string;
 }
 
-function needTransform($orientation) {
-	/*
-	 *   1        2       3      4         5            6           7          8
-     *
-	 * 888888  888888      88  88      8888888888  88                  88  8888888888
-	 * 88          88      88  88      88  88      88  88          88  88      88  88
-	 * 8888      8888    8888  8888    88          8888888888  8888888888          88
-	 * 88          88      88  88
-	 * 88          88  888888  888888
-	 */
-
-	switch($orientation) {
-		case 2:
-		case 3:
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-		case 8:
-			return true;
-		default:
-			return false;
-	}
-}
-
-function imageTransform($image, $orientation) {
-	switch($orientation) {
-		case 2:
-			$image->flopImage();
-			break;
-		case 3:
-			$image->rotateImage(new ImagickPixel(), 180);
-			break;
-		case 4:
-			$image->flipImage();
-			break;
-		case 5:	
-			$image->transposeImage();
-			break;
-		case 6:
-			$image->rotateImage(new ImagickPixel(), 90);
-			break;
-		case 7:
-			$image->transverseImage();
-			break;
-		case 8: 
-			$image->rotateImage(new ImagickPixel(), 270);
-			break;
-		default:
-	}
-	return $image;
-}
-
 function killUpload($postdata) {
 	global $tmpdir;
 	unset($_SESSION['postdata']);
@@ -201,8 +148,7 @@ function upload() {
 		}
 
 		// make sure the postdata gets populated correctly
-		$flags = array("rotate", "norotate",
-		               "resize", "noresize",
+		$flags = array("resize", "noresize",
 		               "repost",
 		               "resample", "noresample");
 		foreach($flags as $flag) {
@@ -685,7 +631,6 @@ function upload_type(&$postdata) {
 ###############################################################################
 function upload_image($postdata) {
 	if(upload_largerthan($postdata, 4*1024*1024)) return false;
-	if(upload_checkrotation($postdata)) return false;
 	$lowercase_filename = strtolower($postdata['filename']);
 	if(!strstr($lowercase_filename, "[repost]") &&
 	   !strstr($lowercase_filename, "[tiar]") &&
@@ -700,7 +645,6 @@ function upload_image($postdata) {
 
 function upload_avatar($postdata) {
 	if(upload_largerthan($postdata, 4*1024*1024)) return false;
-	if(upload_checkrotation($postdata)) return false;
 	if(upload_checkdims($postdata)) return false;
 	if(upload_checksize($postdata)) return false;
 	return upload_insert_file($postdata);
@@ -1022,83 +966,6 @@ function upload_checkrepost(&$postdata) {
 	return true;
 }
 
-function upload_checkrotation(&$postdata) {
-	global $tmpdir;
-
-	if(upload_type($postdata) == "topic" || upload_type($postdata) == "audio")
-		trigger_error("can't check rotation of non-image files", E_USER_ERROR);
-
-	if(array_key_exists("rotate", $postdata) && function_exists("exif_read_data")) {
-		$filename = $tmpdir."/".$postdata['tmpname'];
-		$exif = @exif_read_data($tmpdir."/".$postdata['tmpname']);
-
-		if($exif && array_key_exists("Orientation", $exif)) {
-			$image = new Imagick("$tmpdir/{$postdata['tmpname']}");
-			$image = imageTransform($image, $exif['Orientation']);
-			
-			if(!$image->writeImage("$tmpdir/{$postdata['tmpname']}")) {  
-				trigger_error("ImageMagick/writeImage failed", E_USER_ERROR);
-			}
-			$image->destroy();
-		}
-		// avoid re-rotating (or attempting to) again
-		$postdata['norotate'] = $postdata['rotate'];
-		unset($postdata['rotate']);
-	}
-	
-	if(array_key_exists("norotate", $postdata) ||
-	   array_key_exists("rotate", $postdata)) {
-		if(file_exists("$tmpdir/th{$postdata['tmpname']}"))
-			unlink("$tmpdir/th{$postdata['tmpname']}");
-		if(file_exists("$tmpdir/rh{$postdata['tmpname']}"))
-			unlink("$tmpdir/rh{$postdata['tmpname']}");
-	}
-
-	if(array_key_exists("norotate", $postdata))
-		return false;
-	
-	$filename = $tmpdir."/".$postdata['tmpname'];
-	if(function_exists("exif_read_data")) {
-		$exif = @exif_read_data($filename);
-	}
-
-	if(!$exif || !array_key_exists("Orientation", $exif)) {
-		return false;
-	}
-
-	if(!needTransform($exif['Orientation']))
-		return false;
-	
-	$thfile  = $tmpdir . '/th' . $postdata['tmpname'];
-	$rhfile  = $tmpdir . '/rh' . $postdata['tmpname'];
-	
-	$image = new Imagick("$tmpdir/{$postdata['tmpname']}");
-	$image->resizeImage(100,100, imagick::FILTER_UNDEFINED, 1, true);
-	if(!$image->writeImage($thfile)) {  
-		trigger_error("ImageMagick/writeImage failed", E_USER_ERROR);
-	}
-	$image = imageTransform($image, $exif['Orientation']);
-	if(!$image->writeImage($rhfile)) {  
-		trigger_error("ImageMagick/writeImage failed", E_USER_ERROR);
-	}
-	$image->destroy();
-
-	$message = "Is it sideways?<br />If you want, I can try rotating it for you.<br/><br/>
-	<center><table><tr><td align='middle'>Original</td><td align='middle'>Fixed</td></tr>
-	<tr><td><img src='/offensive/$tmpdir/th{$postdata['tmpname']}'></td><td><img src='/offensive/$tmpdir/rh{$postdata['tmpname']}'></td></tr></table></center><br/>
-
-	<form action=\"{$_SERVER['PHP_SELF']}\" method=\"POST\">
-		<input type=\"hidden\" name=\"c\" value=\"upload\">
-		<input type=\"submit\" name=\"killit\" value=\"Cancel this upload.\"/>
-		<input type=\"submit\" name=\"rotate\" value=\"Rotate it for me.\"/>
-		<input type=\"submit\" name=\"norotate\" value=\"Post it anyway.\"/>
-	</form>";
-	box($message, "¡sǝou ɥo");
-	$_SESSION['postdata'] = serialize($postdata);
-
-	return true;
-}
-
 function upload_largerthan($postdata, $bytes) {
 	global $tmpdir;
 
@@ -1167,7 +1034,11 @@ function upload_insert_file($postdata) {
 		if(image_is_animated($image)) {
 			$image->flattenImages();
 		}
-		
+
+		// phone photos are stored sideways with an EXIF Orientation tag. The
+		// upload itself is left as it is (browsers honour the tag), but the
+		// thumbnail loses the tag, so turn the thumbnail's pixels instead.
+		$image->autoOrient();
 		$image->setGravity(imagick::GRAVITY_CENTER);
 		
 		if(!$image->cropThumbnailImage(133,100)) {
