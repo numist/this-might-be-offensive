@@ -119,31 +119,6 @@ function requestDetail() {
 	return $string;
 }
 
-function needTransform($orientation) {
-	/*
-	 *   1        2       3      4         5            6           7          8
-     *
-	 * 888888  888888      88  88      8888888888  88                  88  8888888888
-	 * 88          88      88  88      88  88      88  88          88  88      88  88
-	 * 8888      8888    8888  8888    88          8888888888  8888888888          88
-	 * 88          88      88  88
-	 * 88          88  888888  888888
-	 */
-
-	switch($orientation) {
-		case 2:
-		case 3:
-		case 4:
-		case 5:
-		case 6:
-		case 7:
-		case 8:
-			return true;
-		default:
-			return false;
-	}
-}
-
 function killUpload($postdata) {
 	global $tmpdir;
 	unset($_SESSION['postdata']);
@@ -656,7 +631,6 @@ function upload_type(&$postdata) {
 ###############################################################################
 function upload_image($postdata) {
 	if(upload_largerthan($postdata, 4*1024*1024)) return false;
-	if(upload_checkrotation($postdata)) return false;
 	$lowercase_filename = strtolower($postdata['filename']);
 	if(!strstr($lowercase_filename, "[repost]") &&
 	   !strstr($lowercase_filename, "[tiar]") &&
@@ -671,7 +645,6 @@ function upload_image($postdata) {
 
 function upload_avatar($postdata) {
 	if(upload_largerthan($postdata, 4*1024*1024)) return false;
-	if(upload_checkrotation($postdata)) return false;
 	if(upload_checkdims($postdata)) return false;
 	if(upload_checksize($postdata)) return false;
 	return upload_insert_file($postdata);
@@ -993,41 +966,6 @@ function upload_checkrepost(&$postdata) {
 	return true;
 }
 
-/*
- * Phones store photos sideways and set the EXIF Orientation tag to say how to
- * turn them. Every current browser honours that tag, so rotating the pixels
- * without resetting it makes the browser turn the image a second time; that
- * is what the old "Rotate it for me" prompt did. Thumbnails lose the tag
- * altogether, so leaving the image alone gave a sideways thumbnail.
- *
- * Instead, always rotate the pixels and set the tag to 1 (Imagick's
- * autoOrient() does both), without asking. The JPEG is re-encoded at the
- * quality it came in at.
- *
- * Returns false: this never needs to stop the upload.
- */
-function upload_checkrotation(&$postdata) {
-	global $tmpdir;
-
-	if(upload_type($postdata) == "topic" || upload_type($postdata) == "audio")
-		trigger_error("can't check rotation of non-image files", E_USER_ERROR);
-
-	$filename = "$tmpdir/{$postdata['tmpname']}";
-	$exif = function_exists("exif_read_data") ? @exif_read_data($filename) : false;
-	if(!$exif || !array_key_exists("Orientation", $exif) || !needTransform($exif['Orientation'])) {
-		return false;
-	}
-
-	$image = new Imagick($filename);
-	$image->autoOrient();
-	if(!$image->writeImage($filename)) {
-		trigger_error("ImageMagick/writeImage failed", E_USER_ERROR);
-	}
-	$image->destroy();
-
-	return false;
-}
-
 function upload_largerthan($postdata, $bytes) {
 	global $tmpdir;
 
@@ -1096,7 +1034,11 @@ function upload_insert_file($postdata) {
 		if(image_is_animated($image)) {
 			$image->flattenImages();
 		}
-		
+
+		// phone photos are stored sideways with an EXIF Orientation tag. The
+		// upload itself is left as it is (browsers honour the tag), but the
+		// thumbnail loses the tag, so turn the thumbnail's pixels instead.
+		$image->autoOrient();
 		$image->setGravity(imagick::GRAVITY_CENTER);
 		
 		if(!$image->cropThumbnailImage(133,100)) {
