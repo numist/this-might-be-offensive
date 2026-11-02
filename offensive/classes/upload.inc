@@ -602,6 +602,8 @@ class Upload {
 		
 		$retname = $this->basePath().$thumbpath;
 		$image = new Imagick($bigfile);
+		// the file keeps its EXIF Orientation tag; the thumbnail won't
+		$image->autoOrient();
 		$image->setGravity(imagick::GRAVITY_CENTER);
 		$image->flattenImages();
 		if(!$image->cropThumbnailImage(133,100)) {
