@@ -37,17 +37,22 @@ if(array_key_exists('APIC', $info['id3v2'])
    && count($info['id3v2']['APIC']) > 0
    && array_key_exists('data', $info['id3v2']['APIC'][0])) {
 	$artdata = $info['id3v2']['APIC'][0]['data'];
-	$mime = $info['id3v2']['APIC'][0]['mime'];
 } else if(array_key_exists('PIC', $info['id3v2'])
           && count($info['id3v2']['PIC']) > 0
           && array_key_exists('data', $info['id3v2']['PIC'][0])) {
 	$artdata = $info['id3v2']['PIC'][0]['data'];
-	$mime = $info['id3v2']['PIC'][0]['image_mime'];
 }
 
 if(!$artdata) fail();
 
-header("Content-Type: $mime");
+// The tag's own MIME field is free text ("jpg", "PNG", "image/jpg", or empty)
+// and nginx sends nosniff, so browsers won't guess past a bad one. Name the
+// type from the bytes instead, and only for formats we'd accept as an upload.
+$size = @getimagesizefromstring($artdata);
+$allowed = [IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_GIF, IMAGETYPE_WEBP];
+if(!$size || !in_array($size[2], $allowed)) fail();
+
+header("Content-Type: ".image_type_to_mime_type($size[2]));
 
 echo $artdata;
 
