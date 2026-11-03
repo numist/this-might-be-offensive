@@ -9,7 +9,7 @@ require_once("offensive/assets/isk.inc");
 global $upload_display_prompt, $tmpdir, $filetypes;
 $upload_display_prompt = true;
 $tmpdir = "quarantine";
-$filetypes = array("jpg", "jpeg", "gif", "png");
+$filetypes = array("jpg", "jpeg", "gif", "png", "webp");
 
 
 /*
@@ -186,15 +186,21 @@ function upload() {
 		$postdata['tmpname'] = explode("/", $_FILES['image']['tmp_name']);
 		$postdata['tmpname'] = array_pop($postdata['tmpname']);
 		// having the file extension helps ImageMagick do its thing.
-		$postdata['file_extension'] = getFileExtension($_FILES['image']['name']);
+		// only a short alphanumeric one, though; it ends up in a path.
+		$postdata['file_extension'] = strtolower((string)getFileExtension($_FILES['image']['name']));
+		if(!preg_match('/^\.[a-z0-9]{1,8}$/', $postdata['file_extension'])) {
+			$postdata['file_extension'] = "";
+		}
 		$postdata['tmpname'] = $postdata['tmpname'].$postdata['file_extension'];
-		// rename filename if filename field is submitted on the form. 
-		if(array_key_exists('filename', $_POST) && !empty($_POST['filename'])) {
-			$postdata['filename'] = $_POST['filename'];
-		} else {
-			$postdata['filename'] = $_FILES['image']['name'];
-		}				
-		$postdata['filename'] = str_replace(array("&", "/", "\\", "?", "#", '"', "'"), '_', $postdata['filename']);
+		// the title the uploader typed wins over the name of the file they picked.
+		// it doubles as the stored file name, so it has to be sanitized either way.
+		$title = array_key_exists('filename', $_POST) && is_string($_POST['filename'])
+		         ? sanitizeUploadTitle($_POST['filename'])
+		         : "";
+		if($title == "") {
+			$title = sanitizeUploadTitle($_FILES['image']['name']);
+		}
+		$postdata['filename'] = $title == "" ? "upload" : $title;
 		if(array_key_exists('nsfw', $_POST) || strpos(strtolower($postdata['filename']), "[nsfw]") !== false)
 			$postdata['nsfw'] = $_POST['nsfw'];
 		if(array_key_exists('tmbo', $_POST) || strpos(strtolower($postdata['filename']), "[tmbo]") !== false)
@@ -220,7 +226,16 @@ function upload() {
 		}
 	}
 
-	switch(upload_type($postdata)) {
+	$type = upload_type($postdata);
+	if($type == "image-unsupported") {
+		killUpload($postdata);
+		box("HEIC and AVIF images aren't supported. Save it as a JPEG and try again.
+		     (On an iPhone: Settings &rsaquo; Camera &rsaquo; Formats &rsaquo; Most Compatible.)", "sorry.");
+		uploadForm();
+		return false;
+	}
+
+	switch($type) {
 		case "image":
 			return upload_image($postdata);
 		case "avatar":
@@ -258,6 +273,25 @@ function upload_type(&$postdata) {
 	}
 
 	$format_info = array(
+		// These container formats come first: the generic RIFF and QuickTime
+		// patterns below would match them too, and the first match wins.
+
+		// WebP - still or animated image - stored as uploaded
+		'webp' => array(
+					'pattern'    => '^RIFF.{4}WEBP',
+					'group'      => 'image',
+					'extensions' => array('.webp', ),
+				  ),
+
+		// HEIF/HEIC and AVIF - still image - ISO-BMFF, identified by the ftyp brand.
+		// Not accepted: decoding them would put libheif's HEVC and AV1 decoders
+		// in reach of uploads. Detected only so upload() can say what to do
+		// instead of the generic rejection (and its suspicious-upload email).
+		'heif' => array(
+					'pattern'    => '^.{4}ftyp(heic|heix|hevc|hevx|heim|heis|mif1|msf1|avif|avis)',
+					'group'      => 'image-unsupported',
+				  ),
+
 
 		// Audio formats
 
@@ -593,7 +627,7 @@ function upload_type(&$postdata) {
 					$postdata['filename'] = $postdata['filename'].".".$format_name;
 					$postdata['file_extension'] = ".".$format_name;
 				} else if(!in_array($current_extension, $info['extensions'])) {
-					if(in_array($current_extension, array(".jpg", ".jpeg", ".jpe", ".jfif", ".jif", ".gif", ".png", ".tiff", ".tif", ".bmp", ".dib"))) {
+					if(in_array($current_extension, array(".jpg", ".jpeg", ".jpe", ".jfif", ".jif", ".gif", ".png", ".tiff", ".tif", ".bmp", ".dib", ".webp"))) {
 						// replace the extension if the upload already has an image extension
 						$postdata['filename'] = substr($postdata['filename'], 0, strrpos($postdata['filename'], ".")).".".$format_name;
 					} else {
@@ -620,6 +654,10 @@ function upload_type(&$postdata) {
 
 	$foo = new getid3_id3v2($fp, $inf);
 	if(count($inf) > 0 && preg_match('/\.mp3$/i', $filename)) {
+		// the title may have come from the form without an extension
+		if(!preg_match('/\.mp3$/i', $postdata['filename'])) {
+			$postdata['filename'] .= ".mp3";
+		}
 		$upload_identified_key = "mp3";
 		$upload_identified_type = "audio";
 		return $upload_identified_type;
@@ -788,7 +826,7 @@ function upload_checksize(&$postdata) {
 
 	$filesize_k = round($filesize / 1024);
 
-	$message = "This image has a pretty big filesize for its dimensions. Expected file size: ${expectedFileSize}k. Your file: ${filesize_k}k.<br />If you want, I can resample it as an 90% quality JPG image.<br /><br />
+	$message = "This image has a pretty big filesize for its dimensions. Expected file size: {$expectedFileSize}k. Your file: {$filesize_k}k.<br />If you want, I can resample it as an 90% quality JPG image.<br /><br />
 		<form action=\"{$_SERVER['PHP_SELF']}\" method=\"POST\">
 			<input type=\"hidden\" name=\"c\" value=\"upload\">
 			<input type=\"submit\" name=\"killit\" value=\"Cancel this upload.\"/>
@@ -1079,25 +1117,31 @@ function upload_insert_file($postdata) {
 				$thumbname = "$path/thumbs/th$fileid";
 				file_put_contents($thumbname, $artdata);
 
-				// generate the thumbnail if necessary
-				list($width, $height, $type, $attr) = getimagesize($thumbname);
-				if($width > 100 || $height > 100) {
-					
-					$image = new Imagick($thumbname);
+				// cover art is whatever bytes the MP3 carried: keep it only if it's a
+				// format we'd accept as an upload (the ImageMagick policy refuses the
+				// rest anyway), and drop it rather than fail the upload if it won't
+				// decode.
+				$info = @getimagesize($thumbname);
+				$allowed = array(IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_GIF, IMAGETYPE_WEBP);
+				if(!$info || !in_array($info[2], $allowed)) {
+					unlink($thumbname);
+				} else if($info[0] > 100 || $info[1] > 100) {
+					try {
+						$image = new Imagick($thumbname);
 
-					if(image_is_animated($image)) {
-						$image->flattenImages();
-					}
+						if(image_is_animated($image)) {
+							$image->flattenImages();
+						}
 
-					$image->setGravity(imagick::GRAVITY_CENTER);
-					if(!$image->cropThumbnailImage(100,100)) {
-						trigger_error("ImageMagick/cropThumbnailImage failed", E_USER_ERROR);
+						$image->setGravity(imagick::GRAVITY_CENTER);
+						$image->cropThumbnailImage(100,100);
+						$image->setImagePage(0, 0, 0, 0);
+						$image->writeImage($thumbname);
+						$image->destroy();
+					} catch(ImagickException $e) {
+						trigger_error("cover art thumbnail failed: ".$e->getMessage(), E_USER_WARNING);
+						unlink($thumbname);
 					}
-					$image->setImagePage(0, 0, 0, 0);
-					if(!$image->writeImage($thumbname)) {
-						trigger_error("ImageMagick/writeImage failed", E_USER_ERROR);
-					}
-					$image->destroy();
 				}
 			}
 		}
