@@ -68,19 +68,6 @@ header( "Content-type: text/xml" );
 			
 				ob_start();
 				
-				$args = "mp3=".urlencode($server.$upload->URL())."&amp;".
-						"width=500&amp;".
-						"showvolume=1&amp;".
-						"showloading=always&amp;".
-						"buttonwidth=25&amp;".
-						"sliderwidth=15&amp;".
-						"volumewidth=36&amp;".
-						"volumeheight=8&amp;".
-						"loadingcolor=9d9d9d&amp;".
-						"sliderovercolor=9999ff&amp;".
-						"buttonovercolor=9999ff&amp;".
-						"autoload=1";
-				
 				$fp = fopen($upload->file(), 'r');
 				$id3 = new getid3_id3v2($fp, $info);
 				
@@ -121,11 +108,7 @@ header( "Content-type: text/xml" );
 					
 			?>
 			
-			<object type="application/x-shockwave-flash" data="<?= $server ?>/offensive/ui/player_mp3_maxi.swf" width="500" height="20">
-			    <param name="movie" value="<?= $server ?>/offensive/ui/player_mp3_maxi.swf" />
-			    <param name="bgcolor" value="#ffffff" />
-			    <param name="FlashVars" value="<?= $args ?>" />
-			</object>
+			<audio src="<?= $fileURL ?>" controls preload="none"><a href="<?= $fileURL ?>">download</a></audio>
 			<?php
 			
 			$string = ob_get_contents();
