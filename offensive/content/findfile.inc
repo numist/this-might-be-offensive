@@ -42,85 +42,76 @@
 	<div class="blackbar"></div>
 	<div class="heading">search results</div>
 	<div class="bluebox">
-	
-	
-	
-<table width="100%">
-
-
 <?php
 		if( mysqli_num_rows( $result ) == 0 ) {
-			echo "<p>No dice, but thanks for playing.</p>";
+			?><p>No dice, but thanks for playing.</p><?php
+		} else {
+			?><ul class="imagelist"><?php
 		}
-		
+
 		while( $row = mysqli_fetch_assoc( $result ) ) {
-			$style = (isset($style) && $style == "") ? "background:var(--bg-content-alt);" : "";
-			$css = (isset($css) && $css == "evenfile") ? "oddfile" : "evenfile";
-			
 			$upload = new Upload($row);
-			
+
 			$filename = $upload->htmlFilename($upload->type() != 'image');
-			
-			$expired = $upload->expired() ? "(expired)" : "";
+			$date = date( "Y-m-d", strtotime( $upload->timestamp() ) );
 ?>
-	
-			<tr class="<?php echo $css ?>" style="<?= $style ?>">
+			<li>
 				<?php if( $upload->type() == 'topic') { ?>
-					<td width="100px"><?php echo date( "Y-m-d", strtotime( $upload->timestamp() ) ) ?></td>
-					<td><a class="<?php echo $css ?>" href="<?= Link::thread($upload) ?>"><?= $filename ?></a></td>
-					<td width="100px" align="center"><a class="<?php echo $css ?>" href="<?= Link::thread($upload) ?>"><?=
-						$upload->commentLabel(false);
-						?></td>
+					<div><a href="<?= Link::thread($upload) ?>"><?= $filename ?></a></div>
+					<div>
+						<a href="<?= Link::thread($upload) ?>"><?= $upload->commentLabel(false) ?></a><br />
+						<?= $date ?>
+					</div>
 				<?php } else { ?>
-					<td width="100px" height="100px">
-					<a href="<?= Link::upload($upload) ?>"
-						<?php if($upload->filtered()) { ?>
-							onMouseOver='changesrc("th<?= $upload->id()?>","<?= $upload->thumbURL() ?>")'
-					 		onMouseOut='changesrc("th<?= $upload->id() ?>","/offensive/graphics/th-filtered.gif")'
-						<?php } ?>
-					><img name="th<?= $upload->id()?>"
-						src="<?= $upload->filtered()
-							? "/offensive/graphics/th-filtered.gif" 
-							: $upload->thumbURL() ?>"
-					/></a>
-					</td>
-					<td><a class="<?php echo $css ?>" href="<?= Link::upload($upload) ?>"><?= $filename ?></a> (uploaded by <?= htmlEscape($upload->uploader()->username()) ?>)<?php echo  $expired ?></td>
-					<td width="170px" align="center"><a class="<?= $css ?>" href="<?= Link::thread($upload) ?>"><nobr><?= 
-						$upload->commentLabel();
-					?></nobr><br /><?=
-						date( "Y-m-d", strtotime( $upload->timestamp() ) )
-					?></td>
+					<div>
+						<a href="<?= Link::upload($upload) ?>"
+							<?php if($upload->filtered()) { ?>
+								onMouseOver='changesrc("th<?= $upload->id()?>","<?= $upload->thumbURL() ?>")'
+								onMouseOut='changesrc("th<?= $upload->id() ?>","/offensive/graphics/th-filtered.gif")'
+							<?php } ?>
+						><img name="th<?= $upload->id()?>" alt=""
+							src="<?= $upload->filtered()
+								? "/offensive/graphics/th-filtered.gif"
+								: $upload->thumbURL() ?>"
+						/></a><br />
+						<a href="<?= Link::upload($upload) ?>"><?= $filename ?></a>
+						(uploaded by <?= htmlEscape($upload->uploader()->username()) ?>)
+						<?= $upload->expired() ? "(expired)" : "" ?>
+					</div>
+					<div>
+						<a href="<?= Link::thread($upload) ?>"><?= $upload->commentLabel() ?></a><br />
+						<?= $date ?>
+					</div>
 				<?php } ?>
-			</tr>
-	
-<?php 	
+			</li>
+<?php
 		}
+
+		if( mysqli_num_rows( $result ) > 0 ) {
+			?></ul><?php
+		}
+
+		$pageLink = function($p) use ($find) {
+			return Link::content("findfile")."&".http_build_query(array("findfile" => $find, "p" => $p));
+		};
 ?>
-
-	<tr>
-		<td>
-			<?php if( $page > 0 ) { ?>
-				<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'] ?>&findfile=<?= urlencode($_REQUEST['findfile']) ?>&p=<?= $page - 1 ?>">&laquo; <b>previous page</b></a></td>
-			<?php } ?>
-		</td>
-		<td></td>
-		<td style="text-align:right">
-			<?php if( mysqli_num_rows( $result ) == $numPerPage ) { ?>
-				<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'] ?>&findfile=<?= urlencode($_REQUEST['findfile']) ?>&p=<?= $page + 1 ?>"><b>next page</b></a> &raquo;
-			<?php } ?>
-		</td>
-	</tr>
-
-
-</table>
-
-
-
+		<div id="commands">
+			<div>
+				<?php if( $page > 0 ) { ?>
+					<a href="<?= htmlEscape($pageLink($page - 1)) ?>">&laquo; <b>previous page</b></a>
+				<?php } ?>
+			</div>
+			<div>
+				<?php if( mysqli_num_rows( $result ) == $numPerPage ) { ?>
+					<a href="<?= htmlEscape($pageLink($page + 1)) ?>"><b>next page</b></a> &raquo;
+				<?php } ?>
+			</div>
+		</div>
 	</div>
 	<div class="blackbar"></div>
 </div>
 <?php
-		
+
 	}
 
 ?>

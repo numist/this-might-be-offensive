@@ -88,7 +88,7 @@
 		<META NAME="ROBOTS" CONTENT="NOARCHIVE" />
 		<title>[<?= $upload->type() ?>] : <?= htmlEscape($upload->filename()) ?> </title>
 		<!-- <?php if($upload->next_filtered()) { ?>
-			<link rel="prefetch" href="<?= $_SERVER['PHP_SELF'] ?>?id=<?= $upload->next_filtered()->id() ?>"/>
+			<link rel="prefetch" href="<?= $_SERVER['SCRIPT_NAME'] ?>?id=<?= $upload->next_filtered()->id() ?>"/>
 		<?php } ?> -->
 
 		<script type="text/javascript">

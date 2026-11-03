@@ -61,7 +61,7 @@
 ?>
 		<div class="bluebox">
 		
-			<form method="post" action="<?php echo $_SERVER['PHP_SELF'] ?>">
+			<form method="post" action="<?php echo $_SERVER['SCRIPT_NAME'] ?>">
 
 				<div style="text-align:center">
 					<div class="label">about:
