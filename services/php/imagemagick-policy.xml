@@ -16,7 +16,8 @@
   but MP3 cover art is handed to Imagick unchecked, and every decoder that can
   run is attack surface. So: deny every coder, then allow only the formats the
   site accepts. JPG and JPE are aliases ImageMagick picks from a file's
-  extension. HEIC and AVIF are only for converting uploads to JPEG.
+  extension. HEIC and AVIF are deliberately left out: libheif's HEVC and AV1
+  decoders stay out of reach.
 -->
 <policymap>
   <policy domain="resource" name="memory" value="256MiB"/>
@@ -34,5 +35,5 @@
   <policy domain="path" rights="none" pattern="@*"/>
 
   <policy domain="coder" rights="none" pattern="*"/>
-  <policy domain="coder" rights="read|write" pattern="{GIF,JPEG,JPG,JPE,PNG,WEBP,HEIC,AVIF}"/>
+  <policy domain="coder" rights="read|write" pattern="{GIF,JPEG,JPG,JPE,PNG,WEBP}"/>
 </policymap>

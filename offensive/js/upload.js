@@ -8,11 +8,10 @@
 	const CAMERA_NAME = /^(img|dsc[fn]?|dcim|pxl|mvimg|photo|image|screenshot|screen shot|signal|whatsapp image|received|\d[\d_ -]*$)([ _-]|\d|$)/i;
 
 	// the extension the server gives a typed title (upload_type() uses the
-	// format's name, and HEIC/AVIF are converted to JPEG). A guess from the
-	// file's name; the server goes by the file's contents.
+	// format's name). A guess from the file's name; the server goes by the
+	// file's contents.
 	const STORED_EXTENSION = {
 		jpg: "jpg", jpeg: "jpg", jpe: "jpg", jfif: "jpg", jif: "jpg",
-		heic: "jpg", heif: "jpg", hif: "jpg", avif: "jpg",
 		png: "png", gif: "gif", webp: "webp", mp3: "mp3",
 	};
 
