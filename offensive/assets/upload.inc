@@ -11,6 +11,10 @@ $upload_display_prompt = true;
 $tmpdir = "quarantine";
 $filetypes = array("jpg", "jpeg", "gif", "png");
 
+// largest image or avatar we'll take, in bytes. PHP (services/php/php.ini) and
+// nginx (client_max_body_size) both allow 20M, so this is the limit that bites.
+const UPLOAD_MAX_BYTES = 8 * 1024 * 1024;
+
 
 /*
  * uploading_file -- determines whether or not a file is being uploaded
@@ -630,7 +634,7 @@ function upload_type(&$postdata) {
 
 ###############################################################################
 function upload_image($postdata) {
-	if(upload_largerthan($postdata, 4*1024*1024)) return false;
+	if(upload_largerthan($postdata, UPLOAD_MAX_BYTES)) return false;
 	$lowercase_filename = strtolower($postdata['filename']);
 	if(!strstr($lowercase_filename, "[repost]") &&
 	   !strstr($lowercase_filename, "[tiar]") &&
@@ -644,7 +648,7 @@ function upload_image($postdata) {
 }
 
 function upload_avatar($postdata) {
-	if(upload_largerthan($postdata, 4*1024*1024)) return false;
+	if(upload_largerthan($postdata, UPLOAD_MAX_BYTES)) return false;
 	if(upload_checkdims($postdata)) return false;
 	if(upload_checksize($postdata)) return false;
 	return upload_insert_file($postdata);
