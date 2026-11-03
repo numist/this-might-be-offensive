@@ -1181,25 +1181,31 @@ function upload_insert_file($postdata) {
 				$thumbname = "$path/thumbs/th$fileid";
 				file_put_contents($thumbname, $artdata);
 
-				// generate the thumbnail if necessary
-				list($width, $height, $type, $attr) = getimagesize($thumbname);
-				if($width > 100 || $height > 100) {
-					
-					$image = new Imagick($thumbname);
+				// cover art is whatever bytes the MP3 carried: keep it only if it's a
+				// format we'd accept as an upload (the ImageMagick policy refuses the
+				// rest anyway), and drop it rather than fail the upload if it won't
+				// decode.
+				$info = @getimagesize($thumbname);
+				$allowed = array(IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_GIF, IMAGETYPE_WEBP);
+				if(!$info || !in_array($info[2], $allowed)) {
+					unlink($thumbname);
+				} else if($info[0] > 100 || $info[1] > 100) {
+					try {
+						$image = new Imagick($thumbname);
 
-					if(image_is_animated($image)) {
-						$image->flattenImages();
-					}
+						if(image_is_animated($image)) {
+							$image->flattenImages();
+						}
 
-					$image->setGravity(imagick::GRAVITY_CENTER);
-					if(!$image->cropThumbnailImage(100,100)) {
-						trigger_error("ImageMagick/cropThumbnailImage failed", E_USER_ERROR);
+						$image->setGravity(imagick::GRAVITY_CENTER);
+						$image->cropThumbnailImage(100,100);
+						$image->setImagePage(0, 0, 0, 0);
+						$image->writeImage($thumbname);
+						$image->destroy();
+					} catch(ImagickException $e) {
+						trigger_error("cover art thumbnail failed: ".$e->getMessage(), E_USER_WARNING);
+						unlink($thumbname);
 					}
-					$image->setImagePage(0, 0, 0, 0);
-					if(!$image->writeImage($thumbname)) {
-						trigger_error("ImageMagick/writeImage failed", E_USER_ERROR);
-					}
-					$image->destroy();
 				}
 			}
 		}
