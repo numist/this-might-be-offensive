@@ -177,7 +177,7 @@
 			<?php if( ! $accountCreated ) { ?>
 				<span class="small" >
 					<div style="width:400px;margin-bottom:12px;"><?= $message != null ? $message->message : "" ?></div>
-					<form name="newaccount" action="<?php echo $_SERVER['PHP_SELF']?>" method="post" onSubmit="return checkPasswords()" method="post">
+					<form name="newaccount" action="<?php echo $_SERVER['SCRIPT_NAME']?>" method="post" onSubmit="return checkPasswords()" method="post">
 						<table>
 							<tr>
 								<td class="label">desired username:</td>

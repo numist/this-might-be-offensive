@@ -100,13 +100,13 @@
 	<tr>
 		<td>
 			<?php if( $page > 0 ) { ?>
-				<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'] ?>&findfile=<?= urlencode($_REQUEST['findfile']) ?>&p=<?= $page - 1 ?>">&laquo; <b>previous page</b></a></td>
+				<a href="<?= $_SERVER['SCRIPT_NAME'] ?>?c=<?= $_REQUEST['c'] ?>&findfile=<?= urlencode($_REQUEST['findfile']) ?>&p=<?= $page - 1 ?>">&laquo; <b>previous page</b></a></td>
 			<?php } ?>
 		</td>
 		<td></td>
 		<td style="text-align:right">
 			<?php if( mysqli_num_rows( $result ) == $numPerPage ) { ?>
-				<a href="<?= $_SERVER['PHP_SELF'] ?>?c=<?= $_REQUEST['c'] ?>&findfile=<?= urlencode($_REQUEST['findfile']) ?>&p=<?= $page + 1 ?>"><b>next page</b></a> &raquo;
+				<a href="<?= $_SERVER['SCRIPT_NAME'] ?>?c=<?= $_REQUEST['c'] ?>&findfile=<?= urlencode($_REQUEST['findfile']) ?>&p=<?= $page + 1 ?>"><b>next page</b></a> &raquo;
 			<?php } ?>
 		</td>
 	</tr>

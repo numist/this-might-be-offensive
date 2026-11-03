@@ -6,7 +6,7 @@
 		$orderid = $_REQUEST['orderid'];
 		$sql = "UPDATE merch_orders set status='shipped' WHERE id=$orderid LIMIT 1";
 		mysqli_query($link, $sql );
-		header( "Location: " . $_SERVER['PHP_SELF'] );		
+		header( "Location: " . $_SERVER['SCRIPT_NAME'] );		
 	}
 
 ?>
