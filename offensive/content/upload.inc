@@ -59,13 +59,14 @@
 					<form id="uploadform" method="post"
 					      action="<?php echo $_SERVER['PHP_SELF']?>"
 					      enctype="multipart/form-data">
-						<!-- the file input is visually hidden; its label is the button, and
-						     the title field next to it shows the picked file's name -->
-						<input type="file" name="image" id="image" />
-						<label for="image">choose file</label>
+						<!-- the file input shows only its button (styles/upload.css); once a
+						     file is picked, the title field and extension take the place of
+						     the browser's file-name readout -->
+						<input type="file" name="image" id="image" required aria-label="file" />
 						<input type="text" name="filename" id="filename" maxlength="120"
-						       aria-label="title" placeholder="name it."
+						       aria-label="title" aria-describedby="extension" placeholder="name it."
 						       autocomplete="off" enterkeyhint="send" />
+						<span id="extension" title="the file extension is added for you">.ext</span>
 
 						<fieldset>
 							<label><input type="checkbox" name="nsfw" value="1"/> [ nsfw ]</label>

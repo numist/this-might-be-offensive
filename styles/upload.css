@@ -1,42 +1,26 @@
-/* upload form: a "choose file" button and the title field on one line,
-   the options and the upload button under them */
+/* upload form: the file button, title and extension on one line, then the
+   options and the upload button. Works without JS; upload.js only fills in
+   the title, placeholder and extension from the picked file. */
 #uploadform {
 	display: grid;
-	grid-template-columns: max-content minmax(0, 1fr);
+	grid-template-columns: max-content minmax(0, 1fr) max-content;
 	gap: var(--spacing-sm);
-	margin-top: var(--spacing);
+	align-items: center;
+	max-width: 475px;
+	margin: var(--spacing) auto 0;
 	text-align: left;
 
-	/* hidden but still focusable and still the thing that holds the file */
+	/* keep the native input (it's the drop target for drag-and-drop and needs
+	   no JS) but hide its "No file chosen" / file-name text: the title field
+	   takes that place */
 	> input[type=file] {
-		position: absolute;
-		width: 1px;
-		height: 1px;
-		opacity: 0;
-		overflow: hidden;
-	}
+		font-size: 0;
+		max-width: 100%;
 
-	> label[for=image] {
-		display: flex;
-		align-items: center;
-		/* tall enough on its own, before the title field appears beside it */
-		min-height: 2em;
-		padding: 0 var(--spacing-sm);
-		border: 1px solid var(--color-brand-medium);
-		border-radius: 3px;
-		background: var(--bg-content-alt);
-		color: var(--color-brand-dark);
-		cursor: pointer;
-		white-space: nowrap;
-	}
-
-	> label[for=image]:hover {
-		background: var(--color-brand-light);
-	}
-
-	&:has(> #image:focus-visible) > label[for=image] {
-		outline: 2px solid var(--color-link);
-		outline-offset: 1px;
+		&::file-selector-button {
+			font-size: 13.333px;
+			margin: 0;
+		}
 	}
 
 	> input[type=text] {
@@ -47,6 +31,17 @@
 		font-size: 16px;
 	}
 
+	> #extension {
+		color: var(--color-brand-medium);
+		font-size: 16px;
+	}
+
+	/* nothing to title until there's a file; the input is required, so it's
+	   :invalid until one is picked */
+	&:has(> #image:invalid) > :is(#filename, #extension) {
+		display: none;
+	}
+
 	> fieldset,
 	> input[type=submit] {
 		grid-column: 1 / -1;
@@ -54,8 +49,9 @@
 
 	> fieldset {
 		display: flex;
-		flex-wrap: wrap;
-		gap: var(--spacing-xs) var(--spacing);
+		flex-direction: column;
+		align-items: start;
+		gap: var(--spacing-xs);
 		border: 0;
 		margin: 0;
 		padding: 0;
