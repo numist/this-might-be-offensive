@@ -310,14 +310,14 @@
 
 				if($upload->next_filtered()) {
 					$style = ($upload->next_filtered()->is_nsfw() || $upload->next_filtered()->is_tmbo() ? 'class="warning_link"' : "") ?>
-					<a id="next" <?= $style ?> <?= preload_attr($upload->next_filtered()) ?> href="<?= Link::upload($upload->next_filtered()) ?>" title="<?= str_replace('"', '\\"', $upload->next_filtered()->filename()) ?>">newer</a>
+					<a id="next" <?= $style ?> <?= preload_attr($upload->next_filtered()) ?> href="<?= Link::upload($upload->next_filtered()) ?>" title="<?= htmlEscape($upload->next_filtered()->filename()) ?>">newer</a>
 				<?php } else { ?>
 					<a href="<?= Link::content($index) ?>" id="next" style="visibility:hidden">newer</a>
 				<?php } ?>
 				. <a id="index" href="<?= Link::content($index) ?>">index</a> .
 				<?php if($upload->prev_filtered()) {
 					$style = ($upload->prev_filtered()->is_nsfw() || $upload->prev_filtered()->is_tmbo() ? 'class="warning_link"' : "") ?>
-					<a id="previous" <?= $style ?> <?= preload_attr($upload->prev_filtered()) ?> href="<?= Link::upload($upload->prev_filtered()) ?>" title="<?= str_replace('"', '\\"', $upload->prev_filtered()->filename()) ?>">older</a>
+					<a id="previous" <?= $style ?> <?= preload_attr($upload->prev_filtered()) ?> href="<?= Link::upload($upload->prev_filtered()) ?>" title="<?= htmlEscape($upload->prev_filtered()->filename()) ?>">older</a>
 				<?php } else { ?>
 					<a id="previous" href="<?= Link::content($index) ?>" style="visibility:hidden">older</a>
 				<?php } ?>

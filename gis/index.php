@@ -514,7 +514,7 @@
                                                     <?php
                                                         $filename = substr($upload->filename(), 0, strrpos($upload->filename(), "."));
 							$filename = str_replace(array("<", ">"), array("[", "]"), strip_tags(str_replace(array("[", "]"), array("<", ">"), $filename)));
-                                                        echo (strlen($filename) > 22 ? substr($filename, 0, 22) : $filename);
+                                                        echo htmlEscape(mb_strimwidth($filename, 0, 22));
                                                     if($upload->file()) {
                                                     ?>
                                                     <div class="f">
