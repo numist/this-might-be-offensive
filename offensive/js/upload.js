@@ -20,8 +20,14 @@
 		// what we last put in the box, so we never clobber something the user typed
 		let suggested = "";
 
+		// the file input itself is hidden, so the title field shows what was
+		// picked: as the suggested title, or as the placeholder when the name is
+		// camera junk (that's also what the server falls back to)
+		const placeholder = title.placeholder;
+
 		file.addEventListener("change", function() {
 			const picked = file.files && file.files[0];
+			title.placeholder = picked ? picked.name : placeholder;
 			if(!picked || (title.value !== "" && title.value !== suggested)) return;
 			suggested = suggestedTitle(picked.name);
 			title.value = suggested;

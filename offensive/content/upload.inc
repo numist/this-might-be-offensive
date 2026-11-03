@@ -59,12 +59,12 @@
 					<form id="uploadform" method="post"
 					      action="<?php echo $_SERVER['PHP_SELF']?>"
 					      enctype="multipart/form-data">
-						<label for="image">file:</label>
+						<!-- the file input is visually hidden; its label is the button, and
+						     the title field next to it shows the picked file's name -->
 						<input type="file" name="image" id="image" />
-
-						<label for="filename">title:</label>
+						<label for="image">choose file</label>
 						<input type="text" name="filename" id="filename" maxlength="120"
-						       placeholder="defaults to the file name"
+						       aria-label="title" placeholder="name it."
 						       autocomplete="off" enterkeyhint="send" />
 
 						<fieldset>
