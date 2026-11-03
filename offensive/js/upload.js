@@ -25,8 +25,18 @@
 		// camera junk (that's also what the server falls back to)
 		const placeholder = title.placeholder;
 
+		// no title field until there's a file to title. Hidden from here rather
+		// than in the markup so the form still works without JS; checked on
+		// load because the browser may restore a picked file on back/forward.
+		function showTitleIfPicked() {
+			title.hidden = !(file.files && file.files.length);
+		}
+		showTitleIfPicked();
+		window.addEventListener("pageshow", showTitleIfPicked);
+
 		file.addEventListener("change", function() {
 			const picked = file.files && file.files[0];
+			showTitleIfPicked();
 			title.placeholder = picked ? picked.name : placeholder;
 			if(!picked || (title.value !== "" && title.value !== suggested)) return;
 			suggested = suggestedTitle(picked.name);

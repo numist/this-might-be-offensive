@@ -19,6 +19,8 @@
 	> label[for=image] {
 		display: flex;
 		align-items: center;
+		/* tall enough on its own, before the title field appears beside it */
+		min-height: 2em;
 		padding: 0 var(--spacing-sm);
 		border: 1px solid var(--color-brand-medium);
 		border-radius: 3px;
