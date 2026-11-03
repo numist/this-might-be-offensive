@@ -15,19 +15,12 @@
 		max-width: 100%;
 	}
 
-	/* a textarea so a long title wraps instead of scrolling sideways on a
-	   phone; upload.js keeps Enter from adding a newline */
-	> textarea {
+	> input[type=text] {
 		width: 100%;
 		box-sizing: border-box;
 		padding: var(--spacing-xs);
-		font-family: inherit;
 		/* under 16px, iOS Safari zooms the page when the field is focused */
 		font-size: 16px;
-		resize: none;
-		/* grow with the text; browsers without field-sizing show rows="2" */
-		field-sizing: content;
-		min-height: calc(1lh + 2 * var(--spacing-xs) + 4px);
 	}
 
 	> fieldset,
@@ -46,5 +39,22 @@
 
 	> input[type=submit] {
 		justify-self: start;
+	}
+
+	/* on a phone, put each label above its control so the title field gets
+	   the whole width of the box */
+	@media (width < 500px) {
+		grid-template-columns: minmax(0, 1fr);
+		gap: var(--spacing-xs);
+
+		> label {
+			justify-self: start;
+		}
+
+		> fieldset,
+		> input[type=submit] {
+			grid-column: 1;
+			margin-top: var(--spacing-sm);
+		}
 	}
 }

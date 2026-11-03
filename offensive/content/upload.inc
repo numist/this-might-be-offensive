@@ -63,9 +63,9 @@
 						<input type="file" name="image" id="image" />
 
 						<label for="filename">title:</label>
-						<textarea name="filename" id="filename" rows="2" maxlength="120"
-						          placeholder="defaults to the file name"
-						          autocomplete="off" enterkeyhint="send"></textarea>
+						<input type="text" name="filename" id="filename" maxlength="120"
+						       placeholder="defaults to the file name"
+						       autocomplete="off" enterkeyhint="send" />
 
 						<fieldset>
 							<label><input type="checkbox" name="nsfw" value="1"/> [ nsfw ]</label>
