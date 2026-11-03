@@ -17,6 +17,15 @@
 		const title = document.getElementById("filename");
 		if(!file || !title) return;
 
+		// the title is a textarea only so it can wrap; Enter submits, as it
+		// would in a text input, and never adds a newline
+		title.addEventListener("keydown", function(e) {
+			if(e.key === "Enter" && !e.isComposing) {
+				e.preventDefault();
+				title.form.requestSubmit();
+			}
+		});
+
 		// what we last put in the box, so we never clobber something the user typed
 		let suggested = "";
 

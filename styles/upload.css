@@ -1,0 +1,50 @@
+/* upload form: labels in a narrow column, controls taking the rest of the box */
+#uploadform {
+	display: grid;
+	grid-template-columns: max-content minmax(0, 1fr);
+	gap: var(--spacing-sm);
+	align-items: baseline;
+	margin-top: var(--spacing);
+	text-align: left;
+
+	> label {
+		justify-self: end;
+	}
+
+	> input[type=file] {
+		max-width: 100%;
+	}
+
+	/* a textarea so a long title wraps instead of scrolling sideways on a
+	   phone; upload.js keeps Enter from adding a newline */
+	> textarea {
+		width: 100%;
+		box-sizing: border-box;
+		padding: var(--spacing-xs);
+		font-family: inherit;
+		/* under 16px, iOS Safari zooms the page when the field is focused */
+		font-size: 16px;
+		resize: none;
+		/* grow with the text; browsers without field-sizing show rows="2" */
+		field-sizing: content;
+		min-height: calc(1lh + 2 * var(--spacing-xs) + 4px);
+	}
+
+	> fieldset,
+	> input[type=submit] {
+		grid-column: 2;
+	}
+
+	> fieldset {
+		display: flex;
+		flex-wrap: wrap;
+		gap: var(--spacing-xs) var(--spacing);
+		border: 0;
+		margin: 0;
+		padding: 0;
+	}
+
+	> input[type=submit] {
+		justify-self: start;
+	}
+}
