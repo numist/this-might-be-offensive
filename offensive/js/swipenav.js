@@ -19,7 +19,7 @@
 	const LAST_KEY = "swipenav-last"; // direction last travelled, for preloading
 	const NAV_KEY = "swipenav-nav";   // direction of the navigation in flight
 
-	const IGNORE = "input, textarea, select, [contenteditable], .ui-dialog, .ui-widget-overlay";
+	const IGNORE = "input, textarea, select, audio, video, [contenteditable], .ui-dialog, .ui-widget-overlay";
 
 	let start = null;
 	let preloaded = false;

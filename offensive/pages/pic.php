@@ -440,27 +440,6 @@
 			if($upload->type() == "audio") {
 				require_once("offensive/assets/id3.inc");
 				
-				$args = "mp3=".urlencode($upload->URL())."&amp;".
-						"width=500&amp;".
-						"showvolume=1&amp;".
-						"showloading=always&amp;".
-						"buttonwidth=25&amp;".
-						"sliderwidth=15&amp;".
-						"volumewidth=36&amp;".
-						"volumeheight=8&amp;".
-						"loadingcolor=9d9d9d&amp;".
-						"sliderovercolor=9999ff&amp;".
-						"buttonovercolor=9999ff";
-
-				// if the upload is filtered, do not automatically play
-				// likewise, if we've seen this before and are not asking to loop, do not autoplay
-				if($autoplay) {
-					$args .= "&amp;autoplay=1";
-				}
-				if(array_key_exists('loop', $_REQUEST)) {
-					$args .= "&amp;loop=1";
-				}
-
 				if(file_exists($upload->file())) {
 					$fp = fopen($upload->file(), 'r');
 					$id3 = new getid3_id3v2($fp, $info);
@@ -512,28 +491,21 @@
 
 					?>
 
-						<!--<audio src="<?= $upload->URL() ?>" controls<?php
-							if($autoplay) {
-								echo " autoplay";
-							}
-							if(array_key_exists('loop', $_REQUEST)) {
-								echo " loop";
-							}
-						?>> -->
-						<object type="application/x-shockwave-flash" data="/offensive/ui/player_mp3_maxi.swf" width="500" height="20">
-							<param value="transparent" name="wmode" />
-							<param name="movie" value="/offensive/ui/player_mp3_maxi.swf" />
-							<param name="bgcolor" value="#ffffff" />
-							<param name="FlashVars" value="<?= $args ?>" />
-						</object>
-					<!--</audio>-->
+					<audio src="<?= $upload->URL() ?>" controls preload="metadata"<?php
+						// only autoplay new uploads (or loops), and never one the viewer filters out
+						if($autoplay && !$upload->filtered()) {
+							echo " autoplay";
+						}
+						if(array_key_exists('loop', $_REQUEST)) {
+							echo " loop";
+						}
+					?>><a href="<?= $upload->URL() ?>">download</a></audio>
 
-					<table><tr><td style="text-align:right" width="480px">
-							&nbsp;
-							<?php if(!array_key_exists('loop', $_REQUEST)) { ?>
-									<a style="color:var(--bg-admin); text-decoration:underline" href="<?= Link::upload($upload) ?>&loop">loop</a>
-							<?php } ?>
-					</td></tr></table>
+					<?php if(!array_key_exists('loop', $_REQUEST)) { ?>
+						<div style="text-align:right; max-width:500px">
+							<a style="color:var(--bg-admin); text-decoration:underline" href="<?= Link::upload($upload) ?>&loop">loop</a>
+						</div>
+					<?php } ?>
 					<?php
 				} else { ?>
 					<div style="padding:128px;">[ got nothin' for ya ]</div><?php
