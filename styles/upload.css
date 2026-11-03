@@ -1,0 +1,63 @@
+/* upload form: the file button, title and extension on one line, then the
+   options and the upload button. Works without JS; upload.js only fills in
+   the title, placeholder and extension from the picked file. */
+#uploadform {
+	display: grid;
+	grid-template-columns: max-content minmax(0, 1fr) max-content;
+	gap: var(--spacing-sm);
+	align-items: center;
+	max-width: 475px;
+	margin: var(--spacing) auto 0;
+	text-align: left;
+
+	/* keep the native input (it's the drop target for drag-and-drop and needs
+	   no JS) but hide its "No file chosen" / file-name text: the title field
+	   takes that place */
+	> input[type=file] {
+		font-size: 0;
+		max-width: 100%;
+
+		&::file-selector-button {
+			font-size: 13.333px;
+			margin: 0;
+		}
+	}
+
+	> input[type=text] {
+		width: 100%;
+		box-sizing: border-box;
+		padding: var(--spacing-xs);
+		/* under 16px, iOS Safari zooms the page when the field is focused */
+		font-size: 16px;
+	}
+
+	> #extension {
+		color: var(--color-brand-medium);
+		font-size: 16px;
+	}
+
+	/* nothing to title until there's a file; the input is required, so it's
+	   :invalid until one is picked */
+	&:has(> #image:invalid) > :is(#filename, #extension) {
+		display: none;
+	}
+
+	> fieldset,
+	> input[type=submit] {
+		grid-column: 1 / -1;
+	}
+
+	> fieldset {
+		display: flex;
+		flex-direction: column;
+		align-items: start;
+		gap: var(--spacing-xs);
+		border: 0;
+		margin: 0;
+		padding: 0;
+	}
+
+	> input[type=submit] {
+		justify-self: start;
+	}
+}

@@ -16,6 +16,11 @@
 		
 	}
 	
+	function head() {
+		CSS::add("/styles/upload.css");
+		JS::add("/offensive/js/upload.js");
+	}
+
 	function body() {
 		return upload();
 	}
@@ -51,38 +56,28 @@
 
 
 
-					<form method="post"
-							action="<?php echo $_SERVER['PHP_SELF']?>"
-							enctype="multipart/form-data"
-					>
+					<form id="uploadform" method="post"
+					      action="<?php echo $_SERVER['PHP_SELF']?>"
+					      enctype="multipart/form-data">
+						<!-- the file input shows only its button (styles/upload.css); once a
+						     file is picked, the title field and extension take the place of
+						     the browser's file-name readout -->
+						<input type="file" name="image" id="image" required aria-label="file" />
+						<input type="text" name="filename" id="filename" maxlength="120"
+						       aria-label="title" aria-describedby="extension" placeholder="name it."
+						       autocomplete="off" enterkeyhint="send" />
+						<span id="extension" title="the file extension is added for you">.ext</span>
 
-							<table border="0" cellpadding="4" cellspacing="0" style="text-align:left;margin-left:auto;margin-right:auto">
-								<tr>
-									<td style="text-align:right"><label for="image">file:</label></td>
-									<td><input type="file" name="image" id="image" /></td>
-								</tr>
-								<tr>
-									<td></td>
-									<td><input type="checkbox" id="nsfw" name="nsfw" value="1"/><label for="nsfw">[ nsfw ]</label></td>
-								</tr>
-								<tr>
-									<td></td>
-									<td><input type="checkbox" id="tmbo" name="tmbo" value="1"/><label for="tmbo">[ this might be offensive ]</label></td>
-								</tr>
+						<fieldset>
+							<label><input type="checkbox" name="nsfw" value="1"/> [ nsfw ]</label>
+							<label><input type="checkbox" name="tmbo" value="1"/> [ this might be offensive ]</label>
+						</fieldset>
 
-								<tr>
-									<td></td>
-									<td>
 <?php if($avatar) {?>
-										<input type="hidden" name="avatar" value=""/>
+						<input type="hidden" name="avatar" value=""/>
 <?php }?>
-										<input type="hidden" name="filename" value=""/>
-										<input type="hidden" name="c" value="upload"/>
-										<input type="submit" value="upload"/>
-									</td>
-								</tr>	
-							</table>
-
+						<input type="hidden" name="c" value="upload"/>
+						<input type="submit" value="upload"/>
 					</form>
 
 				<?php } else { ?>

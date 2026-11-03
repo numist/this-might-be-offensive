@@ -135,6 +135,33 @@ function xmlEscape($string) {
 	return htmlspecialchars($string, ENT_QUOTES | ENT_XML1, "UTF-8");
 }
 
+/*
+ * sanitizeUploadTitle -- make a user-supplied upload title safe to use as the
+ * stored file name, the URL segment and the database value it doubles as.
+ *
+ * Drops control, bidi-override and zero-width characters (ZWJ is kept so emoji
+ * sequences survive), replaces characters that mean something in paths or URLs
+ * with "_", collapses whitespace, strips leading dots and trailing dots/spaces,
+ * and caps the length in bytes so "{id}_" + title + extension stays under the
+ * filesystem's 255-byte name limit and the VARCHAR(255) column.
+ *
+ * Output still has to go through htmlEscape(); this is not an XSS defense.
+ * The extension is not handled here: upload_type() forces it from the file's
+ * detected type.
+ */
+function sanitizeUploadTitle($title, $maxBytes = 180)
+{
+	$title = mb_scrub((string)$title, "UTF-8");
+	$title = preg_replace('/\s+/u', " ", $title);
+	$title = preg_replace('/[\p{Cc}\x{200B}\x{200C}\x{200E}\x{200F}\x{202A}-\x{202E}\x{2060}-\x{2069}\x{FEFF}\x{FFFD}]/u', "", $title);
+	$title = str_replace(array("/", "\\", "?", "#", "&", "%", '"', "'", "<", ">", ":", "*", "|"), "_", $title);
+	$title = rtrim(ltrim($title, " ."), " .");
+	if(strlen($title) > $maxBytes) {
+		$title = rtrim(mb_strcut($title, 0, $maxBytes, "UTF-8"), " .");
+	}
+	return $title;
+}
+
 function getFileExtension($filename) {
 	preg_match( "/\.[^\.]+$/", $filename, $matches );
 	if(is_array($matches) && isset($matches[0])) return $matches[0];

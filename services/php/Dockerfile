@@ -20,6 +20,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY services/php/php.ini /usr/local/etc/php/php.ini
 COPY services/php/www.conf /usr/local/etc/php-fpm.d/www.conf
 
+# Only let ImageMagick decode the formats the site accepts (see the file).
+COPY services/php/imagemagick-policy.xml /etc/ImageMagick-7/policy.xml
+# Fail the build if the policy didn't take (e.g. ImageMagick's config moved):
+# it must refuse an SVG.
+RUN php -r 'try { (new Imagick())->readImageBlob("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1\" height=\"1\"/>"); fwrite(STDERR, "ImageMagick policy not applied\n"); exit(1); } catch (ImagickException $e) {}'
+
 # Set working directory
 WORKDIR /var/www/html
 
