@@ -1190,70 +1190,14 @@ class getid3_lib
 
 
 	static function GetDataImageSize($imgData) {
-		$height = '';
-		$width  = '';
-		$type   = '';
-		if ((substr($imgData, 0, 3) == GETID3_GIF_SIG) && (strlen($imgData) > 10)) {
-			$dim = unpack('v2dim', substr($imgData, 6, 4));
-			$width  = $dim['dim1'];
-			$height = $dim['dim2'];
-			$type = 1;
-		} elseif ((substr($imgData, 0, 8) == GETID3_PNG_SIG) && (strlen($imgData) > 24)) {
-			$dim = unpack('N2dim', substr($imgData, 16, 8));
-			$width  = $dim['dim1'];
-			$height = $dim['dim2'];
-			$type = 3;
-		} elseif ((substr($imgData, 0, 3) == GETID3_JPG_SIG) && (strlen($imgData) > 4)) {
-			///////////////// JPG CHUNK SCAN ////////////////////
-			$imgPos = 2;
-			$type = 2;
-			$buffer = strlen($imgData) - 2;
-			while ($imgPos < strlen($imgData)) {
-				// synchronize to the marker 0xFF
-				$imgPos = strpos($imgData, 0xFF, $imgPos) + 1;
-				$marker = $imgData[$imgPos];
-				do {
-					$marker = ord($imgData[$imgPos++]);
-				} while ($marker == 255);
-				// find dimensions of block
-				switch (chr($marker)) {
-					// Grab width/height from SOF segment (these are acceptable chunk types)
-					case GETID3_JPG_SOF0:
-					case GETID3_JPG_SOF1:
-					case GETID3_JPG_SOF2:
-					case GETID3_JPG_SOF3:
-					case GETID3_JPG_SOF5:
-					case GETID3_JPG_SOF6:
-					case GETID3_JPG_SOF7:
-					case GETID3_JPG_SOF9:
-					case GETID3_JPG_SOF10:
-					case GETID3_JPG_SOF11:
-					case GETID3_JPG_SOF13:
-					case GETID3_JPG_SOF14:
-					case GETID3_JPG_SOF15:
-						$dim = unpack('n2dim', substr($imgData, $imgPos + 3, 4));
-						$height = $dim['dim1'];
-						$width  = $dim['dim2'];
-						break 2; // found it so exit
-					case GETID3_JPG_EOI:
-					case GETID3_JPG_SOS:
-						return false;       // End loop in case we find one of these markers
-					default:            // We're not interested in other markers
-						$skiplen = (ord($imgData[$imgPos++]) << 8) + ord($imgData[$imgPos++]) - 2;
-						// if the skip is more than what we've read in, read more
-						$buffer -= $skiplen;
-						if ($buffer < 512) { // if the buffer of data is too low, read more file.
-							// $imgData .= fread($fd, $skiplen + 1024);
-							// $buffer += $skiplen + 1024;
-							return false; // End loop in case we find run out of data
-						}
-						$imgPos += $skiplen;
-						break;
-				} // endswitch check marker type
-			} // endif loop through JPG chunks
-		} // endif chk for valid file types
-
-		return array($width, $height, $type);
+		// The hand-rolled JPEG scanner this replaced called strpos() with an int
+		// needle, which PHP 8 reads as the string "255", so it never found a JPEG
+		// marker and every JPEG cover raised a warning.
+		$size = @getimagesizefromstring($imgData);
+		if (!$size) {
+			return ['', '', ''];
+		}
+		return [$size[0], $size[1], $size[2]];
 	} // end function
 
 
