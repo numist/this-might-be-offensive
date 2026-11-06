@@ -7,6 +7,8 @@
 
 	require("offensive/data/keynav.inc");
 
+	require_once("offensive/assets/passwordChange.inc");
+
 	function start()
 	{
 		global $key_options;
@@ -49,6 +51,20 @@
 		if(array_key_exists("revoke", $_REQUEST)) {
 			core_destroytoken($_REQUEST["revoke"]);
 			header("Location: ".Link::content("settings"));
+			exit;
+		}
+
+		// redirect after the change so a reload doesn't resubmit the passwords.
+		if($_SERVER['REQUEST_METHOD'] == "POST" && array_key_exists("new_password", $_POST)) {
+			if(!csrfValid()) {
+				trigger_error("rejected a password change with a missing or wrong csrf token", E_USER_ERROR);
+				exit;
+			}
+			$result = passwordChange(array_key_exists("password", $_POST) ? $_POST['password'] : "",
+			                         $_POST['new_password'],
+			                         array_key_exists("new_password2", $_POST) ? $_POST['new_password2'] : "");
+			$_SESSION['password_change_result'] = $result->message;
+			header("Location: ".Link::content("settings")."#password");
 			exit;
 		}
 	}
@@ -198,9 +214,25 @@
 			</div>
 	</div>
 
-	<div class="heading">password:</div>
+	<div class="heading" id="password">password:</div>
 	<div class="bluebox">
-		<p><a href="<?= Link::content("chpw") ?>">change your password</a></p>
+		<?php
+			$passwordResult = null;
+			if(array_key_exists("password_change_result", $_SESSION)) {
+				$passwordResult = $_SESSION['password_change_result'];
+				unset($_SESSION['password_change_result']);
+			}
+		?>
+		<form method="post" action="<?= Link::content("settings") ?>">
+			<input type="hidden" name="csrf" value="<?= htmlEscape(csrfToken()) ?>"/>
+			<?php if($passwordResult) { ?>
+				<p role="status"><?= htmlEscape($passwordResult) ?></p>
+			<?php } ?>
+			<div><label>current password: <input type="password" name="password" autocomplete="current-password" required/></label></div>
+			<div><label>new password: <input type="password" name="new_password" minlength="8" autocomplete="new-password" required/></label></div>
+			<div><label>new password again: <input type="password" name="new_password2" minlength="8" autocomplete="new-password" required/></label></div>
+			<div><input type="submit" value="change password"/></div>
+		</form>
 	</div>
 	<div class="blackbar"></div>
 </div>
