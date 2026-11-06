@@ -197,6 +197,11 @@
 			<?php } ?>
 			</div>
 	</div>
+
+	<div class="heading">password:</div>
+	<div class="bluebox">
+		<p><a href="<?= Link::content("chpw") ?>">change your password</a></p>
+	</div>
 	<div class="blackbar"></div>
 </div>
 <?php
