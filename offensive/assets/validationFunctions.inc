@@ -2,9 +2,15 @@
 	require_once( "offensive/classes/statusMessage.inc" );
 	require_once( "offensive/assets/functions.inc" );
 
+	// structure only.  the character set is narrow enough that a passing address
+	// is safe as a mail() recipient: no spaces, commas or line breaks.
+	function isValidEmailFormat( $email ) {
+		return preg_match( '/^[a-zA-Z0-9-_\.]+\@[a-zA-Z0-9-_\.]+\.[a-zA-Z0-9-_\.]+$/D', (string)$email ) > 0;
+	}
+
 	function isValidEmail( $email ) {
 	
-		$valid = preg_match( '/^[a-zA-Z0-9-_\.]+\@[a-zA-Z0-9-_\.]+\.[a-zA-Z0-9-_\.]+$/', $email ) > 0 && strpos( $email, "mailinator.com" ) == false;
+		$valid = isValidEmailFormat( $email ) && strpos( $email, "mailinator.com" ) == false;
 	
 		if( ! $valid ) {
 			return new statusMessage( false, "The email address provided is invalid, either because it contains structural errors or is from an unsupported provider (mailinator, etc)." );
