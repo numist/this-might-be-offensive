@@ -7,7 +7,7 @@
 
 	/* self-service email change.
 	 *
-	 * 1. the user asks for a new address on their own profile page, giving their
+	 * 1. the user asks for a new address on the settings page, giving their
 	 *    current password.  the session alone is not enough: anyone holding a
 	 *    stolen session or remember cookie could otherwise point the account at
 	 *    their own mailbox and then take it over through the password reset.
@@ -58,7 +58,7 @@
 		return isValidEmail( $newEmail );
 	}
 
-	/* handle the profile page form.  returns a statusMessage. */
+	/* handle the settings page form.  returns a statusMessage. */
 	function emailChangeRequest( $newEmail, $password )
 	{
 		if( TMBO::readonly() ) {
@@ -93,7 +93,7 @@
 		// the format check allows only [A-Za-z0-9-_.@], so the address is safe in a
 		// mail() recipient and in a URL without further escaping; urlencode anyway.
 		$code = emailChangeCode( $row, $newEmail, gmdate( "Y-m-d" ) );
-		$link = "https://thismight.be" . Link::user( $row['userid'] ) .
+		$link = "https://thismight.be" . Link::content( "settings" ) .
 		        "&emailcode=" . urlencode( $code ) . "&newemail=" . urlencode( $newEmail );
 
 		$message = "Someone (hopefully you) asked to use this address for the [this might be offensive] account \"" . $row['username'] . "\".

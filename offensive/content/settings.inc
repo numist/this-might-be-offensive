@@ -5,12 +5,35 @@
 	require_once("offensive/assets/classes.inc");
 	require_once("offensive/assets/core.inc");
 
+	require_once("offensive/assets/emailChange.inc");
+
 	require("offensive/data/keynav.inc");
 
 	function start()
 	{
 		global $key_options;
 		mustLogIn();
+
+		// both steps of an email change redirect back here, so a reload doesn't
+		// resubmit and the code doesn't linger in the address bar.
+		$result = null;
+		if(array_key_exists("emailcode", $_GET)) {
+			$result = emailChangeConfirm($_GET['emailcode'],
+			                             array_key_exists("newemail", $_GET) ? $_GET['newemail'] : "");
+		} else if($_SERVER['REQUEST_METHOD'] == "POST" && array_key_exists("change_email", $_POST)) {
+			// an authenticated request is not the same as a request we asked for.
+			if(!csrfValid()) {
+				trigger_error("rejected an email change with a missing or wrong csrf token", E_USER_ERROR);
+				exit;
+			}
+			$result = emailChangeRequest($_POST['change_email'],
+			                             array_key_exists("password", $_POST) ? $_POST['password'] : "");
+		}
+		if($result) {
+			$_SESSION['email_change_result'] = $result->message;
+			header("Location: ".Link::content("settings"));
+			exit;
+		}
 		
 		if(array_key_exists("submit", $_POST)) {
 			// check for post for keys
@@ -99,6 +122,28 @@
 				<?php } ?>
 			</span>
 		</div>
+	</div>
+
+	<div class="heading">email address:</div>
+	<div class="bluebox">
+		<?php
+			$emailResult = null;
+			if(array_key_exists("email_change_result", $_SESSION)) {
+				$emailResult = $_SESSION['email_change_result'];
+				unset($_SESSION['email_change_result']);
+			}
+			$email = me()->email();
+		?>
+		<form method="post" action="<?= Link::content("settings") ?>">
+			<input type="hidden" name="csrf" value="<?= htmlEscape(csrfToken()) ?>"/>
+			<p>yours is <?= $email ? htmlEscape($email) : "not set" ?>. password resets go there. to change it, we'll send a link to the new address, and tell the old one once it's done.</p>
+			<?php if($emailResult) { ?>
+				<p role="status"><?= htmlEscape($emailResult) ?></p>
+			<?php } ?>
+			<div><label>new address: <input type="email" name="change_email" maxlength="60" autocomplete="email" required/></label></div>
+			<div><label>your password: <input type="password" name="password" autocomplete="current-password" required/></label></div>
+			<div><input type="submit" value="send confirmation"/></div>
+		</form>
 	</div>
 
 	<div class="heading">keyboard navigation:</div>

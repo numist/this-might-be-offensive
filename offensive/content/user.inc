@@ -5,32 +5,10 @@
 	require_once( 'offensive/assets/core.inc' );
 	require_once( 'admin/mysqlConnectionInfo.inc' );
 	if(!isset($link) || !$link) $link = openDbConnection();
-	require_once( 'offensive/assets/emailChange.inc' );
 	
 
 	function start() {
 		mustLogIn();
-
-		// both steps of an email change redirect back to the user's own profile,
-		// so a reload doesn't resubmit and the code doesn't linger in the address bar.
-		$result = null;
-		if(array_key_exists("emailcode", $_GET)) {
-			$result = emailChangeConfirm($_GET['emailcode'],
-			                             array_key_exists("newemail", $_GET) ? $_GET['newemail'] : "");
-		} else if($_SERVER['REQUEST_METHOD'] == "POST" && array_key_exists("change_email", $_POST)) {
-			// an authenticated request is not the same as a request we asked for.
-			if(!csrfValid()) {
-				trigger_error("rejected an email change with a missing or wrong csrf token", E_USER_ERROR);
-				exit;
-			}
-			$result = emailChangeRequest($_POST['change_email'],
-			                             array_key_exists("password", $_POST) ? $_POST['password'] : "");
-		}
-		if($result) {
-			$_SESSION['email_change_result'] = $result->message;
-			header("Location: ".Link::user(me()));
-			exit;
-		}
 		
 		if(!isset($_REQUEST['userid']) ||
 		   $_REQUEST['userid'] == "0" ||
@@ -65,28 +43,6 @@
 
 		</form>
 	</div>
-<?php
-	}
-
-	function changeEmailForm( $email ) {
-		$result = null;
-		if(array_key_exists("email_change_result", $_SESSION)) {
-			$result = $_SESSION['email_change_result'];
-			unset($_SESSION['email_change_result']);
-		}
-?>
-	<form method="post" action="<?= $_SERVER['SCRIPT_NAME'] ?>" style="margin-bottom:12px">
-		<input type="hidden" name="c" value="user"/>
-		<input type="hidden" name="userid" value="<?= me()->id() ?>"/>
-		<input type="hidden" name="csrf" value="<?= htmlEscape(csrfToken()) ?>"/>
-		<p>your email address: <?= $email ? htmlEscape($email) : "none" ?></p>
-		<?php if($result) { ?>
-			<p role="status"><?= htmlEscape($result) ?></p>
-		<?php } ?>
-		<div><label>new address: <input type="email" name="change_email" maxlength="60" autocomplete="email" required/></label></div>
-		<div><label>your password: <input type="password" name="password" autocomplete="current-password" required/></label></div>
-		<div><input type="submit" value="send confirmation"/></div>
-	</form>
 <?php
 	}
 
@@ -207,7 +163,6 @@
 							
 							if( me()->id() == $usrid ) {
 								uploadAvatarForm();
-								changeEmailForm( $email );
 							}
 							
 							
