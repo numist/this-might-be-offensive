@@ -136,7 +136,7 @@
 		?>
 		<form class="fieldform" method="post" action="<?= Link::content("settings") ?>">
 			<input type="hidden" name="csrf" value="<?= htmlEscape(csrfToken()) ?>"/>
-			<p>yours is <?= $email ? htmlEscape($email) : "not set" ?>. password resets go there. to change it, we'll send a link to the new address, and tell the old one once it's done.</p>
+			<p>yours is <?= $email ? htmlEscape($email) : "not set" ?>. password resets go there. to change it, we’ll send a link to the new address and a notification to the old one.</p>
 			<?php if($emailResult) { ?>
 				<p role="status"><?= htmlEscape($emailResult) ?></p>
 			<?php } ?>
