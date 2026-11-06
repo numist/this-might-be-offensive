@@ -136,7 +136,7 @@
 		?>
 		<form class="fieldform" method="post" action="<?= Link::content("settings") ?>">
 			<input type="hidden" name="csrf" value="<?= htmlEscape(csrfToken()) ?>"/>
-			<p>to change it, we’ll send a link to the new address and a notification to the old one.</p>
+			<p>we’ll send a link to the new address and a notification to the old one.</p>
 			<?php if($emailResult) { ?>
 				<p role="status"><?= htmlEscape($emailResult) ?></p>
 			<?php } ?>
