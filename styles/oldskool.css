@@ -70,7 +70,8 @@ label {
 }
 
 /* a form of label/input pairs as direct children: labels in one column, inputs
-   lined up in the next.  anything else (a <p>, a status line) spans both, and
+   lined up in the next.  a read-only value can take an input's place as an
+   <output>.  anything else (a <p>, a status line) spans both, and
    the submit button sits under the inputs.  hidden inputs aren't grid items. */
 form.fieldform {
 	display: grid;
@@ -89,7 +90,7 @@ form.fieldform > input {
 	max-width: 20em;
 }
 
-form.fieldform > :not(label, input) {
+form.fieldform > :not(label, input, output) {
 	grid-column: 1 / -1;
 }
 
