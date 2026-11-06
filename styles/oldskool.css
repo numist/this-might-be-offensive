@@ -144,6 +144,19 @@ label {
         color: var(--color-brand-dark, #003);
         text-align: center;
     }
+
+    /* profile page yearbook photo */
+    figure {
+        margin: 0 0 var(--spacing);
+
+        img {
+            display: block;
+            /* capped by width only, so the width/height attributes still
+               reserve the right box before the image loads */
+            max-width: min(100%, 320px);
+            height: auto;
+        }
+    }
 }
 
 .imagelist {

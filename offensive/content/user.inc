@@ -154,8 +154,22 @@
 							if($avatar) {
 // XXX: avatar history
 								if($avatar->file() && !$avatar->squelched()) {
+									if(!$avatar->filtered()) {
+										list($width, $height) = $avatar->dimensions();
+								?>
+									<figure>
+										<a href="<?= Link::upload($avatar) ?>"><img src="<?= htmlEscape($avatar->URL()) ?>"
+											<?php if(is_int($width) && is_int($height)) { ?>width="<?= $width ?>" height="<?= $height ?>"<?php } ?>
+											alt="<?= htmlEscape($name) ?>'s yearbook photo"></a>
+										<figcaption><?= $name ?> is gorgeous.</figcaption>
+									</figure>
+								<?php
+									} else {
 								?>
 									<p><a href="<?= Link::upload($avatar) ?>"><?= $name ?> is gorgeous.</a></p>
+								<?php
+									}
+								?>
 									<!-- next onclick="img.src=arr[i]" -->
 								<?php
 								}
