@@ -223,15 +223,18 @@
 				unset($_SESSION['password_change_result']);
 			}
 		?>
-		<form method="post" action="<?= Link::content("settings") ?>">
+		<form class="fieldform" method="post" action="<?= Link::content("settings") ?>">
 			<input type="hidden" name="csrf" value="<?= htmlEscape(csrfToken()) ?>"/>
 			<?php if($passwordResult) { ?>
 				<p role="status"><?= htmlEscape($passwordResult) ?></p>
 			<?php } ?>
-			<div><label>current password: <input type="password" name="password" autocomplete="current-password" required/></label></div>
-			<div><label>new password: <input type="password" name="new_password" minlength="8" autocomplete="new-password" required/></label></div>
-			<div><label>new password again: <input type="password" name="new_password2" minlength="8" autocomplete="new-password" required/></label></div>
-			<div><input type="submit" value="change password"/></div>
+			<label for="current_password">current password:</label>
+			<input type="password" id="current_password" name="password" autocomplete="current-password" required/>
+			<label for="new_password">new password:</label>
+			<input type="password" id="new_password" name="new_password" minlength="8" autocomplete="new-password" required/>
+			<label for="new_password2">new password again:</label>
+			<input type="password" id="new_password2" name="new_password2" minlength="8" autocomplete="new-password" required/>
+			<input type="submit" value="change password"/>
 		</form>
 	</div>
 	<div class="blackbar"></div>
