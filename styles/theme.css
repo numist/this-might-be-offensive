@@ -142,6 +142,25 @@ textarea {
             background: var(--color-brand-light-alt);
         }
 
+        /* a tmbo pic comes with its size: show all of it, at its own shape,
+           but no taller than a phone can take in at a glance */
+        img[width] {
+            aspect-ratio: auto;
+            height: auto;
+            max-height: min(24rem, 50vh);
+            object-fit: contain;
+        }
+
+        /* a linked comment */
+        blockquote {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 4;
+            overflow: hidden;
+            margin: 0 0 var(--spacing-xs);
+            font-style: italic;
+        }
+
         > span {
             display: -webkit-box;
             -webkit-box-orient: vertical;
@@ -241,6 +260,16 @@ textarea {
         img {
             grid-row: span 2;
             margin-bottom: 0;
+        }
+
+        img[width] {
+            aspect-ratio: 16 / 9;
+            max-height: none;
+        }
+
+        /* nothing to put beside the text */
+        &:not(:has(> img)) {
+            display: block;
         }
 
         label {
