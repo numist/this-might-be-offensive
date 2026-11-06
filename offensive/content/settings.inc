@@ -134,15 +134,17 @@
 			}
 			$email = me()->email();
 		?>
-		<form method="post" action="<?= Link::content("settings") ?>">
+		<form class="fieldform" method="post" action="<?= Link::content("settings") ?>">
 			<input type="hidden" name="csrf" value="<?= htmlEscape(csrfToken()) ?>"/>
 			<p>yours is <?= $email ? htmlEscape($email) : "not set" ?>. password resets go there. to change it, we'll send a link to the new address, and tell the old one once it's done.</p>
 			<?php if($emailResult) { ?>
 				<p role="status"><?= htmlEscape($emailResult) ?></p>
 			<?php } ?>
-			<div><label>new address: <input type="email" name="change_email" maxlength="60" autocomplete="email" required/></label></div>
-			<div><label>your password: <input type="password" name="password" autocomplete="current-password" required/></label></div>
-			<div><input type="submit" value="send confirmation"/></div>
+			<label for="change_email">new address:</label>
+			<input type="email" id="change_email" name="change_email" maxlength="60" autocomplete="email" required/>
+			<label for="change_email_password">your password:</label>
+			<input type="password" id="change_email_password" name="password" autocomplete="current-password" required/>
+			<input type="submit" value="send confirmation"/>
 		</form>
 	</div>
 
