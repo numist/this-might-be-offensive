@@ -81,6 +81,10 @@ form.fieldform {
 	align-items: center;
 }
 
+form.fieldform > label {
+	justify-self: end;
+}
+
 form.fieldform > input {
 	max-width: 20em;
 }
