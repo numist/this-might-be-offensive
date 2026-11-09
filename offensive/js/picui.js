@@ -251,7 +251,7 @@ function qc_dialog_init() {
 							}
        				
 							// get comments from result
-       	  	  var filteredData = $(data).find("div.entry");
+       	  	  var filteredData = $(data).find(".entry");
 	      		  if(filteredData.length > 0) {
 								if(thecount > 0) {
 									commentRows.children().remove();
