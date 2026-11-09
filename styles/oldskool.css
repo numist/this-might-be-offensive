@@ -48,17 +48,36 @@ a:visited {
 	font-size:9px;
 }
 
+.comment_meta {
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	flex-wrap: wrap;
+	gap: 0 8px;
+
+	& .userLink {
+		/* all of this is to get the >> in the ::before to render next to the username without
+		the link's underline. absolutely positioned elements don't get it. */
+		position: relative;
+		padding-left: 1em;
+
+		&::before {
+			content: "\00bb";
+			position: absolute;
+			left: 0;
+		}
+	}
+}
+
 .timestamp, .votecount {
 	color: var(--text-muted);
 }
 
 .timestamp {
 	font-size:10px;
-	padding-left:8px;
-	float:right;
 }
 
-.timestamp a {
+a:has(> .timestamp) {
 	color: var(--text-muted);
 	text-decoration:none;
 }
