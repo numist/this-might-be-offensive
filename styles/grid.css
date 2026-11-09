@@ -78,6 +78,11 @@
                 &:nth-child(odd) {
                     background: var(--color-brand-light-alt);
                 }
+
+                .score {
+                    display: block;
+                    text-align: right;
+                }
             }
         }
     }
