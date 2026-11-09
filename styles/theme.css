@@ -69,6 +69,30 @@ textarea {
     width: 100%;
 }
 
+/* the line under a comment with its author and time (templates/comment.inc).
+   it lives here, not in oldskool.css, because the quick comment window on the
+   pic page shows the same markup and that page doesn't load oldskool.css. */
+.comment_meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0 8px;
+
+    & .userLink {
+        /* all of this is to get the >> in the ::before to render next to the username without
+        the link's underline. absolutely positioned elements don't get it. */
+        position: relative;
+        padding-left: 1em;
+
+        &::before {
+            content: "\00bb";
+            position: absolute;
+            left: 0;
+        }
+    }
+}
+
 /* link previews (LinkPreview): a button before the link opens the preview as
    a popover, and hovering or focusing the link shows it too. it floats over
    the page, so neither moves anything. with "show link previews" checked
