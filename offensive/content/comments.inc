@@ -123,7 +123,8 @@
 
 
 				function commentExists(comment) {
-					return $('a[name='+comment.id+']').length > 0;
+					// comment.inc puts the comment id on the .entry element itself.
+					return document.getElementById(String(comment.id)) !== null;
 				}
 
 				function addComment(comment) {
