@@ -144,14 +144,14 @@ label {
         color: var(--color-brand-dark, #003);
         text-align: center;
     }
+}
 
-    /* profile page yearbook photo */
-    figure {
-        margin: 0 0 var(--spacing);
+/* profile page yearbook photo */
+.yearbook-photo {
+    margin: 0 0 var(--spacing);
 
-        img {
-            display: block;
-        }
+    img {
+        display: block;
     }
 }
 

@@ -157,7 +157,7 @@
 									$photo = $avatar->filtered() ? '' : $avatar->profilePhotoURL();
 									if($photo != '') {
 								?>
-									<figure>
+									<figure class="yearbook-photo">
 										<a href="<?= Link::upload($avatar) ?>"><img src="<?= htmlEscape($photo) ?>"
 											width="<?= Upload::PROFILE_PHOTO_SIZE / 2 ?>" height="<?= Upload::PROFILE_PHOTO_SIZE / 2 ?>"
 											alt="<?= htmlEscape($name) ?>'s yearbook photo"></a>
