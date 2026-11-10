@@ -167,11 +167,11 @@ audio {
 
 #qc_dialog .timestamp {
 	font-size:10px;
-	padding-left:8px;
-	float:right;
+	float:none;
+	padding-left:0;
 }
 
-#qc_dialog .timestamp a {
+#qc_dialog a:has(> .timestamp) {
 	color: var(--text-muted);
 	text-decoration:none;
 }
