@@ -1170,6 +1170,10 @@ function upload_insert_file($postdata) {
 
 	$upload = new Upload($fileid);
 
+	if($upload->type() == "avatar") {
+		$upload->profilePhoto();
+	}
+
 	publishChange($upload->type(), $upload->channels(), $upload->api_data(true));
 
 	if($upload->type() == "image") {

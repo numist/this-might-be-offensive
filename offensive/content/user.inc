@@ -154,8 +154,22 @@
 							if($avatar) {
 // XXX: avatar history
 								if($avatar->file() && !$avatar->squelched()) {
+									$photo = $avatar->filtered() ? '' : $avatar->profilePhotoURL();
+									if($photo != '') {
+								?>
+									<figure class="yearbook-photo">
+										<a href="<?= Link::upload($avatar) ?>"><img src="<?= htmlEscape($photo) ?>"
+											width="<?= Upload::PROFILE_PHOTO_SIZE / 2 ?>" height="<?= Upload::PROFILE_PHOTO_SIZE / 2 ?>"
+											alt="<?= htmlEscape($name) ?>'s yearbook photo"></a>
+										<figcaption><?= $name ?> is gorgeous.</figcaption>
+									</figure>
+								<?php
+									} else {
 								?>
 									<p><a href="<?= Link::upload($avatar) ?>"><?= $name ?> is gorgeous.</a></p>
+								<?php
+									}
+								?>
 									<!-- next onclick="img.src=arr[i]" -->
 								<?php
 								}
