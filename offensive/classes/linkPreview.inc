@@ -19,6 +19,11 @@
  * to add a provider, add an entry to providers(): "pattern" captures an id
  * from the url, "url" turns that id back into the canonical url (%s is the
  * id), and "oembed" is the provider's oEmbed endpoint.
+ *
+ * links to tmbo itself (a pic, a thread, or a comment in one) aren't fetched
+ * or cached: internal() builds their previews from the database as the page
+ * renders, leaving out what the viewer has chosen not to see.  nothing here
+ * requests pic.php, whose GET moves the viewer's pickup link.
  */
 class LinkPreview {
 	const REFRESH_AGE = 2592000; // 30 days
@@ -27,8 +32,11 @@ class LinkPreview {
 	const FETCH_TIMEOUT = 2;
 	const MAX_FETCHES = 50;      // per request, fetched all at once
 	const MAX_SERIAL_FETCHES = 10; // per request, one at a time without curl
+	const MAX_INTERNAL = 20;     // tmbo links per request, a few queries each
+	const QUOTE_LENGTH = 280;    // characters of a linked comment to show
 
 	private static $queue = array();
+	private static $internal = 0;
 
 	private static function providers() {
 		return array(
@@ -93,16 +101,113 @@ class LinkPreview {
 	 * be unique on the page.  $link alone if there is no preview.
 	 */
 	public static function html($url, $id, $link) {
-		$preview = self::get($url);
+		$preview = self::internal($url);
+		if($preview === null) $preview = self::get($url);
 		if(!$preview) return $link;
 
 		$img = "";
 		if(isset($preview["thumbnail"])) {
-			$img = '<img src="'.htmlEscape($preview["thumbnail"]).'" alt="" loading="lazy" referrerpolicy="no-referrer" />';
+			// with a size, the preview shows the whole picture (theme.css)
+			$size = isset($preview["width"]) ? ' width="'.$preview["width"].'" height="'.$preview["height"].'"' : "";
+			$img = '<img src="'.htmlEscape($preview["thumbnail"]).'"'.$size.' alt="" loading="lazy" referrerpolicy="no-referrer" />';
 		}
+		$quote = isset($preview["quote"]) ? "<blockquote>".htmlEscape($preview["quote"])."</blockquote>" : "";
 		return '<button type="button" popovertarget="'.$id.'" aria-label="preview"></button>'.$link.
-		       '<span id="'.$id.'" popover>'.$img."<span>".htmlEscape($preview["title"])."</span><small>".htmlEscape($preview["provider"]).
+		       '<span id="'.$id.'" popover>'.$img.$quote."<span>".htmlEscape($preview["title"])."</span><small>".htmlEscape($preview["provider"]).
 		       ' <label for="link_previews">hide</label></small></span>';
+	}
+
+	/*
+	 * the preview for a link to tmbo itself: a pic (pages/pic.php?id=), a
+	 * thread (?c=comments&fileid=), or a comment in one (a thread link ending
+	 * in #commentid).  null if $url isn't one of those, false if it is but
+	 * there's nothing to show: it's gone, its poster is squelched, or this
+	 * page already has MAX_INTERNAL.
+	 */
+	private static function internal($url) {
+		$parts = parse_url($url);
+		if(!$parts || !isset($parts["host"]) || !isset($parts["path"]) || !self::local($parts)) {
+			return null;
+		}
+		$query = array();
+		if(isset($parts["query"])) parse_str($parts["query"], $query);
+
+		// a link in a comment runs to the next space, so it can end in
+		// punctuation: take the leading digits and ignore what follows
+		$number = function($from, $key) {
+			if(!isset($from[$key]) || !is_string($from[$key])) return 0;
+			return preg_match('/^\d{1,10}/', $from[$key], $m) ? (int)$m[0] : 0;
+		};
+
+		$commentid = 0;
+		if($parts["path"] == "/offensive/pages/pic.php") {
+			$fileid = $number($query, "id");
+		} else if(preg_match('/^\/offensive\/(?:index\.php)?$/', $parts["path"]) &&
+		          isset($query["c"]) && $query["c"] === "comments") {
+			$fileid = $number($query, "fileid");
+			$commentid = $number($parts, "fragment");
+		} else {
+			return null;
+		}
+		if(!$fileid) return null;
+
+		if(self::$internal >= self::MAX_INTERNAL) return false;
+		self::$internal++;
+
+		$upload = new Upload($fileid);
+		if(!$upload->exists() || $upload->squelched()) return false;
+
+		$tags = ($upload->is_nsfw() ? "[nsfw]" : "").($upload->is_tmbo() ? "[tmbo]" : "");
+		$title = ($tags ? "$tags " : "").$upload->filename();
+
+		if($commentid) {
+			$comment = new Comment($commentid);
+			// a comment from another thread isn't there when the link opens,
+			// so preview the thread instead
+			if($comment->exists() && $comment->upload()->id() == $upload->id()) {
+				$commenter = $comment->commenter();
+				if(me() && me()->squelched($commenter)) return false;
+
+				$quote = trim(preg_replace('/\s+/u', " ", $comment->text()));
+				if($quote == "" && $comment->vote()) $quote = "[ ".$comment->vote()." ]";
+				if(mb_strlen($quote) > self::QUOTE_LENGTH) {
+					$quote = rtrim(mb_substr($quote, 0, self::QUOTE_LENGTH - 1))."\u{2026}";
+				}
+
+				$preview = array(
+					"title" => $title,
+					"provider" => "comment by ".$commenter->username(),
+				);
+				if($quote != "") $preview["quote"] = $quote;
+				return $preview;
+			}
+		}
+
+		$kinds = array("image" => "pic", "topic" => "discussion", "audio" => "audio", "avatar" => "yearbook");
+		$type = $upload->type();
+		$preview = array(
+			"title" => $title,
+			"provider" => (isset($kinds[$type]) ? $kinds[$type] : $type)." by ".$upload->uploader()->username(),
+		);
+		// the image itself, not pic.php, and not one the viewer filters out
+		if(in_array($type, array("image", "avatar")) && !$upload->filtered_nsfw() &&
+		   !$upload->filtered_tmbo() && $upload->file() != "") {
+			$preview["thumbnail"] = $upload->URL();
+			list($width, $height) = $upload->dimensions();
+			if(is_int($width) && is_int($height) && $width > 0 && $height > 0) {
+				$preview["width"] = $width;
+				$preview["height"] = $height;
+			}
+		}
+		return $preview;
+	}
+
+	// whether parse_url() $parts are for this site.  Comment::HTMLcomment()
+	// has already pointed links to every tmbo domain at the one being viewed.
+	private static function local($parts) {
+		if(!isset($_SERVER["HTTP_HOST"])) return false;
+		$host = strtolower($parts["host"]).(isset($parts["port"]) ? ":".$parts["port"] : "");
+		return $host == strtolower($_SERVER["HTTP_HOST"]);
 	}
 
 	private static function enqueue($key, $match, $preview) {
