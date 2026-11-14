@@ -254,7 +254,6 @@ form.fieldform > [type="submit"] {
     .entry {
         .comment_votes {
             color: var(--color-brand-medium, #669);
-            text-align: right;
         }
     }
 }
