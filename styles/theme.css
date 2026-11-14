@@ -187,15 +187,17 @@ textarea {
     }
 }
 
-/* hover and focus show the preview without opening it. phones have no
-   hover, so tapping a link just follows it. */
+/* hover and focus show the preview without opening it, unless the user
+   turned that off in settings (data-hover-previews="off" on <html>). phones
+   have no hover, so tapping a link just follows it. :where() keeps the
+   setting from adding specificity, so inline previews still win. */
 @media (hover: hover) {
-    .comment_body :is(a:hover + [popover], [popover]:hover) {
+    :where(:root:not([data-hover-previews="off"])) .comment_body :is(a:hover + [popover], [popover]:hover) {
         display: block;
     }
 }
 
-.comment_body a:focus-visible + [popover] {
+:where(:root:not([data-hover-previews="off"])) .comment_body a:focus-visible + [popover] {
     display: block;
 }
 

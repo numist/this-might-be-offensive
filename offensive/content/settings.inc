@@ -140,6 +140,18 @@
 		</div>
 	</div>
 
+	<div class="heading">link previews:</div>
+	<div class="bluebox">
+		<p>with a mouse, links in comments show a preview when you hover over them.  turn that off and a preview only opens when you click the &#x25A3; before its link.</p>
+		<div style="text-align:center"><?php
+			if(me()->getPref("hover_link_previews") == 1) { ?>
+				<a href="<?= Link::setPref("hover_link_previews", 0) ?>">turn hover previews off</a>
+			<?php } else { ?>
+				<a href="<?= Link::setPref("hover_link_previews", 1) ?>">turn hover previews on</a>
+			<?php } ?>
+		</div>
+	</div>
+
 	<div class="heading">email address:</div>
 	<div class="bluebox">
 		<?php
