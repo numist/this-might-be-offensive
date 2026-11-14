@@ -81,7 +81,7 @@
 ?>
 <!DOCTYPE HTML>
 
-<html>
+<html<?= me() && me()->getPref("hover_link_previews") == 0 ? ' data-hover-previews="off"' : "" ?>>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 		<?php include 'includes/meta.inc'; ?>

@@ -140,6 +140,23 @@
 		</div>
 	</div>
 
+	<div class="heading">link previews:</div>
+	<div class="bluebox">
+		<?php
+			$hoverPreviewText = me()->getPref("hover_link_previews") == 1
+				? "hate link previews on hover? turn that shit off. previews are still available via click on the &#x25A3; before the link."
+				: "want link previews on hover? enable that shit.";
+		?>
+		<p><?= $hoverPreviewText ?></p>
+		<div style="text-align:center"><?php
+			if(me()->getPref("hover_link_previews") == 1) { ?>
+				<a href="<?= Link::setPref("hover_link_previews", 0) ?>">turn hover previews off</a>
+			<?php } else { ?>
+				<a href="<?= Link::setPref("hover_link_previews", 1) ?>">turn hover previews on</a>
+			<?php } ?>
+		</div>
+	</div>
+
 	<div class="heading">email address:</div>
 	<div class="bluebox">
 		<?php

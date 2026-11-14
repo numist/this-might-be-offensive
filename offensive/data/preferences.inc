@@ -18,6 +18,8 @@ $prefnames = array(
 	
 	// indicates if the user wants to view thumbnails in comments
 	"thumbnails_in_comments",
+	// indicates if the user wants link previews in comments to show on hover
+	"hover_link_previews",
 	
 	// pickup id for images
 	"ipickup",
@@ -54,7 +56,8 @@ $prefnames = array(
 $prefdefaults = array(
 	"index" => "main",
 	"sortorder_discussions" => "date_desc",
-	"thumbnails_in_comments" => "1"
+	"thumbnails_in_comments" => "1",
+	"hover_link_previews" => "1"
 );
 
 ?>

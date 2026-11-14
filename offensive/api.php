@@ -543,6 +543,7 @@
 	 * •&nbsp;<b>sortorder_yearbook</b> - sorting for yearbook
 	 * •&nbsp;<b>index</b> - type of frontpage, "thumbs" or blank
 	 * •&nbsp;<b>thumbnails_in_comments</b> - indicates if the user wants to view thumbnails in comments
+ * •&nbsp;<b>hover_link_previews</b> - indicates if the user wants link previews in comments to show on hover
 	 * •&nbsp;<b>ipickup</b> - pickup id for images
 	 * •&nbsp;<b>tpickup</b> - pickup id for topics (no web interface implemented)
 	 * •&nbsp;<b>apickup</b> - pickup id for audio
@@ -581,6 +582,7 @@
 	 * •&nbsp;<b>sortorder_yearbook</b> - sorting for yearbook
 	 * •&nbsp;<b>index</b> - type of frontpage, "thumbs" or blank
 	 * •&nbsp;<b>thumbnails_in_comments</b> - indicates if the user wants to view thumbnails in comments
+ * •&nbsp;<b>hover_link_previews</b> - indicates if the user wants link previews in comments to show on hover
 	 * •&nbsp;<b>ipickup</b> - pickup id for images
 	 * •&nbsp;<b>tpickup</b> - pickup id for topics (no web interface implemented)
 	 * •&nbsp;<b>apickup</b> - pickup id for audio

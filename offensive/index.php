@@ -87,7 +87,7 @@ $timelimit = 10;
         "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
 
 
-<html>
+<html<?= me() && me()->getPref("hover_link_previews") == 0 ? ' data-hover-previews="off"' : "" ?>>
 <head>
 	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 	<?php include 'includes/meta.inc'; ?>
