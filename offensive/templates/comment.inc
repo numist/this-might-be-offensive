@@ -15,6 +15,7 @@ global $numgood, $numbad;
 $ts = strtotime($comment->timestamp());
 
 ?>
+
 <article id="<?= $comment->id() ?>" class="entry u<?php echo $commenter->id();
 	if($comment->vote() == "this is good") echo " tig";
 	if($comment->vote() == "this is bad") echo " tib";
@@ -25,12 +26,34 @@ $ts = strtotime($comment->timestamp());
 
 	<div class="comment_body"><?= $comment->HTMLcomment(true); ?></div>
 
+	<?php
+		commentVotes($comment);
+		commentMeta($comment);
+	?>
+
+</article>
+
+
+
+<?php
+// ====================================================
+//	👇 utility functions
+// ====================================================
+?>
+
+<?php
+function commentMeta ($comment) {
+?>
 	<header class="comment_meta">
-		<?= $commenter->htmlUsername() ?>
+		<?= $comment->commenter()->htmlUsername() ?>
 		<a href="<?= Link::comment($comment) ?>"><time class="timestamp"<?php if($ts) { ?> datetime="<?= date('c', $ts) ?>"<?php } ?>><?= $comment->timestamp() ?></time></a>
 	</header>
+<?php
+}
+?>
 
-	<?php
+<?php
+function commentVotes ($comment) {
 	$thevote = $comment->vote();
 	if($thevote) {
 		$numgood += ($thevote == 'this is good') ? 1 : 0;
@@ -38,8 +61,9 @@ $ts = strtotime($comment->timestamp());
 	}
 	$tmbo = $comment->tmbo() == 1;
 	$tiar = $comment->tiar() == 1;
-	?>
-	<?php if($thevote || $tmbo || $tiar) { ?>
+
+	if($thevote || $tmbo || $tiar) {
+?>
 	<footer class="comment_votes">
 		<?php if($thevote) { ?>
 		<span title="+<?= $numgood ?> -<?= $numbad ?>" class="vote <?= strpos($thevote, 'good') > 0 ? 'good' : 'bad' ?>"> [ <?= $thevote ?> ]</span>
@@ -47,5 +71,6 @@ $ts = strtotime($comment->timestamp());
 		<?php if($tmbo) { ?><span class="vote"> [ this might be offensive ]</span><?php } ?>
 		<?php if($tiar) { ?><span class="vote"> [ this is a repost ]</span><?php } ?>
 	</footer>
-	<?php } ?>
-</article>
+<?php }
+}
+?>
