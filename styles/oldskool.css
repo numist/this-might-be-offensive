@@ -45,7 +45,11 @@ a:visited {
 
 .vote, label, .votecount {
 	font-weight:bold;
-	font-size:9px;
+	font-size: 0.875em;
+}
+
+.vote {
+    white-space: nowrap;
 }
 
 .timestamp, .votecount {
@@ -245,6 +249,13 @@ form.fieldform > [type="submit"] {
 #commentList {
     .userLink {
         color: var(--color-brand-medium, #669);
+    }
+
+    .entry {
+        .comment_votes {
+            color: var(--color-brand-medium, #669);
+            text-align: right;
+        }
     }
 }
 
