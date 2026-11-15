@@ -26,7 +26,7 @@ if(isset($css) && substr($css, 0, 1) != " ") {
 	</div>
 	<div class="col col2<?= $row_class ?>">
 		<span class="score">
-			<a href="<?= Link::thread($upload) ?>">(<?=$upload->commentLabel(false);?>)</a>
+			<a href="<?= Link::thread($upload) ?>"><?=$upload->commentLabel(false);?></a>
 		</span>
 	</div>
 	<div class="col col3<?= $row_class ?>">

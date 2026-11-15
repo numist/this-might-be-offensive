@@ -693,18 +693,23 @@ class Upload {
 		       ($this->type() == "audio" ? "" : getFileExtension($this->filename()));
 	}
 	
+	/*
+	 * Comment and vote counts as icons and numbers (see .comments and friends
+	 * in styles/theme.css). The words are in .commentlabel, which is visually
+	 * hidden, and the vote icons carry their own alt text, so screen readers
+	 * still hear "27 comments good 14 bad 3". Realtime updates in main.inc,
+	 * thumbs.inc, audio.inc and discussions.inc rewrite these spans by class.
+	 */
 	public function commentLabel($showvotes=true) {
 		$comments = $this->comments();
 
-		$retval = '<span class="comments">'.$comments."</span>&nbsp;"
-		         .'<span class="commentlabel">comment'.($comments == 1 ? "" :"s")."</span>";
+		$retval = '<span class="comments">'.$comments.'</span>'
+		         .'<span class="commentlabel">comment'.($comments == 1 ? "" : "s").'</span>';
 		if(!$showvotes) return $retval;
 
-		$retval .= '&nbsp;('
-		          .'+<span class="goods">'.$this->goods().'</span>'
-		          .'&nbsp;-<span class="bads">'.$this->bads().'</span>'
-		          .($this->tmbos() > 0 ? '&nbsp;x<span class="tmbos">'.$this->tmbos().'</span>' : "")
-		          .")";
+		$retval .= '<span class="goods">'.$this->goods().'</span>'
+		          .'<span class="bads">'.$this->bads().'</span>'
+		          .($this->tmbos() > 0 ? '<span class="tmbos">'.$this->tmbos().'</span>' : "");
 		return $retval;
 	}
 
