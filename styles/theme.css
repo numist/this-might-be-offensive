@@ -359,7 +359,8 @@ label:has(> input[name="link_previews"]) {
 		content: "";
 		position: absolute;
 		left: 50%;
-		bottom: calc(var(--tail) / -2 - 0.5px);
+		bottom: round(down, calc(var(--tail) / -2), 1px);
+		/* bottom: -4px; */
 		z-index: -1;
 		width: var(--tail);
 		height: var(--tail);
