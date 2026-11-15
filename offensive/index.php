@@ -110,7 +110,6 @@ $timelimit = 10;
 	}
 	CSS::add("/styles/filepilestyle.css");
 	CSS::add("/styles/oldskool.css");
-	CSS::add("/styles/index.css");
 	JS::add("/offensive/js/jquery-1.7.1.min.js");
 	JS::add("/offensive/js/tmbolib.js");
 	if(function_exists('head')) {
