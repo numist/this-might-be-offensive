@@ -343,6 +343,7 @@ label:has(> input[name="link_previews"]) {
 	display: inline-block;
 	/* short counts get the same bubble, so a column of them lines up */
 	min-width: 2.5em;
+	padding: 0 4px;
 	text-align: center;
 	margin-block-end: calc(var(--tail) * 0.75);
 	border: 1px solid;
