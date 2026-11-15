@@ -329,3 +329,77 @@ label:has(> input[name="link_previews"]) {
         display: none;
     }
 }
+
+/* comment and vote counts from Upload::commentLabel(), each drawn as a small
+   speech bubble around its number so a row's counts stay one short line on a
+   phone. the comment count is a plain number, and the votes get a +, - or x
+   in front. the word "comments" is in the markup for screen readers but
+   isn't drawn, and each vote sign carries its own alt text. */
+.comments, .goods, .bads, .tmbos {
+    --bubble-fill: var(--bg-content);
+    --tail: 0.45em;
+
+    position: relative;
+    isolation: isolate;
+    display: inline-block;
+    /* short counts get the same bubble, so a column of them lines up */
+    min-width: 2.5em;
+    box-sizing: border-box;
+    text-align: center;
+    /* digits have no descenders, so a little more room on top centers them */
+    padding: 0.15em 0.35em 0.05em;
+    margin-block-end: calc(var(--tail) * 0.75);
+    border: 1px solid;
+    border-radius: 0.3em;
+    background: var(--bubble-fill);
+    line-height: 1.1;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+
+    /* the tail is a square turned 45 degrees, centered on the bottom border.
+       its right and bottom borders draw the two sides, and its fill hides
+       the bubble's border between them. it sits under the number (z-index
+       -1 within the isolated bubble) so it never covers a digit. */
+    &::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        bottom: calc(var(--tail) / -2 - 0.5px);
+        z-index: -1;
+        box-sizing: border-box;
+        width: var(--tail);
+        height: var(--tail);
+        border-style: solid;
+        border-width: 0 1px 1px 0;
+        background: var(--bubble-fill);
+        transform: translateX(-50%) rotate(45deg);
+    }
+}
+
+.goods, .bads, .tmbos {
+    margin-inline-start: 0.5em;
+}
+
+.goods::before {
+    content: "+";
+    content: "+" / "good ";
+}
+
+.bads::before {
+    content: "\2212";
+    content: "\2212" / "bad ";
+}
+
+.tmbos::before {
+    content: "\00d7";
+    content: "\00d7" / "this might be offensive ";
+}
+
+.commentlabel {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
