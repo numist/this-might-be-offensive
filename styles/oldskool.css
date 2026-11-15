@@ -193,7 +193,9 @@ form.fieldform > [type="submit"] {
 
 .imagelist {
 	display: grid;
-	grid-template-columns: minmax(200px, 1fr) min-content;
+	/* the counts column is a few icons and numbers, so it gets its full width
+	   and the title column wraps instead */
+	grid-template-columns: minmax(0, 1fr) max-content;
 	list-style-type: none;
 	margin: 0;
 	padding: 0;

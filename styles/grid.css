@@ -68,6 +68,7 @@
                 grid-template-columns: subgrid;
                 padding: var(--spacing-xs);
                 overflow-wrap: break-word;
+                align-items: center;
         
                 /* @media (width < 800px) {
                     .commentlabel {
@@ -94,12 +95,19 @@
         margin: 0;
         padding: 0;
         display: grid;
-        gap: 5px;
+        gap: 10px 5px;
         grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
         justify-items: center;
 
         li {
             overflow: hidden;
         }
+    }
+
+    .thumbcontainer {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5em;
+        align-items: center;
     }
 }
