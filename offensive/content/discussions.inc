@@ -82,7 +82,7 @@
 		<div class="bluebox">
 			<div id="grid-container">
 				<div id="commands">
-					<div class="floatright">
+					<div>
 						<a href="<?= Link::content("newtopic") ?>">new topic</a>
 					</div>
 				</div>
@@ -109,25 +109,22 @@
 				me()->setPref("sortorder_discussions", $args["sort"]);
 			}
 ?>
+				<div class="header">
+					<div>sort by</div>
+					<div>
+							<?= ($args["sort"] !== "date_desc"
+										? '<a href="./?'.query_string("sort").'&sort=date_desc">creation date</a>'
+										: 'thread creation date' ) ?>
+							<?= ($args["sort"] !== "comments_desc"
+										? '<a href="./?'.query_string("sort").'&sort=comments_desc">comment count</a>'
+										: 'comment count' )?>
+							<?= ($args["sort"] !== "activity_desc"
+										? '<b><a href="./?'.query_string("sort").'&sort=activity_desc">latest comment</a></b>'
+										: 'latest comment' ) ?>
+					</div>
+				</div>
 				<div class="grid" id="discussions">
 					<ul>
-						<li class="header">
-							<div class="col col1">
-									<?= ($args["sort"] !== "date_desc"
-												? '<a href="./?'.query_string("sort").'&sort=date_desc">sort by thread creation date</a>'
-												: 'sort by thread creation date' ) ?>
-							</div>
-							<div class="col col2">
-									<?= ($args["sort"] !== "comments_desc"
-												? '<a href="./?'.query_string("sort").'&sort=comments_desc">comment count</a>'
-												: 'comment count' )?>
-							</div>
-							<div class="col col3">
-									<?= ($args["sort"] !== "activity_desc"
-												? '<b><a href="./?'.query_string("sort").'&sort=activity_desc">latest comment</a></b>'
-												: 'latest comment' ) ?>
-							</div>
-						</li>
 <?php
 						$pickuplinks = PickupLink::get();
 						$first = array_key_exists("p", $args) && $args["p"] > 0 ? false : true;

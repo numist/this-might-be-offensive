@@ -194,6 +194,22 @@ class Upload {
 		return ($last_active == null ? $this->timestamp() : $last_active);
 	}
 	
+	/*
+	 * username of the most recent commenter, or null if there are no comments.
+	 * list queries (uploadsql()) prefetch this; otherwise it costs one query.
+	 */
+	public function last_commenter() {
+		if(!array_key_exists("last_commenter", $this->data)) {
+			$sql = "SELECT u.username FROM offensive_comments c, users u
+			        WHERE c.fileid = ".(int)$this->data["id"]." AND u.userid = c.userid
+			        ORDER BY c.id DESC LIMIT 1";
+			$result = tmbo_query($sql);
+			$row = mysqli_fetch_assoc($result);
+			$this->data["last_commenter"] = $row ? $row["username"] : null;
+		}
+		return $this->data["last_commenter"];
+	}
+
 	public function subscribed($user=null) {
 		if($user == null) $user = me();
 		if(is_numeric($user)) $user = new User($user);

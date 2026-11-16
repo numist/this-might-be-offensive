@@ -1,6 +1,3 @@
-@import "main_nav.css";
-@import "grid.css";
-
 body {
 	background: var(--color-brand);
 	font-family: verdana, helvetica, sans-serif;
