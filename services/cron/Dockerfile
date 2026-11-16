@@ -1,4 +1,4 @@
-# Same PHP as the php service.  The search-sync service uses this image too.
+# Same PHP as the php service. The search-sync service uses this image too.
 FROM php:8.4-cli
 
 RUN apt-get update && apt-get install -y --no-install-recommends libpq-dev \

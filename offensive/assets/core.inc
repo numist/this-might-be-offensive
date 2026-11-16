@@ -582,8 +582,8 @@
 
 	/*
 	 * Comment search, through the PostgreSQL index in
-	 * offensive/assets/commentSearch.inc.  Leaves out the viewer's squelched
-	 * users.  Throws 400 when the query has nothing to look up, and 413 when
+	 * offensive/assets/commentSearch.inc. Leaves out the viewer's squelched
+	 * users. Throws 400 when the query has nothing to look up, and 413 when
 	 * it takes too long, which only a relevance sort of a common word should.
 	 */
 	function core_searchcomments($args) {

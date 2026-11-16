@@ -5,11 +5,11 @@
  * usage: php admin/commentSearchSync.php /path/to/webroot [--rebuild]
  *
  * without --rebuild it copies the comments added since the last run, which is
- * what cron does every minute.  on an empty index that means a rebuild.
+ * what cron does every minute. on an empty index that means a rebuild.
  *
  * --rebuild builds a fresh index beside the live one and swaps it in at the
- * end, so search keeps working meanwhile.  use it after changing how comments
- * are indexed (the text search configuration, say).  a rebuild that is
+ * end, so search keeps working meanwhile. use it after changing how comments
+ * are indexed (the text search configuration, say). a rebuild that is
  * stopped starts over the next time.
  *
  * comments are never edited or deleted, so new ids are all there is to copy.
@@ -60,7 +60,7 @@ function overlapStart($id)
 }
 
 /* copies comments with ids above $after into $table and returns the highest
- * id it read.  with $state, keeps sync_state up to date as it goes. */
+ * id it read. with $state, keeps sync_state up to date as it goes. */
 function copyComments($table, $after, $state, $progress = false)
 {
 	global $link, $pg;

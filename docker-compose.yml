@@ -78,7 +78,7 @@ services:
       start_period: 30s
 
   search-db:
-    # Comment search index (admin/database/search.sql).  search-sync fills it
+    # Comment search index (admin/database/search.sql). search-sync fills it
     # from db; it holds nothing that can't be rebuilt from there.
     image: postgres:17
     environment:
@@ -97,7 +97,7 @@ services:
 
   search-sync:
     # What cron does in production: copy new comments into search-db every
-    # minute.  The first run indexes every comment in db.
+    # minute. The first run indexes every comment in db.
     build:
       context: .
       dockerfile: services/cron/Dockerfile

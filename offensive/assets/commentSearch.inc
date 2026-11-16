@@ -1,16 +1,16 @@
 <?php
 /*
  * Comment search, against the PostgreSQL index that admin/commentSearchSync.php
- * keeps (schema: admin/database/search.sql).  It only finds comment ids;
+ * keeps (schema: admin/database/search.sql). It only finds comment ids;
  * core_searchcomments() loads the comments from MariaDB.
  *
  * Queries are web-search style, as websearch_to_tsquery() reads them:
- * words (all required), "quoted phrases", -excluded words, and "or".  On top
- * of that a word ending in * matches as a prefix.  Words are stemmed
+ * words (all required), "quoted phrases", -excluded words, and "or". On top
+ * of that a word ending in * matches as a prefix. Words are stemmed
  * (english), so "dogs" finds "dog", and stopwords like "the" are ignored.
  */
 
-// A search is cut off after this long and answers 413 instead.  Newest-first
+// A search is cut off after this long and answers 413 instead. Newest-first
 // searches are milliseconds; this is for relevance sorting of a common word,
 // which has to rank every comment that contains it.
 const COMMENT_SEARCH_TIMEOUT_MS = 3000;
@@ -35,7 +35,7 @@ function commentSearchDb()
 }
 
 /* MariaDB's latin1 columns hold UTF-8 bytes, but not every old comment is
- * valid UTF-8, and PostgreSQL refuses text that isn't.  Old non-UTF-8 text
+ * valid UTF-8, and PostgreSQL refuses text that isn't. Old non-UTF-8 text
  * was almost certainly typed as Windows-1252. */
 function commentSearchText($s)
 {
@@ -56,8 +56,8 @@ function commentSearchQuery($q)
 	}
 
 	// websearch_to_tsquery() has no prefix syntax, so take out word* and add
-	// it as word:*.  Only letters and digits get through, so it can't carry
-	// tsquery operators.  Short prefixes match too much to be useful.
+	// it as word:*. Only letters and digits get through, so it can't carry
+	// tsquery operators. Short prefixes match too much to be useful.
 	$prefixes = [];
 	$q = preg_replace_callback('/(?<=^|\s)(-?)([\p{L}\p{N}]{3,})\*(?=\s|$)/u', function($m) use (&$prefixes) {
 		if(count($prefixes) < 5) {
@@ -84,7 +84,7 @@ function commentSearchQuery($q)
 	return $row["q"];
 }
 
-/* Ids of matching comments, newest first or best match first.  Throws 413
+/* Ids of matching comments, newest first or best match first. Throws 413
  * when the search runs too long. */
 function commentSearchIds($tsquery, $order, $offset, $limit, $exclude_userids = [])
 {

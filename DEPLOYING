@@ -352,13 +352,13 @@ COMMENT SEARCH
 ###############################################################################
 
 Comment search (offensive/content/search.inc, and searchcomments in the API) reads a
-PostgreSQL database, tmbo_search, beside MariaDB.  It holds an index of comment
+PostgreSQL database, tmbo_search, beside MariaDB. It holds an index of comment
 words and nothing else: MariaDB's offensive_comments stays the source of truth, and
-admin/commentSearchSync.php can rebuild the whole thing from it.  So it needs no
+admin/commentSearchSync.php can rebuild the whole thing from it. So it needs no
 backups, and if it is down or empty only search is affected -- the search page says
 search isn't working, and every other page is unaffected.
 
-Setting it up, once.  The tmbo_search role needs no privileges beyond owning its
+Setting it up, once. The tmbo_search role needs no privileges beyond owning its
 database:
 
     sudo apt install postgresql php8.4-pgsql
@@ -368,15 +368,15 @@ database:
 
 Debian's PostgreSQL listens on localhost only, and its default memory settings
 (128MB shared_buffers) are fine; the index lives in the OS file cache like any
-other file.  Add the connection to admin/.config:
+other file. Add the connection to admin/.config:
 
     search_db_dsn = "pgsql:host=localhost;dbname=tmbo_search"
     search_db_user = "tmbo_search"
     search_db_pass = "<the password you gave createuser>"
 
-Then build the index, as the user that owns the checkout.  It reads MariaDB a batch
+Then build the index, as the user that owns the checkout. It reads MariaDB a batch
 at a time by primary key and takes no locks there, so the site runs normally
-meanwhile.  Measured on 19M comments: about 9 minutes and 3GB of disk, plus about
+meanwhile. Measured on 19M comments: about 9 minutes and 3GB of disk, plus about
 1GB of PostgreSQL's write-ahead log while it runs:
 
     nice php ~/sites/tmbo/admin/commentSearchSync.php ~/sites/tmbo
@@ -388,7 +388,7 @@ and add it to that user's crontab to copy new comments every minute:
 Only one copy runs at a time (the others exit), so a slow run can't pile up.
 Comments are never edited or deleted, so new ids are all it copies.
 
-The code can go out before or after the index.  Until the database exists the search
+The code can go out before or after the index. Until the database exists the search
 page says search isn't working; until the first build finishes it finds nothing.
 
 To rebuild the index, after changing how comments are indexed (search.sql, or the
@@ -398,10 +398,10 @@ To rebuild the index, after changing how comments are indexed (search.sql, or th
 
 It builds a new copy beside the live one and swaps it in at the end, so search keeps
 working, but it needs room for both: about 7GB free at the peak, measured on 19M
-comments.  Check df first.  A stopped rebuild leaves a comments_new table behind;
+comments. Check df first. A stopped rebuild leaves a comments_new table behind;
 the next rebuild drops it.
 
 Searches time out after 3 seconds (COMMENT_SEARCH_TIMEOUT_MS in
 offensive/assets/commentSearch.inc) and the page asks for a narrower search.
-Newest-first searches take milliseconds.  Sorting by best match ranks every comment
+Newest-first searches take milliseconds. Sorting by best match ranks every comment
 that matches, so on a very common word that is the one that times out.

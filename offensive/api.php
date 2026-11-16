@@ -444,10 +444,10 @@
 	/**
 	 * @method searchcomments
 	 *
-	 * Search comment text.  Words are all required, "quoted phrases" must appear as written, -word excludes, "or" between words matches either, and word* matches as a prefix.  Very common words like "the" are ignored.  Comments by users you have squelched are left out.
+	 * Search comment text. Words are all required, "quoted phrases" must appear as written, -word excludes, "or" between words matches either, and word* matches as a prefix. Very common words like "the" are ignored. Comments by users you have squelched are left out.
 	 *
 	 * @param q string required What to search for.
-	 * @param sort string optional {"date_desc", "relevance"} Default:"date_desc" Newest first, or best match first.  A relevance search for a very common word can time out (413).
+	 * @param sort string optional {"date_desc", "relevance"} Default:"date_desc" Newest first, or best match first. A relevance search for a very common word can time out (413).
 	 * @param limit limit optional Default and maximum is 200.
 	 * @return An array of comment objects.
 	 * @example q=cat
