@@ -13,7 +13,20 @@
     overflow-x: auto;
 
     #discussions {
-        --columns: minmax(200px, 1fr) max-content max-content;
+        /* --columns: minmax(200px, 1fr) max-content max-content; */
+        --columns: min-content 1fr;
+
+        gap: 0 0.5em;
+
+        ul li {
+            align-items: baseline;
+
+            time {
+                grid-column: 2;
+                color: var(--color-brand-medium);
+            }
+        }
+
     }
 
     #hof {
@@ -23,15 +36,6 @@
     /* on a phone the title column gives way and wraps, so rows fit the screen */
     @media (width < 800px) {
         --columns: minmax(0, 1fr) max-content;
-
-        /* topic title on its own line, comment count and latest comment below it */
-        #discussions {
-            --columns: minmax(0, 1fr) max-content;
-
-            .col1 {
-                grid-column: 1 / -1;
-            }
-        }
 
         /* filename on its own line next to the rank, the other columns below it */
         #hof {

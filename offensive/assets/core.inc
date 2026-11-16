@@ -22,6 +22,11 @@
 			             ca.repost as tiars,
 			             ca.comments,
 			             ca.timestamp as last_active,
+			             IF(up.type = 'topic',
+			                (SELECT lu.username FROM offensive_comments lc, users lu
+			                 WHERE lc.fileid = up.id AND lu.userid = lc.userid
+			                 ORDER BY lc.id DESC LIMIT 1),
+			                NULL) as last_commenter,
 			             u.username as user_username,
 			             u.account_status as user_account_status
 		        FROM offensive_uploads up, offensive_count_cache ca, users u
