@@ -38,7 +38,12 @@ require("admin/mysqlConnectionInfo.inc");
 $link = openDbConnection();
 require("offensive/assets/commentSearch.inc");
 
-$pg = commentSearchDb();
+try {
+	$pg = commentSearchDb();
+} catch(PDOException $e) {
+	fwrite(STDERR, "can't reach the comment search database: ".$e->getMessage()."\n");
+	exit(1);
+}
 if(!$pg->query("SELECT pg_try_advisory_lock(".LOCK_KEY.")")->fetchColumn()) {
 	if($rebuild) {
 		echo "another sync is running; try again when it's done\n";

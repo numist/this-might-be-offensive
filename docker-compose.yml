@@ -33,6 +33,9 @@ services:
       - ./admin/.config.generated:/var/www/html/admin/.config:ro
     environment:
       - TMBO_ENV=development
+      - SEARCH_DB_DSN=pgsql:host=search-db;dbname=tmbo_search
+      - SEARCH_DB_USER=tmbo_search
+      - SEARCH_DB_PASS=shortbus
     depends_on:
       db:
         condition: service_healthy
@@ -101,7 +104,12 @@ services:
     build:
       context: .
       dockerfile: services/cron/Dockerfile
-    command: ["sh", "-c", "while :; do php admin/commentSearchSync.php .; sleep 60; done"]
+    # Bundled Predis trips PHP 8.4 deprecation notices on every run; keep the log readable.
+    command: ["sh", "-c", "while :; do php -d 'error_reporting=E_ALL & ~E_DEPRECATED' admin/commentSearchSync.php .; sleep 60; done"]
+    environment:
+      - SEARCH_DB_DSN=pgsql:host=search-db;dbname=tmbo_search
+      - SEARCH_DB_USER=tmbo_search
+      - SEARCH_DB_PASS=shortbus
     volumes:
       - ./:/var/www/html:ro
       - ./admin/.config.generated:/var/www/html/admin/.config:ro

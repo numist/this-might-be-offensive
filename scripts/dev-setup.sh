@@ -47,13 +47,6 @@ if [ ! -f "$CONFIG_GENERATED" ]; then
     echo "Auth secrets generated."
 else
     echo "Auth secrets already exist, skipping generation."
-    # Settings added to .config.docker since the file was generated.
-    for key in search_db_dsn search_db_user search_db_pass; do
-        if ! grep -q "^$key *=" "$CONFIG_GENERATED"; then
-            grep "^$key *=" "$PROJECT_ROOT/admin/.config.docker" >> "$CONFIG_GENERATED"
-            echo "Added $key to admin/.config.generated."
-        fi
-    done
 fi
 
 # On Linux, run PHP-FPM as the user who owns this checkout.

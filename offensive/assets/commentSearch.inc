@@ -15,15 +15,25 @@
 // which has to rank every comment that contains it.
 const COMMENT_SEARCH_TIMEOUT_MS = 3000;
 
-function commentSearchDb()
+/* A search_db_* setting from admin/.config, else from the environment
+ * (SEARCH_DB_DSN and so on), which is how docker-compose.yml sets them. */
+function commentSearchSetting($key, $default = null)
 {
 	global $config;
+	if(isset($config[$key]) && $config[$key] !== "") {
+		return $config[$key];
+	}
+	$env = getenv(strtoupper($key));
+	return $env !== false && $env !== "" ? $env : $default;
+}
+
+function commentSearchDb()
+{
 	static $db = null;
 	if($db === null) {
-		$dsn = isset($config["search_db_dsn"]) ? $config["search_db_dsn"] : "pgsql:host=localhost;dbname=tmbo_search";
-		$db = new PDO($dsn,
-		              isset($config["search_db_user"]) ? $config["search_db_user"] : null,
-		              isset($config["search_db_pass"]) ? $config["search_db_pass"] : null,
+		$db = new PDO(commentSearchSetting("search_db_dsn", "pgsql:host=localhost;dbname=tmbo_search"),
+		              commentSearchSetting("search_db_user"),
+		              commentSearchSetting("search_db_pass"),
 		              [
 		              	PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
 		              	// Bind values as literals, so the planner sees the actual
