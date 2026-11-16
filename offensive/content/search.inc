@@ -6,6 +6,7 @@
 	require_once( 'offensive/assets/functions.inc' );	
 	require_once( 'offensive/assets/tabs.inc' );
 	require_once( 'offensive/assets/core.inc' );
+	require_once( 'offensive/assets/commentSearch.inc' );
 	
 	function start() {
 		mustLogIn();
@@ -38,6 +39,12 @@
 		$page = isset($_REQUEST['p']) && is_intger($_REQUEST['p']) ? max(0, (int)$_REQUEST['p']) : 0;
 		$numperpage = 25;
 
+		// deep pages are slow to reach, and nobody reads them
+		if(($page + 1) * $numperpage > COMMENT_SEARCH_MAX_OFFSET) {
+			?><div class="entry">Results stop after page <?= intdiv(COMMENT_SEARCH_MAX_OFFSET, $numperpage) ?>. Add a word to narrow the search.</div><?php
+			return;
+		}
+
 		// ask for one extra to find out whether there is a next page
 		try {
 			$comments = core_searchcomments([
@@ -52,8 +59,12 @@
 		} catch(Exception $e) {
 			if($e->getCode() == 400) {
 				?><div class="entry">Nothing to search for. Very common words like "the" are ignored, and a search needs at least one word that isn't excluded.</div><?php
-			} else if($e->getCode() == 413) {
+			} else if($e->getCode() == 422 && $sort == "relevance") {
 				?><div class="entry">That search matches too many comments to sort by best match. Add a less common word, or sort by newest.</div><?php
+			} else if($e->getCode() == 422) {
+				?><div class="entry">That search took too long. Add a less common word.</div><?php
+			} else if($e->getCode() == 429) {
+				?><div class="entry">You already have a search running. Try again in a moment.</div><?php
 			} else {
 				throw $e;
 			}
@@ -62,10 +73,16 @@
 		$more = count($comments) > $numperpage;
 		$comments = array_slice($comments, 0, $numperpage);
 
-		?><div class="entry"><?php
 		if(count($comments) == 0) {
-			echo $page == 0 ? "No results." : "No more results.";
+			?><div class="entry"><?= $page == 0 ? "No results." : "No more results." ?><?php
+			if($page > 0) {
+				searchPager($find, $sort, $page, false);
+			}
+			?></div><?php
+			return;
 		}
+
+		?><div class="entry"><?php
 		searchPager($find, $sort, $page, $more);
 		?></div></div></div><?php
 
@@ -80,7 +97,7 @@
 				<?php } else if( $upload->type() == 'topic' ) {
 						$prefix = $upload->uploader()->status() == "admin" ? "" : "don't blame me,"; ?>
 						<a class="heading" href="<?= Link::thread($upload) ?>"><?= $upload->htmlFilename(); ?></a>
-							<br/><span style="color:var(--link-user)"><?= $prefix ?> <a href="<?= Link::user($upload->uploader()) ?>" style="color:var(--link-user)"><?= $upload->uploader()->username() ?></a> started it.</span><br/>
+							<br/><span style="color:var(--link-user)"><?= $prefix ?> <?= $upload->uploader()->htmlUsername() ?> started it.</span><br/>
 				<?php } else { ?>
 						<a class="heading" href="<?= Link::upload($upload) ?>"><?= $upload->htmlFilename(); ?></a><br/><span style="color:var(--link-user)">uploaded by <?= $upload->uploader()->htmlUsername() ?></span><br/>
 				<?php } ?>

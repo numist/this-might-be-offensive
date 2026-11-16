@@ -583,8 +583,9 @@
 	/*
 	 * Comment search, through the PostgreSQL index in
 	 * offensive/assets/commentSearch.inc. Leaves out the viewer's squelched
-	 * users. Throws 400 when the query has nothing to look up, and 413 when
-	 * it takes too long, which only a relevance sort of a common word should.
+	 * users. Throws 400 when the query has nothing to look up, 422 when it
+	 * takes too long (a relevance sort of a common word, mostly), and 429
+	 * when the viewer already has a search running.
 	 */
 	function core_searchcomments($args) {
 		if(!is_array($args)) {
@@ -602,10 +603,33 @@
 			throw new Exception("nothing to search for", 400);
 		}
 
+		// A search can hold a PHP worker for COMMENT_SEARCH_TIMEOUT_MS, so one
+		// user firing many at once could tie up every worker. One at a time
+		// each; the lock expires on its own if this process dies holding it.
+		global $redis;
+		$lock = me() ? "commentsearch:lock:".me()->id() : null;
+		try {
+			if($lock && !$redis->set($lock, 1, "EX", 10, "NX")) {
+				throw new Exception("you already have a search running", 429);
+			}
+		} catch(Predis\PredisException $e) {
+			$lock = null; // no redis: search anyway, without the lock
+		}
+
 		list($offset, $count) = explode(",", $limit);
 		$squelched = me() ? me()->squelched_list() : [];
-		$ids = commentSearchIds($tsquery, $sort === "relevance" ? "relevance" : "date_desc",
-		                        $offset, $count, $squelched);
+		try {
+			$ids = commentSearchIds($tsquery, $sort === "relevance" ? "relevance" : "date_desc",
+			                        $offset, $count, $squelched);
+		} finally {
+			if($lock) {
+				try {
+					$redis->del($lock);
+				} catch(Predis\PredisException $e) {
+					// it expires anyway
+				}
+			}
+		}
 		if(count($ids) == 0) {
 			return [];
 		}

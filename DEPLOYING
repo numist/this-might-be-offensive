@@ -356,7 +356,9 @@ PostgreSQL database, tmbo_search, beside MariaDB. It holds an index of comment
 words and nothing else: MariaDB's offensive_comments stays the source of truth, and
 admin/commentSearchSync.php can rebuild the whole thing from it. So it needs no
 backups, and if it is down or empty only search is affected -- the search page says
-search isn't working, and every other page is unaffected.
+search isn't working, and every other page is unaffected. A search gives up on
+connecting after 2 seconds (COMMENT_SEARCH_CONNECT_TIMEOUT), so a hung database
+can't hold PHP workers for long either.
 
 Setting it up, once. The tmbo_search role needs no privileges beyond owning its
 database:
@@ -364,7 +366,10 @@ database:
     sudo apt install postgresql php8.4-pgsql
     sudo systemctl restart php8.4-fpm
     sudo -u postgres createuser --pwprompt tmbo_search
-    sudo -u postgres createdb -O tmbo_search tmbo_search
+    sudo -u postgres createdb -E UTF8 -T template0 --locale=C.UTF-8 -O tmbo_search tmbo_search
+
+Spell out the encoding: createdb otherwise copies the server's default, and if that
+is SQL_ASCII, words with accents won't index properly.
 
 Debian's PostgreSQL listens on localhost only, and its default memory settings
 (128MB shared_buffers) are fine; the index lives in the OS file cache like any
@@ -381,15 +386,29 @@ meanwhile. Measured on 19M comments: about 9 minutes and 3GB of disk, plus about
 
     nice php ~/sites/tmbo/admin/commentSearchSync.php ~/sites/tmbo
 
-and add it to that user's crontab to copy new comments every minute:
+and add it to that user's crontab to copy new comments every minute. Its output
+goes to syslog rather than cron mail, which would otherwise send an error a minute
+while the database is down:
 
-    * * * * * nice php $HOME/sites/tmbo/admin/commentSearchSync.php $HOME/sites/tmbo > /dev/null
+    * * * * * nice php $HOME/sites/tmbo/admin/commentSearchSync.php $HOME/sites/tmbo 2>&1 | logger -t tmbo-search
+
+Read it with `journalctl -t tmbo-search`.
 
 Only one copy runs at a time (the others exit), so a slow run can't pile up.
-Comments are never edited or deleted, so new ids are all it copies.
+Comments are never edited or deleted, so new ids are all it copies. If you redact a
+comment by hand in MariaDB, the index still has its old words, and searching for
+them still finds it. Delete its row from the index too:
+
+    psql -h localhost -U tmbo_search tmbo_search -c 'DELETE FROM comments WHERE id = <id>'
+
+or run a rebuild (below).
 
 The code can go out before or after the index. Until the database exists the search
 page says search isn't working; until the first build finishes it finds nothing.
+
+Once search works, the old Xapian index is unused and can be deleted:
+
+    rm -rf ~/sites/tmbo/offensive/data/comments.db*
 
 To rebuild the index, after changing how comments are indexed (search.sql, or the
 'english' text search configuration):
@@ -404,4 +423,8 @@ the next rebuild drops it.
 Searches time out after 3 seconds (COMMENT_SEARCH_TIMEOUT_MS in
 offensive/assets/commentSearch.inc) and the page asks for a narrower search.
 Newest-first searches take milliseconds. Sorting by best match ranks every comment
-that matches, so on a very common word that is the one that times out.
+that matches, so on a very common word that is the one that times out. Results stop
+after the first 10,000 (COMMENT_SEARCH_MAX_OFFSET), since deep pages cost as much as
+reading everything before them. Each user gets one search at a time, through a
+Redis lock, so nobody can tie up every PHP worker with slow searches. Without Redis
+searches still work, just without that limit.

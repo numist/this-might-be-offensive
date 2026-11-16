@@ -39,8 +39,9 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      # started, not healthy: the site runs without search
       search-db:
-        condition: service_healthy
+        condition: service_started
       redis:
         condition: service_healthy
     networks:
