@@ -25,6 +25,10 @@
                 grid-column: 2;
                 color: var(--color-brand-medium);
             }
+
+            > :has(.comments) { /* the comment count */
+                justify-self: end;
+            }
         }
 
     }
