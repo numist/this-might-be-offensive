@@ -6,192 +6,131 @@
 	require_once( 'offensive/assets/functions.inc' );	
 	require_once( 'offensive/assets/tabs.inc' );
 	require_once( 'offensive/assets/core.inc' );
+	require_once( 'offensive/assets/commentSearch.inc' );
 	
-	$tmboroot = get_include_path();
-	set_include_path($defaultpath);
-	require_once("xapian.php");
-	set_include_path($tmboroot);
-
 	function start() {
 		mustLogIn();
 	}
 	
 
-	function doSearch( $find ) {
-		$page = isset($_REQUEST['p']) && is_intger($_REQUEST['p']) ? $_REQUEST['p'] : 0;
-		// XXX: this should probably use argvalidation
-		$numperpage = isset($_REQUEST['limit']) && is_intger($_REQUEST['limit']) ?
-			          $_REQUEST['limit'] : 25;
-		$start = $page * $numperpage;
-
-		$indexfile = get_include_path()."/offensive/data/comments.db";
-		$lockfile = get_include_path()."/offensive/data/comments.db.lock";
-
-		// aquire lock.  try a couple times
-		$starttime = microtime(true);
-		$fp = fopen($lockfile, "r") or trigger_error("lockfile not found", E_USER_ERROR);
-		while(microtime(true) < $starttime + 2 && false === ($locked = flock($fp, LOCK_SH | LOCK_NB))) {
-			usleep(round(rand(100, 400) * 1000));
-		}
-		if(!$locked) {
-			trigger_error("locked out.", E_USER_ERROR);
-			exit(2);
-		}
-		
-		try {
-			$database = new XapianDatabase($indexfile);
-
-		    // Start an enquire session.
-		    $enquire = new XapianEnquire($database);
-
-		    // Combine the rest of the command line arguments with spaces between
-		    // them, so that simple queries don't have to be quoted at the shell
-		    // level.
-		    $query_string = $find;
-
-		    $qp = new XapianQueryParser();
-		    $stemmer = new XapianStem("english");
-		    $qp->set_stemmer($stemmer);
-		    $qp->set_database($database);
-		    $qp->set_stemming_strategy(XapianQueryParser::STEM_SOME);
-		    $query = $qp->parse_query($query_string, XapianQueryParser::FLAG_DEFAULT | XapianQueryParser::FLAG_SPELLING_CORRECTION);
-		    echo "<!-- Parsed query is: {$query->get_description()} -->\n";
-		
-			$corrected = $qp->get_corrected_query_string();
-			if($corrected) {
-				echo "Did you mean: <a href=\"XXX\">\"$corrected\"</a>?<br />\n";
-			}
-			
-			// get results for the query.
-		    $enquire->set_query($query);
-		    $matches = $enquire->get_mset($start, $numperpage);
-		    
-			// XXX: end end end yadda
-			?>
-			<br />
-			<table width="100%">
-				<tr>
-					<td width="200px">
-						<?php if( $page > 0 ) { ?>
-							<a href="<?= $_SERVER['SCRIPT_NAME'] ?>?c=<?= $_REQUEST['c'] ?>&find=<?= urlencode($_REQUEST['find']) ?>&p=<?= $page - 1 ?>">&laquo;&nbsp;<b>previous&nbsp;page</b></a></td>
-						<?php } ?>
-					</td>
-					<td style="text-align:center">
-						<?php
-							if ($matches->get_matches_estimated() > 0) {
-								// pagination
-								echo ($start + 1)." - ".min($start + $numperpage ,$matches->get_matches_estimated()).
-									 " of about {$matches->get_matches_estimated()}.\n\n";
-							 } else {
-								echo "No Results";
-							}
-						?>
-					</td>
-					<td style="text-align:right" width="200px">
-						<?php if( $start + $numperpage < $matches->get_matches_estimated() ) { ?>
-							<a href="<?= $_SERVER['SCRIPT_NAME'] ?>?c=<?= $_REQUEST['c'] ?>&find=<?= urlencode($_REQUEST['find']) ?>&p=<?= $page + 1 ?>"><b>next&nbsp;page</b></a>&nbsp;&raquo;
-						<?php } ?>
-					</td>
-				</tr>        
-			</table>
-			
-			</div></div><?php
-		
-			// d'oh this is not going to be very efficient, is it…
-			
-			$results = array();
-			$comments = array();
-			$i = $matches->begin();
-		    while (!$i->equals($matches->end())) {
-				$result = array();
-				$result['rank'] = $i->get_rank() + 1;
-				// XXX: prepopulate comment, upload, username from db
-				$result['comment'] = new Comment($i->get_document()->get_data());
-				$comments[] = $i->get_document()->get_data();
-				$result['match'] = $i->get_percent();
-				$i->next();
-				$results[] = $result;
-			}
-			
-			// load the class cache
-			if (count($comments) > 0) {
-				$comments = core_getcomment($comments);
-			}
-			
-			foreach($comments as $comment) {
-				$upload = $comment->upload(); ?>
-				<div class="contentbox">
-					<div class="heading"><?php
-					  // changeblog special header
-						if($upload->id() == "211604") { ?>
-							<a class="heading" href="<?= Link::content("changeblog") ?>">changeblog</a>
-							<br/><span style="color:var(--link-user)">beat to fit. paint to match.</span><br/>
-					<?php } else if( $upload->type() == 'topic' ) {
-							$prefix = $upload->uploader()->status() == "admin" ? "" : "don't blame me,"; ?>
-							<a class="heading" href="<?= Link::thread($upload) ?>"><?= $upload->htmlFilename(); ?></a>
-								<br/><span style="color:var(--link-user)"><?= $prefix ?> <a href="<?= Link::user($upload->uploader()) ?>" style="color:var(--link-user)"><?= $upload->uploader()->username() ?></a> started it.</span><br/>
-					<?php } else { ?>
-							<a class="heading" href="<?= Link::upload($upload) ?>"><?= $upload->htmlFilename(); ?></a><br/><span style="color:var(--link-user)">uploaded by <?= $upload->uploader()->htmlUsername() ?></span><br/>
+	function searchPager($find, $sort, $page, $more) {
+		$base = $_SERVER['SCRIPT_NAME']."?c=search&find=".urlencode($find)
+		       .($sort == "relevance" ? "&sort=relevance" : "")."&p=";
+		?>
+		<table width="100%">
+			<tr>
+				<td width="200px">
+					<?php if( $page > 0 ) { ?>
+						<a href="<?= htmlEscape($base.($page - 1)) ?>">&laquo;&nbsp;<b>previous&nbsp;page</b></a>
 					<?php } ?>
-					</div>
-				<div class="entry">
-				<?= $comment->HTMLcomment(); ?><br/>
-					 
-	 	 			<div class="timestamp"><?= $result['match'] ?>% <a href="<?= Link::comment($comment) ?>"><?= $comment->timestamp() ?></a></div>
-					&raquo; <?= $comment->commenter()->htmlUsername() ?>
-	
-				<?php
+				</td>
+				<td></td>
+				<td style="text-align:right" width="200px">
+					<?php if( $more ) { ?>
+						<a href="<?= htmlEscape($base.($page + 1)) ?>"><b>next&nbsp;page</b></a>&nbsp;&raquo;
+					<?php } ?>
+				</td>
+			</tr>
+		</table>
+		<?php
+	}
 
-				if( $comment->vote() ) {
-					echo "<span class='vote'> [ " . $comment->vote() . " ]</span>";
-				}
-							
-				if( $comment->tmbo() ) {
-					?><span class="vote"> [ this might be offensive ]</span><?php
-				}
-				
-				if( $comment->tiar() ) {
-					?><span class="vote"> [ this is a repost ]</span><?php
-				}
-				?>
-				</div></div>
-				<?php
+	function doSearch( $find, $sort ) {
+		$page = isset($_REQUEST['p']) && is_intger($_REQUEST['p']) ? max(0, (int)$_REQUEST['p']) : 0;
+		$numperpage = 25;
+
+		// deep pages are slow to reach, and nobody reads them
+		if(($page + 1) * $numperpage > COMMENT_SEARCH_MAX_OFFSET) {
+			?><div class="entry">Results stop after page <?= intdiv(COMMENT_SEARCH_MAX_OFFSET, $numperpage) ?>. Add a word to narrow the search.</div><?php
+			return;
+		}
+
+		// ask for one extra to find out whether there is a next page
+		try {
+			$comments = core_searchcomments([
+				"q" => $find,
+				"sort" => $sort,
+				"limit" => ($page * $numperpage).",".($numperpage + 1),
+			]);
+		} catch(PDOException $e) {
+			trigger_error("comment search: ".$e->getMessage(), E_USER_WARNING);
+			?><div class="entry">Search isn't working right now. Try again later.</div><?php
+			return;
+		} catch(Exception $e) {
+			if($e->getCode() == 400) {
+				?><div class="entry">Nothing to search for. Very common words like "the" are ignored, and a search needs at least one word that isn't excluded.</div><?php
+			} else if($e->getCode() == 422 && $sort == "relevance") {
+				?><div class="entry">That search matches too many comments to sort by best match. Add a less common word, or sort by newest.</div><?php
+			} else if($e->getCode() == 422) {
+				?><div class="entry">That search took too long. Add a less common word.</div><?php
+			} else if($e->getCode() == 429) {
+				?><div class="entry">You already have a search running. Try again in a moment.</div><?php
+			} else {
+				throw $e;
 			}
-			
-			?>
-			
+			return;
+		}
+		$more = count($comments) > $numperpage;
+		$comments = array_slice($comments, 0, $numperpage);
+
+		if(count($comments) == 0) {
+			?><div class="entry"><?= $page == 0 ? "No results." : "No more results." ?><?php
+			if($page > 0) {
+				searchPager($find, $sort, $page, false);
+			}
+			?></div><?php
+			return;
+		}
+
+		?><div class="entry"><?php
+		searchPager($find, $sort, $page, $more);
+		?></div></div></div><?php
+
+		foreach($comments as $comment) {
+			$upload = $comment->upload(); ?>
 			<div class="contentbox">
-				<div class="entry">
-			<table width="100%">
-				<tr>
-					<td width="200px">
-						<?php if( $page > 0 ) { ?>
-							<a href="<?= $_SERVER['SCRIPT_NAME'] ?>?c=<?= $_REQUEST['c'] ?>&find=<?= urlencode($_REQUEST['find']) ?>&p=<?= $page - 1 ?>">&laquo;&nbsp;<b>previous&nbsp;page</b></a></td>
-						<?php } ?>
-					</td>
-					<td style="text-align:center">
-						<?php
-							// pagination.
-						?>
-					</td>
-					<td style="text-align:right" width="200px">
-						<?php if( $start + $numperpage < $matches->get_matches_estimated() ) { ?>
-							<a href="<?= $_SERVER['SCRIPT_NAME'] ?>?c=<?= $_REQUEST['c'] ?>&find=<?= urlencode($_REQUEST['find']) ?>&p=<?= $page + 1 ?>"><b>next&nbsp;page</b></a>&nbsp;&raquo;
-						<?php } ?>
-					</td>
-				</tr>        
-			</table>
+				<div class="heading"><?php
+				  // changeblog special header
+					if($upload->id() == "211604") { ?>
+						<a class="heading" href="<?= Link::content("changeblog") ?>">changeblog</a>
+						<br/><span style="color:var(--link-user)">beat to fit. paint to match.</span><br/>
+				<?php } else if( $upload->type() == 'topic' ) {
+						$prefix = $upload->uploader()->status() == "admin" ? "" : "don't blame me,"; ?>
+						<a class="heading" href="<?= Link::thread($upload) ?>"><?= $upload->htmlFilename(); ?></a>
+							<br/><span style="color:var(--link-user)"><?= $prefix ?> <?= $upload->uploader()->htmlUsername() ?> started it.</span><br/>
+				<?php } else { ?>
+						<a class="heading" href="<?= Link::upload($upload) ?>"><?= $upload->htmlFilename(); ?></a><br/><span style="color:var(--link-user)">uploaded by <?= $upload->uploader()->htmlUsername() ?></span><br/>
+				<?php } ?>
+				</div>
+			<div class="entry">
+			<?= $comment->HTMLcomment(); ?><br/>
+
+				<div class="timestamp"><a href="<?= Link::comment($comment) ?>"><?= $comment->timestamp() ?></a></div>
+				&raquo; <?= $comment->commenter()->htmlUsername() ?>
 
 			<?php
-		
-		} catch (Exception $e) {
-			flock($fp, LOCK_UN);
-			fclose($fp);
-		    trigger_error("XAPIAN: ".$e->getMessage(), E_USER_ERROR);
+
+			if( $comment->vote() ) {
+				echo "<span class='vote'> [ " . $comment->vote() . " ]</span>";
+			}
+
+			if( $comment->tmbo() ) {
+				?><span class="vote"> [ this might be offensive ]</span><?php
+			}
+
+			if( $comment->tiar() ) {
+				?><span class="vote"> [ this is a repost ]</span><?php
+			}
+			?>
+			</div></div>
+			<?php
 		}
-		
-		flock($fp, LOCK_UN);
-		fclose($fp);
+
+		?>
+		<div class="contentbox">
+			<div class="entry">
+		<?php
+		searchPager($find, $sort, $page, $more);
 	}
 
 	function body() {
@@ -203,12 +142,17 @@
 
 <?php
 		$find = trim(array_key_exists("find", $_REQUEST) ? $_REQUEST['find'] : "");
+		$sort = array_key_exists("sort", $_REQUEST) && $_REQUEST['sort'] == "relevance" ? "relevance" : "date_desc";
 
 		?>
 		<div class="entry">
 				<form action="./">
 					<input type="hidden" name="c" value="search"/>
 					<input type="text" name="find" value="<?= htmlspecialchars($find) ?>"/>
+					<select name="sort" aria-label="sort by">
+						<option value="date_desc">newest first</option>
+						<option value="relevance"<?= $sort == "relevance" ? " selected" : "" ?>>best match</option>
+					</select>
 					<input type="submit" value="search comments"/>				
 				</form>
 		</div>
@@ -228,7 +172,7 @@
 		</div>
 		<?php
 		if( strlen( $find ) > 0 ) {
-			doSearch( $find );
+			doSearch( $find, $sort );
 		}
 		
 		

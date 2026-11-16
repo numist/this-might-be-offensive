@@ -9,6 +9,3 @@ THEMAXX=/var/www/html
 
 # Delete old quarantine files (older than 2 days)
 3 1 * * * www-data $THEMAXX/offensive/deleteOldFiles.pl 2 quarantine > /dev/null 2>&1
-
-# Run comment indexer hourly
-0 * * * * www-data /usr/bin/nice /usr/bin/php $THEMAXX/admin/commentIndexer.php > /dev/null 2>&1

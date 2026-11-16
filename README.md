@@ -12,7 +12,7 @@ Getting Started (Docker)
 6. Point your browser to [`https://localhost/offensive`](https://localhost/offensive/) (accept the self-signed certificate warning)
 7. Log in as `admin`/`[nsfw]`
 
-To include cron jobs (for zip file creation, cleanup, and comment indexing):
+To include cron jobs (for zip file creation and cleanup):
 
 ```bash
 docker compose --profile full up
@@ -43,6 +43,8 @@ changes are needed. Docker Desktop on macOS doesn't need it and skips it.
 - **nginx** - Web server (ports 80/443)
 - **php** - PHP 8.4 FPM for application code
 - **db** - MariaDB 10.11 (exposed on port 3307 for local access)
+- **search-db** - PostgreSQL 17, the comment search index
+- **search-sync** - Copies new comments from db into search-db every minute
 - **redis** - Session and cache storage
 - **realtime** - Node.js WebSocket server
 - **cron** - Scheduled tasks (only with `--profile full`)

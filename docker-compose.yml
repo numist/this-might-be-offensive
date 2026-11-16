@@ -33,9 +33,15 @@ services:
       - ./admin/.config.generated:/var/www/html/admin/.config:ro
     environment:
       - TMBO_ENV=development
+      - SEARCH_DB_DSN=pgsql:host=search-db;dbname=tmbo_search
+      - SEARCH_DB_USER=tmbo_search
+      - SEARCH_DB_PASS=shortbus
     depends_on:
       db:
         condition: service_healthy
+      # started, not healthy: the site runs without search
+      search-db:
+        condition: service_started
       redis:
         condition: service_healthy
     networks:
@@ -74,6 +80,47 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
+
+  search-db:
+    # Comment search index (admin/database/search.sql). search-sync fills it
+    # from db; it holds nothing that can't be rebuilt from there.
+    image: postgres:17
+    environment:
+      POSTGRES_DB: tmbo_search
+      POSTGRES_USER: tmbo_search
+      POSTGRES_PASSWORD: shortbus
+    volumes:
+      - search_data:/var/lib/postgresql/data
+    networks:
+      - tmbo-network
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "tmbo_search", "-d", "tmbo_search"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  search-sync:
+    # What cron does in production: copy new comments into search-db every
+    # minute. The first run indexes every comment in db.
+    build:
+      context: .
+      dockerfile: services/cron/Dockerfile
+    # Bundled Predis trips PHP 8.4 deprecation notices on every run; keep the log readable.
+    command: ["sh", "-c", "while :; do php -d 'error_reporting=E_ALL & ~E_DEPRECATED' admin/commentSearchSync.php .; sleep 60; done"]
+    environment:
+      - SEARCH_DB_DSN=pgsql:host=search-db;dbname=tmbo_search
+      - SEARCH_DB_USER=tmbo_search
+      - SEARCH_DB_PASS=shortbus
+    volumes:
+      - ./:/var/www/html:ro
+      - ./admin/.config.generated:/var/www/html/admin/.config:ro
+    depends_on:
+      db:
+        condition: service_healthy
+      search-db:
+        condition: service_healthy
+    networks:
+      - tmbo-network
 
   redis:
     image: redis:7-alpine
@@ -127,6 +174,7 @@ services:
 
 volumes:
   mysql_data:
+  search_data:
   redis_data:
 
 networks:

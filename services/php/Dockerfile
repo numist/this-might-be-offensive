@@ -1,7 +1,8 @@
 # PHP 8.4, matching production since the PHP 8.4 / MariaDB port.
 FROM php:8.4-fpm
 
-# mysqli for the app, gd + imagick for thumbnails (Upload::thumb() uses Imagick).
+# mysqli for the app, pdo_pgsql for comment search, gd + imagick for thumbnails
+# (Upload::thumb() uses Imagick).
 # imagick is pinned so builds are reproducible. Note that `pecl install`
 # regenerates its arginfo headers with a script that downloads PHP-Parser from
 # GitHub, so building this image needs GitHub access.
@@ -10,8 +11,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libpng-dev \
         libjpeg62-turbo-dev \
         libfreetype6-dev \
+        libpq-dev \
     && docker-php-ext-configure gd --with-jpeg --with-freetype \
-    && docker-php-ext-install -j"$(nproc)" mysqli gd exif \
+    && docker-php-ext-install -j"$(nproc)" mysqli pdo_pgsql gd exif \
     && pecl install imagick-3.8.0 \
     && docker-php-ext-enable imagick \
     && rm -rf /var/lib/apt/lists/* /tmp/pear

@@ -1,7 +1,9 @@
-# Same PHP as the php service, so admin/commentIndexer.php runs on 8.4.
+# Same PHP as the php service. The search-sync service uses this image too.
 FROM php:8.4-cli
 
-RUN docker-php-ext-install mysqli
+RUN apt-get update && apt-get install -y --no-install-recommends libpq-dev \
+    && docker-php-ext-install mysqli pdo_pgsql \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install cron, Perl, and dependencies.
 RUN apt-get update && apt-get install -y \

@@ -6,4 +6,4 @@ THEMAXX=/home/vagrant/sites/tmbo
 5 0 * * * www-data $THEMAXX/offensive/deleteOldFiles.pl 7 zips > /dev/null
 2 0 * * * www-data $THEMAXX/offensive/zipYesterday.pl zips
 3 1 * * * www-data $THEMAXX/offensive/deleteOldFiles.pl 2 quarantine > /dev/null
-0 * * * * www-data /usr/bin/nice /usr/bin/php5 $THEMAXX/admin/commentIndexer.php
+* * * * * www-data /usr/bin/nice /usr/bin/php $THEMAXX/admin/commentSearchSync.php $THEMAXX 2>&1 | logger -t tmbo-search

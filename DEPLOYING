@@ -345,3 +345,126 @@ after you roll forward, for the same reason.
 Do not leave production checked out on a detached commit or a feature branch.  Merge
 first, then move the server back to develop, then delete the branch.  A branch
 deleted out from under a live checkout is its own outage.
+
+
+###############################################################################
+COMMENT SEARCH
+###############################################################################
+
+Comment search (offensive/content/search.inc, and searchcomments in the API) reads a
+PostgreSQL database, tmbo_search, beside MariaDB. It holds an index of comment
+words and nothing else: MariaDB's offensive_comments stays the source of truth, and
+admin/commentSearchSync.php can rebuild the whole thing from it. So it needs no
+backups, and if it is down or empty only search is affected -- the search page says
+search isn't working, and every other page is unaffected. A search gives up on
+connecting after 2 seconds (COMMENT_SEARCH_CONNECT_TIMEOUT), so a hung database
+can't hold PHP workers for long either.
+
+Setting it up, once. The tmbo_search role needs no privileges beyond owning its
+database:
+
+    sudo apt install postgresql php8.4-pgsql
+    sudo systemctl restart php8.4-fpm
+    sudo -u postgres createuser --pwprompt tmbo_search
+    sudo -u postgres createdb -E UTF8 -T template0 --locale=C.UTF-8 -O tmbo_search tmbo_search
+
+Spell out the encoding: createdb otherwise copies the server's default, and if that
+is SQL_ASCII, words with accents won't index properly.
+
+Debian's PostgreSQL listens on localhost only, and its default memory settings
+(128MB shared_buffers) are fine; the index lives in the OS file cache like any
+other file. Add the connection to admin/.config:
+
+    search_db_dsn = "pgsql:host=localhost;dbname=tmbo_search"
+    search_db_user = "tmbo_search"
+    search_db_pass = "<the password you gave createuser>"
+
+Then build the index, as the user that owns the checkout. It reads MariaDB a batch
+at a time by primary key and takes no locks there, so the site runs normally
+meanwhile. Measured on 19M comments: about 9 minutes and 3GB of disk, plus about
+1GB of PostgreSQL's write-ahead log while it runs:
+
+    nice php ~/sites/tmbo/admin/commentSearchSync.php ~/sites/tmbo
+
+and add it to that user's crontab to copy new comments every minute. Its output
+goes to syslog rather than cron mail, which would otherwise send an error a minute
+while the database is down:
+
+    * * * * * nice php $HOME/sites/tmbo/admin/commentSearchSync.php $HOME/sites/tmbo 2>&1 | logger -t tmbo-search
+
+Read it with `journalctl -t tmbo-search`.
+
+Only one copy runs at a time (the others exit), so a slow run can't pile up.
+Comments are never edited or deleted, so new ids are all it copies. If you redact a
+comment by hand in MariaDB, the index still has its old words, and searching for
+them still finds it. Delete its row from the index too:
+
+    psql -h localhost -U tmbo_search tmbo_search -c 'DELETE FROM comments WHERE id = <id>'
+
+or run a rebuild (below).
+
+The code can go out before or after the index. Until the database exists the search
+page says search isn't working; until the first build finishes it finds nothing.
+
+Once search works, the old Xapian index is unused and can be deleted:
+
+    rm -rf ~/sites/tmbo/offensive/data/comments.db*
+
+To rebuild the index, after changing how comments are indexed (search.sql, or the
+'english' text search configuration):
+
+    nice php ~/sites/tmbo/admin/commentSearchSync.php ~/sites/tmbo --rebuild
+
+It builds a new copy beside the live one and swaps it in at the end, so search keeps
+working, but it needs room for both: about 7GB free at the peak, measured on 19M
+comments. Check df first. A stopped rebuild leaves a comments_new table behind;
+the next rebuild drops it.
+
+Searches time out after 3 seconds (COMMENT_SEARCH_TIMEOUT_MS in
+offensive/assets/commentSearch.inc) and the page asks for a narrower search.
+Newest-first searches take milliseconds. Sorting by best match ranks every comment
+that matches, so on a very common word that is the one that times out. Results stop
+after the first 10,000 (COMMENT_SEARCH_MAX_OFFSET), since deep pages cost as much as
+reading everything before them. Each user gets one search at a time, through a
+Redis lock, so nobody can tie up every PHP worker with slow searches. Without Redis
+searches still work, just without that limit.
+
+Turning it off without a rollback. If search misbehaves but the rest of the deploy
+is fine, stop the database. The search page then says search isn't working, and
+nothing else notices:
+
+    sudo systemctl stop postgresql
+
+Backing it out completely. Comment search changes nothing in MariaDB: no tables, no
+columns, no grants. The sync reads offensive_comments as the site's own user. So
+none of this is needed to keep the site up, only to clean up. In this order:
+
+1. Take the sync out of the crontab first, or it errors to syslog every minute
+   once the code or the database is gone.
+
+2. Roll the code back, as in ROLLING BACK. The old search page needs Xapian, so
+   search goes back to being broken, as it was before. Nothing else changes.
+
+3. Remove the search_db_* lines from admin/.config. Old code ignores them, so
+   this can wait.
+
+4. Remove PostgreSQL and its data, which frees the index's disk (3GB or more):
+
+       sudo -u postgres dropdb tmbo_search
+       sudo -u postgres dropuser tmbo_search
+       sudo apt purge 'postgresql*'
+       sudo rm -rf /var/lib/postgresql /etc/postgresql
+
+   To keep PostgreSQL installed for another try, do only the first two lines,
+   or just `sudo systemctl disable --now postgresql`.
+
+5. Optionally `sudo apt purge php8.4-pgsql` and restart php8.4-fpm. Leaving the
+   extension loaded is harmless.
+
+Setup edits no PostgreSQL config files (pg_hba.conf and postgresql.conf stay at
+Debian's defaults), so there is nothing to put back there. Searches leave
+short-lived Redis keys, commentsearch:lock:<userid>, that expire on their own
+after 10 seconds.
+
+Keep offensive/data/comments.db* until you're sure you won't roll back, though the
+old code can't read it on PHP 8 anyway.
