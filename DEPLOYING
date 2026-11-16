@@ -428,3 +428,43 @@ after the first 10,000 (COMMENT_SEARCH_MAX_OFFSET), since deep pages cost as muc
 reading everything before them. Each user gets one search at a time, through a
 Redis lock, so nobody can tie up every PHP worker with slow searches. Without Redis
 searches still work, just without that limit.
+
+Turning it off without a rollback. If search misbehaves but the rest of the deploy
+is fine, stop the database. The search page then says search isn't working, and
+nothing else notices:
+
+    sudo systemctl stop postgresql
+
+Backing it out completely. Comment search changes nothing in MariaDB: no tables, no
+columns, no grants. The sync reads offensive_comments as the site's own user. So
+none of this is needed to keep the site up, only to clean up. In this order:
+
+1. Take the sync out of the crontab first, or it errors to syslog every minute
+   once the code or the database is gone.
+
+2. Roll the code back, as in ROLLING BACK. The old search page needs Xapian, so
+   search goes back to being broken, as it was before. Nothing else changes.
+
+3. Remove the search_db_* lines from admin/.config. Old code ignores them, so
+   this can wait.
+
+4. Remove PostgreSQL and its data, which frees the index's disk (3GB or more):
+
+       sudo -u postgres dropdb tmbo_search
+       sudo -u postgres dropuser tmbo_search
+       sudo apt purge 'postgresql*'
+       sudo rm -rf /var/lib/postgresql /etc/postgresql
+
+   To keep PostgreSQL installed for another try, do only the first two lines,
+   or just `sudo systemctl disable --now postgresql`.
+
+5. Optionally `sudo apt purge php8.4-pgsql` and restart php8.4-fpm. Leaving the
+   extension loaded is harmless.
+
+Setup edits no PostgreSQL config files (pg_hba.conf and postgresql.conf stay at
+Debian's defaults), so there is nothing to put back there. Searches leave
+short-lived Redis keys, commentsearch:lock:<userid>, that expire on their own
+after 10 seconds.
+
+Keep offensive/data/comments.db* until you're sure you won't roll back, though the
+old code can't read it on PHP 8 anyway.
