@@ -3,5 +3,8 @@ database_host = "db"
 database_user = "tmbo"
 database_pass = "shortbus"
 database_name = "tmbo"
+search_db_dsn = "pgsql:host=search-db;dbname=tmbo_search"
+search_db_user = "tmbo_search"
+search_db_pass = "shortbus"
 redis_host = "redis"
 use_isk = 0

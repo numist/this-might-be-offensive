@@ -10,7 +10,7 @@ Read these before changing anything substantial:
 
 ## Stack
 
-PHP 8.4 (FPM), MariaDB 10.11, Redis (sessions and cache, via the bundled Predis client), nginx, and a Node.js Socket.IO service in `realtime/`. Front-end JavaScript is plain scripts with jQuery 1.7.1 and jQuery UI 1.8.17 already loaded on most pages.
+PHP 8.4 (FPM), MariaDB 10.11, PostgreSQL (comment search index only, rebuilt from MariaDB by `admin/commentSearchSync.php`), Redis (sessions and cache, via the bundled Predis client), nginx, and a Node.js Socket.IO service in `realtime/`. Front-end JavaScript is plain scripts with jQuery 1.7.1 and jQuery UI 1.8.17 already loaded on most pages.
 
 ## Local development
 

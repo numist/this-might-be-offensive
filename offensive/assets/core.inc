@@ -580,17 +580,49 @@
 		throw new Exception("unimplemented", 404);
 	}
 
-	// XXX: unimplemented (broken)
+	/*
+	 * Comment search, through the PostgreSQL index in
+	 * offensive/assets/commentSearch.inc.  Leaves out the viewer's squelched
+	 * users.  Throws 400 when the query has nothing to look up, and 413 when
+	 * it takes too long, which only a relevance sort of a common word should.
+	 */
 	function core_searchcomments($args) {
 		if(!is_array($args)) {
 			throw new Exception("args is not an array");
 		}
-			
-		$q = check_arg("q", "string", $method);
-		$limit = check_arg("limit", "limit", $method, false);
+
+		$q = check_arg("q", "string", $args);
+		$sort = check_arg("sort", "string", $args, false, ["date_desc", "relevance"]);
+		$limit = check_arg("limit", "limit", $args, false);
 		handle_errors();
-		
-		throw new Exception("not implemented :(", 404);
+
+		require_once("offensive/assets/commentSearch.inc");
+		$tsquery = commentSearchQuery($q);
+		if($tsquery === null) {
+			throw new Exception("nothing to search for", 400);
+		}
+
+		list($offset, $count) = explode(",", $limit);
+		$squelched = me() ? me()->squelched_list() : [];
+		$ids = commentSearchIds($tsquery, $sort === "relevance" ? "relevance" : "date_desc",
+		                        $offset, $count, $squelched);
+		if(count($ids) == 0) {
+			return [];
+		}
+
+		$result = tmbo_query(commentsql()." AND com.id IN (".implode(",", $ids).")");
+		$byid = [];
+		while($row = mysqli_fetch_assoc($result)) {
+			$byid[$row["id"]] = new Comment($row);
+		}
+		// in search order; a comment whose upload or user is gone drops out
+		$ret = [];
+		foreach($ids as $id) {
+			if(isset($byid[$id])) {
+				$ret[] = $byid[$id];
+			}
+		}
+		return $ret;
 	}
 
 	function core_searchuser($args) {

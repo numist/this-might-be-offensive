@@ -33,6 +33,7 @@
 			"401" => "HTTP/1/0 401 Unauthorized",
 			"403" => "HTTP/1/0 403 Forbidden",
 			"404" => "HTTP/1/0 404 Not Found",
+			"413" => "HTTP/1/0 413 Request Entity Too Large",
 			"500" => "HTTP/1/0 500 Internal Server Error",
 			"502" => "HTTP/1/0 502 Bad Gateway",
 			"503" => "HTTP/1/0 503 Service Unavailable"
@@ -440,6 +441,17 @@
 		throw new Exception("unimplemented", 404);
 	}
 
+	/**
+	 * @method searchcomments
+	 *
+	 * Search comment text.  Words are all required, "quoted phrases" must appear as written, -word excludes, "or" between words matches either, and word* matches as a prefix.  Very common words like "the" are ignored.  Comments by users you have squelched are left out.
+	 *
+	 * @param q string required What to search for.
+	 * @param sort string optional {"date_desc", "relevance"} Default:"date_desc" Newest first, or best match first.  A relevance search for a very common word can time out (413).
+	 * @param limit limit optional Default and maximum is 200.
+	 * @return An array of comment objects.
+	 * @example q=cat
+	 */
 	function api_searchcomments() {
 		send(core_searchcomments($_REQUEST));
 	}
