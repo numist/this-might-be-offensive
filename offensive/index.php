@@ -109,6 +109,10 @@ $timelimit = 10;
 		CSS::add("/styles/theme.dev.css");
 	}
 	CSS::add("/styles/filepilestyle.css");
+	// these were @imported by oldskool.css, which left them without a cache-busting
+	// version string; link them directly so edits reach browsers immediately.
+	CSS::add("/styles/main_nav.css");
+	CSS::add("/styles/grid.css");
 	CSS::add("/styles/oldskool.css");
 	JS::add("/offensive/js/jquery-1.7.1.min.js");
 	JS::add("/offensive/js/tmbolib.js");
