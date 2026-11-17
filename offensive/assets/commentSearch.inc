@@ -5,11 +5,17 @@
  * core_searchcomments() loads the comments from MariaDB.
  *
  * Queries are web-search style, as websearch_to_tsquery() reads them:
- * words (all required), "quoted phrases", -excluded words, and "or". On top
- * of that a word ending in * matches as a prefix. A prefix is always
- * required (or excluded, with -): "or" doesn't apply to it. Words are stemmed
- * (english), so "dogs" finds "dog", and stopwords like "the" are ignored.
+ * words (all required), -excluded words, and "or". On top of that a word
+ * ending in * matches as a prefix, and a "quoted phrase" matches those words
+ * in that order, stopwords included ("i get it"). Prefixes and phrases are
+ * always required (or excluded, with -): "or" doesn't apply to them. Words
+ * are stemmed (english), so "dogs" finds "dog", and outside phrases
+ * stopwords like "the" are ignored.
  */
+
+// What comments are indexed with: english stemming that keeps stopwords
+// (admin/database/search.sql). Changing it makes the sync rebuild the index.
+const COMMENT_SEARCH_INDEX_CONFIG = "english_nostop";
 
 // A search is cut off after this long and answers 422 instead. Newest-first
 // searches are milliseconds; this is for relevance sorting of a common word,
@@ -75,6 +81,21 @@ function commentSearchQuery($q)
 		$q = mb_substr($q, 0, 300);
 	}
 
+	// Phrases go through the index's own configuration, so their stopwords
+	// count. Up to five, like prefixes; past that, a phrase's words stay in
+	// the query as loose words (an excluded one is dropped).
+	$phrases = [];
+	$q = preg_replace_callback('/(?<=^|\s)(-?)"([^"]*)"/u', function($m) use (&$phrases) {
+		if(trim($m[2]) === "") {
+			return " ";
+		}
+		if(count($phrases) >= 5) {
+			return $m[1] === "-" ? " " : " ".$m[2]." ";
+		}
+		$phrases[] = [$m[1] === "-", $m[2]];
+		return " ";
+	}, $q);
+
 	// websearch_to_tsquery() has no prefix syntax, so take out word* and add
 	// it as word:*. Only letters and digits get through, so it can't carry
 	// tsquery operators. Short prefixes match too much to be useful. Past
@@ -91,6 +112,10 @@ function commentSearchQuery($q)
 
 	$sql = "websearch_to_tsquery('english', ?)";
 	$params = [$q];
+	foreach($phrases as $p) {
+		$sql = "($sql && ".($p[0] ? "!!" : "")."phraseto_tsquery('".COMMENT_SEARCH_INDEX_CONFIG."', ?))";
+		$params[] = $p[1];
+	}
 	foreach($prefixes as $p) {
 		$sql = "($sql && ".($p[0] ? "!!" : "")."to_tsquery('english', ? || ':*'))";
 		$params[] = $p[1];

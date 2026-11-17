@@ -445,7 +445,7 @@
 	/**
 	 * @method searchcomments
 	 *
-	 * Search comment text. Words are all required, "quoted phrases" must appear as written, -word excludes, "or" between words matches either, and word* matches as a prefix (always required, or excluded with -word*; "or" doesn't apply to it). Very common words like "the" are ignored. Comments by users you have squelched are left out. Results stop after the first 10000. One search at a time per user (429 otherwise).
+	 * Search comment text. Words are all required, "quoted phrases" must appear as written, small words included (always required, or excluded with -"..."), -word excludes, "or" between words matches either, and word* matches as a prefix (always required, or excluded with -word*; "or" doesn't apply to it). Very common words like "the" are ignored. Comments by users you have squelched are left out. Results stop after the first 10000. One search at a time per user (429 otherwise).
 	 *
 	 * @param q string required What to search for.
 	 * @param sort string optional {"date_desc", "relevance"} Default:"date_desc" Newest first, or best match first. A relevance search for a very common word can time out (422).

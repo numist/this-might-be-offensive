@@ -10,6 +10,22 @@
 -- `php admin/commentSearchSync.php <webroot> --rebuild`, so this database
 -- needs no backups.
 
+-- English stemming that keeps stopwords. The stock 'english' configuration
+-- drops words like "i", "it" and "the", so a quoted "i get it" could only
+-- look for "get". Comments are indexed with this one so every word is there,
+-- in position, for phrases. Searches for loose words still use 'english',
+-- which stems the same way and just skips the stopwords.
+DO $$
+BEGIN
+	IF NOT EXISTS (SELECT 1 FROM pg_ts_dict WHERE dictname = 'english_nostop') THEN
+		CREATE TEXT SEARCH DICTIONARY english_nostop (TEMPLATE = snowball, Language = english);
+	END IF;
+	IF NOT EXISTS (SELECT 1 FROM pg_ts_config WHERE cfgname = 'english_nostop') THEN
+		CREATE TEXT SEARCH CONFIGURATION english_nostop (COPY = english);
+		ALTER TEXT SEARCH CONFIGURATION english_nostop ALTER MAPPING REPLACE english_stem WITH english_nostop;
+	END IF;
+END $$;
+
 CREATE TABLE IF NOT EXISTS comments (
 	id integer PRIMARY KEY,
 	userid integer NOT NULL,
@@ -36,8 +52,11 @@ END $$;
 
 -- The highest offensive_comments.id the sync has read. Vote-only comments
 -- have no text and aren't stored, so max(comments.id) can't stand in for it.
+-- indexed_with is the text search configuration the index was built with;
+-- the sync rebuilds when it isn't the one the code uses.
 CREATE TABLE IF NOT EXISTS sync_state (
 	one boolean PRIMARY KEY DEFAULT true CHECK (one),
 	last_id integer NOT NULL
 );
+ALTER TABLE sync_state ADD COLUMN IF NOT EXISTS indexed_with text;
 INSERT INTO sync_state (last_id) VALUES (0) ON CONFLICT DO NOTHING;

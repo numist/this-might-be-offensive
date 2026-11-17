@@ -5,7 +5,8 @@
  * usage: php admin/commentSearchSync.php /path/to/webroot [--rebuild]
  *
  * without --rebuild it copies the comments added since the last run, which is
- * what cron does every minute. on an empty index that means a rebuild.
+ * what cron does every minute. on an empty index, or one built with another
+ * text search configuration than COMMENT_SEARCH_INDEX_CONFIG, it rebuilds.
  *
  * --rebuild builds a fresh index beside the live one and swaps it in at the
  * end, so search keeps working meanwhile. use it after changing how comments
@@ -95,7 +96,7 @@ function copyComments($table, $after, $state, $progress = false)
 		// a comment that is only stopwords ("the") has nothing to find it by
 		$pg->exec("INSERT INTO $table (id, userid, tsv)
 		           SELECT id, userid, tsv FROM (
-		               SELECT id, userid, to_tsvector('english', body) AS tsv FROM staging
+		               SELECT id, userid, to_tsvector('".COMMENT_SEARCH_INDEX_CONFIG."', body) AS tsv FROM staging
 		           ) s WHERE length(tsv) > 0
 		           ON CONFLICT (id) DO NOTHING");
 		$pg->exec("TRUNCATE staging");
@@ -114,10 +115,17 @@ function copyComments($table, $after, $state, $progress = false)
 	}
 }
 
-$last = (int)$pg->query("SELECT last_id FROM sync_state")->fetchColumn();
-if(!$rebuild && $last > 0) {
+$state = $pg->query("SELECT last_id, indexed_with FROM sync_state")->fetch(PDO::FETCH_ASSOC);
+$last = (int)$state["last_id"];
+// An index from before indexed_with existed was built with 'english'.
+$built_with = $state["indexed_with"] !== null ? $state["indexed_with"] : ($last > 0 ? "english" : null);
+if(!$rebuild && $last > 0 && $built_with === COMMENT_SEARCH_INDEX_CONFIG) {
 	copyComments("comments", overlapStart($last), true);
 	exit(0);
+}
+
+if(!$rebuild && $last > 0) {
+	fwrite(STDERR, "the index was built with '$built_with', rebuilding with '".COMMENT_SEARCH_INDEX_CONFIG."'\n");
 }
 
 // Load without the index and build it at the end, which is several times
@@ -137,7 +145,7 @@ $pg->exec("DROP TABLE comments");
 $pg->exec("ALTER TABLE comments_new RENAME TO comments");
 $pg->exec("ALTER INDEX comments_new_pkey RENAME TO comments_pkey");
 $pg->exec("ALTER INDEX comments_new_tsv RENAME TO comments_tsv");
-$pg->exec("UPDATE sync_state SET last_id = $last");
+$pg->exec("UPDATE sync_state SET last_id = $last, indexed_with = '".COMMENT_SEARCH_INDEX_CONFIG."'");
 $pg->commit();
 $pg->exec("ANALYZE comments");
 fwrite(STDERR, "done, up to id $last\n");
