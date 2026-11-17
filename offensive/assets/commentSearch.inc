@@ -84,6 +84,8 @@ function commentSearchQuery($q)
 	// Phrases go through the index's own configuration, so their stopwords
 	// count. Up to five, like prefixes; past that, a phrase's words stay in
 	// the query as loose words (an excluded one is dropped).
+	// Phones type curly quotes (iOS smart punctuation), which count too.
+	$q = str_replace(["\u{201C}", "\u{201D}", "\u{201E}", "\u{201F}"], '"', $q);
 	$phrases = [];
 	$q = preg_replace_callback('/(?<=^|\s)(-?)"([^"]*)"/u', function($m) use (&$phrases) {
 		if(trim($m[2]) === "") {
