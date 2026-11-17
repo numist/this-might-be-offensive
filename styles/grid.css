@@ -33,26 +33,37 @@
 
     }
 
+    /* rank, filename and counts like the image list, with the uploader and
+       age on a second line like the discussions list */
     #hof {
-        --columns: repeat(6, max-content);
+        --columns: max-content minmax(0, 1fr) max-content;
+
+        li {
+            align-items: baseline;
+
+            /* the rank. the rows are grid boxes, not list items, so they
+               count themselves (see hof.inc for the start and gaps) */
+            counter-increment: list-item;
+
+            &::before {
+                content: counter(list-item) ".";
+                justify-self: end;
+            }
+
+            > :last-child {
+                grid-column: 2 / -1;
+                color: var(--color-brand-medium);
+
+                time {
+                    white-space: nowrap;
+                }
+            }
+        }
     }
 
     /* on a phone the title column gives way and wraps, so rows fit the screen */
     @media (width < 800px) {
         --columns: minmax(0, 1fr) max-content;
-
-        /* filename on its own line next to the rank, the other columns below it */
-        #hof {
-            --columns: max-content minmax(0, 1fr) repeat(3, max-content);
-
-            .col2 {
-                grid-column: 2 / -1;
-            }
-
-            .col3 {
-                grid-column: 2;
-            }
-        }
     }
 
     .grid {
@@ -62,7 +73,7 @@
             font-weight: bold;
         }
     
-        > ul {
+        > :is(ul, ol) {
             display: grid;
             grid-template-columns: var(--columns);
             list-style-type: none;
