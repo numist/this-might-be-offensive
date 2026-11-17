@@ -77,7 +77,7 @@ var infScrLoadingFeedback = 'loading…';
                     // if needed, prep the item (for css)
                     item = prep_item(item, $('li[data-fileid]').last());
                   }
-                  $('#grid-container ul').append(item);
+                  $('#grid-container ul, #grid-container ol').append(item);
                 }
               });
               
@@ -87,7 +87,7 @@ var infScrLoadingFeedback = 'loading…';
               if(typeof pickuplink_set_visibility == "function") {
                 pickuplink_set_visibility();
               }
-            } else if($(data).find('#grid-container ul').length > 0) {
+            } else if($(data).find('#grid-container ul, #grid-container ol').length > 0) {
               // make sure the error exists before assuming no elements—this could be an error page
               hasMore = false;
             }

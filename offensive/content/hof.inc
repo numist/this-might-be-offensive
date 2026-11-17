@@ -15,7 +15,6 @@
 
 	function head() {
 		CSS::add("/styles/grid.css");
-		JS::add("/offensive/js/prep_evenodd.js");
 		JS::add("/offensive/js/lazyload_bottom.js");
 	}
 	function body() {
@@ -35,16 +34,6 @@
 	<div class="bluebox">
 		<div id="grid-container">
 			<div class="grid" id="hof">
-				<ul>
-					<li class="header">
-						<div class="col col1"></div>
-						<div class="col col2">filename</div>
-						<div class="col col3">uploaded by</div>
-						<div class="col col4">comments</div>
-						<div class="col col5">votes</div>
-						<div class="col col6"><?php if($view=="today") { ?> hours <?php } else { ?> weeks <?php } ?></div>
-					</li>
-
 <?php
 		$numPerPage = 100;
 		$page = isset($_REQUEST['p']) && is_intger($_REQUEST['p']) ?
@@ -65,50 +54,39 @@
 		}
 
 		$result = core_getuploads($args);
+		// the list numbers the rows, starting from this page's first rank.
+		// the rows are grid boxes, not list items, so browsers don't apply
+		// start and value to them; the inline counter styles do that.
 		$count = $page * $numPerPage;
-		$css = "oddfile odd_row";
+		$skipped = false;
+?>
+				<ol start="<?= $count + 1 ?>" style="counter-reset: list-item <?= $count ?>">
+<?php
 		foreach($result as $upload) {
+			++$count;
 			// cellophane doesn't want her images in the hof;
-			// this is a quick hack to omit them.
+			// this is a quick hack to omit them. the next row says its
+			// rank, so the list doesn't renumber around the gap.
 			if( $upload->uploader()->id() == 1138 ) {
-				++$count;
+				$skipped = true;
 				continue;
 			}
-			$css = strpos($css, "even") !== false ? "odd_row" : "even_row";
-
-			if( $upload->uploader()->id() == me()->id()) {
-				$css = "my_hof ".$css;
-			}
-
-			if($view=="today") $timeSince=hoursSince($upload->timestamp());
-			if($view=="hof") $timeSince = weeksSince($upload->timestamp());
-			$cssw = $view == 'hof' ? "$css weeks_$timeSince" : $css;
+			$value = $skipped ? ' value="'.$count.'" style="counter-set: list-item '.$count.'"' : "";
+			$skipped = false;
 ?>
-						<li data-fileid="<?= $upload->id() ?>">
-							<div class="col col1 <?= $cssw ?>">
-								<?php echo ++$count ?>.
-							</div>
-							<div class="col col2 <?= $cssw ?>">
-								<a href="<?= Link::upload($upload) ?>"><?= $upload->htmlFilename()?></a>
-							</div>
-							<div class="col col3 <?= $cssw ?>">
-								<?= $upload->uploader()->htmlUsername(); ?>
-							</div>
-							<div class="col col4 <?= $cssw ?>">
-								<a href="<?= Link::thread($upload) ?>"><?= $upload->comments() ?></a>
-							</div>
-							<div class="col col5 <?= $cssw ?>">
-								+<?= $upload->goods() ?>
-							</div>
-							<div class="col col6 <?= $cssw ?>">
-								<?= $timeSince ?>
-							</div>
-						</li>
-						<?php
-								}
-						?>
-					</ul>
-				</div>
+					<li data-fileid="<?= $upload->id() ?>"<?= $value ?>>
+						<div><a href="<?= Link::upload($upload) ?>"><?= $upload->htmlFilename() ?></a></div>
+						<div class="score"><a href="<?= Link::thread($upload) ?>" title="<?= $upload->timestamp() ?>"><?= $upload->commentLabel(false) ?><span class="goods"><?= $upload->goods() ?></span></a></div>
+						<div>
+							<?= htmlEscape($upload->uploader()->username()) ?>
+							<time datetime="<?= $upload->timestamp() ?>"><?= time_ago($upload->timestamp()) ?> ago</time>
+						</div>
+					</li>
+<?php
+		}
+?>
+				</ol>
+			</div>
 				<div id="bottom">
 					<?php
 						// next page!
@@ -126,13 +104,4 @@
 </div>
 <?php
 	}
-
-	function weeksSince( $timestamp ) {
-		return floor( (time() - strtotime( $timestamp )) / (60 * 60 * 24 * 7) );
-	}
-
-	function hoursSince( $timestamp) {
-		return floor((time() - strtotime($timestamp)) / (60*60));
-	}
-
 ?>
