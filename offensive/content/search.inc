@@ -148,12 +148,13 @@
 		<div class="entry">
 				<form action="./">
 					<input type="hidden" name="c" value="search"/>
-					<input type="text" name="find" value="<?= htmlspecialchars($find) ?>"/>
+					<input type="text" name="find" value="<?= htmlspecialchars($find) ?>" aria-describedby="find-hint"/>
 					<select name="sort" aria-label="sort by">
 						<option value="date_desc">newest first</option>
 						<option value="relevance"<?= $sort == "relevance" ? " selected" : "" ?>>best match</option>
 					</select>
-					<input type="submit" value="search comments"/>				
+					<input type="submit" value="search comments"/>
+					<div id="find-hint"><small>Put a phrase in quotes to find it exactly: "i get it".</small></div>
 				</form>
 		</div>
 		<div class="entry">
