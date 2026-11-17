@@ -154,7 +154,7 @@
 						<option value="relevance"<?= $sort == "relevance" ? " selected" : "" ?>>best match</option>
 					</select>
 					<input type="submit" value="search comments"/>
-					<div id="find-hint"><small>Put a phrase in quotes to find it exactly: "i get it".</small></div>
+					<div id="find-hint"><small>Use quotes to find exact phrases, e.g. "two hands and a flashlight"</small></div>
 				</form>
 		</div>
 		<div class="entry">
