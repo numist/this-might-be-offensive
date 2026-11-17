@@ -410,8 +410,13 @@ Once search works, the old Xapian index is unused and can be deleted:
 
     rm -rf ~/sites/tmbo/offensive/data/comments.db*
 
-To rebuild the index, after changing how comments are indexed (search.sql, or the
-'english' text search configuration):
+When the code changes which text search configuration comments are indexed with
+(COMMENT_SEARCH_INDEX_CONFIG in offensive/assets/commentSearch.inc), the next cron
+run notices and rebuilds the index on its own. Until it swaps the new one in,
+searches use the old index, and quoted phrases with stopwords in them ("i get it")
+find nothing.
+
+To rebuild by hand, after changing anything else about how comments are indexed:
 
     nice php ~/sites/tmbo/admin/commentSearchSync.php ~/sites/tmbo --rebuild
 

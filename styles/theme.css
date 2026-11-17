@@ -399,3 +399,9 @@ label:has(> input[name="link_previews"]) {
 	clip-path: inset(50%);
 	white-space: nowrap;
 }
+
+/* the hint under the comment search box, quiet like the second line of
+   the discussions list */
+#find-hint {
+	color: var(--color-brand-medium);
+}
