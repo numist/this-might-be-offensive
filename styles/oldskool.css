@@ -8,7 +8,7 @@ a:link {
 }
 
 a:visited {
-	color: var(--color-brand);
+	color: var(--color-link-visited);
 }
 
 .orange.orange {
