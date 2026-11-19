@@ -44,6 +44,7 @@
 
 	--link-accent: var(--orange);
 	--text-muted: #9999cc;
+	--text-disabled: #cccccc;
 
 	font-size: 10px;
 	line-height: 1.5;
