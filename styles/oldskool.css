@@ -1,6 +1,11 @@
 body {
 	background: var(--color-brand);
 	font-family: verdana, helvetica, sans-serif;
+
+	/* the browser's default 8px margin is wasted width on a phone */
+	@media (width < 800px) {
+		margin: 0;
+	}
 }
 
 a:link {
