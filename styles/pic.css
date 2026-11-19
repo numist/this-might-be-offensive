@@ -231,6 +231,10 @@ audio {
 			a {
 				color: var(--color-brand-light);
 			}
+
+			#votelinks.off, #votelinks.off a {
+				color: var(--color-brand-medium);
+			}
 		}
 	}
 
