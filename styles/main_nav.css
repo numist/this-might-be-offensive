@@ -54,7 +54,16 @@
         margin-left: auto;
     }
 
-    
+    /* unread() marks the popover's list .empty when nothing is unread. */
+    &:has(~ .unreadMenu .empty) .unreadButton {
+        color: var(--color-brand-medium);
+
+        &::after {
+            border-bottom-color: currentColor;
+        }
+    }
+
+
     @media (width < 800px) {
         position: fixed;
         inset: 0;
