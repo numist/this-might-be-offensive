@@ -269,7 +269,7 @@ audio {
 			margin-bottom: var(--spacing-sm);
 			padding: var(--spacing-xs) var(--spacing-sm);
 			/* a white backing, so the counts stay readable over the image as it scrolls by */
-			background: white;
+			background: rgb(255 255 255 / 70%);
 			border-radius: 3px;
 		}
 
