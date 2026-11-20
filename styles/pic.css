@@ -233,31 +233,50 @@ audio {
 			overflow-x: auto;
 			padding: var(--spacing);
 
-			a {
+			/* the counts float above the bar, on the page, so they keep
+				their desktop colors */
+			a:not(#comments) {
 				color: var(--color-brand-light);
 			}
 
 			#votelinks.off, #votelinks.off a {
 				color: var(--color-brand-medium);
 			}
-
-			.comments {
-				--bubble-fill: var(--color-brand-dark);
-			}
 		}
 
-		/* index and quick live in the menu on phones, and the vote links
-			speak for themselves without their label */
-		#navigation_controls span:has(#index), #quicklink, #votelinks > span {
+		/* quick lives in the menu on phones, and the vote links speak for
+			themselves without their label */
+		#quicklink, #votelinks > span {
 			display: none;
 		}
 
 		#heading {
+			anchor-name: --picBar;
 			display: flex;
 			align-items: center;
 			justify-content: space-between;
 			gap: var(--spacing-sm);
-			padding-inline: var(--spacing-sm);
+			/* no right padding: the more button sits flush with the edge */
+			padding: 0 0 0 var(--spacing-sm);
+		}
+
+		/* the counts sit centered on the page just above the bar. fixed,
+			not absolute, so the bar's overflow doesn't clip them. */
+		#heading #voting_stats {
+			position: fixed;
+			position-anchor: --picBar;
+			bottom: anchor(top);
+			justify-self: anchor-center;
+			margin-bottom: var(--spacing-sm);
+			padding: var(--spacing-xs) var(--spacing-sm);
+			/* a white backing, so the counts stay readable over the image as it scrolls by */
+			background: rgb(255 255 255 / 70%);
+			border-radius: 3px;
+		}
+
+		#navigation_controls, #votelinks {
+			display: flex;
+			gap: var(--spacing-sm);
 		}
 
 		/* same look as the phone tabs' menu buttons (main_nav.css) */
@@ -269,7 +288,11 @@ audio {
 			right: 0;
 			appearance: none;
 			border: none;
-			padding: var(--spacing-sm) 0 var(--spacing-sm) var(--spacing-sm);
+			/* sets the bar's height, like the tabs' buttons, and sits flush
+				with its bottom and right edges so the orange underline lines
+				up with theirs */
+			padding: var(--spacing-lg) var(--spacing);
+			border-bottom: 2px solid orange;
 			background: var(--color-brand-dark);
 			color: var(--color-brand-light);
 			font: inherit;
@@ -287,9 +310,10 @@ audio {
 			position-anchor: --picMenuButton;
 			position: fixed;
 			inset: auto;
-			bottom: anchor(top);
+			/* above the whole bar, so it doesn't cover the counts row */
+			bottom: anchor(--picBar top);
 			right: anchor(right);
-			margin: 0 0 var(--spacing) 0;
+			margin: 0 0 var(--spacing-sm) 0;
 			padding: var(--spacing-xs) 0;
 			background: var(--color-brand-light);
 			color: var(--color-brand-dark);
@@ -305,7 +329,9 @@ audio {
 				padding-block: var(--spacing-xs);
 			}
 
-			a {
+			/* #heading's link color rule is more specific than a plain
+				"a" here */
+			a:not(#comments) {
 				color: var(--color-brand-dark);
 				text-decoration: none;
 			}
@@ -325,6 +351,27 @@ audio {
 		isn't a flex item on phones */
 	#navigation_controls::before {
 		content: "\a0\a0";
+	}
+
+	/* phones space these groups with a gap instead */
+	#navigation_controls > span::before {
+		content: ". ";
+	}
+
+	#navigation_controls > span::after {
+		content: " .";
+	}
+
+	/* inline-block keeps the link's underline off the separator, and
+		it takes the bar's text color rather than the link's */
+	#bad::before {
+		content: ". ";
+		display: inline-block;
+		white-space: pre;
+	}
+
+	#votelinks.on #bad::before {
+		color: black;
 	}
 
 	#picMenu {
