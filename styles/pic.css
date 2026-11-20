@@ -252,12 +252,29 @@ audio {
 			display: none;
 		}
 
+		/* the counts get their own row above the controls */
 		#heading {
-			display: flex;
+			anchor-name: --picBar;
+			display: grid;
+			grid-template-columns: repeat(3, auto);
 			align-items: center;
 			justify-content: space-between;
 			gap: var(--spacing-sm);
 			padding-inline: var(--spacing-sm);
+		}
+
+		#heading > * {
+			grid-row: 2;
+		}
+
+		#heading > #voting_stats {
+			grid-row: 1;
+			grid-column: 1 / -1;
+		}
+
+		#navigation_controls, #votelinks {
+			display: flex;
+			gap: var(--spacing);
 		}
 
 		/* same look as the phone tabs' menu buttons (main_nav.css) */
@@ -287,9 +304,10 @@ audio {
 			position-anchor: --picMenuButton;
 			position: fixed;
 			inset: auto;
-			bottom: anchor(top);
+			/* above the whole bar, so it doesn't cover the counts row */
+			bottom: anchor(--picBar top);
 			right: anchor(right);
-			margin: 0 0 var(--spacing) 0;
+			margin: 0 0 var(--spacing-sm) 0;
 			padding: var(--spacing-xs) 0;
 			background: var(--color-brand-light);
 			color: var(--color-brand-dark);
@@ -325,6 +343,27 @@ audio {
 		isn't a flex item on phones */
 	#navigation_controls::before {
 		content: "\a0\a0";
+	}
+
+	/* phones space these groups with a gap instead */
+	#navigation_controls > span::before {
+		content: ". ";
+	}
+
+	#navigation_controls > span::after {
+		content: " .";
+	}
+
+	/* inline-block keeps the link's underline off the separator, and
+		it takes the bar's text color rather than the link's */
+	#bad::before {
+		content: ". ";
+		display: inline-block;
+		white-space: pre;
+	}
+
+	#votelinks.on #bad::before {
+		color: black;
 	}
 
 	#picMenu {

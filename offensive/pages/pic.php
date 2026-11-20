@@ -314,7 +314,7 @@
 				<?php } else { ?>
 					<a href="<?= Link::content($index) ?>" id="next" style="visibility:hidden">newer</a>
 				<?php } ?>
-				<span>. <a id="index" href="<?= Link::content($index) ?>">index</a></span> .
+				<span><a id="index" href="<?= Link::content($index) ?>">index</a></span>
 				<?php if($upload->prev_filtered()) {
 					$style = ($upload->prev_filtered()->is_nsfw() || $upload->prev_filtered()->is_tmbo() ? 'class="warning_link"' : "") ?>
 					<a id="previous" <?= $style ?> <?= preload_attr($upload->prev_filtered()) ?> href="<?= Link::upload($upload->prev_filtered()) ?>" title="<?= htmlEscape($upload->prev_filtered()->filename()) ?>">older</a>
@@ -356,7 +356,7 @@
 
 					?>
 					<span id="votelinks" class="<?= $class ?>">
-						<span>vote:</span> <a name="<?= $upload->id() ?>" id="good" class="votelink" <?= $good_href ?>>[ this is good ]</a> .
+						<span>vote:</span> <a name="<?= $upload->id() ?>" id="good" class="votelink" <?= $good_href ?>>[ this is good ]</a>
 						<a name="<?= $upload->id() ?>" id="bad" class="votelink" <?= $bad_href ?>>[ this is bad ]</a>
 					</span>
 				</span>
