@@ -356,7 +356,7 @@
 
 					?>
 					<span id="votelinks" class="<?= $class ?>">
-						vote: <a name="<?= $upload->id() ?>" id="good" class="votelink" <?= $good_href ?>>[ this is good ]</a> .
+						<span>vote:</span> <a name="<?= $upload->id() ?>" id="good" class="votelink" <?= $good_href ?>>[ this is good ]</a> .
 						<a name="<?= $upload->id() ?>" id="bad" class="votelink" <?= $bad_href ?>>[ this is bad ]</a>
 					</span>
 				</span>

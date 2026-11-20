@@ -246,8 +246,9 @@ audio {
 			}
 		}
 
-		/* index and quick live in the menu on phones */
-		#navigation_controls span:has(#index), #quicklink {
+		/* index and quick live in the menu on phones, and the vote links
+			speak for themselves without their label */
+		#navigation_controls span:has(#index), #quicklink, #votelinks > span {
 			display: none;
 		}
 
