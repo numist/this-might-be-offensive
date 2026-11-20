@@ -1,5 +1,10 @@
-#comments_link {
-	padding-left:24px;
+/* the counts are drawn like the lists' (see .comments in theme.css), so no underline */
+#comments {
+	text-decoration: none;
+
+	.comments {
+		--bubble-fill: white; /* body#pic's background */
+	}
 }
 
 #content {
@@ -234,6 +239,10 @@ audio {
 
 			#votelinks.off, #votelinks.off a {
 				color: var(--color-brand-medium);
+			}
+
+			.comments {
+				--bubble-fill: var(--color-brand-dark);
 			}
 		}
 	}
