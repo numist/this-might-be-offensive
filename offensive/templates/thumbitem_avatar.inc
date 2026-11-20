@@ -12,7 +12,7 @@ if(!defined("TMBO") || !isset($upload)) {
 ?>
 <li data-fileid="<?= $upload->id() ?>">
 	<div class="thumbcontainer">
-		<div><a href="<?= Link::upload($upload) ?>"
+		<div><a href="<?= Link::upload($upload).(isset($ctxQuery) ? $ctxQuery : "") ?>"
 			<?php if($upload->filtered()) { ?>
 			onMouseOver='changesrc("th<?= $upload->id()?>","<?= $upload->thumbURL() ?>")'
 			onMouseOut='changesrc("th<?= $upload->id() ?>","/offensive/graphics/th-filtered.gif")'

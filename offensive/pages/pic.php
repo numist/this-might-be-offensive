@@ -43,10 +43,10 @@
 	$context = PicContext::fromRequest($upload);
 
 	###########################################################################
-	// update pickuplinks, which only the main feed moves
+	// update pickuplinks, which only the main feed and the yearbook move
 	global $autoplay;
 
-	$autoplay = $context ? false : PickupLink::update($upload);
+	$autoplay = !$context || $context->movesPickup() ? PickupLink::update($upload) : false;
 
 	if(array_key_exists('loop', $_REQUEST)) {
 		$autoplay = true;

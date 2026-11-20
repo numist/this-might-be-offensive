@@ -4,11 +4,12 @@ require_once("offensive/assets/core.inc");
 require_once("offensive/assets/contributions.inc");
 
 // a pic page opened from a list other than the main feed (a user's
-// contributions) steps through that list instead: newer/older, the arrow
+// contributions, the yearbook) steps through that list instead: newer/older, the arrow
 // keys and swiping all follow its links. the list is named in the URL
 // (&ctx=...), so a link can be shared and back works, and nothing is kept
 // in the session. browsing a list doesn't move the pickup link, which
-// marks how far through the main feed the viewer has read.
+// marks how far through the main feed the viewer has read, unless the
+// list is the one the pickup link belongs to.
 abstract class PicContext {
 
 	// the list the request names, or null for the main feed. a list that
@@ -17,6 +18,9 @@ abstract class PicContext {
 		$ctx = isset($_REQUEST['ctx']) && is_string($_REQUEST['ctx']) ? $_REQUEST['ctx'] : "";
 		if($ctx === "contributions") {
 			return ContributionsContext::fromRequest($upload);
+		}
+		if($ctx === "yearbook") {
+			return YearbookContext::fromRequest($upload);
 		}
 		return null;
 	}
@@ -39,6 +43,11 @@ abstract class PicContext {
 	// the neighbor shown above (before) or below (after) $upload in the
 	// list, or false at either end.
 	abstract protected function neighbor($before);
+
+	// whether viewing an upload in this list moves the pickup link.
+	function movesPickup() {
+		return false;
+	}
 
 	// labels for the links to the item before and after. a list in date
 	// order keeps the main feed's.
@@ -96,11 +105,13 @@ abstract class PicContext {
 	}
 
 	// the first upload past $upload in the list's order, as keyset
-	// pagination: $cols are the list's sort columns, all descending, and
-	// $values $upload's values for them. before means toward the top.
-	protected function keyset($where, $cols, $values, $before, $hint = "") {
-		$cmp = $before ? ">" : "<";
-		$dir = $before ? "ASC" : "DESC";
+	// pagination: $cols are the list's sort columns, all descending (or
+	// all ascending, with $ascending), and $values $upload's values for
+	// them. before means toward the top.
+	protected function keyset($where, $cols, $values, $before, $hint = "", $ascending = false) {
+		$up = $before != $ascending;
+		$cmp = $up ? ">" : "<";
+		$dir = $up ? "ASC" : "DESC";
 		$order = array();
 		foreach($cols as $col) {
 			$order[] = "$col $dir";
@@ -181,6 +192,81 @@ class ContributionsContext extends PicContext {
 		$where = "AND up.userid = ".(int)$this->user->id()." AND up.type <> 'topic'";
 		return $this->keyset($where, $cols, $values, $before, "USE KEY (userid)");
 	}
+}
+
+// ?c=yearbook&sort=<sort>: each user's newest yearbook photo from the
+// last year, as core_getyearbook() lists them, a few hundred at most.
+class YearbookContext extends PicContext {
+	private $sort;
+
+	// sort => array(column, ascending, description)
+	private static function sorts() {
+		return array(
+			"uname_asc" => array("u.username", true, "by username"),
+			"uname_desc" => array("u.username", false, "by username, z to a"),
+			"date_desc" => array("up.id", false, "newest first"),
+			"date_asc" => array("up.id", true, "oldest first"),
+		);
+	}
+
+	static function fromRequest($upload) {
+		if($upload->type() != "avatar") {
+			return null;
+		}
+		$sort = isset($_REQUEST['sort']) && is_string($_REQUEST['sort']) ? $_REQUEST['sort'] : "";
+		if(!array_key_exists($sort, self::sorts())) {
+			return null;
+		}
+		return new YearbookContext($upload, $sort);
+	}
+
+	function __construct($upload, $sort) {
+		parent::__construct($upload);
+		$this->sort = $sort;
+	}
+
+	function query() {
+		return yearbookContextQuery($this->sort);
+	}
+
+	function listLink() {
+		return Link::content("yearbook")."&sort=".$this->sort;
+	}
+
+	function describe() {
+		$sorts = self::sorts();
+		return '<a href="'.$this->listLink().'">the yearbook</a>, '.$sorts[$this->sort][2];
+	}
+
+	// the yearbook's pickup link is the one for yearbook photos.
+	function movesPickup() {
+		return true;
+	}
+
+	function labels() {
+		if($this->sort == "date_desc") return array("newer", "older");
+		if($this->sort == "date_asc") return array("older", "newer");
+		return array("prev", "next");
+	}
+
+	protected function neighbor($before) {
+		$sorts = self::sorts();
+		list($col, $ascending) = $sorts[$this->sort];
+		$value = $col == "up.id"
+		         ? (int)$this->upload->id()
+		         : "'".sqlEscape($this->upload->uploader()->username())."'";
+		$where = "AND up.type = 'avatar'
+		          AND up.id = (SELECT MAX(newest.id) FROM offensive_uploads newest
+		                       WHERE newest.type = 'avatar' AND newest.userid = up.userid)
+		          AND u.account_status != 'locked'
+		          AND up.timestamp > DATE_SUB(NOW(), INTERVAL 12 MONTH)";
+		return $this->keyset($where, array($col), array($value), $before, "", $ascending);
+	}
+}
+
+// what a pic page link carries to browse the yearbook in $sort.
+function yearbookContextQuery($sort) {
+	return "&ctx=yearbook&sort=".rawurlencode($sort);
 }
 
 ?>
