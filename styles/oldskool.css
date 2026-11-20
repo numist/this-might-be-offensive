@@ -217,6 +217,11 @@ form.fieldform > [type="submit"] {
 			overflow-wrap: anywhere;
 		}
 
+		/* the counts, right-aligned like the other lists' score column */
+		> :nth-child(2) {
+			text-align: right;
+		}
+
 		@media (width < 800px) {
 			/* .commentlabel {
 				display: none;
