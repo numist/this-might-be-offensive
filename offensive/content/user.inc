@@ -463,8 +463,22 @@ function contributionsList($uploads, $byYear) {
 		}
 		?>
 		<li>
-			<div><a href="<?= Link::upload($upload) ?>"><?= $upload->htmlFilename(true) ?></a></div>
-			<div><a href="<?= Link::thread($upload) ?>" title="<?= $upload->timestamp() ?>"><?=$upload->commentLabel(!($upload->type() == 'topic'));?></a></div>
+<?php
+		// a discussion has no votes, so its bubble goes before the title
+		// like the discussions list, and the counts column is left empty.
+		// where the bubble sits tells a discussion from an image, so only
+		// other types (audio) keep a type prefix.
+		if($upload->type() == 'topic') {
+?>
+			<div><a href="<?= Link::thread($upload) ?>" title="<?= $upload->timestamp() ?>"><?= $upload->commentLabel(false) ?></a> <a href="<?= Link::upload($upload) ?>"><?= $upload->htmlFilename() ?></a></div>
+<?php
+		} else {
+?>
+			<div><a href="<?= Link::upload($upload) ?>"><?= $upload->htmlFilename($upload->type() != 'image') ?></a></div>
+			<div><a href="<?= Link::thread($upload) ?>" title="<?= $upload->timestamp() ?>"><?= $upload->commentLabel() ?></a></div>
+<?php
+		}
+?>
 		</li>
 		<?php
 	}
