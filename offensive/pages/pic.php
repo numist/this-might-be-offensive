@@ -216,7 +216,7 @@
 					if (comment.tmbo) {
 						var tmbo_span = stats_row.find('#count_tmbo');
 						if (tmbo_span.length == 0) {
-							stats_row.find("#count_bad").after(' x<span id="count_tmbo" style="color:var(--state-warning)">0</span>');
+							stats_row.find("#count_bad").after('<span id="count_tmbo" class="tmbos">0</span>');
 							tmbo_span = stats_row.find('#count_tmbo');
 						}
 						var tmbo_count = parseInt(tmbo_span.text()) + 1;
@@ -329,13 +329,14 @@
 				<span id="voting_stats">
 					<a style="margin-left:48px;"
 					id="comments"
-					href="<?= Link::thread($upload) ?>">comments</a>
-					(<span id="count_comment"><?= $upload->comments() ?></span>c
-					+<span id="count_good"><?= $upload->goods() ?></span>
-					-<span id="count_bad"><?= $upload->bads() ?></span><?php
-					if($upload->tmbos() > 0) { ?>
-						x<span id="count_tmbo"><?= $upload->tmbos() ?></span>
-					<?php } ?>)
+					href="<?= Link::thread($upload) ?>"><span
+					id="count_comment" class="comments"><?= $upload->comments() ?></span><span
+					class="commentlabel">comments</span><span
+					id="count_good" class="goods"><?= $upload->goods() ?></span><span
+					id="count_bad" class="bads"><?= $upload->bads() ?></span><?php
+					if($upload->tmbos() > 0) { ?><span
+						id="count_tmbo" class="tmbos"><?= $upload->tmbos() ?></span><?php
+					} ?></a>
 					<span id="quicklink">&nbsp;(<a id="quickcomment" href="#">quick</a>)</span>
 				</span>
 
