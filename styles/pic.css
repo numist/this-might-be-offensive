@@ -271,7 +271,6 @@ audio {
 			/* a pill, so the counts stay readable over the image as it scrolls by */
 			background: white;
 			border-radius: 999px;
-			box-shadow: 0px 2px 4px var(--color-brand-medium);
 		}
 
 		#navigation_controls, #votelinks {
