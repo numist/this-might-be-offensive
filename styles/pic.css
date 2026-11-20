@@ -233,16 +233,14 @@ audio {
 			overflow-x: auto;
 			padding: var(--spacing);
 
-			a {
+			/* the counts float above the bar, on the page, so they keep
+				their desktop colors */
+			a:not(#comments) {
 				color: var(--color-brand-light);
 			}
 
 			#votelinks.off, #votelinks.off a {
 				color: var(--color-brand-medium);
-			}
-
-			.comments {
-				--bubble-fill: var(--color-brand-dark);
 			}
 		}
 
@@ -252,24 +250,24 @@ audio {
 			display: none;
 		}
 
-		/* the counts get their own row above the controls */
 		#heading {
 			anchor-name: --picBar;
-			display: grid;
-			grid-template-columns: repeat(3, auto);
+			display: flex;
 			align-items: center;
 			justify-content: space-between;
 			gap: var(--spacing-sm);
 			padding-inline: var(--spacing-sm);
 		}
 
-		#heading > * {
-			grid-row: 2;
-		}
-
-		#heading > #voting_stats {
-			grid-row: 1;
-			grid-column: 1 / -1;
+		/* the counts sit centered on the page just above the bar. fixed,
+			not absolute, so the bar's overflow doesn't clip them. */
+		#heading #voting_stats {
+			position: fixed;
+			position-anchor: --picBar;
+			bottom: anchor(top);
+			justify-self: anchor-center;
+			color: black;
+			padding-block: var(--spacing-sm);
 		}
 
 		#navigation_controls, #votelinks {
