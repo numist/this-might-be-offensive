@@ -256,7 +256,8 @@ audio {
 			align-items: center;
 			justify-content: space-between;
 			gap: var(--spacing-sm);
-			padding-inline: var(--spacing-sm);
+			/* no right padding: the more button sits flush with the edge */
+			padding: 0 0 0 var(--spacing-sm);
 		}
 
 		/* the counts sit centered on the page just above the bar. fixed,
@@ -287,7 +288,11 @@ audio {
 			right: 0;
 			appearance: none;
 			border: none;
-			padding: var(--spacing-sm) 0 var(--spacing-sm) var(--spacing-sm);
+			/* sets the bar's height, like the tabs' buttons, and sits flush
+				with its bottom and right edges so the orange underline lines
+				up with theirs */
+			padding: var(--spacing-lg) var(--spacing);
+			border-bottom: 2px solid orange;
 			background: var(--color-brand-dark);
 			color: var(--color-brand-light);
 			font: inherit;
