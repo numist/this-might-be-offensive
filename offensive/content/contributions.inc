@@ -25,6 +25,10 @@
 		}
 	}
 
+	function head() {
+		JS::add("/offensive/js/contributions_more.js");
+	}
+
 	function title() {
 		global $them;
 		return "[contributions] : ".$them->username();
@@ -50,6 +54,7 @@
 			$uploads = contributionsQuery($usrid, $sort, $numPerPage + 1, $page * $numPerPage);
 			$more = count($uploads) > $numPerPage;
 			// a page can start partway through a year; its heading repeats.
+			// contributions_more.js folds such a page into the year above it.
 			contributionsList(array_slice($uploads, 0, $numPerPage), $sort != "votes");
 			if($more) {
 ?>
