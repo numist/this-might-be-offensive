@@ -314,7 +314,7 @@
 				<?php } else { ?>
 					<a href="<?= Link::content($index) ?>" id="next" style="visibility:hidden">newer</a>
 				<?php } ?>
-				. <a id="index" href="<?= Link::content($index) ?>">index</a> .
+				<span>. <a id="index" href="<?= Link::content($index) ?>">index</a></span> .
 				<?php if($upload->prev_filtered()) {
 					$style = ($upload->prev_filtered()->is_nsfw() || $upload->prev_filtered()->is_tmbo() ? 'class="warning_link"' : "") ?>
 					<a id="previous" <?= $style ?> <?= preload_attr($upload->prev_filtered()) ?> href="<?= Link::upload($upload->prev_filtered()) ?>" title="<?= htmlEscape($upload->prev_filtered()->filename()) ?>">older</a>
@@ -327,8 +327,7 @@
 					comment block
 				-->
 				<span id="voting_stats">
-					<a style="margin-left:48px;"
-					id="comments"
+					<a id="comments"
 					href="<?= Link::thread($upload) ?>"><span
 					id="count_comment" class="comments"><?= $upload->comments() ?></span><span
 					class="commentlabel">comments</span><span
@@ -343,7 +342,7 @@
 				<!--
 					voting block
 				-->
-				<span id="voting_controls" style="margin-left:40px;">
+				<span id="voting_controls">
 					<?php
 					if($upload->canVote()) {
 						// TODO: clean up
@@ -363,9 +362,19 @@
 				</span>
 
 				<!--
+					on phones the rest of the bar collapses into this menu; on
+					desktop the menu is laid out inline, and its copies of index
+					and quick are hidden.
+				-->
+				<button id="picMenuButton" popovertarget="picMenu" popovertargetaction="toggle">more</button>
+				<div id="picMenu" popover>
+				<a href="<?= Link::content($index) ?>">index</a>
+				<a href="#qc_dialog">quick comment</a>
+
+				<!--
 					subscribe block
 				-->
-				<span id="subscribe" style="margin-left:48px;">
+				<span id="subscribe">
 					<?php
 					if($upload->subscribed()) { ?>
 						<a class="subscribe_toggle" id="unsubscribeLink" href="/offensive/subscribe.php?un=1&fileid=<?= $id ?>" title="take this file off my 'unread comments' watch list.">unsubscribe</a>
@@ -378,7 +387,7 @@
 					filter block
 				-->
 				<span id="filter_controls">
-					<span style="margin-left:48px;">filters:</span>
+					<span>filters:</span>
 					<span style="margin-left:5px;"><?php
 							if(me()->getPref("hide_nsfw") == 1) { ?>
 									<a href="<?= Link::setPref("hide_nsfw", "") ?>">nsfw(on)</a>
@@ -395,6 +404,7 @@
 							<?php } ?>
 					</span>
 				</span>
+				</div>
 			</div>
 
 			<br />

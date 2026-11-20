@@ -497,6 +497,12 @@ $(document).ready(function() {
 	
 	// bind quick link
 	$("#quickcomment").on("click", function(e){ $("#qc_dialog").dialog("open"); e.preventDefault(); return false;});
+	// the phone menu repeats it; close the menu so it doesn't cover the dialog
+	document.querySelector('#picMenu a[href="#qc_dialog"]')?.addEventListener("click", function(e) {
+		e.preventDefault();
+		document.getElementById("picMenu").hidePopover();
+		document.getElementById("quickcomment").click();
+	});
 
 	// start reacting to events normally
 	bind_default_events();
