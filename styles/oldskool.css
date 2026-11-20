@@ -5,6 +5,11 @@ body {
 	/* the browser's default 8px margin is wasted width on a phone */
 	@media (width < 800px) {
 		margin: 0;
+
+		/* index.php's leading <br> spaces #content below the hidden #titleimg */
+		> br:first-child {
+			display: none;
+		}
 	}
 }
 
