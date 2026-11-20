@@ -244,9 +244,9 @@ audio {
 			}
 		}
 
-		/* index and quick live in the menu on phones, and the vote links
-			speak for themselves without their label */
-		#navigation_controls span:has(#index), #quicklink, #votelinks > span {
+		/* quick lives in the menu on phones, and the vote links speak for
+			themselves without their label */
+		#quicklink, #votelinks > span {
 			display: none;
 		}
 
@@ -275,7 +275,7 @@ audio {
 
 		#navigation_controls, #votelinks {
 			display: flex;
-			gap: var(--spacing);
+			gap: var(--spacing-sm);
 		}
 
 		/* same look as the phone tabs' menu buttons (main_nav.css) */

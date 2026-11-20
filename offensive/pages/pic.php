@@ -363,12 +363,11 @@
 
 				<!--
 					on phones the rest of the bar collapses into this menu; on
-					desktop the menu is laid out inline, and its copies of index
-					and quick are hidden.
+					desktop the menu is laid out inline, and its copy of quick is
+					hidden.
 				-->
 				<button id="picMenuButton" popovertarget="picMenu" popovertargetaction="toggle">more</button>
 				<div id="picMenu" popover>
-				<a href="<?= Link::content($index) ?>">index</a>
 				<a href="#qc_dialog">quick comment</a>
 
 				<!--
