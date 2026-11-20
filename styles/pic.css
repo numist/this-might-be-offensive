@@ -245,8 +245,104 @@ audio {
 				--bubble-fill: var(--color-brand-dark);
 			}
 		}
+
+		/* index and quick live in the menu on phones, and the vote links
+			speak for themselves without their label */
+		#navigation_controls span:has(#index), #quicklink, #votelinks > span {
+			display: none;
+		}
+
+		#heading {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: var(--spacing-sm);
+			padding-inline: var(--spacing-sm);
+		}
+
+		/* same look as the phone tabs' menu buttons (main_nav.css) */
+		#picMenuButton {
+			display: flex;
+			gap: var(--spacing-sm);
+			align-items: center;
+			position: sticky;
+			right: 0;
+			appearance: none;
+			border: none;
+			padding: var(--spacing-sm) 0 var(--spacing-sm) var(--spacing-sm);
+			background: var(--color-brand-dark);
+			color: var(--color-brand-light);
+			font: inherit;
+			font-weight: bold;
+
+			&::after {
+				content: '';
+				border: 4px solid transparent;
+				border-bottom-color: currentColor;
+				border-top-width: 0;
+			}
+		}
+
+		#picMenu {
+			position-anchor: --picMenuButton;
+			position: fixed;
+			inset: auto;
+			bottom: anchor(top);
+			right: anchor(right);
+			margin: 0 0 var(--spacing) 0;
+			padding: var(--spacing-xs) 0;
+			background: var(--color-brand-light);
+			color: var(--color-brand-dark);
+			font-weight: bold;
+			white-space: nowrap;
+			box-shadow: 0px 2px 4px var(--color-brand-medium);
+			border: none;
+			border-radius: 3px;
+
+			> * {
+				display: block;
+				padding-inline: var(--spacing-lg);
+				padding-block: var(--spacing-xs);
+			}
+
+			a {
+				color: var(--color-brand-dark);
+				text-decoration: none;
+			}
+		}
 	}
 
+}
+
+#picMenuButton {
+	anchor-name: --picMenuButton;
+	display: none;
+}
+
+/* desktop: the menu's contents sit inline in the bar, as they always have */
+@media (width >= 800px) {
+	/* the bar's old leading &nbsp;&nbsp;, kept out of the markup so it
+		isn't a flex item on phones */
+	#navigation_controls::before {
+		content: "\a0\a0";
+	}
+
+	#picMenu {
+		display: contents;
+		color: inherit;
+
+		> a {
+			display: none;
+		}
+	}
+
+	#comments, #subscribe, #filter_controls > :first-child {
+		margin-left: 48px;
+	}
+
+	#voting_controls {
+		margin-left: 40px;
+	}
 }
 
 .scrollcontainer {
