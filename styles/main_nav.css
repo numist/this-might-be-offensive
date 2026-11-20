@@ -94,8 +94,16 @@
     background: linear-gradient(var(--color-brand-light) 12px, var(--color-brand-light-alt));
     padding-top: var(--spacing, 8px);
 
+    /* on a phone .tabs is the fixed bar at the bottom of the screen; the
+       subtabs stay in the page, scrolling sideways if they don't fit */
     @media (width < 800px) {
-        display: none;
+        position: static;
+        background: linear-gradient(var(--color-brand-light) 12px, var(--color-brand-light-alt));
+        z-index: auto;
+
+        > * {
+            display: block;
+        }
     }
 }
 
