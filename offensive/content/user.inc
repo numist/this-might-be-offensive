@@ -354,25 +354,109 @@ function contributions($usrid) {
 		return;
 	}
 	
-	?><h3>
+	// newest first by default, or by votes, all time or by year.
+	$sorts = array("" => "newest", "votes" => "votes, all time", "years" => "votes, by year");
+	$sort = isset($_REQUEST['sort']) && is_string($_REQUEST['sort']) && array_key_exists($_REQUEST['sort'], $sorts) ? $_REQUEST['sort'] : "";
+
+	?><h3 id="contributions">
 		<a href="<?= Link::mainpage() ?>&userid=<?= $usrid?>"><?= $them->username() ?>'<?= substr($them->username(), -1) == "s" ? "" : "s" ?> contributions to society:</a>
 		<!-- +<?php echo isset($good_votes) ? $good_votes : 0; ?> -<?php echo isset($bad_votes) ? $bad_votes : 0; ?> (<a href="./?c=uservotedetail&userid=<?= $usrid ?>">click for details</a>)--></h3>
+	<p>sort by:
 <?php
-	contributionsList(core_getuploads(array("userid" => $usrid)));
+	$first = true;
+	foreach($sorts as $key => $label) {
+		echo $first ? "" : " · ";
+		$first = false;
+		if($key === $sort) {
+			?><strong><?= $label ?></strong><?php
+		} else {
+			?><a href="<?= Link::content("user")."&userid=$usrid".($key === "" ? "" : "&sort=$key") ?>#contributions"><?= $label ?></a><?php
+		}
+	}
+?>
+	</p>
+<?php
+	if($sort == "votes") {
+		contributionsList(contributionsByVotes($usrid, 100), false);
+	} else if($sort == "years") {
+		contributionsList(contributionsByYear($usrid, 10), true);
+	} else {
+		contributionsList(core_getuploads(array("userid" => $usrid)), true);
+	}
 }
 
-// a list of uploads, newest first. each year gets a heading and a list of
-// its own, like the hall of fame's by year view.
-function contributionsList($uploads) {
+// the votes sorts leave out discussions, which can't be voted on.
+// a user's uploads come from the userid index, and even a prolific user
+// has few enough that sorting them all by votes is cheap. without the
+// hint MariaDB intersects userid with the status index, which takes twice
+// as long for a user with 20,000 uploads.
+function contributionsByVotes($usrid, $limit) {
+	$usrid = (int)$usrid;
+	$sql = uploadsql()." AND up.userid = $usrid AND up.type <> 'topic'
+	       ORDER BY ca.good DESC, ca.id DESC
+	       LIMIT $limit";
+	$sql = str_replace("offensive_uploads up", "offensive_uploads up USE KEY (userid)", $sql);
+	$result = tmbo_query($sql);
+	$uploads = array();
+	while($row = mysqli_fetch_assoc($result)) {
+		$uploads[] = new Upload($row);
+	}
+	return $uploads;
+}
+
+// the user's top $n uploads of each year, newest year first, ranked like
+// the hall of fame's by year view. the ranking reads only ids and counts;
+// the full rows are fetched for the few uploads that make the cut.
+function contributionsByYear($usrid, $n) {
+	$usrid = (int)$usrid;
+	$result = tmbo_query("SELECT id FROM (
+			SELECT up.id, YEAR(up.timestamp) AS yr,
+			       ROW_NUMBER() OVER (PARTITION BY YEAR(up.timestamp)
+			                          ORDER BY ca.good DESC, ca.id DESC) AS rnk
+			FROM offensive_uploads up USE KEY (userid)
+			JOIN offensive_count_cache ca ON ca.threadid = up.id
+			WHERE up.userid = $usrid AND up.status = 'normal' AND up.type <> 'topic'
+		) ranked
+		WHERE rnk <= $n
+		ORDER BY yr DESC, rnk ASC");
+	$ids = array();
+	while($row = mysqli_fetch_assoc($result)) {
+		$ids[] = (int)$row['id'];
+	}
+	if(count($ids) == 0) {
+		return array();
+	}
+	$byid = array();
+	$result = tmbo_query(uploadsql()." AND up.id IN (".implode(",", $ids).")");
+	while($row = mysqli_fetch_assoc($result)) {
+		$byid[$row['id']] = new Upload($row);
+	}
+	$uploads = array();
+	foreach($ids as $id) {
+		if(isset($byid[$id])) {
+			$uploads[] = $byid[$id];
+		}
+	}
+	return $uploads;
+}
+
+// a list of uploads. with $byYear, the uploads come newest year first and
+// each year gets a heading and a list of its own, like the hall of fame's
+// by year view.
+function contributionsList($uploads, $byYear) {
 	$year = null;
 	foreach($uploads as $upload) {
 		$thisYear = substr($upload->timestamp(), 0, 4);
-		if($thisYear !== $year) {
+		if($year === null || ($byYear && $thisYear !== $year)) {
 			if($year !== null) {
 				?></ul>
 <?php
 			}
-			?><h3><?= $thisYear ?></h3>
+			if($byYear) {
+				?><h3><?= $thisYear ?></h3>
+<?php
+			}
+			?>
 	<ul class="imagelist">
 <?php
 			$year = $thisYear;
