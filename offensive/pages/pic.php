@@ -7,6 +7,7 @@
 	require_once("offensive/assets/classes.inc");
 	require_once("offensive/assets/core.inc");
 	require_once("offensive/classes/assets.inc");
+	require_once("offensive/assets/picContext.inc");
 
 	mustLogIn();
 	time_start($ptime);
@@ -38,11 +39,14 @@
 		exit;
 	}
 
+	// the list being browsed, or null for the main feed
+	$context = PicContext::fromRequest($upload);
+
 	###########################################################################
-	// update pickuplinks
+	// update pickuplinks, which only the main feed moves
 	global $autoplay;
 
-	$autoplay = PickupLink::update($upload);
+	$autoplay = $context ? false : PickupLink::update($upload);
 
 	if(array_key_exists('loop', $_REQUEST)) {
 		$autoplay = true;
@@ -229,12 +233,16 @@
 		</script>
 	</head>
 	<body id="pic">
-		<!-- message -->
-		<div id="pic_header">
+		<!-- message, or the list being browsed and a way back to the main feed -->
+		<div id="pic_header"<?= $context ? " data-context" : "" ?>>
 			<?php if(count($prefs) == 0) { ?>
 				<div id="instruction_link"><a href="#">?</a></div>
 			<?php } ?>
-			<div>consciousness doesn't really exist. it's just another one of our ideas.</div>
+			<?php if($context) { ?>
+				<div>browsing <?= $context->describe() ?>. <a href="<?= Link::upload($upload) ?>">back to the main feed</a></div>
+			<?php } else { ?>
+				<div>consciousness doesn't really exist. it's just another one of our ideas.</div>
+			<?php } ?>
 		</div>
 		<?php if(count($prefs) == 0) { ?>
 			<div id="instructions">
@@ -308,18 +316,33 @@
 						break;
 				}
 
-				if($upload->next_filtered()) {
-					$style = ($upload->next_filtered()->is_nsfw() || $upload->next_filtered()->is_tmbo() ? 'class="warning_link"' : "") ?>
-					<a id="next" <?= $style ?> <?= preload_attr($upload->next_filtered()) ?> href="<?= Link::upload($upload->next_filtered()) ?>" title="<?= htmlEscape($upload->next_filtered()->filename()) ?>">newer</a>
+				$indexLink = Link::content($index);
+
+				// "next" is the one before this in the list (newer, in the
+				// main feed), "previous" the one after it
+				if($context) {
+					$next = $context->before();
+					$previous = $context->after();
+					list($nextLabel, $previousLabel) = $context->labels();
+					$indexLink = $context->listLink();
+				} else {
+					$next = $upload->next_filtered();
+					$previous = $upload->prev_filtered();
+					list($nextLabel, $previousLabel) = array("newer", "older");
+				}
+
+				if($next) {
+					$style = ($next->is_nsfw() || $next->is_tmbo() ? 'class="warning_link"' : "") ?>
+					<a id="next" <?= $style ?> <?= preload_attr($next) ?> href="<?= $context ? $context->link($next) : Link::upload($next) ?>" title="<?= htmlEscape($next->filename()) ?>"><?= $nextLabel ?></a>
 				<?php } else { ?>
-					<a href="<?= Link::content($index) ?>" id="next" style="visibility:hidden">newer</a>
+					<a href="<?= $indexLink ?>" id="next" style="visibility:hidden"><?= $nextLabel ?></a>
 				<?php } ?>
-				<span><a id="index" href="<?= Link::content($index) ?>">index</a></span>
-				<?php if($upload->prev_filtered()) {
-					$style = ($upload->prev_filtered()->is_nsfw() || $upload->prev_filtered()->is_tmbo() ? 'class="warning_link"' : "") ?>
-					<a id="previous" <?= $style ?> <?= preload_attr($upload->prev_filtered()) ?> href="<?= Link::upload($upload->prev_filtered()) ?>" title="<?= htmlEscape($upload->prev_filtered()->filename()) ?>">older</a>
+				<span><a id="index" href="<?= $indexLink ?>">index</a></span>
+				<?php if($previous) {
+					$style = ($previous->is_nsfw() || $previous->is_tmbo() ? 'class="warning_link"' : "") ?>
+					<a id="previous" <?= $style ?> <?= preload_attr($previous) ?> href="<?= $context ? $context->link($previous) : Link::upload($previous) ?>" title="<?= htmlEscape($previous->filename()) ?>"><?= $previousLabel ?></a>
 				<?php } else { ?>
-					<a id="previous" href="<?= Link::content($index) ?>" style="visibility:hidden">older</a>
+					<a id="previous" href="<?= $indexLink ?>" style="visibility:hidden"><?= $previousLabel ?></a>
 				<?php } ?>
 				</span>
 
@@ -328,7 +351,7 @@
 				-->
 				<span id="voting_stats">
 					<a id="comments"
-					href="<?= Link::thread($upload) ?>"><span
+					href="<?= $context ? $context->threadLink($upload) : Link::thread($upload) ?>"><span
 					id="count_comment" class="comments"><?= $upload->comments() ?></span><span
 					class="commentlabel">comments</span><span
 					id="count_good" class="goods"><?= $upload->goods() ?></span><span
@@ -513,7 +536,7 @@
 
 					<?php if(!array_key_exists('loop', $_REQUEST)) { ?>
 						<div style="text-align:right; max-width:500px">
-							<a style="color:var(--bg-admin); text-decoration:underline" href="<?= Link::upload($upload) ?>&loop">loop</a>
+							<a style="color:var(--bg-admin); text-decoration:underline" href="<?= $context ? $context->link($upload) : Link::upload($upload) ?>&loop">loop</a>
 						</div>
 					<?php } ?>
 					<?php
