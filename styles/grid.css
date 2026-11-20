@@ -38,6 +38,17 @@
     #hof {
         --columns: max-content minmax(0, 1fr) max-content;
 
+        /* a year's page: newer year, this year, older year */
+        > nav {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: baseline;
+
+            > :last-child {
+                justify-self: end;
+            }
+        }
+
         li {
             align-items: baseline;
 

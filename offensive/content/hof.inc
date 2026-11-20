@@ -26,6 +26,14 @@
 		return $year >= 1997 && $year <= (int)date("Y") ? $year : false;
 	}
 
+	// the first year with any images, so the per-year view knows where to stop.
+	// t_t_id starts with type and timestamp, so this reads one index entry.
+	function hofFirstYear() {
+		$result = tmbo_query("SELECT YEAR(MIN(timestamp)) AS yr FROM offensive_uploads WHERE type = 'image'");
+		$row = mysqli_fetch_assoc($result);
+		return $row && $row['yr'] ? (int)$row['yr'] : (int)date("Y");
+	}
+
 	// the top $n images of every year, as year => rank => Upload, newest year
 	// first. ranking a year means sorting all of its images, so the ranks are
 	// worked out in one pass over the whole table and kept in redis for an
@@ -186,6 +194,18 @@
 		}
 		if(!array_key_exists("type", $args)) {
 			$args["type"] = "image";
+		}
+
+		if($year) {
+			// newer year on the left, older on the right, like the by-year list
+			// reads top to bottom. an empty span holds the side with no year.
+?>
+				<nav>
+					<?= $year < (int)date("Y") ? '<a href="'.Link::content("hof").'&y='.($year + 1).'" rel="next">« '.($year + 1).'</a>' : '<span></span>' ?>
+					<h3><?= $year ?></h3>
+					<?= $year > hofFirstYear() ? '<a href="'.Link::content("hof").'&y='.($year - 1).'" rel="prev">'.($year - 1).' »</a>' : '<span></span>' ?>
+				</nav>
+<?php
 		}
 
 		// the list numbers the rows, starting from this page's first rank.
