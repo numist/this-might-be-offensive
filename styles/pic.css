@@ -324,7 +324,9 @@ audio {
 				padding-block: var(--spacing-xs);
 			}
 
-			a {
+			/* #heading's link color rule is more specific than a plain
+				"a" here */
+			a:not(#comments) {
 				color: var(--color-brand-dark);
 				text-decoration: none;
 			}
