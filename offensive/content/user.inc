@@ -363,7 +363,7 @@ function contributions($usrid) {
 		<!-- +<?php echo isset($good_votes) ? $good_votes : 0; ?> -<?php echo isset($bad_votes) ? $bad_votes : 0; ?> (<a href="./?c=uservotedetail&userid=<?= $usrid ?>">click for details</a>)--></h3>
 <?php
 	$uploads = contributionsQuery($usrid, "", 10, 0);
-	contributionsList($uploads, true);
+	contributionsList($uploads, true, contributionsContextQuery($usrid, ""));
 	if(count($uploads) > 0) {
 		?><p><a href="<?= $all ?>">see all</a></p>
 <?php

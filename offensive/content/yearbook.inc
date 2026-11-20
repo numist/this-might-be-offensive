@@ -6,6 +6,7 @@
 	require_once( 'offensive/assets/tabs.inc' );
 	require_once( 'offensive/assets/classes.inc' );
 	require_once( 'offensive/assets/core.inc' );
+	require_once( 'offensive/assets/picContext.inc' );
 
 	function start() {
 		mustLogIn();
@@ -87,7 +88,8 @@
 				<ul>
 			<?php
 
-		// output loop
+		// output loop. the pic page steps through the yearbook in this sort.
+		$ctxQuery = yearbookContextQuery($args["sort"]);
 		foreach($result as $upload) {
 			require("offensive/templates/thumbitem_avatar.inc");
 		} ?>
