@@ -389,17 +389,17 @@
 					<span>filters:</span>
 					<span style="margin-left:5px;"><?php
 							if(me()->getPref("hide_nsfw") == 1) { ?>
-									<a href="<?= Link::setPref("hide_nsfw", "") ?>">nsfw(on)</a>
+									<a href="<?= Link::setPref("hide_nsfw", "") ?>" data-checked>nsfw<span>(on)</span></a>
 							<?php } else { ?>
-									<a href="<?= Link::setPref("hide_nsfw", 1) ?>">nsfw(off)</a>
+									<a href="<?= Link::setPref("hide_nsfw", 1) ?>">nsfw<span>(off)</span></a>
 							<?php } ?>
 					</span>
 			
 					<span style="margin-left:5px;"><?php
 							if(me()->getPref("hide_tmbo") == 1) { ?>
-											<a href="<?= Link::setPref("hide_tmbo", "") ?>">tmbo(on)</a>
+											<a href="<?= Link::setPref("hide_tmbo", "") ?>" data-checked>tmbo<span>(on)</span></a>
 							<?php } else { ?>
-											<a href="<?= Link::setPref("hide_tmbo", 1) ?>">tmbo(off)</a>
+											<a href="<?= Link::setPref("hide_tmbo", 1) ?>">tmbo<span>(off)</span></a>
 							<?php } ?>
 					</span>
 				</span>
