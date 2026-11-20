@@ -309,6 +309,22 @@ audio {
 				color: var(--color-brand-dark);
 				text-decoration: none;
 			}
+
+			/* filters read as checkboxes here instead of "(on)"/"(off)";
+				data-checked marks a filter that's on */
+			#filter_controls a {
+				span {
+					display: none;
+				}
+
+				&::before {
+					content: "\2610  ";
+				}
+
+				&[data-checked]::before {
+					content: "\2611  ";
+				}
+			}
 		}
 	}
 
