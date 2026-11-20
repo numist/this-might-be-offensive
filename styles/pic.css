@@ -268,9 +268,9 @@ audio {
 			justify-self: anchor-center;
 			margin-bottom: var(--spacing-sm);
 			padding: var(--spacing-xs) var(--spacing-sm);
-			/* a pill, so the counts stay readable over the image as it scrolls by */
+			/* a white backing, so the counts stay readable over the image as it scrolls by */
 			background: white;
-			border-radius: 999px;
+			border-radius: 3px;
 		}
 
 		#navigation_controls, #votelinks {
