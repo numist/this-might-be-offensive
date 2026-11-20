@@ -6,7 +6,7 @@
 	require_once( 'admin/mysqlConnectionInfo.inc' );
 	if(!isset($link) || !$link) $link = openDbConnection();
 
-	// every upload of one user, a page at a time, in the profile list's sorts.
+	// every upload of one user, a page at a time, newest first or by votes.
 
 	function start() {
 		mustLogIn();
@@ -45,7 +45,7 @@
 		if(me()->squelched($them)) {
 			?><p>You've squelched <?= $them->htmlUsername() ?>.</p><?php
 		} else {
-			contributionsSortLinks("contributions", $usrid, $sort);
+			contributionsSortLinks($usrid, $sort);
 			// one more than a page, to know whether there is a next one.
 			$uploads = contributionsQuery($usrid, $sort, $numPerPage + 1, $page * $numPerPage);
 			$more = count($uploads) > $numPerPage;
@@ -53,7 +53,7 @@
 			contributionsList(array_slice($uploads, 0, $numPerPage), $sort != "votes");
 			if($more) {
 ?>
-		<p id="morelink"><a href="<?= contributionsLink("contributions", $usrid, $sort) ?>&p=<?= $page + 1 ?>">more…</a></p>
+		<p id="morelink"><a href="<?= contributionsLink($usrid, $sort) ?>&p=<?= $page + 1 ?>">more…</a></p>
 <?php
 			}
 		}

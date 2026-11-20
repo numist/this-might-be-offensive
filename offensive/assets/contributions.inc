@@ -1,6 +1,6 @@
 <?php
 
-// a user's uploads, as listed on their profile (a preview) and on
+// a user's uploads, as listed on their profile (the newest few) and on
 // ?c=contributions (all of them, a page at a time): newest first with a
 // heading per year, by votes, or by votes within each year.
 
@@ -15,13 +15,12 @@ function contributionsSort() {
 	       && array_key_exists($_REQUEST['sort'], contributionsSorts()) ? $_REQUEST['sort'] : "";
 }
 
-function contributionsLink($page, $usrid, $sort) {
-	return Link::content($page)."&userid=".(int)$usrid.($sort === "" ? "" : "&sort=$sort");
+function contributionsLink($usrid, $sort) {
+	return Link::content("contributions")."&userid=".(int)$usrid.($sort === "" ? "" : "&sort=$sort");
 }
 
-// the "sort by" line. on the profile the links jump down to the list.
-function contributionsSortLinks($page, $usrid, $sort) {
-	$anchor = $page == "user" ? "#contributions" : "";
+// the "sort by" line.
+function contributionsSortLinks($usrid, $sort) {
 ?>
 	<p>sort by:
 <?php
@@ -32,7 +31,7 @@ function contributionsSortLinks($page, $usrid, $sort) {
 		if($key === $sort) {
 			?><strong><?= $label ?></strong><?php
 		} else {
-			?><a href="<?= contributionsLink($page, $usrid, $key).$anchor ?>"><?= $label ?></a><?php
+			?><a href="<?= contributionsLink($usrid, $key) ?>"><?= $label ?></a><?php
 		}
 	}
 ?>
@@ -69,42 +68,6 @@ function contributionsQuery($usrid, $sort, $limit, $offset) {
 	$uploads = array();
 	while($row = mysqli_fetch_assoc($result)) {
 		$uploads[] = new Upload($row);
-	}
-	return $uploads;
-}
-
-// the user's top $n uploads of each year, newest year first, ranked like
-// the hall of fame's by year view. the ranking reads only ids and counts;
-// the full rows are fetched for the few uploads that make the cut.
-function contributionsByYear($usrid, $n) {
-	$usrid = (int)$usrid;
-	$result = tmbo_query("SELECT id FROM (
-			SELECT up.id, YEAR(up.timestamp) AS yr,
-			       ROW_NUMBER() OVER (PARTITION BY YEAR(up.timestamp)
-			                          ORDER BY ca.good DESC, ca.id DESC) AS rnk
-			FROM offensive_uploads up USE KEY (userid)
-			JOIN offensive_count_cache ca ON ca.threadid = up.id
-			WHERE up.userid = $usrid AND up.status = 'normal' AND up.type <> 'topic'
-		) ranked
-		WHERE rnk <= $n
-		ORDER BY yr DESC, rnk ASC");
-	$ids = array();
-	while($row = mysqli_fetch_assoc($result)) {
-		$ids[] = (int)$row['id'];
-	}
-	if(count($ids) == 0) {
-		return array();
-	}
-	$byid = array();
-	$result = tmbo_query(uploadsql()." AND up.id IN (".implode(",", $ids).")");
-	while($row = mysqli_fetch_assoc($result)) {
-		$byid[$row['id']] = new Upload($row);
-	}
-	$uploads = array();
-	foreach($ids as $id) {
-		if(isset($byid[$id])) {
-			$uploads[] = $byid[$id];
-		}
 	}
 	return $uploads;
 }

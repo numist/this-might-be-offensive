@@ -355,17 +355,18 @@ function contributions($usrid) {
 		return;
 	}
 
-	$sort = contributionsSort();
-	?><h3 id="contributions">
-		<a href="<?= contributionsLink("contributions", $usrid, $sort) ?>"><?= $them->username() ?>'<?= substr($them->username(), -1) == "s" ? "" : "s" ?> contributions to society:</a>
+	// a preview of the newest few. the full list, with its sorts, is on
+	// its own page.
+	$all = contributionsLink($usrid, "");
+	?><h3>
+		<a href="<?= $all ?>"><?= $them->username() ?>'<?= substr($them->username(), -1) == "s" ? "" : "s" ?> most recent contributions:</a>
 		<!-- +<?php echo isset($good_votes) ? $good_votes : 0; ?> -<?php echo isset($bad_votes) ? $bad_votes : 0; ?> (<a href="./?c=uservotedetail&userid=<?= $usrid ?>">click for details</a>)--></h3>
 <?php
-	contributionsSortLinks("user", $usrid, $sort);
-	// a preview: the first 100, except that by year shows each year's top 10.
-	if($sort == "years") {
-		contributionsList(contributionsByYear($usrid, 10), true);
-	} else {
-		contributionsList(contributionsQuery($usrid, $sort, 100, 0), $sort != "votes");
+	$uploads = contributionsQuery($usrid, "", 10, 0);
+	contributionsList($uploads, true);
+	if(count($uploads) > 0) {
+		?><p><a href="<?= $all ?>">see all</a></p>
+<?php
 	}
 }
 
