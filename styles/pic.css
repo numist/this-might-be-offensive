@@ -230,7 +230,9 @@ audio {
 			top: auto;
 			background: var(--color-brand-dark);
 			color: var(--color-brand-light);
-			overflow-x: auto;
+			/* the bar fits without scrolling now, and the counts hang
+				above it */
+			overflow: visible;
 			padding: var(--spacing);
 
 			/* the counts float above the bar, on the page, so they keep
@@ -260,13 +262,14 @@ audio {
 			padding: 0 0 0 var(--spacing-sm);
 		}
 
-		/* the counts sit centered on the page just above the bar. fixed,
-			not absolute, so the bar's overflow doesn't clip them. */
+		/* the counts sit centered on the page just above the bar. the
+			fixed bar is their containing block; anchoring them to it instead
+			left them clipped by the bar's overflow in iOS Safari. */
 		#heading #voting_stats {
-			position: fixed;
-			position-anchor: --picBar;
-			bottom: anchor(top);
-			justify-self: anchor-center;
+			position: absolute;
+			bottom: 100%;
+			left: 50%;
+			translate: -50% 0;
 			margin-bottom: var(--spacing-sm);
 			padding: var(--spacing-xs) var(--spacing-sm);
 			/* a white backing, so the counts stay readable over the image as it scrolls by */
