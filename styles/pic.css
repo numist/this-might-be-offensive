@@ -255,6 +255,7 @@ audio {
 		#heading {
 			display: flex;
 			align-items: center;
+			justify-content: space-between;
 			gap: var(--spacing-sm);
 			padding-inline: var(--spacing-sm);
 		}
@@ -266,7 +267,6 @@ audio {
 			align-items: center;
 			position: sticky;
 			right: 0;
-			margin-left: auto;
 			appearance: none;
 			border: none;
 			padding: var(--spacing-sm) 0 var(--spacing-sm) var(--spacing-sm);
@@ -321,6 +321,12 @@ audio {
 
 /* desktop: the menu's contents sit inline in the bar, as they always have */
 @media (width >= 800px) {
+	/* the bar's old leading &nbsp;&nbsp;, kept out of the markup so it
+		isn't a flex item on phones */
+	#navigation_controls::before {
+		content: "\a0\a0";
+	}
+
 	#picMenu {
 		display: contents;
 		color: inherit;

@@ -290,7 +290,7 @@
 		<div id="content">
 			<div id="heading" style="white-space:nowrap;" class="scrollcontainer">
 				<div class="scroll-hint"><div class="scroll-hint-icon">→</div></div>
-				&nbsp;&nbsp;<span id="navigation_controls">
+				<span id="navigation_controls">
 				<?php
 				/*
 				* navigation buttons, prev index next are dependant on type
