@@ -5,6 +5,7 @@
 	require_once("offensive/assets/functions.inc");
 	require_once("offensive/assets/tabs.inc");
 	require_once("offensive/assets/classes.inc");
+	require_once("offensive/assets/picContext.inc");
 
 	function title() {
 		global $upload;
@@ -12,7 +13,7 @@
 	}
 
 	function start() {
-		global $upload, $uploader;
+		global $upload, $uploader, $context;
 		mustLogIn();
 		
 		if( ! is_intger( $_REQUEST['fileid'] ) ){
@@ -22,6 +23,10 @@
 		
 		$upload = core_getupload($_REQUEST['fileid']);
 		$uploader = $upload->uploader();
+
+		// the list the pic page was browsing (picContext.inc), kept on the
+		// links back to it
+		$context = $upload->type() == "topic" ? null : PicContext::fromRequest($upload);
 
 		$upload->clearSubscription();
 
@@ -61,12 +66,14 @@
 			}
 
 			if( array_key_exists("redirect", $_REQUEST) ) {
-				header("Location: ".Link::upload($_REQUEST['fileid']));
+				header("Location: ".($context ? $context->link($upload) : Link::upload($upload)));
 				exit;
 			}
 			
 			// redirecting to the same place prevents 'reload' from reposting the comment.
-			header("Location: ".Link::comment($comment));
+			header("Location: ".($context
+				? $context->threadLink($upload)."#".$comment->id()
+				: Link::comment($comment)));
 			exit;
 		}
 	}
@@ -244,14 +251,14 @@
 	}
 
 	function body() {
-		global $upload, $uploader;
+		global $upload, $uploader, $context;
 	
 		$comments_exist = count($upload->getComments()) > 0;
 	
 		$comments_heading = "the dorks who came before you said:";
 		$add_comment_heading = $comments_exist ? "and then you came along and were all:" : "you were first on the scene and were all:";
 
-		$href = Link::upload($upload);
+		$href = $context ? $context->link($upload) : Link::upload($upload);
 ?>	
 
 <div class="contentbox">
@@ -355,7 +362,7 @@
 
 					<div>
 					<?php if ($upload->type() != "topic") { ?>
-						<a class="heading" href="<?= Link::upload($upload) ?>"><?= $upload->htmlFilename(); ?></a><br/>
+						<a class="heading" href="<?= $href ?>"><?= $upload->htmlFilename(); ?></a><br/>
 					<?php }
 						else {
 						 ?>&nbsp;<?php
@@ -381,6 +388,7 @@
 			<p>
 				<input type="hidden" id="fileid" name="fileid" value="<?= $upload->id() ?>"/>
 				<input type="hidden" name="c" value="comments"/>
+				<?= $context ? $context->hiddenFields() : "" ?>
 				<textarea name="comment" rows="12" cols="64"></textarea>
 			</p>
 				

@@ -19,6 +19,11 @@ function contributionsLink($usrid, $sort) {
 	return Link::content("contributions")."&userid=".(int)$usrid.($sort === "" ? "" : "&sort=$sort");
 }
 
+// what a pic page link carries to browse this list (see picContext.inc).
+function contributionsContextQuery($usrid, $sort) {
+	return "&ctx=contributions&userid=".(int)$usrid.($sort === "" ? "" : "&sort=$sort");
+}
+
 // the "sort by" line.
 function contributionsSortLinks($usrid, $sort) {
 ?>
@@ -74,8 +79,9 @@ function contributionsQuery($usrid, $sort, $limit, $offset) {
 
 // a list of uploads. with $byYear, the uploads come newest year first and
 // each year gets a heading and a list of its own, like the hall of fame's
-// by year view.
-function contributionsList($uploads, $byYear) {
+// by year view. $ctxQuery goes on each pic page link, so the pic page
+// steps through this list.
+function contributionsList($uploads, $byYear, $ctxQuery = "") {
 	$year = null;
 	foreach($uploads as $upload) {
 		$thisYear = substr($upload->timestamp(), 0, 4);
@@ -106,7 +112,7 @@ function contributionsList($uploads, $byYear) {
 <?php
 		} else {
 ?>
-			<div><a href="<?= Link::upload($upload) ?>"><?= $upload->htmlFilename($upload->type() != 'image') ?></a></div>
+			<div><a href="<?= Link::upload($upload).$ctxQuery ?>"><?= $upload->htmlFilename($upload->type() != 'image') ?></a></div>
 			<div><a href="<?= Link::thread($upload) ?>" title="<?= $upload->timestamp() ?>"><?= $upload->commentLabel() ?></a></div>
 <?php
 		}

@@ -50,6 +50,18 @@ body {
 	max-height: calc(100vh - 105px);
 }
 
+/* browsing a list instead of the main feed: the colors swap so it stands
+   out, and the line wraps rather than cut off the way back */
+#pic_header[data-context] {
+	background: var(--link-accent);
+	color: var(--bg-heading);
+	white-space: normal;
+}
+
+#pic_header[data-context] a {
+	color: inherit;
+}
+
 #instruction_link {
 	float: right;
 }

@@ -55,7 +55,7 @@
 			$more = count($uploads) > $numPerPage;
 			// a page can start partway through a year; its heading repeats.
 			// contributions_more.js folds such a page into the year above it.
-			contributionsList(array_slice($uploads, 0, $numPerPage), $sort != "votes");
+			contributionsList(array_slice($uploads, 0, $numPerPage), $sort != "votes", contributionsContextQuery($usrid, $sort));
 			if($more) {
 ?>
 		<p id="morelink"><a href="<?= contributionsLink($usrid, $sort) ?>&p=<?= $page + 1 ?>">more…</a></p>
