@@ -357,10 +357,26 @@ function contributions($usrid) {
 	?><h3>
 		<a href="<?= Link::mainpage() ?>&userid=<?= $usrid?>"><?= $them->username() ?>'<?= substr($them->username(), -1) == "s" ? "" : "s" ?> contributions to society:</a>
 		<!-- +<?php echo isset($good_votes) ? $good_votes : 0; ?> -<?php echo isset($bad_votes) ? $bad_votes : 0; ?> (<a href="./?c=uservotedetail&userid=<?= $usrid ?>">click for details</a>)--></h3>
+<?php
+	contributionsList(core_getuploads(array("userid" => $usrid)));
+}
+
+// a list of uploads, newest first. each year gets a heading and a list of
+// its own, like the hall of fame's by year view.
+function contributionsList($uploads) {
+	$year = null;
+	foreach($uploads as $upload) {
+		$thisYear = substr($upload->timestamp(), 0, 4);
+		if($thisYear !== $year) {
+			if($year !== null) {
+				?></ul>
+<?php
+			}
+			?><h3><?= $thisYear ?></h3>
 	<ul class="imagelist">
 <?php
-	$uploads = core_getuploads(array("userid" => $usrid));
-	foreach($uploads as $upload) {
+			$year = $thisYear;
+		}
 		?>
 		<li>
 			<div><a href="<?= Link::upload($upload) ?>"><?= $upload->htmlFilename(true) ?></a></div>
@@ -368,9 +384,10 @@ function contributions($usrid) {
 		</li>
 		<?php
 	}
-?>
-	</ul>
+	if($year !== null) {
+		?></ul>
 <?php
+	}
 }
 
 ?>
