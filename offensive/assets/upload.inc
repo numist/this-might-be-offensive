@@ -766,6 +766,15 @@ function upload_checkdims(&$postdata) {
 		return false;
 	}
 
+	// we can't shrink an animated image and keep the animation, so don't
+	// offer to. ping reads the frame list without decoding pixels.
+	$image = new Imagick();
+	$image->pingImage("$tmpdir/{$postdata['tmpname']}");
+	$animated = image_is_animated($image);
+	$image->destroy();
+	if($animated)
+		return false;
+
 	$message = "This image is rather large ($width x $height).<br />If you want, I can try resizing it for you.<br/><br/>
 	<form action=\"{$_SERVER['SCRIPT_NAME']}\" method=\"POST\">
 		<input type=\"hidden\" name=\"c\" value=\"upload\">
