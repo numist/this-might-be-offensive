@@ -158,6 +158,12 @@ form.fieldform > [type="submit"] {
 		font-weight: bold;
 		padding: 0.5rem;
 
+		/* the default link color is unreadable on the dark heading, so links
+			take the heading's own color, like the comments page's filename */
+		a:not(.orange) {
+			color: inherit;
+		}
+
 		.blame, .blame a {
 			color: var(--color-brand-medium);
 		}
