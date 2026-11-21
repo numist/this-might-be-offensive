@@ -406,12 +406,9 @@
 				</div>
 			</div>
 
-			<br />
-
 			<!--
 				filename/size block
 			-->
-			<br />
 			<?php if($upload->is_nsfw() || $upload->is_tmbo()) { ?>
 			  <span class="warning_tags">
 			  <?php
