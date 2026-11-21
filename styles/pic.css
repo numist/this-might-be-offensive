@@ -378,6 +378,10 @@ audio {
 
 /* desktop: the menu's contents sit inline in the bar, as they always have */
 @media (width >= 800px) {
+	#heading {
+		margin-bottom: 1em;
+	}
+
 	/* the bar's old leading &nbsp;&nbsp;, kept out of the markup so it
 		isn't a flex item on phones */
 	#navigation_controls::before {
