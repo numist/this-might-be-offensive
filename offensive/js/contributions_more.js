@@ -1,13 +1,15 @@
 // infinite scroll for ?c=contributions. the page lists a user's uploads as
-// year headings (h3), each followed by its own ul.imagelist, so the shared
+// year headings (h3), each followed by its own ul (a ul.imagelist, or a
+// list of thumbnails in the thumbnail view), so the shared
 // lazyload_bottom.js, which appends every row to every list on the page,
 // can't be used. this fetches the "more…" link's page when it nears the
 // viewport and appends its headings and lists, folding a list into the
 // last one on the page when it continues the same year. without
-// javascript, the "more…" link still pages normally.
+// javascript, the "more…" link still pages normally. it also applies the
+// viewer's thumbnail filters (tmbolib.js) to the page and to what it adds.
 (function() {
 	function lastList(box) {
-		var lists = box.querySelectorAll(":scope > ul.imagelist");
+		var lists = box.querySelectorAll(":scope > ul");
 		return lists.length ? lists[lists.length - 1] : null;
 	}
 
@@ -18,6 +20,8 @@
 	}
 
 	function init() {
+		hideFilteredThumbnails();
+
 		// the lists' box, which the "more…" link ends
 		var more = document.getElementById("morelink");
 		if(!more || !("IntersectionObserver" in window)) {
@@ -42,13 +46,13 @@
 				})
 				.then(function(html) {
 					var doc = new DOMParser().parseFromString(html, "text/html");
-					var newList = doc.querySelector("ul.imagelist");
+					var newList = doc.querySelector(".bluebox > ul");
 					if(!newList) {
 						throw new Error("no list in the response");
 					}
 					var newBox = newList.parentElement;
 					var heading = null;
-					newBox.querySelectorAll(":scope > h3, :scope > ul.imagelist").forEach(function(node) {
+					newBox.querySelectorAll(":scope > h3, :scope > ul").forEach(function(node) {
 						if(node.tagName == "H3") {
 							heading = node;
 							return;
@@ -69,6 +73,7 @@
 						}
 						heading = null;
 					});
+					hideFilteredThumbnails();
 					var next = newBox.querySelector("#morelink a");
 					if(next) {
 						link.href = next.href;

@@ -151,6 +151,7 @@ abstract class PicContext {
 class ContributionsContext extends PicContext {
 	private $user;
 	private $sort;
+	private $thumbs;
 
 	static function fromRequest($upload) {
 		if(!isset($_REQUEST['userid']) || !is_intger($_REQUEST['userid'])) {
@@ -160,21 +161,24 @@ class ContributionsContext extends PicContext {
 		if($user->id() != $_REQUEST['userid'] || me()->squelched($user)) {
 			return null;
 		}
-		return new ContributionsContext($upload, $user, contributionsSort());
+		return new ContributionsContext($upload, $user, contributionsSort(), contributionsThumbs());
 	}
 
-	function __construct($upload, $user, $sort) {
+	// $thumbs only takes the index link back to the thumbnail view: the
+	// thumbnails leave out discussions, which this skips anyway.
+	function __construct($upload, $user, $sort, $thumbs) {
 		parent::__construct($upload);
 		$this->user = $user;
 		$this->sort = $sort;
+		$this->thumbs = $thumbs;
 	}
 
 	function query() {
-		return contributionsContextQuery($this->user->id(), $this->sort);
+		return contributionsContextQuery($this->user->id(), $this->sort, $this->thumbs);
 	}
 
 	function listLink() {
-		return contributionsLink($this->user->id(), $this->sort);
+		return contributionsLink($this->user->id(), $this->sort, $this->thumbs);
 	}
 
 	function describe() {

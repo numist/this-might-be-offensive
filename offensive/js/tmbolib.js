@@ -30,6 +30,33 @@ if (typeof String.prototype.parseInt != 'function') {
   }
 }
 
+// swap the thumbnails of uploads the viewer filters out (nsfw, tmbo, bad)
+// for a placeholder, showing the real one while the pointer is over it.
+function hideFilteredThumbnails() {
+	var filtered = '/offensive/graphics/th-filtered.gif';
+	var selectors = ['nsfw', 'tmbo', 'bad'].filter(function(filter) {
+		return me['hide_' + filter];
+	}).map(function(filter) {
+		return '.thumbcontainer img.' + filter;
+	});
+	if(!selectors.length) {
+		return;
+	}
+	document.querySelectorAll(selectors.join(',')).forEach(function(img) {
+		if(img.dataset.originalSrc !== undefined) {
+			return;
+		}
+		img.dataset.originalSrc = img.getAttribute('src');
+		img.setAttribute('src', filtered);
+		img.addEventListener('mouseenter', function() {
+			img.setAttribute('src', img.dataset.originalSrc);
+		});
+		img.addEventListener('mouseleave', function() {
+			img.setAttribute('src', filtered);
+		});
+	});
+}
+
 (function($) {
 	$.fn.hasAttr = function(name) {  
 	  // fucking browsers.
@@ -50,23 +77,7 @@ if (typeof String.prototype.parseInt != 'function') {
 		return this;
   };
 	$.fn.hideFilteredThumbnails = function() {
-		var hide_filter = [];
-		$.each(['nsfw', 'tmbo', 'bad'], function(idx, filter) {
-			if(me['hide_' + filter])
-				hide_filter.push('.thumbcontainer img.' + filter);
-		});
-		$(hide_filter.join(',')).each(function() {
-			var self = $(this);
-			if(self.data('original_src') === undefined) {
-				self.data('original_src', self.attr('src'));
-				self.attr('src', '/offensive/graphics/th-filtered.gif');
-				self.hover(function() {
-					self.attr('src', self.data('original_src'));
-				}, function() {
-					self.attr('src','/offensive/graphics/th-filtered.gif');
-				});
-			}
-		});
+		hideFilteredThumbnails();
 	};
 	$.fn.getCaretPosition = function() {
 		if(this.length == 0) return undefined;

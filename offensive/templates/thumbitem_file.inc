@@ -13,7 +13,7 @@ if(!defined("TMBO") || !isset($upload)) {
 <li data-fileid="<?= $upload->id() ?>">
   <div class="thumbcontainer">
 		<div>
-			<a href="<?= Link::upload($upload) ?>"
+			<a href="<?= Link::upload($upload).(isset($ctxQuery) ? $ctxQuery : "") ?>"
 				title="uploaded by <?= htmlEscape($upload->uploader()->username()) ?>">
 				<img name="th<?= $upload->id()?>"
 						 class="<?php
