@@ -15,6 +15,13 @@ $filetypes = array("jpg", "jpeg", "gif", "png", "webp");
 // nginx (client_max_body_size) both allow 20M, so this is the limit that bites.
 const UPLOAD_MAX_BYTES = 8 * 1024 * 1024;
 
+// images bigger than this (long side in px, or total pixels) get the resize
+// prompt. phone photos (4032x3024) and screenshots fit under both.
+const UPLOAD_PROMPT_MAX_SIDE = 4096;
+const UPLOAD_PROMPT_MAX_PIXELS = 16 * 1000 * 1000;
+// "resize it for me" fits the image inside a square this many px wide.
+const UPLOAD_RESIZE_MAX_SIDE = 2560;
+
 
 /*
  * uploading_file -- determines whether or not a file is being uploaded
@@ -725,7 +732,7 @@ function upload_checkdims(&$postdata) {
 			unset($postdata['resize']);
 			return false;
 		} else {
-			$image->resizeImage(1024, 1024, imagick::FILTER_UNDEFINED, 1, true);
+			$image->resizeImage(UPLOAD_RESIZE_MAX_SIDE, UPLOAD_RESIZE_MAX_SIDE, imagick::FILTER_UNDEFINED, 1, true);
 			if(!$image->writeImage("$tmpdir/{$postdata['tmpname']}")) {  
 				trigger_error("ImageMagick/writeImage failed", E_USER_ERROR);
 			}
@@ -762,7 +769,8 @@ function upload_checkdims(&$postdata) {
 		return true;
 	}
 
-	if($height <= 1024 || $width <= 1024) {
+	if(max($width, $height) <= UPLOAD_PROMPT_MAX_SIDE &&
+	   $width * $height <= UPLOAD_PROMPT_MAX_PIXELS) {
 		return false;
 	}
 
