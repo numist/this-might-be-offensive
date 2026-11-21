@@ -56,6 +56,7 @@ body {
 	background: var(--link-accent);
 	color: var(--bg-heading);
 	white-space: normal;
+	padding: 1rem 2rem;
 }
 
 #pic_header[data-context] a {
