@@ -239,13 +239,13 @@ form.fieldform > [type="submit"] {
 			background: var(--color-brand-light-alt);
 		}
 	}
+}
 
-	/* the link after a list: "see all" on the profile, "more…" on the
-	   full contributions list */
-	+ p {
-		text-align: center;
-		font-weight: bold;
-	}
+/* the link after a list: "see all" on the profile, "more…" on the full
+   contributions list, in either view */
+:is(.imagelist, .grid_thumbs > ul) + p {
+	text-align: center;
+	font-weight: bold;
 }
 
 /* .unreadlist {

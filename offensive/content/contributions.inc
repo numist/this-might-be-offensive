@@ -38,27 +38,28 @@
 		global $them;
 		$usrid = $them->id();
 		$sort = contributionsSort();
+		$thumbs = contributionsThumbs();
 		$numPerPage = 100;
 		$page = isset($_REQUEST['p']) && is_intger($_REQUEST['p']) ? max(0, (int)$_REQUEST['p']) : 0;
 ?>
 <div class="contentbox">
 	<div class="heading"><?= $them->htmlUsername() ?>'<?= substr($them->username(), -1) == "s" ? "" : "s" ?> contributions to society.</div>
 	<?php tabs(); ?>
-	<div class="bluebox">
+	<div class="bluebox<?= $thumbs ? " grid_thumbs" : "" ?>">
 <?php
 		if(me()->squelched($them)) {
 			?><p>You've squelched <?= $them->htmlUsername() ?>.</p><?php
 		} else {
-			contributionsSortLinks($usrid, $sort);
+			contributionsSortLinks($usrid, $sort, $thumbs);
 			// one more than a page, to know whether there is a next one.
-			$uploads = contributionsQuery($usrid, $sort, $numPerPage + 1, $page * $numPerPage);
+			$uploads = contributionsQuery($usrid, $sort, $numPerPage + 1, $page * $numPerPage, $thumbs);
 			$more = count($uploads) > $numPerPage;
 			// a page can start partway through a year; its heading repeats.
 			// contributions_more.js folds such a page into the year above it.
-			contributionsList(array_slice($uploads, 0, $numPerPage), $sort != "votes", contributionsContextQuery($usrid, $sort));
+			contributionsList(array_slice($uploads, 0, $numPerPage), $sort != "votes", contributionsContextQuery($usrid, $sort, $thumbs), $thumbs);
 			if($more) {
 ?>
-		<p id="morelink"><a href="<?= contributionsLink($usrid, $sort) ?>&p=<?= $page + 1 ?>">more…</a></p>
+		<p id="morelink"><a href="<?= contributionsLink($usrid, $sort, $thumbs) ?>&p=<?= $page + 1 ?>">more…</a></p>
 <?php
 			}
 		}

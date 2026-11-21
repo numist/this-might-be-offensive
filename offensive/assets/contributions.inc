@@ -2,7 +2,8 @@
 
 // a user's uploads, as listed on their profile (the newest few) and on
 // ?c=contributions (all of them, a page at a time): newest first with a
-// heading per year, by votes, or by votes within each year.
+// heading per year, by votes, or by votes within each year, as a list or,
+// on ?c=contributions with &view=thumbs, as thumbnails.
 
 // the sorts, as ?sort= value => label.
 function contributionsSorts() {
@@ -15,17 +16,22 @@ function contributionsSort() {
 	       && array_key_exists($_REQUEST['sort'], contributionsSorts()) ? $_REQUEST['sort'] : "";
 }
 
-function contributionsLink($usrid, $sort) {
-	return Link::content("contributions")."&userid=".(int)$usrid.($sort === "" ? "" : "&sort=$sort");
+// whether the thumbnail view was asked for.
+function contributionsThumbs() {
+	return isset($_REQUEST['view']) && $_REQUEST['view'] === "thumbs";
+}
+
+function contributionsLink($usrid, $sort, $thumbs = false) {
+	return Link::content("contributions")."&userid=".(int)$usrid.($sort === "" ? "" : "&sort=$sort").($thumbs ? "&view=thumbs" : "");
 }
 
 // what a pic page link carries to browse this list (see picContext.inc).
-function contributionsContextQuery($usrid, $sort) {
-	return "&ctx=contributions&userid=".(int)$usrid.($sort === "" ? "" : "&sort=$sort");
+function contributionsContextQuery($usrid, $sort, $thumbs = false) {
+	return "&ctx=contributions&userid=".(int)$usrid.($sort === "" ? "" : "&sort=$sort").($thumbs ? "&view=thumbs" : "");
 }
 
-// the "sort by" line.
-function contributionsSortLinks($usrid, $sort) {
+// the "sort by" and "view" lines.
+function contributionsSortLinks($usrid, $sort, $thumbs) {
 ?>
 	<p>sort by:
 <?php
@@ -36,7 +42,18 @@ function contributionsSortLinks($usrid, $sort) {
 		if($key === $sort) {
 			?><strong><?= $label ?></strong><?php
 		} else {
-			?><a href="<?= contributionsLink($usrid, $key) ?>"><?= $label ?></a><?php
+			?><a href="<?= contributionsLink($usrid, $key, $thumbs) ?>"><?= $label ?></a><?php
+		}
+	}
+?>
+	<br>view:
+<?php
+	foreach(array("list" => false, "thumbnails" => true) as $label => $view) {
+		echo $view ? " · " : "";
+		if($view == $thumbs) {
+			?><strong><?= $label ?></strong><?php
+		} else {
+			?><a href="<?= contributionsLink($usrid, $sort, $view) ?>"><?= $label ?></a><?php
 		}
 	}
 ?>
@@ -45,24 +62,23 @@ function contributionsSortLinks($usrid, $sort) {
 }
 
 // a page of a user's uploads in the given sort. the votes sorts leave out
-// discussions, which can't be voted on.
+// discussions, which can't be voted on, and so do thumbnails, since
+// discussions have none.
 // a user's uploads come from the userid index, and even a prolific user
 // has few enough that sorting them all is cheap. without the hint MariaDB
 // intersects userid with the status index, which takes twice as long for
 // a user with 20,000 uploads, and core_getuploads' newest first hint
 // (t_t_id) needs a type, so without one it reads the whole table.
-function contributionsQuery($usrid, $sort, $limit, $offset) {
+function contributionsQuery($usrid, $sort, $limit, $offset, $thumbs = false) {
 	$usrid = (int)$usrid;
 	$limit = (int)$limit;
 	$offset = (int)$offset;
+	$where = $sort != "" || $thumbs ? "AND up.type <> 'topic'" : "";
 	if($sort == "votes") {
-		$where = "AND up.type <> 'topic'";
 		$order = "ca.good DESC, ca.id DESC";
 	} else if($sort == "years") {
-		$where = "AND up.type <> 'topic'";
 		$order = "YEAR(up.timestamp) DESC, ca.good DESC, ca.id DESC";
 	} else {
-		$where = "";
 		$order = "up.timestamp DESC, up.id DESC";
 	}
 	$sql = uploadsql()." AND up.userid = $usrid $where
@@ -80,8 +96,10 @@ function contributionsQuery($usrid, $sort, $limit, $offset) {
 // a list of uploads. with $byYear, the uploads come newest year first and
 // each year gets a heading and a list of its own, like the hall of fame's
 // by year view. $ctxQuery goes on each pic page link, so the pic page
-// steps through this list.
-function contributionsList($uploads, $byYear, $ctxQuery = "") {
+// steps through this list. with $thumbs, the lists are of thumbnails like
+// the thumbnail view of the image list (?c=thumbs), and the page puts them
+// in a .grid_thumbs box.
+function contributionsList($uploads, $byYear, $ctxQuery = "", $thumbs = false) {
 	$year = null;
 	foreach($uploads as $upload) {
 		$thisYear = substr($upload->timestamp(), 0, 4);
@@ -95,9 +113,13 @@ function contributionsList($uploads, $byYear, $ctxQuery = "") {
 <?php
 			}
 			?>
-	<ul class="imagelist">
+	<ul<?= $thumbs ? "" : ' class="imagelist"' ?>>
 <?php
 			$year = $thisYear;
+		}
+		if($thumbs) {
+			require("offensive/templates/thumbitem_file.inc");
+			continue;
 		}
 		?>
 		<li>
