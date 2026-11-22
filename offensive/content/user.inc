@@ -218,9 +218,13 @@ function recentComments( $uid ) {
 		return;
 	}
 
-	$previews = me()->getPref("remark_previews") == 1;
+	$previews = commentPreviewsOn();
 	
 ?><h3>the smartypants' most recent remarks:</h3>
+<?php
+	// one toggle for this list and the contributions below it.
+	commentPreviewsToggle();
+?>
 	<ul class="imagelist">
 <?php
 
@@ -250,7 +254,7 @@ function recentComments( $uid ) {
 		// XXX: rejigger the query and use Link::comment
 		?><li><div><a href="<?= Link::thread($upload) ?>#<?= $row['commentid'] ?>"><?= $upload->htmlFilename() ?></a><?php
 			if($previews) {
-				?><p><?= htmlEscape(remarkPreview($row['remark'])) ?></p><?php
+				commentPreview($row['remark']);
 			}
 		?></div></li><?php
 
@@ -258,21 +262,6 @@ function recentComments( $uid ) {
 ?>
 	</ul>
 <?php
-	if($count > 0) {
-		if($previews) {
-			?><p><a href="<?= Link::setPref("remark_previews", 0) ?>">hide previews</a></p><?php
-		} else {
-			?><p><a href="<?= Link::setPref("remark_previews", 1) ?>">show previews</a></p><?php
-		}
-	}
-
-}
-
-// the start of a comment on one line, short enough to keep the profile
-// small. CSS trims it further to fit the width.
-function remarkPreview( $text ) {
-	$text = trim(preg_replace('/\s+/u', ' ', mb_scrub($text, "UTF-8")));
-	return mb_strimwidth($text, 0, 120, "…", "UTF-8");
 }
 
 
@@ -385,7 +374,8 @@ function contributions($usrid) {
 		<!-- +<?php echo isset($good_votes) ? $good_votes : 0; ?> -<?php echo isset($bad_votes) ? $bad_votes : 0; ?> (<a href="./?c=uservotedetail&userid=<?= $usrid ?>">click for details</a>)--></h3>
 <?php
 	$uploads = contributionsQuery($usrid, "", 10, 0);
-	contributionsList($uploads, true, contributionsContextQuery($usrid, ""));
+	contributionsList($uploads, true, contributionsContextQuery($usrid, ""), false,
+	                  commentPreviewsOn() ? contributionsCaptions($usrid, $uploads) : null);
 	if(count($uploads) > 0) {
 		?><p><a href="<?= $all ?>">see all</a></p>
 <?php
