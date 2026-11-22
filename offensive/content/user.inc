@@ -219,9 +219,6 @@ function recentComments( $uid ) {
 	}
 
 	$previews = me()->getPref("remark_previews") == 1;
-	
-?><h3>the smartypants' most recent remarks:</h3>
-<?php
 
 	// TODO: THIS IS REALLY SLOW
 	//$comments = core_getcomments(array("limit" => 100, "userid" => $uid, "votefilter" => "c", "sort" => "date_desc"));
@@ -237,14 +234,15 @@ function recentComments( $uid ) {
 	      LIMIT 100";
 	$result = tmbo_query( $sql );
 
+	?><h3 class="toggle-heading"><span>most recent remarks:</span><?php
 	if(mysqli_num_rows($result) > 0) {
 		if($previews) {
-			?><p><a href="<?= Link::setPref("remark_previews", 0) ?>">hide previews</a></p><?php
+			?> <a href="<?= Link::setPref("remark_previews", 0) ?>">hide previews</a><?php
 		} else {
-			?><p><a href="<?= Link::setPref("remark_previews", 1) ?>">show previews</a></p><?php
+			?> <a href="<?= Link::setPref("remark_previews", 1) ?>">show previews</a><?php
 		}
 	}
-?>
+	?></h3>
 	<ul class="imagelist">
 <?php
 	
