@@ -15,7 +15,10 @@
 	--color-brand-light-alt: oklch(from var(--color-brand) 0.80 c h);
 	--color-brand-light: oklch(from var(--color-brand) 0.86 c h);
 	--color-link: oklch(from var(--color-brand) 0.35 0.15 h);
-	--color-link-visited: oklch(from var(--color-link) 0.55 calc(c * 0.5) h); /* might need to tweak this. it's hard to find a balance between readability and differentiation from unvisited links. */
+	/* dark enough for 4.5:1 on both row stripes. that leaves too little room
+		to tell it from --color-link by lightness alone, so list titles also
+		fade the underline once visited (oldskool.css) */
+	--color-link-visited: oklch(from var(--color-link) 0.42 calc(c * 0.25) h);
 
 	/* maybe trying to derive the palette from a single color isn't a good idea. */
 	--orange: #ff6600;
