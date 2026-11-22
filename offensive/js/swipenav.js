@@ -44,12 +44,22 @@
 		return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 	}
 
-	// "previous" is older (swipe left), "next" is newer (swipe right)
+	// With nothing newer/older the link is a hidden placeholder pointing at the
+	// index (or the list being browsed), which is where the arrow keys go.
+	function placeholder(link) {
+		return getComputedStyle(link).visibility === "hidden";
+	}
+
+	// "previous" is older (swipe left), "next" is newer (swipe right). At either
+	// end of the list this is the index placeholder, so a swipe matches the keys.
 	function target(id) {
-		const link = document.getElementById(id);
-		// with nothing newer/older the link is a hidden placeholder pointing at the index
-		if(!link || getComputedStyle(link).visibility === "hidden") return null;
-		return link;
+		return document.getElementById(id);
+	}
+
+	// the neighboring upload in that direction, if there is one
+	function neighbor(id) {
+		const link = target(id);
+		return link && !placeholder(link) ? link : null;
 	}
 
 	// sessionStorage can throw (disabled storage, private modes)
@@ -73,7 +83,7 @@
 		const last = read(LAST_KEY);
 		const ids = last === "next" || last === "previous" ? [last] : ["next", "previous"];
 		ids.forEach(function(id) {
-			const link = target(id);
+			const link = neighbor(id);
 			if(link && link.dataset.image) new Image().src = link.dataset.image;
 		});
 	}
@@ -95,7 +105,7 @@
 
 	function go(link, dx) {
 		leaving = true;
-		store(LAST_KEY, link.id); // pageswap also does this, where supported
+		if(!placeholder(link)) store(LAST_KEY, link.id); // pageswap also does this, where supported
 		const img = image();
 		if(!img || reducedMotion()) {
 			document.location.href = link.href;
@@ -184,7 +194,7 @@
 		if(!e.activation || !e.activation.entry) return;
 		const url = e.activation.entry.url;
 		const dir = ["next", "previous"].find(function(id) {
-			const link = target(id);
+			const link = neighbor(id);
 			return link && link.href === url;
 		});
 		store(NAV_KEY, dir);
