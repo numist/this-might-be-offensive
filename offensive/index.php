@@ -29,6 +29,7 @@ $timelimit = 10;
 
 	// if we're logged in, we'll want access to the user object for the logged in user
 	require_once("offensive/assets/classes.inc");
+	require_once("offensive/assets/unread.inc");
 
 	// in an upgrade, break glass:
 	if( $upgrading &&
@@ -116,6 +117,7 @@ $timelimit = 10;
 	CSS::add("/styles/oldskool.css");
 	JS::add("/offensive/js/jquery-1.7.1.min.js");
 	JS::add("/offensive/js/tmbolib.js");
+	JS::add("/offensive/js/unread.js");
 	if(function_exists('head')) {
 		head();
 	}
@@ -134,51 +136,12 @@ $timelimit = 10;
 		squelched: <?= json_encode(me()->squelched_list()) ?>
 	}
 	
-	getSocket("<?php $t = new Token("realtime"); echo $t->tokenid(); ?>", function(){});
-
-	$(function() {
-		getSocket("<?php $t = new Token("realtime"); echo $t->tokenid(); ?>", function(socket) {
-			socket.on('reset_subscription', function(upload) {
-				var existing = $('#unread' + upload.id);
-				if (existing.length > 0) {
-					existing.remove();
-					if ($("#unread-container a").length === 0)
-						$("#unread").hide();
-				}
-			});
-
-			socket.on('subscription', function(comment) {
-				var link = '/offensive/?c=comments&fileid=' + comment.fileid + '#' + comment.id;
-				var existing = $('#unread' + comment.fileid);
-				if (existing.length > 0) {
-					existing.attr('href', link);
-				} else {
-					var element = $('<div class="clipper" />');
-					var anchor = $('<a id="unread' + comment.fileid + '" href="' + link + '"></a>').text(comment.filename);
-					element.append(anchor);
-					var prev_id = 0;
-					var fileid_int = parseInt(comment.fileid);
-					var inserted = false;
-					$("#unread-container a").each(function(idx, el) {
-						var this_id = parseInt($(el).attr('id').match(/\d+/)[0]);
-						if (this_id > fileid_int && prev_id < fileid_int && !inserted) {
-							element.insertBefore($(el).parent());
-							anchor.addClass(idx % 2 == 0 ? 'evenfile' : 'oddfile');
-							inserted = true;
-						}
-						if (inserted) {
-							$(el).addClass(idx % 2 != 0 ? 'evenfile' : 'oddfile').removeClass(idx % 2 == 0 ? 'evenfile' : 'oddfile');
-						}
-						prev_id = this_id;
-					});
-					if (element.parent().length === 0) {
-						$("#unread-container").append(element);
-					  anchor.addClass(($("#unread-container a").length % 2 != 0 ? 'evenfile' : 'oddfile'));
-					}
-					$("#unread").show();
-				}
-			});
-		});
+	getSocket("<?php $t = new Token("realtime"); echo $t->tokenid(); ?>", function(socket) {
+		// unread.js refetches both unread lists rather than editing them here.
+		socket.on('subscription', refreshUnread);
+		socket.on('reset_subscription', refreshUnread);
+		// events published while the socket was down are not replayed.
+		socket.on('reconnect', refreshUnread);
 	});
 </script>
 </head>
@@ -378,45 +341,6 @@ $timelimit = 10;
 </body>
 </html>
 <?php
-	// XXX: this needs to use core
-	//
-	// $id distinguishes render sites: this is drawn both in the sidebar and inside
-	// the tabs popover, and two elements sharing id="unread" is invalid HTML that
-	// breaks getElementById and #unread styling for whichever comes second.
-	function unread($id = "unread") {
-		if(!me()) return;
-		$uid = me()->id();
-
-		// Memoized because both render sites call this on the same request and the
-		// query is identical; without this the page pays for it twice.
-		static $comments = null;
-		if($comments === null) $comments = core_unreadcomments(array());
-
-		$isEmpty = count($comments) == 0;
-
-		?>
-
-		<div id="<?= htmlEscape($id) ?>" class="contentbox <?= ($isEmpty ? 'empty' : '')?>">
-			<div class="heading">unread comments:</div>
-			<div id="<?= htmlEscape($id) ?>-container" class="bluebox">
-
-				<?php 
-					if($isEmpty) {
-						?>all caught up.<?php
-					}
-				?>
-
-				<?php foreach ($comments as $comment) {
-					$upload = $comment->upload();
-					if($upload->squelched()) continue;
-
-					$css = isset($css) && $css == "evenfile" ? "oddfile" : "evenfile";  ?>
-					<div class="clipper"><a id="<?= htmlEscape($id) ?><?= $comment->upload()->id()?>" class="<?= $css ?>" href="<?= Link::comment($comment) ?>"><?= $upload->htmlFilename() ?></a></div>
-				<?php } ?>
-			</div>
-		</div>
-	<?php }
-
 	// XXX: this needs to use core
 	function whosOn() {
 		global $userlimit, $timelimit;
