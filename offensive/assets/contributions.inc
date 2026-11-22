@@ -56,63 +56,9 @@ function contributionsSortLinks($usrid, $sort, $thumbs) {
 			?><a href="<?= contributionsLink($usrid, $sort, $view) ?>"><?= $label ?></a><?php
 		}
 	}
-	if(!$thumbs) {
-		?><br><?php commentPreviewsLink();
-	}
 ?>
 	</p>
 <?php
-}
-
-// whether the viewer wants the start of a comment under each entry of a
-// profile's recent remarks and contributions lists.
-function commentPreviewsOn() {
-	return me()->getPref("comment_previews") == 1;
-}
-
-function commentPreviewsLink() {
-	if(commentPreviewsOn()) {
-		?><a href="<?= Link::setPref("comment_previews", 0) ?>">hide previews</a><?php
-	} else {
-		?><a href="<?= Link::setPref("comment_previews", 1) ?>">show previews</a><?php
-	}
-}
-
-function commentPreviewsToggle() {
-	?><p><?php commentPreviewsLink(); ?></p>
-<?php
-}
-
-// the start of a comment on one line, short enough to keep the page small.
-// CSS trims it further to fit the width.
-function commentPreview($text) {
-	$text = trim(preg_replace('/\s+/u', ' ', mb_scrub($text, "UTF-8")));
-	?><p><?= htmlEscape(mb_strimwidth($text, 0, 120, "…", "UTF-8")) ?></p><?php
-}
-
-// the uploader's first comment on each of their uploads, as fileid => text:
-// the body of a discussion, or what they said about their image. one range
-// of the (userid, fileid) index, in index order, so no sort.
-function contributionsCaptions($usrid, $uploads) {
-	$ids = array();
-	foreach($uploads as $upload) {
-		$ids[] = (int)$upload->id();
-	}
-	if(count($ids) == 0) {
-		return array();
-	}
-	$sql = "SELECT fileid, comment FROM offensive_comments USE KEY (userid_fileid)
-	        WHERE userid = ".(int)$usrid." AND fileid IN (".implode(",", $ids).")
-	        AND comment <> ''
-	        ORDER BY fileid, id";
-	$result = tmbo_query($sql);
-	$captions = array();
-	while($row = mysqli_fetch_assoc($result)) {
-		if(!array_key_exists($row['fileid'], $captions)) {
-			$captions[$row['fileid']] = $row['comment'];
-		}
-	}
-	return $captions;
 }
 
 // a page of a user's uploads in the given sort. the votes sorts leave out
@@ -152,9 +98,8 @@ function contributionsQuery($usrid, $sort, $limit, $offset, $thumbs = false) {
 // by year view. $ctxQuery goes on each pic page link, so the pic page
 // steps through this list. with $thumbs, the lists are of thumbnails like
 // the thumbnail view of the image list (?c=thumbs), and the page puts them
-// in a .grid_thumbs box. $captions (see contributionsCaptions()) puts the
-// start of the uploader's comment under each title that has one.
-function contributionsList($uploads, $byYear, $ctxQuery = "", $thumbs = false, $captions = null) {
+// in a .grid_thumbs box.
+function contributionsList($uploads, $byYear, $ctxQuery = "", $thumbs = false) {
 	$year = null;
 	foreach($uploads as $upload) {
 		$thisYear = substr($upload->timestamp(), 0, 4);
@@ -185,11 +130,11 @@ function contributionsList($uploads, $byYear, $ctxQuery = "", $thumbs = false, $
 		// other types (audio) keep a type prefix.
 		if($upload->type() == 'topic') {
 ?>
-			<div><a href="<?= Link::thread($upload) ?>" title="<?= $upload->timestamp() ?>"><?= $upload->commentLabel(false) ?></a> <a href="<?= Link::upload($upload) ?>"><?= $upload->htmlFilename() ?></a><?php contributionsCaption($captions, $upload) ?></div>
+			<div><a href="<?= Link::thread($upload) ?>" title="<?= $upload->timestamp() ?>"><?= $upload->commentLabel(false) ?></a> <a href="<?= Link::upload($upload) ?>"><?= $upload->htmlFilename() ?></a></div>
 <?php
 		} else {
 ?>
-			<div><a href="<?= Link::upload($upload).$ctxQuery ?>"><?= $upload->htmlFilename($upload->type() != 'image') ?></a><?php contributionsCaption($captions, $upload) ?></div>
+			<div><a href="<?= Link::upload($upload).$ctxQuery ?>"><?= $upload->htmlFilename($upload->type() != 'image') ?></a></div>
 			<div><a href="<?= Link::thread($upload) ?>" title="<?= $upload->timestamp() ?>"><?= $upload->commentLabel() ?></a></div>
 <?php
 		}
@@ -200,12 +145,6 @@ function contributionsList($uploads, $byYear, $ctxQuery = "", $thumbs = false, $
 	if($year !== null) {
 		?></ul>
 <?php
-	}
-}
-
-function contributionsCaption($captions, $upload) {
-	if(is_array($captions) && array_key_exists($upload->id(), $captions)) {
-		commentPreview($captions[$upload->id()]);
 	}
 }
 

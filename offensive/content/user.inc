@@ -218,14 +218,9 @@ function recentComments( $uid ) {
 		return;
 	}
 
-	$previews = commentPreviewsOn();
+	$previews = me()->getPref("remark_previews") == 1;
 	
 ?><h3>the smartypants' most recent remarks:</h3>
-<?php
-	// one toggle for this list and the contributions below it.
-	commentPreviewsToggle();
-?>
-	<ul class="imagelist">
 <?php
 
 	// TODO: THIS IS REALLY SLOW
@@ -241,6 +236,17 @@ function recentComments( $uid ) {
 	      ORDER  BY offensive_comments.timestamp DESC 
 	      LIMIT 100";
 	$result = tmbo_query( $sql );
+
+	if(mysqli_num_rows($result) > 0) {
+		if($previews) {
+			?><p><a href="<?= Link::setPref("remark_previews", 0) ?>">hide previews</a></p><?php
+		} else {
+			?><p><a href="<?= Link::setPref("remark_previews", 1) ?>">show previews</a></p><?php
+		}
+	}
+?>
+	<ul class="imagelist">
+<?php
 	
 	$seen = array();
 	$count = 0;
@@ -254,7 +260,7 @@ function recentComments( $uid ) {
 		// XXX: rejigger the query and use Link::comment
 		?><li><div><a href="<?= Link::thread($upload) ?>#<?= $row['commentid'] ?>"><?= $upload->htmlFilename() ?></a><?php
 			if($previews) {
-				commentPreview($row['remark']);
+				?><p><?= htmlEscape(remarkPreview($row['remark'])) ?></p><?php
 			}
 		?></div></li><?php
 
@@ -262,6 +268,13 @@ function recentComments( $uid ) {
 ?>
 	</ul>
 <?php
+}
+
+// the start of a comment on one line, short enough to keep the profile
+// small. CSS trims it further to fit the width.
+function remarkPreview( $text ) {
+	$text = trim(preg_replace('/\s+/u', ' ', mb_scrub($text, "UTF-8")));
+	return mb_strimwidth($text, 0, 120, "…", "UTF-8");
 }
 
 
@@ -374,8 +387,7 @@ function contributions($usrid) {
 		<!-- +<?php echo isset($good_votes) ? $good_votes : 0; ?> -<?php echo isset($bad_votes) ? $bad_votes : 0; ?> (<a href="./?c=uservotedetail&userid=<?= $usrid ?>">click for details</a>)--></h3>
 <?php
 	$uploads = contributionsQuery($usrid, "", 10, 0);
-	contributionsList($uploads, true, contributionsContextQuery($usrid, ""), false,
-	                  commentPreviewsOn() ? contributionsCaptions($usrid, $uploads) : null);
+	contributionsList($uploads, true, contributionsContextQuery($usrid, ""));
 	if(count($uploads) > 0) {
 		?><p><a href="<?= $all ?>">see all</a></p>
 <?php
