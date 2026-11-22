@@ -40,9 +40,9 @@
 
 <div id="unreadMenu" class="menu unreadMenu" popover>
 <?php
-	/* unread() lives in offensive/index.php, so it is not defined for every
-		entrypoint that includes this file (gis/index.php includes tabs.inc but
-		never defines it). Guard rather than fatal, and pass a distinct id so this
+	/* unread() lives in offensive/assets/unread.inc, which offensive/index.php
+		includes, so it is not defined for every entrypoint that includes this
+		file (gis/index.php includes tabs.inc but never defines it). Guard rather than fatal, and pass a distinct id so this
 		copy does not collide with the one rendered in the sidebar. */
 	if(function_exists('unread')) unread('unreadMenu-unread');
 ?>
