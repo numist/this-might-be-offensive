@@ -214,6 +214,8 @@
 }
 
 function recentComments( $uid ) {
+	global $them;
+
 	if(me()->squelched($uid)) {
 		return;
 	}
@@ -234,7 +236,8 @@ function recentComments( $uid ) {
 	      LIMIT 100";
 	$result = tmbo_query( $sql );
 
-	?><h3 class="toggle-heading"><span>most recent remarks:</span><?php
+	$name = htmlEscape($them->username());
+	?><h3 class="toggle-heading"><span><?= $name ?>'<?= substr($name, -1) == "s" ? "" : "s" ?> most recent remarks:</span><?php
 	if(mysqli_num_rows($result) > 0) {
 		if($previews) {
 			?> <a href="<?= Link::setPref("remark_previews", 0) ?>">hide previews</a><?php
