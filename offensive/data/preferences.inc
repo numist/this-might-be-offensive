@@ -20,6 +20,8 @@ $prefnames = array(
 	"thumbnails_in_comments",
 	// indicates if the user wants link previews in comments to show on hover
 	"hover_link_previews",
+	// indicates if the user wants the start of each comment in a profile's recent remarks
+	"remark_previews",
 	
 	// pickup id for images
 	"ipickup",
@@ -57,7 +59,8 @@ $prefdefaults = array(
 	"index" => "main",
 	"sortorder_discussions" => "date_desc",
 	"thumbnails_in_comments" => "1",
-	"hover_link_previews" => "1"
+	"hover_link_previews" => "1",
+	"remark_previews" => "1"
 );
 
 ?>

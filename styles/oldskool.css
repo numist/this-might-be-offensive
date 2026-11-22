@@ -212,6 +212,20 @@ form.fieldform > [type="submit"] {
 	}
 }
 
+/* a heading with a link on the right, like "hide previews". the gap keeps
+   them apart, and the link wraps to its own line when they don't fit. */
+.toggle-heading {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	column-gap: var(--spacing);
+
+	> a {
+		margin-left: auto;
+		font-weight: normal;
+	}
+}
+
 .imagelist {
 	display: grid;
 	/* the counts column is a few icons and numbers, so it gets its full width
@@ -229,6 +243,15 @@ form.fieldform > [type="submit"] {
 		/* unbroken filenames otherwise spill into the comments column */
 		> :first-child {
 			overflow-wrap: anywhere;
+
+			/* the start of the comment, under its thread on the profile */
+			p {
+				margin: 0;
+				overflow: hidden;
+				white-space: nowrap;
+				text-overflow: ellipsis;
+				color: color-mix(in oklch, currentColor 70%, transparent);
+			}
 		}
 
 		/* the counts, right-aligned like the other lists' score column */

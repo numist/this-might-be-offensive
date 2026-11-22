@@ -214,18 +214,20 @@
 }
 
 function recentComments( $uid ) {
+	global $them;
+
 	if(me()->squelched($uid)) {
 		return;
 	}
-	
-?><h3>the smartypants' most recent remarks:</h3>
-	<ul class="imagelist">
-<?php
+
+	$previews = me()->getPref("remark_previews") == 1;
 
 	// TODO: THIS IS REALLY SLOW
 	//$comments = core_getcomments(array("limit" => 100, "userid" => $uid, "votefilter" => "c", "sort" => "date_desc"));
 	
-	$sql="SELECT up.*, offensive_comments.id as commentid
+	// the comment text costs nothing extra: the row is read anyway to skip
+	// votes without a comment.
+	$sql="SELECT up.*, offensive_comments.id as commentid".($previews ? ", offensive_comments.comment as remark" : "")."
 	      FROM offensive_uploads up, offensive_comments
 	      WHERE offensive_comments.userid = $uid
 	      AND up.id = offensive_comments.fileid
@@ -233,6 +235,19 @@ function recentComments( $uid ) {
 	      ORDER  BY offensive_comments.timestamp DESC 
 	      LIMIT 100";
 	$result = tmbo_query( $sql );
+
+	$name = htmlEscape($them->username());
+	?><h3 class="toggle-heading"><span><?= $name ?>'<?= substr($name, -1) == "s" ? "" : "s" ?> most recent remarks:</span><?php
+	if(mysqli_num_rows($result) > 0) {
+		if($previews) {
+			?> <a href="<?= Link::setPref("remark_previews", 0) ?>">hide previews</a><?php
+		} else {
+			?> <a href="<?= Link::setPref("remark_previews", 1) ?>">show previews</a><?php
+		}
+	}
+	?></h3>
+	<ul class="imagelist">
+<?php
 	
 	$seen = array();
 	$count = 0;
@@ -244,13 +259,23 @@ function recentComments( $uid ) {
 		$count++;
 
 		// XXX: rejigger the query and use Link::comment
-		?><li><div><a href="<?= Link::thread($upload) ?>#<?= $row['commentid'] ?>"><?= $upload->htmlFilename() ?></a></div></li><?php
+		?><li><div><a href="<?= Link::thread($upload) ?>#<?= $row['commentid'] ?>"><?= $upload->htmlFilename() ?></a><?php
+			if($previews) {
+				?><p><?= htmlEscape(remarkPreview($row['remark'])) ?></p><?php
+			}
+		?></div></li><?php
 
 	}
 ?>
 	</ul>
 <?php
+}
 
+// the start of a comment on one line, short enough to keep the profile
+// small. CSS trims it further to fit the width.
+function remarkPreview( $text ) {
+	$text = trim(preg_replace('/\s+/u', ' ', mb_scrub($text, "UTF-8")));
+	return mb_strimwidth($text, 0, 120, "…", "UTF-8");
 }
 
 
