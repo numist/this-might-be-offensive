@@ -21,6 +21,14 @@ a:visited {
 	color: var(--color-link-visited);
 }
 
+/* in lists, a visited title keeps a faint underline, so it still looks like a
+   link but reads as seen. browsers apply only colors from :visited, so the
+   underline's color is the one thing that can differ. the comment count links
+   are left alone. */
+:is(.imagelist, .grid) a:not(:has(.comments)):visited {
+	text-decoration-color: color-mix(in oklch, var(--color-link-visited) 35%, var(--bg-content));
+}
+
 .orange.orange {
 	color: var(--link-accent);
 }
