@@ -233,11 +233,9 @@ form.fieldform > [type="submit"] {
 			/* the start of the comment, under its thread on the profile */
 			p {
 				margin: 0;
-				display: -webkit-box;
-				-webkit-box-orient: vertical;
-				-webkit-line-clamp: 3;
-				line-clamp: 3;
 				overflow: hidden;
+				white-space: nowrap;
+				text-overflow: ellipsis;
 				color: color-mix(in oklch, currentColor 70%, transparent);
 			}
 		}
