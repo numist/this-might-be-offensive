@@ -229,6 +229,15 @@ form.fieldform > [type="submit"] {
 		/* unbroken filenames otherwise spill into the comments column */
 		> :first-child {
 			overflow-wrap: anywhere;
+
+			/* the start of the comment, under its thread on the profile */
+			p {
+				margin: 0;
+				overflow: hidden;
+				white-space: nowrap;
+				text-overflow: ellipsis;
+				color: color-mix(in oklch, currentColor 70%, transparent);
+			}
 		}
 
 		/* the counts, right-aligned like the other lists' score column */
