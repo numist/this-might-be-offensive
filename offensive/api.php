@@ -558,6 +558,8 @@
 	 * •&nbsp;<b>thumbnails_in_comments</b> - indicates if the user wants to view thumbnails in comments
  * •&nbsp;<b>hover_link_previews</b> - indicates if the user wants link previews in comments to show on hover
 	 * •&nbsp;<b>remark_previews</b> - indicates if the user wants the start of each comment in a profile's recent remarks
+	 * •&nbsp;<b>collapse_votes</b> - indicates if the user wants each run of comments without text (votes only) collapsed to one row of totals
+	 * •&nbsp;<b>collapse_votes_min</b> - how many consecutive comments without text it takes for collapse_votes to collapse them (default 5)
 	 * •&nbsp;<b>ipickup</b> - pickup id for images
 	 * •&nbsp;<b>tpickup</b> - pickup id for topics (no web interface implemented)
 	 * •&nbsp;<b>apickup</b> - pickup id for audio
@@ -598,6 +600,8 @@
 	 * •&nbsp;<b>thumbnails_in_comments</b> - indicates if the user wants to view thumbnails in comments
  * •&nbsp;<b>hover_link_previews</b> - indicates if the user wants link previews in comments to show on hover
 	 * •&nbsp;<b>remark_previews</b> - indicates if the user wants the start of each comment in a profile's recent remarks
+	 * •&nbsp;<b>collapse_votes</b> - indicates if the user wants each run of comments without text (votes only) collapsed to one row of totals
+	 * •&nbsp;<b>collapse_votes_min</b> - how many consecutive comments without text it takes for collapse_votes to collapse them (default 5)
 	 * •&nbsp;<b>ipickup</b> - pickup id for images
 	 * •&nbsp;<b>tpickup</b> - pickup id for topics (no web interface implemented)
 	 * •&nbsp;<b>apickup</b> - pickup id for audio

@@ -230,4 +230,12 @@ function time_ago($timestamp) {
 }
 
 
+// how many consecutive comments without text "collapse votes" collapses
+// (the collapse_votes_min pref, set on the settings page). at least 1.
+function collapseVotesMin()
+{
+	$min = me()->getPref("collapse_votes_min");
+	return is_intger($min) && $min >= 1 ? (int)$min : 5;
+}
+
 ?>

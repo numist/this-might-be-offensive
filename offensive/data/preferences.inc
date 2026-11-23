@@ -22,6 +22,10 @@ $prefnames = array(
 	"hover_link_previews",
 	// indicates if the user wants the start of each comment in a profile's recent remarks
 	"remark_previews",
+	// indicates if the user wants each run of comments without text (votes only) collapsed to one row of totals
+	"collapse_votes",
+	// how many consecutive comments without text it takes for collapse_votes to collapse them
+	"collapse_votes_min",
 	
 	// pickup id for images
 	"ipickup",
@@ -60,7 +64,9 @@ $prefdefaults = array(
 	"sortorder_discussions" => "date_desc",
 	"thumbnails_in_comments" => "1",
 	"hover_link_previews" => "1",
-	"remark_previews" => "1"
+	"remark_previews" => "1",
+	"collapse_votes" => "1",
+	"collapse_votes_min" => "5"
 );
 
 ?>

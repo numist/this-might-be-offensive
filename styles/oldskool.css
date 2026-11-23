@@ -312,7 +312,9 @@ form.fieldform > [type="submit"] {
 	}
 }
 
-.entry:nth-child(odd) {
+/* the row standing in for collapsed votes (div.entry, theme.css) only counts
+	while it's shown */
+.entry:nth-child(odd of :not(#commentList > div.entry)) {
 	background: var(--color-brand-light-alt);
 }
 

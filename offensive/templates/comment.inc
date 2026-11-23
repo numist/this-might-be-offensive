@@ -22,6 +22,7 @@ require_once("offensive/templates/comment_parts.inc");
 	if($comment->tiar()) echo " tiar";
 	if($comment->tmbo()) echo " tmbo";
 	if(strlen($comment->text())) echo " comment"; ?>"
+	<?php if(!empty($collapsible)) { ?>data-collapsible<?php } ?>
 	<?php if(isset($css) && $css !== '') { ?>style="<?= $css ?>"<?php } ?>>
 
 	<div class="comment_body"><?= $comment->HTMLcomment(true); ?></div>

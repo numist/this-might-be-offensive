@@ -156,6 +156,23 @@
 		</div>
 	</div>
 
+	<div class="heading">votes in threads:</div>
+	<div class="bluebox">
+		<p>comments that are only a vote pile up. collapse runs of them into one row of totals with the "collapse votes" link at the top of a thread, or here.</p>
+		<form style="text-align:center" action="/offensive/setPref.php">
+			<input type="hidden" name="p" value="collapse_votes_min"/>
+			<label>collapse <input type="number" name="v" min="1" value="<?= collapseVotesMin() ?>" style="width:4em" aria-label="minimum run length"/> or more consecutive vote-only comments</label>
+			<input type="submit" value="save"/>
+		</form>
+		<div style="text-align:center"><?php
+			if(me()->getPref("collapse_votes") == 1) { ?>
+				<a href="<?= Link::setPref("collapse_votes", 0) ?>">turn collapsing off</a>
+			<?php } else { ?>
+				<a href="<?= Link::setPref("collapse_votes", 1) ?>">turn collapsing on</a>
+			<?php } ?>
+		</div>
+	</div>
+
 	<div class="heading">email address:</div>
 	<div class="bluebox">
 		<?php
