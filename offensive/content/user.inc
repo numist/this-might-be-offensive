@@ -261,7 +261,7 @@ function recentComments( $uid ) {
 		// XXX: rejigger the query and use Link::comment
 		?><li><div><a href="<?= Link::thread($upload) ?>#<?= $row['commentid'] ?>"><?= $upload->htmlFilename() ?></a><?php
 			if($previews) {
-				?><p><?= htmlEscape(remarkPreview($row['remark'])) ?></p><?php
+				?><blockquote><?= htmlEscape(remarkPreview($row['remark'])) ?></blockquote><?php
 			}
 		?></div></li><?php
 
