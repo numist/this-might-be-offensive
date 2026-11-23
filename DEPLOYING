@@ -161,6 +161,15 @@ the auth secrets.  Losing it takes the whole site down, not just authentication:
 mysqlConnectionInfo.inc raises E_USER_ERROR when parse_ini_file() fails.  Back it
 up somewhere outside this repository.
 
+Behaviour that differs between hosts belongs in admin/.config, not in an uncommitted
+edit to a tracked file. A local edit conflicts on the next pull and is invisible to
+anyone reading the repository. use_isk is one such setting: 1 turns on the imgSeek
+(ISK) content-based repost check, and anything else, or no use_isk line at all,
+means no upload talks to the ISK server. isk_enabled() in offensive/assets/isk.inc
+gates both the lookup before posting (upload_checkisk) and the add after insert.
+The hash-based repost check (upload_checkrepost) runs either way. isk_host and
+isk_port are read only when it is on.
+
 
 ###############################################################################
 THE TOKENS TABLE IS NOT WHAT IT LOOKS LIKE

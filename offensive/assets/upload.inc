@@ -1069,11 +1069,7 @@ function upload_checkisk(&$postdata) {
 	if(array_key_exists("repost", $postdata))
 		return false;
 
-	// do we want to use ISK?
-	$config = parse_ini_file("admin/.config");
-	if($config['use_isk'] != "1") {
-		return false;
-	}
+	if(!isk_enabled()) return false;
 	
 	// we still need a hash in case we want to revert to the old system
 	$postdata['hash'] = getHash($tmpdir."/".$postdata['tmpname']);
@@ -1388,7 +1384,7 @@ function upload_insert_file($postdata) {
 
 	publishChange($upload->type(), $upload->channels(), $upload->api_data(true));
 
-	if($upload->type() == "image") {
+	if($upload->type() == "image" && isk_enabled()) {
 		$isk = new Isk();
 		if($isk->add($upload->file(), $upload->id())) {
 			$isk->save();
