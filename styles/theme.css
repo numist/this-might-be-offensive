@@ -180,6 +180,18 @@ textarea {
 	the page, so neither moves anything. with "show link previews" checked
 	(tmbolib.js keeps the choice per device) every preview is shown inline. */
 .comment_body {
+	/* a long link that doesn't fit on the line would wrap to the next one
+	   and leave its button behind. the break between them is controlled by
+	   the span they share, so that span doesn't wrap, and the link and its
+	   preview inside it still do. */
+	span:has(> [popovertarget]) {
+		white-space: nowrap;
+
+		> * {
+			white-space: normal;
+		}
+	}
+
 	/* the icon stays quiet until it's wanted */
 	[popovertarget] {
 		min-width: 24px;
