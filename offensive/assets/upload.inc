@@ -19,8 +19,12 @@ const UPLOAD_MAX_BYTES = 8 * 1024 * 1024;
 // prompt. phone photos (4032x3024) and screenshots fit under both.
 const UPLOAD_PROMPT_MAX_SIDE = 4096;
 const UPLOAD_PROMPT_MAX_PIXELS = 16 * 1000 * 1000;
-// "resize it for me" fits the image inside a square this many px wide.
-const UPLOAD_RESIZE_MAX_SIDE = 2560;
+// the resize tool's starting settings and its bounds. The long edge can't go
+// past the original's (no enlarging); quality applies to JPEG and WebP.
+const UPLOAD_RESIZE_DEFAULT_SIDE = 2560;
+const UPLOAD_RESIZE_MIN_SIDE = 320;
+const UPLOAD_RESIZE_DEFAULT_QUALITY = 85;
+const UPLOAD_RESIZE_MIN_QUALITY = 10;
 
 
 /*
@@ -135,6 +139,7 @@ function killUpload($postdata) {
 	unset($_SESSION['postdata']);
 	if(file_exists($tmpdir."/".$postdata['tmpname']))
 		unlink($tmpdir."/".$postdata['tmpname']);
+	upload_resize_discard($postdata);
 }
 
 ###############################################################################
@@ -159,7 +164,7 @@ function upload() {
 		}
 
 		// make sure the postdata gets populated correctly
-		$flags = array("resize", "noresize",
+		$flags = array("noresize",
 		               "repost",
 		               "resample", "noresample");
 		foreach($flags as $flag) {
@@ -720,40 +725,17 @@ function upload_checkdims(&$postdata) {
 	if(upload_type($postdata) == "topic" || upload_type($postdata) == "audio")
 		trigger_error("can't check pixel dimensions of non-image files", E_USER_ERROR);
 
-	if(array_key_exists("noresize", $postdata))
-		return false;
-
-	if (array_key_exists("resize", $postdata)) {		
-		$image = new Imagick("$tmpdir/{$postdata['tmpname']}");
-
-		if(image_is_animated($image)) {
-			// animated GIF. fuck it.
-			$postdata['noresize'] = $postdata['resize'];
-			unset($postdata['resize']);
-			return false;
-		} else {
-			$image->resizeImage(UPLOAD_RESIZE_MAX_SIDE, UPLOAD_RESIZE_MAX_SIDE, imagick::FILTER_UNDEFINED, 1, true);
-			if(!$image->writeImage("$tmpdir/{$postdata['tmpname']}")) {  
-				trigger_error("ImageMagick/writeImage failed", E_USER_ERROR);
-			}
-		}
-		
-		if(needCompression("$tmpdir/{$postdata['tmpname']}")) {
-			$postdata['resample'] = true;
-		} else {
-			$postdata['noresample'] = true;
-		}
-		
-		$image->destroy();
-
-		$postdata['noresize'] = $postdata['resize'];
-		unset($postdata['resize']);
-		
+	if(array_key_exists("noresize", $postdata)) {
+		// they chose the original: drop any preview, and don't follow the
+		// resize tool with the compression prompt, they've seen that choice.
+		upload_resize_discard($postdata);
+		$postdata['noresample'] = true;
 		return false;
 	}
 
-	$filesize = filesize($tmpdir."/".$postdata['tmpname']);
-	list($width, $height, $type, $attr) = getimagesize($tmpdir."/".$postdata['tmpname']);
+	$original = "$tmpdir/{$postdata['tmpname']}";
+	$filesize = filesize($original);
+	list($width, $height, $type, $attr) = getimagesize($original);
 
 	// sanity check
 	if(!is_numeric( $width ) || !is_numeric($height) || $width * $height == 0 ) {
@@ -769,6 +751,20 @@ function upload_checkdims(&$postdata) {
 		return true;
 	}
 
+	// the resize tool's buttons. These are one-shot actions, so they're read
+	// from the request rather than kept in $postdata like the other flags.
+	if(array_key_exists("resize_use", $_POST)) {
+		return upload_resize_use($postdata, $width, $height, $filesize);
+	}
+	if(array_key_exists("resize_preview", $_POST)) {
+		return upload_resize_preview($postdata, $width, $height, $filesize);
+	}
+	if(array_key_exists("resize_retry", $_POST)) {
+		upload_resize_discard($postdata);
+		upload_resize_form($postdata, $width, $height, $filesize);
+		return true;
+	}
+
 	if(max($width, $height) <= UPLOAD_PROMPT_MAX_SIDE &&
 	   $width * $height <= UPLOAD_PROMPT_MAX_PIXELS) {
 		return false;
@@ -777,22 +773,225 @@ function upload_checkdims(&$postdata) {
 	// we can't shrink an animated image and keep the animation, so don't
 	// offer to. ping reads the frame list without decoding pixels.
 	$image = new Imagick();
-	$image->pingImage("$tmpdir/{$postdata['tmpname']}");
+	$image->pingImage($original);
 	$animated = image_is_animated($image);
 	$image->destroy();
 	if($animated)
 		return false;
 
-	$message = "This image is rather large ($width x $height).<br />If you want, I can try resizing it for you.<br/><br/>
-	<form action=\"{$_SERVER['SCRIPT_NAME']}\" method=\"POST\">
-		<input type=\"hidden\" name=\"c\" value=\"upload\">
-		<input type=\"submit\" name=\"killit\" value=\"Cancel this upload.\"/>
-		<input type=\"submit\" name=\"resize\" value=\"Resize it for me.\"/>
-		<input type=\"submit\" name=\"noresize\" value=\"Post it anyway.\"/>
-	</form>";
-	box($message, "is it 'post your desktop' day?");
+	upload_resize_form($postdata, $width, $height, $filesize);
+	return true;
+}
+
+/* The resize tool: the uploader picks a long edge (and a quality, for formats
+ * that have one), looks at the result, then uses it, tries other settings, or
+ * posts the original. The preview sits in the quarantine next to the original
+ * until one of those happens (the nightly quarantine sweep takes abandoned
+ * ones) and is shown only to its uploader, through offensive/ui/uploadPreview.php.
+ */
+
+// formats whose encoder takes a quality setting. PNG and GIF are lossless here,
+// so only the size changes.
+function upload_resize_has_quality($postdata) {
+	return array_key_exists('format_name', $postdata) &&
+	       in_array($postdata['format_name'], array("jpg", "webp"));
+}
+
+// the preview's file in the quarantine, or "" if there isn't one.
+function upload_resize_preview_file($postdata) {
+	global $tmpdir;
+	if(!array_key_exists('preview', $postdata)) return "";
+	$file = $tmpdir."/".$postdata['preview']['tmpname'];
+	return file_exists($file) ? $file : "";
+}
+
+function upload_resize_discard(&$postdata) {
+	$file = upload_resize_preview_file($postdata);
+	if($file != "") unlink($file);
+	unset($postdata['preview']);
+}
+
+// "12.3 MB", "850 KB"
+function upload_format_bytes($bytes) {
+	if($bytes >= 1024 * 1024) return number_format($bytes / 1024 / 1024, 1)." MB";
+	return number_format(max(1, round($bytes / 1024)))." KB";
+}
+
+// the settings the form shows: what they last asked for, else the defaults.
+function upload_resize_settings($postdata, $width, $height) {
+	$longside = max($width, $height);
+	$side = array_key_exists('resize_side', $postdata)
+	        ? $postdata['resize_side']
+	        : min(UPLOAD_RESIZE_DEFAULT_SIDE, $longside);
+	$quality = array_key_exists('resize_quality', $postdata)
+	           ? $postdata['resize_quality']
+	           : UPLOAD_RESIZE_DEFAULT_QUALITY;
+	return array($side, $quality, min(UPLOAD_RESIZE_MIN_SIDE, $longside), $longside);
+}
+
+function upload_resize_form(&$postdata, $width, $height, $filesize, $error="") {
+	list($side, $quality, $minside, $maxside) = upload_resize_settings($postdata, $width, $height);
+	$size = upload_format_bytes($filesize);
+
+	ob_start();
+	if($error != "") { ?>
+		<p><strong><?= $error ?></strong></p>
+	<?php } ?>
+	<p>This image is rather large (<?= $width ?> x <?= $height ?>, <?= $size ?>).<br />
+	If you want, I can make a smaller copy for you to look at before anything is posted.</p>
+	<form id="resizeform" action="<?= $_SERVER['SCRIPT_NAME'] ?>" method="POST">
+		<input type="hidden" name="c" value="upload"/>
+		<label>long edge
+			<input type="number" name="resize_side" value="<?= (int)$side ?>"
+			       min="<?= $minside ?>" max="<?= $maxside ?>" step="1" required
+			       inputmode="numeric"/> px
+		</label>
+<?php if(upload_resize_has_quality($postdata)) { ?>
+		<label>quality
+			<input type="number" name="resize_quality" value="<?= (int)$quality ?>"
+			       min="<?= UPLOAD_RESIZE_MIN_QUALITY ?>" max="100" step="1" required
+			       inputmode="numeric" aria-describedby="resizequalityhint"/>
+			<span id="resizequalityhint">(<?= UPLOAD_RESIZE_MIN_QUALITY ?>&ndash;100, higher looks better and weighs more)</span>
+		</label>
+<?php } else { ?>
+		<p><?= strtoupper($postdata['format_name']) ?> is lossless, so only the size changes.</p>
+<?php } ?>
+		<input type="submit" name="resize_preview" value="Show me the resized image."/>
+		<input type="submit" name="noresize" value="Post the original." formnovalidate/>
+		<input type="submit" name="killit" value="Cancel this upload." formnovalidate/>
+	</form>
+	<?php
+	box(ob_get_clean(), "is it 'post your desktop' day?");
+	$_SESSION['postdata'] = serialize($postdata);
+}
+
+// reads and checks the settings from the form. Returns an error, or "".
+function upload_resize_read_settings(&$postdata, $width, $height) {
+	list($side, $quality, $minside, $maxside) = upload_resize_settings($postdata, $width, $height);
+
+	$side = filter_var($_POST['resize_side'] ?? "", FILTER_VALIDATE_INT,
+	                   array("options" => array("min_range" => $minside, "max_range" => $maxside)));
+	if($side === false) {
+		return "The long edge has to be a whole number of pixels from $minside to $maxside.";
+	}
+	$postdata['resize_side'] = $side;
+
+	if(upload_resize_has_quality($postdata)) {
+		$quality = filter_var($_POST['resize_quality'] ?? "", FILTER_VALIDATE_INT,
+		                      array("options" => array("min_range" => UPLOAD_RESIZE_MIN_QUALITY, "max_range" => 100)));
+		if($quality === false) {
+			return "The quality has to be a whole number from ".UPLOAD_RESIZE_MIN_QUALITY." to 100.";
+		}
+		$postdata['resize_quality'] = $quality;
+	}
+	return "";
+}
+
+function upload_resize_preview(&$postdata, $width, $height, $filesize) {
+	global $tmpdir;
+
+	upload_resize_discard($postdata);
+
+	$error = upload_resize_read_settings($postdata, $width, $height);
+	if($error != "") {
+		upload_resize_form($postdata, $width, $height, $filesize, $error);
+		return true;
+	}
+
+	$side = $postdata['resize_side'];
+	$quality = upload_resize_has_quality($postdata) ? $postdata['resize_quality'] : null;
+	$previewname = "preview_".$postdata['tmpname'];
+
+	try {
+		$image = new Imagick("$tmpdir/{$postdata['tmpname']}");
+		if(image_is_animated($image)) {
+			// the prompt is never offered for these, so someone's poking at it.
+			$image->destroy();
+			upload_resize_form($postdata, $width, $height, $filesize, "Animated images can't be resized.");
+			return true;
+		}
+		$image->resizeImage($side, $side, imagick::FILTER_LANCZOS, 1, true);
+		if($quality !== null) {
+			$image->setImageCompressionQuality($quality);
+		}
+		$image->writeImage("$tmpdir/$previewname");
+		$image->destroy();
+	} catch(ImagickException $e) {
+		trigger_error("upload resize preview failed: ".$e->getMessage(), E_USER_WARNING);
+		if(file_exists("$tmpdir/$previewname")) unlink("$tmpdir/$previewname");
+		upload_resize_form($postdata, $width, $height, $filesize,
+		                   "Sorry, I couldn't resize that one. Try other settings, or post the original.");
+		return true;
+	}
+	chmod("$tmpdir/$previewname", 0644);
+
+	list($newwidth, $newheight) = getimagesize("$tmpdir/$previewname");
+	$newsize = filesize("$tmpdir/$previewname");
+	$postdata['preview'] = array(
+		'tmpname' => $previewname,
+		'userid'  => me()->id(),
+	);
+
+	$change = round(100 * ($newsize - $filesize) / $filesize);
+	$change = $change < 0 ? "&minus;".abs($change)."%" : "+$change%";
+	$toobig = $newsize > UPLOAD_MAX_BYTES;
+	$src = "/offensive/ui/uploadPreview.php?v=".filemtime("$tmpdir/$previewname");
+
+	ob_start(); ?>
+	<p><a href="<?= $src ?>" target="_blank"><img id="resizepreview" src="<?= $src ?>"
+		width="<?= $newwidth ?>" height="<?= $newheight ?>"
+		alt="your image, resized"/></a></p>
+	<table id="resizestats">
+		<tr><th></th><th>dimensions</th><th>file size</th></tr>
+		<tr><th>original</th><td><?= $width ?> x <?= $height ?></td><td><?= upload_format_bytes($filesize) ?></td></tr>
+		<tr><th>resized</th><td><?= $newwidth ?> x <?= $newheight ?></td><td><?= upload_format_bytes($newsize) ?> (<?= $change ?>)</td></tr>
+	</table>
+	<p>long edge <?= $side ?> px<?= $quality !== null ? ", quality $quality" : "" ?>.
+	The image links to its full size.</p>
+<?php if($toobig) { ?>
+	<p><strong>That's still too big to post (the limit is <?= upload_format_bytes(UPLOAD_MAX_BYTES) ?>).
+	Try a smaller size or a lower quality.</strong></p>
+<?php } ?>
+	<form id="resizeform" action="<?= $_SERVER['SCRIPT_NAME'] ?>" method="POST">
+		<input type="hidden" name="c" value="upload"/>
+<?php if(!$toobig) { ?>
+		<input type="submit" name="resize_use" value="Use the resized image."/>
+<?php } ?>
+		<input type="submit" name="resize_retry" value="Try different settings."/>
+		<input type="submit" name="noresize" value="Post the original."/>
+		<input type="submit" name="killit" value="Cancel this upload."/>
+	</form>
+	<?php
+	box(ob_get_clean(), "how's this?");
 	$_SESSION['postdata'] = serialize($postdata);
 	return true;
+}
+
+function upload_resize_use(&$postdata, $width, $height, $filesize) {
+	global $tmpdir;
+
+	$preview = upload_resize_preview_file($postdata);
+	if($preview == "" || $postdata['preview']['userid'] != me()->id()) {
+		unset($postdata['preview']);
+		upload_resize_form($postdata, $width, $height, $filesize,
+		                   "That preview is gone. Have another go?");
+		return true;
+	}
+	if(filesize($preview) > UPLOAD_MAX_BYTES) {
+		upload_resize_discard($postdata);
+		upload_resize_form($postdata, $width, $height, $filesize,
+		                   "That's still too big to post. Try a smaller size or a lower quality.");
+		return true;
+	}
+
+	// the resized copy takes the original's place and carries on through the
+	// rest of the checks. It's already been through the compression choice.
+	rename($preview, "$tmpdir/{$postdata['tmpname']}")
+		or trigger_error("could not replace the upload with its preview", E_USER_ERROR);
+	unset($postdata['preview']);
+	$postdata['noresize'] = true;
+	$postdata['noresample'] = true;
+	return false;
 }
 
 // does the upload have a reasonable bits per pixel? (pictures only)

@@ -61,3 +61,56 @@
 		justify-self: start;
 	}
 }
+
+/* the resize tool (upload_resize_form() and upload_resize_preview() in
+   offensive/assets/upload.inc): settings on their own lines, then the choices,
+   which wrap onto as many lines as the screen needs */
+#resizeform {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: var(--spacing-sm);
+	max-width: 475px;
+	margin: 0 auto;
+
+	> :is(label, p) {
+		flex-basis: 100%;
+		margin: 0;
+	}
+
+	input[type=number] {
+		width: 5em;
+		padding: var(--spacing-xs);
+		/* under 16px, iOS Safari zooms the page when the field is focused */
+		font-size: 16px;
+	}
+
+	#resizequalityhint {
+		display: block;
+		color: var(--color-brand-medium);
+	}
+}
+
+/* the tool's centered messages: even lines instead of a one-word last line */
+p:has(~ #resizeform),
+#resizeform :is(p, #resizequalityhint) {
+	text-wrap: balance;
+}
+
+/* the preview fits the screen; tapping it opens it full size */
+#resizepreview {
+	max-width: 100%;
+	max-height: 70vh;
+	width: auto;
+	height: auto;
+}
+
+#resizestats {
+	margin: 0 auto;
+	border-collapse: collapse;
+
+	:is(th, td) {
+		padding: var(--spacing-xs) var(--spacing-sm);
+		text-align: left;
+	}
+}
