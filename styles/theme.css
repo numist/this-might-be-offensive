@@ -79,7 +79,6 @@ textarea {
 	pic page shows the same markup and that page doesn't load oldskool.css. */
 .comment_meta {
 	display: flex;
-	justify-content: space-between;
 	align-items: baseline;
 	flex-wrap: wrap;
 	gap: 0 8px;
@@ -89,11 +88,59 @@ textarea {
 		the link's underline. absolutely positioned elements don't get it. */
 		position: relative;
 		padding-left: 1em;
+		/* lets a 50 character username wrap instead of pushing past the edge */
+		min-width: 0;
 
 		&::before {
 			content: "\00bb";
 			position: absolute;
 			left: 0;
+		}
+	}
+
+	/* the time stays on the right, also when it wraps to its own line */
+	& > a:last-child {
+		margin-left: auto;
+	}
+}
+
+/* the vote and tmbo/repost flags, between the username and the time. on
+	phones every label shrinks to a symbol, [ this is good ] to [+], so a
+	thread reads the same all the way down. the symbols carry the full text
+	as alt text for screen readers (the first content line is for browsers
+	without alt text). */
+.comment_votes {
+	font-weight: bold;
+	font-size: 0.875em;
+	white-space: nowrap;
+
+	& .vote {
+		font-size: inherit;
+	}
+
+	@media (width < 800px) {
+		& .vote > span {
+			display: none;
+		}
+
+		& .good::before {
+			content: "[+]";
+			content: "[+]" / "this is good";
+		}
+
+		& .bad::before {
+			content: "[\2212]";
+			content: "[\2212]" / "this is bad";
+		}
+
+		& .tmbo::before {
+			content: "[\00d7]";
+			content: "[\00d7]" / "this might be offensive";
+		}
+
+		& .tiar::before {
+			content: "[repost]";
+			content: "[repost]" / "this is a repost";
 		}
 	}
 }
