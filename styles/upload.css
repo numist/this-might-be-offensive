@@ -91,6 +91,12 @@
 	}
 }
 
+/* the tool's centered messages: even lines instead of a one-word last line */
+p:has(~ #resizeform),
+#resizeform :is(p, #resizequalityhint) {
+	text-wrap: balance;
+}
+
 /* the preview fits the screen; tapping it opens it full size */
 #resizepreview {
 	max-width: 100%;
