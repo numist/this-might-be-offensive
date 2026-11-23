@@ -134,43 +134,66 @@
 					return document.getElementById(String(comment.id)) !== null;
 				}
 
+				// a comment from the realtime socket: add it to the list and slide it
+				// open. when you're typing in the comment box below the list, the
+				// page scrolls along so the box stays put.
 				function addComment(comment) {
 					if(commentExists(comment))
 						return;
-					var html = $(comment.html);
+					var template = document.createElement('template');
+					template.innerHTML = comment.html;
 					// Find the entry by class: the template's top-level node layout has changed before.
-					var entry = html.filter('.entry');
-					if (entry.length == 0)
-						entry = html.find('.entry');
-					entry = entry.first();
-					if($.inArray(comment.userid, me.squelched) != -1)
-						entry.find('.comment_body').html('<div class="squelched">[ squelched ]</div>');
-					if ($('#thumbnail').length > 0)
-						$('#thumbnail').before(html);
+					var entry = template.content.querySelector('.entry');
+					if(entry && me.squelched.indexOf(comment.userid) != -1)
+						entry.querySelector('.comment_body').innerHTML = '<div class="squelched">[ squelched ]</div>';
+					var thumbnail = document.getElementById('thumbnail');
+					if(thumbnail)
+						thumbnail.before(template.content);
 					else
-						$("#commentList").append(html);
-					if (entry.length == 0)
+						document.getElementById('commentList').append(template.content);
+					if(!entry)
 						return;
-					entry.hide();
-					var currentScroll = $(window).scrollTop();
-					var slideUp = $('textarea').is(':focus');
-					var propTotals = {};
 					latest_comment = entry;
-					entry.animate({
-				"height": "show",
-				"marginTop": "show",
-				"marginBottom": "show",
-				"paddingTop": "show",
-				"paddingBottom": "show"
-					}, {
-						step: function(now, fx) {
-							if (slideUp) {
-								propTotals[fx.prop] = now;
-								var scrollTo = currentScroll;
-								$.each(propTotals, function(idx, change) { scrollTo += change; });
-								$(window).scrollTop(scrollTo);
-							}
-						}
+					revealComment(entry);
+				}
+
+				// slides a new comment open from nothing. the overflow it needs while
+				// it grows comes off again at the end: left on, it would make the
+				// comment the scroll container of its sticky author line (theme.css
+				// .comment_meta), which then sits a line or two up for good.
+				function revealComment(entry) {
+					if(matchMedia('(prefers-reduced-motion: reduce)').matches)
+						return;
+					var slideUp = document.activeElement && document.activeElement.tagName == 'TEXTAREA';
+					var style = getComputedStyle(entry);
+					var open = {
+						height: style.height,
+						paddingTop: style.paddingTop,
+						paddingBottom: style.paddingBottom
+					};
+					var closed = { height: '0px', paddingTop: '0px', paddingBottom: '0px' };
+					entry.style.overflow = 'clip';
+					var animation = entry.animate([closed, open], { duration: 400, easing: 'ease-in-out' });
+
+					var shown = 0;
+					function follow() {
+						var height = entry.getBoundingClientRect().height;
+						window.scrollBy(0, height - shown);
+						shown = height;
+					}
+					function step() {
+						if(animation.playState != 'running')
+							return;
+						follow();
+						requestAnimationFrame(step);
+					}
+					if(slideUp)
+						requestAnimationFrame(step);
+
+					animation.finished.finally(function() {
+						entry.style.overflow = '';
+						if(slideUp)
+							follow();
 					});
 				}
 
