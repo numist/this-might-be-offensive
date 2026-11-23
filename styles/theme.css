@@ -390,15 +390,57 @@ textarea {
 #commentList > div:has(> label input[name="link_previews"]) {
 	display: flex;
 	flex-wrap: wrap;
-	justify-content: space-between;
 	align-items: center;
 	column-gap: var(--spacing);
+
+	/* the toggles go to the right, together */
+	> b {
+		margin-inline-end: auto;
+	}
+}
+
+/* "collapse votes": each long enough run of comments with no text, only a
+	vote or a tmbo/repost flag, shows as one row of totals (comments.inc)
+	written like the counts in the lists. the choice is a pref (tmbolib.js
+	saves it), and so is how long a run has to be (settings.inc). a
+	vote linked to directly still shows, and the stripes skip whatever is
+	hidden. */
+#commentList > div.entry {
+	display: none;
+}
+
+:root:has(input[name="collapse_votes"]:checked) #commentList {
+	/* rules above and below, so it doesn't read as a comment */
+	> div.entry {
+		display: block;
+		color: var(--color-brand-medium);
+		border-block: 1px solid var(--color-brand-medium);
+		font-weight: bold;
+		font-size: 0.875em;
+
+		/* in line with the usernames */
+		> .goods {
+			margin-inline-start: 0;
+		}
+	}
+
+	> article[data-collapsible]:not(:target) {
+		display: none;
+	}
+
+	> .entry {
+		background: var(--bg-content);
+	}
+
+	> .entry:nth-child(odd of :not(article[data-collapsible]:not(:target))) {
+		background: var(--color-brand-light-alt);
+	}
 }
 
 /* a toggle in the tmbo style: link-like text that says what clicking it will
 	do.  the checkbox stays for keyboards and screen readers (its aria-label
 	names it, and checked says whether previews are showing) but isn't drawn. */
-label:has(> input[name="link_previews"]) {
+label:has(> input:is([name="link_previews"], [name="collapse_votes"])) {
 	color: var(--color-link);
 	font-weight: normal;
 	text-decoration: underline;

@@ -250,6 +250,48 @@
 
 	}
 
+	// comments with no text, only a vote or a tmbo/repost flag, grouped into
+	// runs of consecutive ones. returns the runs that are long enough to
+	// collapse (the collapse_votes_min pref), keyed by the index of their
+	// first comment.
+	function voteOnlyRuns($comments)
+	{
+		$min = collapseVotesMin();
+		$runs = array();
+		$start = null;
+		foreach($comments as $i => $comment) {
+			if(strlen($comment->text())) {
+				$start = null;
+				continue;
+			}
+			if($start === null) {
+				$start = $i;
+				$runs[$start] = array();
+			}
+			$runs[$start][] = $comment;
+		}
+		return array_filter($runs, function($run) use ($min) {
+			return count($run) >= $min;
+		});
+	}
+
+	// the row that stands in for a run of vote-only comments while "collapse
+	// votes" is on: their totals, written like the counts in the lists. it's
+	// always in the page, and theme.css shows either it or the comments.
+	function collapsedVotes($run)
+	{
+		$goods = $bads = $tmbos = 0;
+		foreach($run as $comment) {
+			$goods += $comment->vote() == "this is good" ? 1 : 0;
+			$bads += $comment->vote() == "this is bad" ? 1 : 0;
+			$tmbos += $comment->tmbo() ? 1 : 0;
+		}
+		?><div class="entry"><span class="goods"><?= $goods ?></span><span class="bads"><?= $bads ?></span><?php
+			if($tmbos > 0) { ?><span class="tmbos"><?= $tmbos ?></span><?php }
+		?> (votes collapsed)</div>
+<?php
+	}
+
 	function body() {
 		global $upload, $uploader, $context;
 	
@@ -295,15 +337,31 @@
 
 	$lastcomment = 0;
 	if( $comments_exist > 0) { 
+		$comments = $upload->getComments();
+		$voteRuns = voteOnlyRuns($comments);
+
 	// changeblog doesn't say anything demeaning about the people who posted.
 	if($upload->id() != "211604") { 
 			// one element, so it doesn't throw off the .entry:nth-child striping
-			?><div><b><?= $comments_heading ?></b><label><input type="checkbox" id="link_previews" name="link_previews" aria-label="show link previews" /><span>show</span><span>hide</span> link previews</label></div><?php
+			?><div><b><?= $comments_heading ?></b><label><input type="checkbox" id="link_previews" name="link_previews" aria-label="show link previews" /><span>show</span><span>hide</span> link previews</label><?php
+			if(count($voteRuns)) {
+				?><label><input type="checkbox" id="collapse_votes" name="collapse_votes" aria-label="collapse votes"<?= me()->getPref("collapse_votes") == 1 ? " checked" : "" ?> /><span>collapse</span><span>expand</span> votes</label><?php
+			}
+			?></div><?php
 		}
 
 		$numgood = 0;
 		$numbad = 0;
-		foreach($upload->getComments() as $comment) {
+		// comment.inc marks the comments in a run with data-collapsible
+		$collapsible = false;
+		foreach($comments as $i => $comment) {
+			if(isset($voteRuns[$i])) {
+				collapsedVotes($voteRuns[$i]);
+				$collapsible = true;
+			}
+			if(strlen($comment->text())) {
+				$collapsible = false;
+			}
 			$lastcomment = $comment->id();
 			require("offensive/templates/comment.inc");
 		}

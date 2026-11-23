@@ -202,3 +202,17 @@ function changesrc(a,im)
 		}
 	});
 })();
+
+/* "collapse votes" on the comments page (theme.css) works without javascript
+   but only for the page it's on. with javascript, the choice is saved as the
+   collapse_votes pref, so every thread opens the same way. */
+document.addEventListener("change", function(e) {
+	if(!e.target.matches("input[name=collapse_votes]")) return;
+	fetch("/offensive/api.php/set_preference.json", {
+		method: "POST",
+		body: new URLSearchParams({
+			key: "collapse_votes",
+			value: e.target.checked ? "1" : "0"
+		})
+	});
+});
