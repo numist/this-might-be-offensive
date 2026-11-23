@@ -15,10 +15,12 @@ $filetypes = array("jpg", "jpeg", "gif", "png", "webp");
 // nginx (client_max_body_size) both allow 20M, so this is the limit that bites.
 const UPLOAD_MAX_BYTES = 8 * 1024 * 1024;
 
-// images bigger than this (long side in px, or total pixels) get the resize
-// prompt. phone photos (4032x3024) and screenshots fit under both.
+// images bigger than this (long side in px, total pixels, or bytes) get the
+// resize tool. Most phone photos are over the byte limit, on purpose: the tool
+// offers a smaller copy, and posting the original is one click.
 const UPLOAD_PROMPT_MAX_SIDE = 4096;
 const UPLOAD_PROMPT_MAX_PIXELS = 16 * 1000 * 1000;
+const UPLOAD_PROMPT_MAX_BYTES = 1024 * 1024;
 // the resize tool's starting settings and its bounds. The long edge can't go
 // past the original's (no enlarging); quality applies to JPEG and WebP.
 const UPLOAD_RESIZE_DEFAULT_SIDE = 2560;
@@ -766,7 +768,8 @@ function upload_checkdims(&$postdata) {
 	}
 
 	if(max($width, $height) <= UPLOAD_PROMPT_MAX_SIDE &&
-	   $width * $height <= UPLOAD_PROMPT_MAX_PIXELS) {
+	   $width * $height <= UPLOAD_PROMPT_MAX_PIXELS &&
+	   $filesize <= UPLOAD_PROMPT_MAX_BYTES) {
 		return false;
 	}
 
