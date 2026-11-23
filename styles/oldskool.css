@@ -247,7 +247,7 @@ form.fieldform > [type="submit"] {
 			/* the start of the comment, under its thread on the profile, set
 			   off by a rule like an inline link preview in a comment */
 			blockquote {
-				margin: var(--spacing-xs) 0 0;
+				margin: var(--spacing-sm) 0;
 				padding-left: var(--spacing-sm);
 				border-left: 2px solid var(--color-brand-medium);
 				max-width: 70ch;
