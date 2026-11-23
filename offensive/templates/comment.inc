@@ -26,10 +26,7 @@ require_once("offensive/templates/comment_parts.inc");
 
 	<div class="comment_body"><?= $comment->HTMLcomment(true); ?></div>
 
-	<?php
-		commentVotes($comment, $numgood, $numbad);
-		commentMeta($comment);
-	?>
+	<?php commentMeta($comment, $numgood, $numbad); ?>
 
 </article>
 
