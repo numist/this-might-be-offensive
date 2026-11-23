@@ -27,6 +27,9 @@
 			                 WHERE lc.fileid = up.id AND lu.userid = lc.userid
 			                 ORDER BY lc.id DESC LIMIT 1),
 			                NULL) as last_commenter,
+			             IF(up.type = 'topic',
+			                (SELECT MAX(lc.id) FROM offensive_comments lc WHERE lc.fileid = up.id),
+			                NULL) as last_comment_id,
 			             u.username as user_username,
 			             u.account_status as user_account_status
 		        FROM offensive_uploads up, offensive_count_cache ca, users u

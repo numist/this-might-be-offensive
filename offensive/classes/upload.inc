@@ -210,6 +210,20 @@ class Upload {
 		return $this->data["last_commenter"];
 	}
 
+	/*
+	 * id of the most recent comment, or null if there are no comments.
+	 * list queries (uploadsql()) prefetch this; otherwise it costs one query.
+	 */
+	public function last_comment_id() {
+		if(!array_key_exists("last_comment_id", $this->data)) {
+			$sql = "SELECT MAX(id) AS id FROM offensive_comments
+			        WHERE fileid = ".(int)$this->data["id"];
+			$row = mysqli_fetch_assoc(tmbo_query($sql));
+			$this->data["last_comment_id"] = $row ? $row["id"] : null;
+		}
+		return $this->data["last_comment_id"];
+	}
+
 	public function subscribed($user=null) {
 		if($user == null) $user = me();
 		if(is_numeric($user)) $user = new User($user);
