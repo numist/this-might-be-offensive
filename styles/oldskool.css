@@ -244,12 +244,18 @@ form.fieldform > [type="submit"] {
 		> :first-child {
 			overflow-wrap: anywhere;
 
-			/* the start of the comment, under its thread on the profile */
-			p {
-				margin: 0;
+			/* the start of the comment, under its thread on the profile, set
+			   off by a rule like an inline link preview in a comment */
+			blockquote {
+				margin: var(--spacing-sm) 0;
+				padding-left: var(--spacing-sm);
+				border-left: 2px solid var(--color-brand-medium);
+				max-width: 70ch;
+				display: -webkit-box;
+				-webkit-box-orient: vertical;
+				-webkit-line-clamp: 3;
+				line-clamp: 3;
 				overflow: hidden;
-				white-space: nowrap;
-				text-overflow: ellipsis;
 				color: color-mix(in oklch, currentColor 70%, transparent);
 			}
 		}
