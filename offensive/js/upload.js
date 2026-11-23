@@ -57,3 +57,21 @@
 		});
 	});
 })();
+
+// Resize tool: show the quality slider's value as it moves. Without this the
+// number stays hidden (it would go stale), and the preview page says what was
+// picked.
+(function() {
+	"use strict";
+
+	document.addEventListener("DOMContentLoaded", function() {
+		const slider = document.getElementById("resizequality");
+		const value = document.querySelector("output[for=resizequality]");
+		if(!slider || !value) return;
+
+		value.hidden = false;
+		slider.addEventListener("input", function() {
+			value.textContent = slider.value;
+		});
+	});
+})();

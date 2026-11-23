@@ -850,11 +850,11 @@ function upload_resize_form(&$postdata, $width, $height, $filesize, $error="") {
 			       inputmode="numeric"/> px
 		</label>
 <?php if(upload_resize_has_quality($postdata)) { ?>
-		<label>quality
-			<input type="number" name="resize_quality" value="<?= (int)$quality ?>"
-			       min="<?= UPLOAD_RESIZE_MIN_QUALITY ?>" max="100" step="1" required
-			       inputmode="numeric" aria-describedby="resizequalityhint"/>
-			<span id="resizequalityhint">(<?= UPLOAD_RESIZE_MIN_QUALITY ?>&ndash;100, higher looks better and weighs more)</span>
+		<label>quality <output for="resizequality" hidden><?= (int)$quality ?></output>
+			<span>smaller
+				<input type="range" name="resize_quality" id="resizequality" value="<?= (int)$quality ?>"
+				       min="<?= UPLOAD_RESIZE_MIN_QUALITY ?>" max="100" step="5"/>
+				sharper</span>
 		</label>
 <?php } else { ?>
 		<p><?= strtoupper($postdata['format_name']) ?> is lossless, so only the size changes.</p>
