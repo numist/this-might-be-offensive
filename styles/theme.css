@@ -79,6 +79,19 @@ textarea {
 	pic page shows the same markup and that page doesn't load oldskool.css. */
 .comment_meta {
 	display: flex;
+	/* a comment taller than the screen keeps its author in view: the line
+		sticks to the bottom of the viewport (or the quick comment window)
+		until the top of the comment scrolls past. the background, from the
+		striped .entry, keeps the text behind it from showing through. */
+	position: sticky;
+	bottom: 0;
+	background: inherit;
+	/* a little more background around the line while it's stuck, without
+		moving it when it isn't */
+	padding-block: 6px;
+	margin-block: -6px;
+	/* lets the line ask whether it's stuck (below) */
+	container-type: scroll-state;
 	align-items: baseline;
 	flex-wrap: wrap;
 	gap: 0 8px;
@@ -101,6 +114,23 @@ textarea {
 	/* the time stays on the right, also when it wraps to its own line */
 	& > a:last-child {
 		margin-left: auto;
+	}
+}
+
+/* while the author line is stuck, a soft shadow along its top edge separates
+	it from the comment text sliding under it. the ::before spans the .entry's
+	10px side padding too. browsers without scroll-state queries (firefox and
+	safari, as of 2026) show the stuck line without it. */
+.comment_meta::before {
+	content: "";
+	position: absolute;
+	inset: 0 -10px;
+	pointer-events: none;
+}
+
+@container scroll-state(stuck: bottom) {
+	.comment_meta::before {
+		box-shadow: 0 -4px 6px -4px rgb(0 0 51 / 0.4);
 	}
 }
 
