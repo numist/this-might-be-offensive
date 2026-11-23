@@ -5,6 +5,16 @@
    written by Cor Bosman (cor@tmbo)
 */
 
+/* true when admin/.config sets use_isk = 1. anything else, including a missing
+ * key, means no upload path talks to the ISK server at all.
+ */
+function isk_enabled()
+{
+	global $config;
+
+	return is_array($config) && isset($config['use_isk']) && $config['use_isk'] == "1";
+}
+
 class Isk {
  	private $client;			// xmlrpc connection
 	private $errno;				// error code
