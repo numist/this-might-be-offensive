@@ -85,15 +85,25 @@
 		font-size: 16px;
 	}
 
-	#resizequalityhint {
-		display: block;
+	/* quality: "smaller [slider] sharper" on its own line under the label */
+	label > span {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: var(--spacing-sm);
 		color: var(--color-brand-medium);
+	}
+
+	input[type=range] {
+		flex: 0 1 15em;
+		min-width: 0;
+		margin: 0;
 	}
 }
 
 /* the tool's centered messages: even lines instead of a one-word last line */
 p:has(~ #resizeform),
-#resizeform :is(p, #resizequalityhint) {
+#resizeform p {
 	text-wrap: balance;
 }
 
