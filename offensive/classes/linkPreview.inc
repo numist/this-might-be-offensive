@@ -97,8 +97,10 @@ class LinkPreview {
 
 	/*
 	 * $link (the <a> for $url, unescaped) with its preview: a button before it
-	 * that opens the preview as a popover, and the preview after it.  $id must
-	 * be unique on the page.  $link alone if there is no preview.
+	 * that opens the preview as a popover, and the preview after it, in a
+	 * span that keeps the button on the line where the link starts
+	 * (theme.css).  $id must be unique on the page.  $link alone if there is
+	 * no preview.
 	 */
 	public static function html($url, $id, $link) {
 		$preview = self::internal($url);
@@ -112,9 +114,9 @@ class LinkPreview {
 			$img = '<img src="'.htmlEscape($preview["thumbnail"]).'"'.$size.' alt="" loading="lazy" referrerpolicy="no-referrer" />';
 		}
 		$quote = isset($preview["quote"]) ? "<blockquote>".htmlEscape($preview["quote"])."</blockquote>" : "";
-		return '<button type="button" popovertarget="'.$id.'" aria-label="preview"></button>'.$link.
+		return '<span><button type="button" popovertarget="'.$id.'" aria-label="preview"></button>'.$link.
 		       '<span id="'.$id.'" popover>'.$img.$quote."<span>".htmlEscape($preview["title"])."</span><small>".htmlEscape($preview["provider"]).
-		       ' <label for="link_previews">hide</label></small></span>';
+		       ' <label for="link_previews">hide</label></small></span></span>';
 	}
 
 	/*
