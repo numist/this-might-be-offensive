@@ -31,7 +31,9 @@ if(isset($css) && substr($css, 0, 1) != " ") {
   $last_commenter = $upload->last_commenter();
   if($last_commenter !== null) {
     $when = $upload->last_active();
-    $activity = htmlEscape($last_commenter)." commented ".time_ago($when)." ago";
+    $activity = htmlEscape($last_commenter)
+              .' <a href="'.Link::thread($upload).'#'.$upload->last_comment_id().'">commented '
+              .time_ago($when).' ago</a>';
   } else {
     $when = $upload->timestamp();
     $activity = htmlEscape($upload->uploader()->username())." started it ".time_ago($when)." ago";
