@@ -418,9 +418,74 @@ textarea {
 		font-weight: bold;
 		font-size: 0.875em;
 
+		/* the totals open the list of votes, like a link preview's button */
+		> button {
+			padding: 0;
+			border: 0;
+			background: none;
+			color: inherit;
+			font: inherit;
+			cursor: pointer;
+
+			> span:last-child {
+				text-decoration: underline dotted;
+			}
+
+			&:is(:hover, :focus-visible),
+			&:has(+ :popover-open) {
+				color: var(--color-link);
+			}
+		}
+
 		/* in line with the usernames */
-		> .goods {
+		.goods {
 			margin-inline-start: 0;
+		}
+
+		/* the list of votes, drawn like a link preview's card. where anchor
+			positioning is supported it opens under the totals, otherwise in
+			the middle of the screen. */
+		[popover] {
+			width: max-content;
+			max-width: min(32rem, 80vw);
+			/* a long run scrolls instead of covering the screen */
+			max-height: 60vh;
+			overflow-y: auto;
+			margin: 0;
+			padding: var(--spacing-sm);
+			list-style: none;
+			background: var(--bg-content);
+			border: 1px solid var(--color-brand-medium);
+			box-shadow: 0 2px 8px rgb(0 0 51 / 0.3);
+			font-weight: normal;
+			font-size: 1.1rem;
+
+			@supports (anchor-name: --a) {
+				position-anchor: auto;
+				inset: auto;
+				top: anchor(bottom);
+				left: anchor(left);
+				position-try-fallbacks: flip-block;
+			}
+
+			@supports not (anchor-name: --a) {
+				margin: auto;
+			}
+
+			.userLink {
+				position: relative;
+				padding-left: 1em;
+
+				&::before {
+					content: "\00bb";
+					position: absolute;
+					left: 0;
+				}
+			}
+
+			.comment_votes {
+				text-decoration: none;
+			}
 		}
 	}
 

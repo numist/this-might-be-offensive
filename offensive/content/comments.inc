@@ -276,8 +276,9 @@
 	}
 
 	// the row that stands in for a run of vote-only comments while "collapse
-	// votes" is on: their totals, written like the counts in the lists. it's
-	// always in the page, and theme.css shows either it or the comments.
+	// votes" is on: their totals, written like the counts in the lists, as a
+	// button that opens a list of who voted how. it's always in the page, and
+	// theme.css shows either it or the comments.
 	function collapsedVotes($run)
 	{
 		$goods = $bads = $tmbos = 0;
@@ -286,9 +287,21 @@
 			$bads += $comment->vote() == "this is bad" ? 1 : 0;
 			$tmbos += $comment->tmbo() ? 1 : 0;
 		}
-		?><div class="entry"><span class="goods"><?= $goods ?></span><span class="bads"><?= $bads ?></span><?php
+		$id = "votes".$run[0]->id();
+		?><div class="entry"><button type="button" popovertarget="<?= $id ?>"><span class="goods"><?= $goods ?></span><span class="bads"><?= $bads ?></span><?php
 			if($tmbos > 0) { ?><span class="tmbos"><?= $tmbos ?></span><?php }
-		?> (votes collapsed)</div>
+		?> <span>(votes collapsed)</span></button><ul id="<?= $id ?>" popover><?php
+			// who voted, the same way the comments show it. each links to
+			// its comment, which shows it even while collapsed (theme.css)
+			foreach($run as $comment) {
+				$vote = $comment->vote();
+				?><li><?= $comment->commenter()->htmlUsername() ?> <a class="comment_votes" href="#<?= $comment->id() ?>"><?php
+					if($vote) { ?><span class="vote <?= $vote == "this is good" ? "good" : "bad" ?>"><span>[ <?= $vote ?> ]</span></span><?php }
+					if($comment->tmbo()) { ?><span class="vote tmbo"><span>[ this might be offensive ]</span></span><?php }
+					if($comment->tiar()) { ?><span class="vote tiar"><span>[ this is a repost ]</span></span><?php }
+				?></a></li><?php
+			}
+		?></ul></div>
 <?php
 	}
 

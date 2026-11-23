@@ -216,3 +216,10 @@ document.addEventListener("change", function(e) {
 		})
 	});
 });
+
+/* a vote in the list a collapsed row opens links to that comment, which
+   shows it. close the list so it doesn't cover it. */
+document.addEventListener("click", function(e) {
+	var link = e.target.closest("#commentList [popover] a[href^='#']");
+	if(link) link.closest("[popover]").hidePopover();
+});
