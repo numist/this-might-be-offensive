@@ -271,11 +271,11 @@ function recentComments( $uid ) {
 <?php
 }
 
-// the start of a comment on one line, short enough to keep the profile
-// small. CSS trims it further to fit the width.
+// the start of a comment, about three lines of the 70ch preview, so the
+// profile stays small. CSS clamps it to three lines.
 function remarkPreview( $text ) {
 	$text = trim(preg_replace('/\s+/u', ' ', mb_scrub($text, "UTF-8")));
-	return mb_strimwidth($text, 0, 120, "…", "UTF-8");
+	return mb_strimwidth($text, 0, 240, "…", "UTF-8");
 }
 
 
