@@ -134,7 +134,9 @@ form.fieldform > [type="submit"] {
 
 		#rightcol {
 			width: 100%;
-			overflow: auto;
+			/* clip, not auto: a scroll container here would trap the sticky
+				comment author line (theme.css .comment_meta) inside it */
+			overflow-x: clip;
 		}
 	}
 }
@@ -317,6 +319,17 @@ form.fieldform > [type="submit"] {
 #commentList {
 	.userLink {
 		color: var(--color-brand-medium, #669);
+	}
+
+	/* above the phone tab bar (main_nav.css .menuButton: padding, one line,
+		border), which is about 54px on iOS and 59px in chrome. the line's
+		top edge sits just below the shortest of those, and its 6px padding
+		keeps the text clear of the tallest, so nothing shows through between
+		the two. */
+	.comment_meta {
+		@media (width < 800px) {
+			bottom: calc(2 * var(--spacing-lg) + 0.8rem);
+		}
 	}
 
 	.entry {
