@@ -47,14 +47,20 @@ body {
 #image {
 	/* 100%, not 100vw: #content's 8px margin would push the page 8px wider than the screen */
 	max-width: 100%;
-	/* fit the screen, but never shrink narrower than half the screen (or the
-	   image's own width): a tall image runs on down the page instead of
+	/* fit the screen, but never shrink narrower than --min-image-width (or
+	   the image's own width): a tall image runs on down the page instead of
 	   becoming a sliver. the size comes from pic.php; without it, the image
 	   just fits */
+	--min-image-width: 50vw;
 	max-height: max(
 		calc(100vh - 105px),
-		min(50vw, var(--image-width, 0px)) * var(--image-ratio, 0)
+		min(var(--min-image-width), var(--image-width, 0px)) * var(--image-ratio, 0)
 	);
+
+	/* a phone is narrow enough that anything less than its full width is a sliver */
+	@media (width < 800px) {
+		--min-image-width: 100vw;
+	}
 }
 
 /* browsing a list instead of the main feed: the colors swap so it stands
