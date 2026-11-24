@@ -441,77 +441,108 @@ audio {
 	}
 }
 
-.scrollcontainer {
-    container-type: scroll-state;
-	position: relative;
+/* phones: a tall image runs on down the page under the bar, so an arrow
+	above the bar bounces a few times to say there is more below. it is all
+	scroll-driven: --pic-image is the view timeline of the image's
+	container, and the arrow exists only while that is still entering the
+	screen (taller than it, top not yet scrolled past), so an image that fits never shows one.
+	it fades out as soon as the page scrolls, and on its own after a few
+	seconds. browsers without scroll-driven animations never show it */
+#heading .scroll-hint {
+	display: none;
+}
 
-	--initialDelay: 1s;
-	--bounceDelay: var(--initialDelay);
-	--numBounces: 4;
-	--bounceDuration: 0.25s;
-
-	--doubleBounces: calc(var(--numBounces) * 2);
-	--bounceIterations: calc(var(--doubleBounces) - mod(calc(var(--doubleBounces) - 1), 2)); /* double the number of bounces, floored to odd */
-
-	--fadeDuration: 0.5s;
-	--fadeOutDelay: calc(var(--initialDelay) + var(--fadeDuration) + var(--bounceDuration) * (var(--bounceIterations) - 1));
-
-	.scroll-hint {
-		opacity: 0;
-		position: absolute;
-		right: 0;
-		top: 50%;
-        transform: translateY(-50%);
-		pointer-events: none;
-		font-weight: bold;
-		font-size: 12px;
-
-		@container (scroll-state(scrollable: right)) and (not scroll-state(scrollable: left)) {
-			animation: var(--fadeDuration) ease-in-out var(--initialDelay) 1 forwards fadeIn,
-				var(--fadeDuration) ease-in-out var(--fadeOutDelay) 1 reverse forwards fadeIn;
-			}
-		
-		@supports not (container-type: scroll-state) {
-			animation: var(--fadeDuration) ease-in-out var(--initialDelay) 1 forwards fadeIn,
-				var(--fadeDuration) ease-in-out var(--fadeOutDelay) 1 reverse forwards fadeIn;
-		}
+@supports (animation-timeline: view()) {
+	body {
+		timeline-scope: --pic-image;
 	}
 
-	.scroll-hint-icon {
-		background: var(--color-brand-light);
-		color: var(--color-brand-dark);
-		padding: 12px;
-		border-radius: 4px;
+	/* #content rather than #image: an image that hasn't loaded yet has no
+		size, which leaves its timeline inactive and the arrow showing */
+	#content {
+		view-timeline: --pic-image block;
+	}
 
-		@container (scroll-state(scrollable: right)) and (not scroll-state(scrollable: left)) {
-			animation: var(--bounceDuration) ease-in var(--bounceDelay) var(--bounceIterations) alternate forwards bounce;
+	@media (width < 800px) {
+		#heading .scroll-hint {
+			display: block;
+			position: absolute;
+			bottom: 100%;
+			right: var(--spacing-sm);
+			margin-bottom: var(--spacing-sm);
+			pointer-events: none;
+			font-weight: bold;
+			font-size: 12px;
+			animation: scroll-hint-tall linear both, scroll-hint-scrolled linear both;
+			animation-timeline: --pic-image, scroll(root);
+			animation-range: entry, 0 2em;
+
+			/* becoming displayed (once the image has loaded and turned out
+				tall) is what starts the icon's timed animations */
+			--initialDelay: 0.5s;
+			--numBounces: 4;
+			--bounceDuration: 0.25s;
+
+			--doubleBounces: calc(var(--numBounces) * 2);
+			--bounceIterations: calc(var(--doubleBounces) - mod(calc(var(--doubleBounces) - 1), 2)); /* double the number of bounces, floored to odd */
+
+			--fadeDuration: 0.5s;
+			--fadeOutDelay: calc(var(--initialDelay) + var(--fadeDuration) + var(--bounceDuration) * (var(--bounceIterations) - 1) + 1s);
 		}
 
-		@supports not (container-type: scroll-state) {
-			animation: var(--bounceDuration) ease-in var(--bounceDelay) var(--bounceIterations) alternate forwards bounce;
+		.scroll-hint-icon {
+			background: var(--color-brand-light);
+			color: var(--color-brand-dark);
+			/* sized like the counts beside it */
+			padding: var(--spacing-xs) var(--spacing-sm);
+			border-radius: 3px;
+			opacity: 0;
+			animation: var(--fadeDuration) ease-in-out var(--initialDelay) 1 forwards scroll-hint-fade,
+				var(--fadeDuration) ease-in-out var(--fadeOutDelay) 1 reverse forwards scroll-hint-fade,
+				var(--bounceDuration) ease-in var(--initialDelay) var(--bounceIterations) alternate forwards scroll-hint-bounce;
+
+			@media (prefers-reduced-motion: reduce) {
+				animation: var(--fadeDuration) ease-in-out var(--initialDelay) 1 forwards scroll-hint-fade,
+					var(--fadeDuration) ease-in-out var(--fadeOutDelay) 1 reverse forwards scroll-hint-fade;
+			}
 		}
 	}
 }
 
-
-
-@keyframes bounce {
-	from {
-		transform: translateX(-5px);
+/* shown while the image is entering (not past it): see above */
+@keyframes scroll-hint-tall {
+	from, 99.9% {
+		display: block;
 	}
 	to {
-		transform: translateX(0);
+		display: none;
 	}
 }
 
-@keyframes fadeIn {
+@keyframes scroll-hint-scrolled {
+	from {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
+	}
+}
+
+@keyframes scroll-hint-bounce {
+	from {
+		transform: translateY(-5px);
+	}
+	to {
+		transform: translateY(0);
+	}
+}
+
+@keyframes scroll-hint-fade {
 	from {
 		opacity: 0;
-		right: -50px;
 	}
 	to {
 		opacity: 1;
-		right: 0px;
 	}
 }
 

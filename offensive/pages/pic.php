@@ -296,8 +296,8 @@
 		</div>
 
 		<div id="content">
-			<div id="heading" style="white-space:nowrap;" class="scrollcontainer">
-				<div class="scroll-hint"><div class="scroll-hint-icon">→</div></div>
+			<div id="heading" style="white-space:nowrap;">
+				<div class="scroll-hint"><div class="scroll-hint-icon">↓</div></div>
 				<span id="navigation_controls">
 				<?php
 				/*
