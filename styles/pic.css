@@ -476,18 +476,6 @@ audio {
 			animation: scroll-hint-tall linear both, scroll-hint-scrolled linear both;
 			animation-timeline: --pic-image, scroll(root);
 			animation-range: entry, 0 2em;
-
-			/* becoming displayed (once the image has loaded and turned out
-				tall) is what starts the icon's timed animations */
-			--initialDelay: 0.5s;
-			--numBounces: 4;
-			--bounceDuration: 0.25s;
-
-			--doubleBounces: calc(var(--numBounces) * 2);
-			--bounceIterations: calc(var(--doubleBounces) - mod(calc(var(--doubleBounces) - 1), 2)); /* double the number of bounces, floored to odd */
-
-			--fadeDuration: 0.5s;
-			--fadeOutDelay: calc(var(--initialDelay) + var(--fadeDuration) + var(--bounceDuration) * (var(--bounceIterations) - 1) + 1s);
 		}
 
 		.scroll-hint-icon {
@@ -497,13 +485,13 @@ audio {
 			padding: var(--spacing-xs) var(--spacing-sm);
 			border-radius: 3px;
 			opacity: 0;
-			animation: var(--fadeDuration) ease-in-out var(--initialDelay) 1 forwards scroll-hint-fade,
-				var(--fadeDuration) ease-in-out var(--fadeOutDelay) 1 reverse forwards scroll-hint-fade,
-				var(--bounceDuration) ease-in var(--initialDelay) var(--bounceIterations) alternate forwards scroll-hint-bounce;
+			/* becoming displayed (once the image has loaded and turned out
+				tall) is what starts this. one animation, not several, so every
+				browser runs the steps in the same order */
+			animation: 5s linear 0.5s both scroll-hint-bounce;
 
 			@media (prefers-reduced-motion: reduce) {
-				animation: var(--fadeDuration) ease-in-out var(--initialDelay) 1 forwards scroll-hint-fade,
-					var(--fadeDuration) ease-in-out var(--fadeOutDelay) 1 reverse forwards scroll-hint-fade;
+				animation-name: scroll-hint-appear;
 			}
 		}
 	}
@@ -528,20 +516,33 @@ audio {
 	}
 }
 
+/* fade in, bounce four times well after that, hold, fade out. each
+	bounce is 0.5s, eased up and back down */
 @keyframes scroll-hint-bounce {
-	from {
-		transform: translateY(-5px);
+	0% {
+		opacity: 0;
 	}
-	to {
-		transform: translateY(0);
+	6%, 90% {
+		opacity: 1;
+	}
+	10%, 20%, 30%, 40%, 50% {
+		translate: 0 0;
+		animation-timing-function: ease-out;
+	}
+	15%, 25%, 35%, 45% {
+		translate: 0 -10px;
+		animation-timing-function: ease-in;
+	}
+	100% {
+		opacity: 0;
 	}
 }
 
-@keyframes scroll-hint-fade {
-	from {
+@keyframes scroll-hint-appear {
+	0%, 100% {
 		opacity: 0;
 	}
-	to {
+	6%, 90% {
 		opacity: 1;
 	}
 }
