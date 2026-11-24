@@ -20,46 +20,47 @@
 	}
 
 	function head_post_js() {
+		$sort = array_key_exists("sort", $_REQUEST) ? $_REQUEST["sort"] : defaultSort();
+		$firstPage = !(isset($_REQUEST["p"]) && $_REQUEST["p"] > 0);
 		?>
 		<script type="text/javascript">
 			getSocket("<?php $t = new Token("realtime"); echo $t->tokenid(); ?>", function(socket) {
-				function recolorRows() {
-					$('#discussions li').not('.header').each( function(idx) {
-						$(this).find('.col').removeClass('odd_row even_row').addClass( (idx % 2 == 0) ? 'even_row' : 'odd_row');
-					});
-				}
-				
-				var _sortOrder;
-				function sortOrder() {
-					if(!_sortOrder) {
-						$('#discussions .header .col').each(function(idx) {
-							if ($(this).find('a').length == 0)
-								_sortOrder = idx;
-						});
-					}
-					return _sortOrder;
-				}
+				var sort = <?= json_encode($sort) ?>;
+				var firstPage = <?= $firstPage ? "true" : "false" ?>;
+				var list = document.querySelector('#discussions ul');
 
+				// a new comment: bump the count, point the activity line at it,
+				// and move the row to the top when the list is sorted by it.
 				socket.on('comment', function(comment) {
-					var old_row = $("li[data-fileid=" + comment.fileid +"]");
-					if (old_row.length > 0) {
-						var count = parseInt(old_row.find('.comments').text()) + 1;
-						var label = count == 1 ? 'comment' : 'comments';
-						old_row.find('.comments').text(count);
-						old_row.find('.commentlabel').text(label);
-						old_row.find('.col3').text(comment.timestamp);
-						// if (sortOrder() == 2) {
-						//   $('#discussions .header').after(old_row);
-						//   recolorRows();
-						// }
+					var row = list.querySelector('li[data-fileid="' + comment.fileid + '"]');
+					if(!row) return;
+
+					if(comment.comment) {
+						var count = row.querySelector('.comments');
+						var n = parseInt(count.textContent, 10) + 1;
+						count.textContent = n;
+						row.querySelector('.commentlabel').textContent = n == 1 ? 'comment' : 'comments';
+					}
+
+					var link = document.createElement('a');
+					link.href = '<?= Link::content("comments") ?>&fileid=' + comment.fileid + '#' + comment.id;
+					link.textContent = 'commented less than a minute ago';
+					var time = row.querySelector('time');
+					time.dateTime = comment.timestamp;
+					time.replaceChildren(comment.username + ' ', link);
+
+					if(sort == 'activity_desc' && firstPage) {
+						list.prepend(row);
 					}
 				});
+
+				// a new topic is the newest and most recently active row.
 				socket.on('topic', function(topic) {
-					if(sortOrder() != 1 && $.inArray(topic.userid, me.squleched) == -1) {
-						$('#discussions .header').after(topic.html);
-						recolorRows();
-					}
+					if(!firstPage || (sort != 'date_desc' && sort != 'activity_desc')) return;
+					if(me.squelched.some(function(id) { return id == topic.userid; })) return;
+					list.insertAdjacentHTML('afterbegin', topic.html);
 				});
+
 				socket.emit('subscribe', '/uploads/*');
 			});
 		</script>
