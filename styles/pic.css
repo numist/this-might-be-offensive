@@ -47,7 +47,14 @@ body {
 #image {
 	/* 100%, not 100vw: #content's 8px margin would push the page 8px wider than the screen */
 	max-width: 100%;
-	max-height: calc(100vh - 105px);
+	/* fit the screen, but never shrink narrower than half the screen (or the
+	   image's own width): a tall image runs on down the page instead of
+	   becoming a sliver. the size comes from pic.php; without it, the image
+	   just fits */
+	max-height: max(
+		calc(100vh - 105px),
+		min(50vw, var(--image-width, 0px)) * var(--image-ratio, 0)
+	);
 }
 
 /* browsing a list instead of the main feed: the colors swap so it stands
