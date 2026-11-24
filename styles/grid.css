@@ -52,12 +52,12 @@
         li {
             align-items: baseline;
 
-            /* the rank. the rows are grid boxes, not list items, so they
-               count themselves (see hof.inc for the start and gaps) */
-            counter-increment: list-item;
-
+            /* the rank. the rows are grid boxes, not list items, and
+               browsers disagree on counting those with the list-item
+               counter, so hof.inc writes each rank into the value
+               attribute */
             &::before {
-                content: counter(list-item) ".";
+                content: attr(value) ".";
                 justify-self: end;
             }
 

@@ -40,23 +40,19 @@
 	// $ctxQuery goes on each pic page link, so the pic page steps
 	// through this list.
 	function hofList($ranked, $start, $ctxQuery) {
-		// the rows are grid boxes, not list items, so browsers don't apply
-		// start and value to them; the inline counter styles do that.
 ?>
-				<ol start="<?= $start ?>" style="counter-reset: list-item <?= $start - 1 ?>">
+				<ol start="<?= $start ?>">
 <?php
-		$next = $start;
 		foreach($ranked as $rank => $upload) {
 			// cellophane doesn't want her images in the hof;
 			// this is a quick hack to omit them.
 			if( $upload->uploader()->id() == 1138 ) {
 				continue;
 			}
-			// a row after a gap says its rank, so the list doesn't renumber.
-			$value = $rank != $next ? ' value="'.$rank.'" style="counter-set: list-item '.$rank.'"' : "";
-			$next = $rank + 1;
+			// every row says its rank, so a gap left by a hidden upload doesn't
+			// renumber the rest. grid.css shows it from the value attribute.
 ?>
-					<li data-fileid="<?= $upload->id() ?>"<?= $value ?>>
+					<li data-fileid="<?= $upload->id() ?>" value="<?= $rank ?>">
 						<div><a href="<?= Link::upload($upload).$ctxQuery ?>"><?= $upload->htmlFilename() ?></a></div>
 						<div class="score"><a href="<?= Link::thread($upload) ?>" title="<?= $upload->timestamp() ?>"><?= $upload->commentLabel(false) ?><span class="goods"><?= $upload->goods() ?></span></a></div>
 						<div>
