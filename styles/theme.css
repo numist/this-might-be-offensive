@@ -86,10 +86,13 @@ textarea {
 	position: sticky;
 	bottom: 0;
 	background: inherit;
-	/* a little more background around the line while it's stuck, without
-		moving it when it isn't */
-	padding-block: 6px;
-	margin-block: -6px;
+	/* a little more background below the line while it's stuck, without
+		moving it when it isn't. only below: a negative top margin would pull
+		the line's background up over the descenders of the comment's last
+		line. above, the line's own half-leading keeps the text sliding under
+		it clear. */
+	padding-block-end: 6px;
+	margin-block-end: -6px;
 	/* lets the line ask whether it's stuck (below) */
 	container-type: scroll-state;
 	align-items: baseline;
