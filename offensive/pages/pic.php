@@ -560,8 +560,13 @@
 				} else { ?>
 					<div class="<?php echo $upload->is_nsfw() == 1 ? 'nsfw' : 'image' ?> u<?= $upload->uploader()->id() ?>">
 						<?php if($upload->file() != "") {
-							$dimensions = $upload->dimensions(); ?>
-							<a id="imageLink" href="<?= $upload->URL() ?>"><img src="<?= $upload->URL() ?>" style="border:none" id="image"
+							$dimensions = $upload->dimensions();
+							// the image's own size, for pic.css to keep a tall image from shrinking to a sliver
+							$size = "";
+							if(is_int($dimensions[0]) && is_int($dimensions[1]) && $dimensions[0] > 0) {
+								$size = " --image-width: ".$dimensions[0]."px; --image-ratio: ".round($dimensions[1] / $dimensions[0], 4).";";
+							} ?>
+							<a id="imageLink" href="<?= $upload->URL() ?>"><img src="<?= $upload->URL() ?>" style="border:none;<?= $size ?>" id="image"
 								 max-width="<?= $dimensions[0] ?>px" max-height="<?= $dimensions[1] ?>px"/></a>
 						<?php } else { ?>
 							<div style="padding:128px;">[ got nothin' for ya ]</div>
