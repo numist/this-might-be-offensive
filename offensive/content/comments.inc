@@ -88,20 +88,15 @@
 		?>
 		<script type="text/javascript">
 			getSocket("<?php $t = new Token("realtime"); echo $t->tokenid(); ?>", function(socket) {
+				var threadid = <?= $upload->id() ?>;
 				var latest_comment;
 
+				// the whole of the newest comment that came in live is on screen.
 				function isLatestCommentVisible() {
-					var docViewTop = $(window).scrollTop();
-					var docViewBottom = docViewTop + $(window).height();
-					
-					var offset = $(latest_comment).offset();
-					if (!offset)
+					if(!latest_comment.isConnected)
 						return false;
-					var elemTop = offset.top;
-					var elemBottom = elemTop + $(latest_comment).height();
-					
-					return ((elemBottom >= docViewTop) && (elemTop <= docViewBottom)
-					&& (elemBottom <= docViewBottom) &&  (elemTop >= docViewTop) );
+					var rect = latest_comment.getBoundingClientRect();
+					return rect.top >= 0 && rect.bottom <= window.innerHeight;
 				}
 
 				var favicon = new Favico({
@@ -117,29 +112,28 @@
 						latest_comment = null;
 						unread = 0;
 						favicon.badge(unread);
-						$.ajax("/offensive/api.php/resetsubscription.json", {
-							data: {
-								threadid: '<?= $upload->id() ?>'
-							}
-						});
+						fetch("/offensive/api.php/resetsubscription.json?threadid=" + threadid);
 					}
-					return true;
 				}
 
-				$(document).on('mousemove keydown DOMMouseScroll mousewheel mousedown touchstart touchmove', handleEvent);
-
+				['mousemove', 'keydown', 'wheel', 'mousedown', 'touchstart', 'touchmove'].forEach(function(type) {
+					document.addEventListener(type, handleEvent, { passive: true });
+				});
 
 				function commentExists(comment) {
 					// comment.inc puts the comment id on the .entry element itself.
 					return document.getElementById(String(comment.id)) !== null;
 				}
 
-				// a comment from the realtime socket: add it to the list and slide it
-				// open. when you're typing in the comment box below the list, the
-				// page scrolls along so the box stays put.
+				// a comment from the realtime socket or the api: add it to the list
+				// and slide it open. when you're typing in the comment box below
+				// the list, the page scrolls along so the box stays put. false if
+				// it was already there.
 				function addComment(comment) {
 					if(commentExists(comment))
-						return;
+						return false;
+					// the newest comment on the page, so a later catch-up starts after it.
+					lastcomment = Math.max(lastcomment, Number(comment.id));
 					var template = document.createElement('template');
 					template.innerHTML = comment.html;
 					// Find the entry by class: the template's top-level node layout has changed before.
@@ -151,10 +145,11 @@
 						thumbnail.before(template.content);
 					else
 						document.getElementById('commentList').append(template.content);
-					if(!entry)
-						return;
-					latest_comment = entry;
-					revealComment(entry);
+					if(entry) {
+						latest_comment = entry;
+						revealComment(entry);
+					}
+					return true;
 				}
 
 				// slides a new comment open from nothing. the overflow it needs while
@@ -197,60 +192,89 @@
 					});
 				}
 
+				// the comments after the newest one on the page, oldest first.
+				function fetchNewComments() {
+					var query = new URLSearchParams({
+						thread: threadid,
+						idmin: lastcomment + 1,
+						sort: 'date_asc',
+						html: 1
+					});
+					return fetch('/offensive/api.php/getcomments.json?' + query).then(function(response) {
+						if(!response.ok)
+							throw new Error('getcomments: ' + response.status);
+						return response.json();
+					});
+				}
+
+				// post without leaving the page. the new comment is fetched back
+				// rather than waited for on the socket: a socket can look connected
+				// and still be dead (a phone that slept, a dropped proxy connection),
+				// and then the comment never showed up. the fetch also brings in
+				// anything the socket missed, in order.
+				var form = document.getElementById('comment_form');
+				if(form) form.addEventListener('submit', function(e) {
+					e.preventDefault();
+					function flag(id) {
+						var input = form.querySelector('#' + id);
+						return input && input.checked ? "1" : "0";
+					}
+					var vote = form.querySelector('input[name=vote]:checked');
+					var data = new URLSearchParams({
+						vote: vote ? vote.value : "novote",
+						comment: form.elements.comment.value,
+						offensive: flag('tmbo'),
+						repost: flag('repost'),
+						subscribe: flag('subscribe'),
+						fileid: form.elements.fileid.value
+					});
+
+					var submit = form.querySelector('input[type=submit]');
+					submit.disabled = true;
+
+					fetch('/offensive/api.php/postcomment.json', { method: 'POST', body: data }).then(function(response) {
+						if(!response.ok)
+							throw new Error('postcomment: ' + response.status);
+						if(data.get('vote') != "novote") {
+							var voteControls = document.getElementById('vote_controls');
+							if(voteControls)
+								voteControls.remove();
+						}
+						if(data.get('comment') != '' || data.get('vote') == "this is bad" || data.get('subscribe') != "0")
+							toggle_subscribe("subscribe", data.get('fileid'), $("#subscribeLink"));
+						form.reset();
+						return fetchNewComments().then(function(comments) {
+							comments.forEach(addComment);
+						});
+					}).catch(function(error) {
+						// the text stays in the box, so it can be sent again.
+						console.error(error);
+					}).finally(function() {
+						submit.disabled = false;
+					});
+				});
+
 				var heldComments = [];
 				var handleRealtimeComment = function(comment) {
 					heldComments.push(comment);
 				}
 
-				socket.on('disconnect', function() {
-	      	$("#comment_form").off('submit.realtime');
-				});
-					
-	      socket.on('connect', function() {
-	      	$("#comment_form").on('submit.realtime', function(e) {
-	      		e.preventDefault();
-	      		e.stopPropagation();
-	      		var data = {
-	      			vote: $('#comment_form input[name=vote]:checked').val() || "novote",
-	      			comment: $("#comment_form textarea[name=comment]").val() || "",
-	      			offensive: $("#comment_form #tmbo").attr("checked") ? "1" : "0",
-	      			repost: $("#comment_form #repost").attr("checked") ? "1" : "0",
-	      			subscribe: $("#comment_form #subscribe").attr("checked") ? "1" : "0",
-	      			fileid: $("#comment_form #fileid").val()
-	      		};
-
-	      		$("#comment_form input:submit").prop('disabled', true);
-
-	      		var request = $.post('/offensive/api.php/postcomment.php', data);
-	      		request.done(function() {
-	      			if(data.vote != "novote")
-	      				$("#vote_controls").remove();
-	      		  if(data.comment != '' || data.vote == "this is bad" || data.subscribe != "0")
-	      				toggle_subscribe("subscribe", data.fileid, $("#subscribeLink"));
-	      			$("#comment_form")[0].reset();
-	      		});
-	      		request.always(function() {
-	      			$("#comment_form input:submit").prop('disabled', false);
-	      		});
-	      	});
-	      });
-
 				socket.on('comment', function(comment) {
 					handleRealtimeComment(comment);
 				});
 
-				socket.emit('subscribe', '/uploads/<?= $upload->id() ?>');
+				socket.emit('subscribe', '/uploads/' + threadid);
 
-				$.getJSON('/offensive/api.php/getcomments.json', {
-					thread: <?= $upload->id() ?>,
-					idmin: lastcomment,
-					html: 1
-				}, function(data) {
-					data.forEach(addComment);
+				// whatever came in between rendering the page and the socket connecting.
+				fetchNewComments().then(function(comments) {
+					comments.forEach(addComment);
+				}).catch(function(error) {
+					console.error(error);
+				}).then(function() {
 					heldComments.forEach(addComment);
 					handleRealtimeComment = function(comment) {
-						addComment(comment);
-						if(comment.comment) {
+						// your own comment is usually on the page already.
+						if(addComment(comment) && comment.comment) {
 							unread += 1;
 							favicon.badge(unread);
 						}
