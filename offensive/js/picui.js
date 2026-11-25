@@ -62,9 +62,16 @@ function qc_dialog_init() {
 				} else {
 					newheight = commentRows.position().top + commentRows.get(0).scrollHeight;
 				}
-				// limit the maximum height
-				if(newheight > $(window).height() - 150) {
-					newheight = $(window).height() - 150;
+				// limit the maximum height, but always leave the comments room
+				// for a few lines (or all of them, if they're shorter). the
+				// sticky author line (theme.css .comment_meta) sits at the
+				// bottom of a box shorter than one comment and hides its text,
+				// so a short window would otherwise show only "» name [vote]".
+				var maxheight = Math.max($(window).height() - 150,
+				                         newheight - commentRows.get(0).scrollHeight
+				                         + Math.min(commentRows.get(0).scrollHeight, 150));
+				if(newheight > maxheight) {
+					newheight = maxheight;
 				}
 				if(self.height() != newheight) {
 				  self.height(newheight);
