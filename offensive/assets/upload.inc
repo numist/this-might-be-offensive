@@ -14,7 +14,7 @@ $filetypes = array("jpg", "jpeg", "gif", "png", "webp");
 // largest image or avatar we'll take in, in bytes. PHP (services/php/php.ini)
 // and nginx (client_max_body_size) both allow 20M, so this is the limit that
 // bites.
-const UPLOAD_MAX_BYTES = 12 * 1024 * 1024;
+const UPLOAD_MAX_BYTES = 16 * 1024 * 1024;
 // largest image we'll post. A still image between this and UPLOAD_MAX_BYTES
 // (a 48 MP phone photo, say) has to go through the resize tool first; an
 // animated one can't be resized, so it's turned away.
