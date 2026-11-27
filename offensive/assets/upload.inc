@@ -11,9 +11,14 @@ $upload_display_prompt = true;
 $tmpdir = "quarantine";
 $filetypes = array("jpg", "jpeg", "gif", "png", "webp");
 
-// largest image or avatar we'll take, in bytes. PHP (services/php/php.ini) and
-// nginx (client_max_body_size) both allow 20M, so this is the limit that bites.
-const UPLOAD_MAX_BYTES = 8 * 1024 * 1024;
+// largest image or avatar we'll take in, in bytes. PHP (services/php/php.ini)
+// and nginx (client_max_body_size) both allow 20M, so this is the limit that
+// bites.
+const UPLOAD_MAX_BYTES = 16 * 1024 * 1024;
+// largest image we'll post. A still image between this and UPLOAD_MAX_BYTES
+// (a 48 MP phone photo, say) has to go through the resize tool first; an
+// animated one can't be resized, so it's turned away.
+const UPLOAD_MAX_POST_BYTES = 8 * 1024 * 1024;
 
 // images bigger than this (long side in px, total pixels, or bytes) get the
 // resize tool. Most phone photos are over the byte limit, on purpose: the tool
@@ -687,6 +692,7 @@ function upload_type(&$postdata) {
 ###############################################################################
 function upload_image($postdata) {
 	if(upload_largerthan($postdata, UPLOAD_MAX_BYTES)) return false;
+	if(upload_animated_largerthan($postdata, UPLOAD_MAX_POST_BYTES)) return false;
 	$lowercase_filename = strtolower($postdata['filename']);
 	if(!strstr($lowercase_filename, "[repost]") &&
 	   !strstr($lowercase_filename, "[tiar]") &&
@@ -701,6 +707,7 @@ function upload_image($postdata) {
 
 function upload_avatar($postdata) {
 	if(upload_largerthan($postdata, UPLOAD_MAX_BYTES)) return false;
+	if(upload_animated_largerthan($postdata, UPLOAD_MAX_POST_BYTES)) return false;
 	if(upload_checkdims($postdata)) return false;
 	if(upload_checksize($postdata)) return false;
 	return upload_insert_file($postdata);
@@ -727,17 +734,24 @@ function upload_checkdims(&$postdata) {
 	if(upload_type($postdata) == "topic" || upload_type($postdata) == "audio")
 		trigger_error("can't check pixel dimensions of non-image files", E_USER_ERROR);
 
+	$original = "$tmpdir/{$postdata['tmpname']}";
+	$filesize = filesize($original);
+	list($width, $height, $type, $attr) = getimagesize($original);
+
 	if(array_key_exists("noresize", $postdata)) {
+		if(upload_resize_required($filesize)) {
+			// the form doesn't offer the original, so someone's poking at it.
+			unset($postdata['noresize']);
+			upload_resize_discard($postdata);
+			upload_resize_form($postdata, $width, $height, $filesize);
+			return true;
+		}
 		// they chose the original: drop any preview, and don't follow the
 		// resize tool with the compression prompt, they've seen that choice.
 		upload_resize_discard($postdata);
 		$postdata['noresample'] = true;
 		return false;
 	}
-
-	$original = "$tmpdir/{$postdata['tmpname']}";
-	$filesize = filesize($original);
-	list($width, $height, $type, $attr) = getimagesize($original);
 
 	// sanity check
 	if(!is_numeric( $width ) || !is_numeric($height) || $width * $height == 0 ) {
@@ -774,12 +788,9 @@ function upload_checkdims(&$postdata) {
 	}
 
 	// we can't shrink an animated image and keep the animation, so don't
-	// offer to. ping reads the frame list without decoding pixels.
-	$image = new Imagick();
-	$image->pingImage($original);
-	$animated = image_is_animated($image);
-	$image->destroy();
-	if($animated)
+	// offer to (upload_animated_largerthan() has already turned away the ones
+	// too big to post as they are).
+	if(upload_is_animated($postdata))
 		return false;
 
 	upload_resize_form($postdata, $width, $height, $filesize);
@@ -840,8 +851,14 @@ function upload_resize_form(&$postdata, $width, $height, $filesize, $error="") {
 	if($error != "") { ?>
 		<p><strong><?= $error ?></strong></p>
 	<?php } ?>
+<?php if(upload_resize_required($filesize)) { ?>
+	<p>This image is too big to post as it is (<?= $width ?> x <?= $height ?>, <?= $size ?>;
+	the limit is <?= upload_format_bytes(UPLOAD_MAX_POST_BYTES) ?>).<br />
+	Pick a size and quality, and I'll make a smaller copy for you to look at before anything is posted.</p>
+<?php } else { ?>
 	<p>This image is rather large (<?= $width ?> x <?= $height ?>, <?= $size ?>).<br />
 	If you want, I can make a smaller copy for you to look at before anything is posted.</p>
+<?php } ?>
 	<form id="resizeform" action="<?= $_SERVER['SCRIPT_NAME'] ?>" method="POST">
 		<input type="hidden" name="c" value="upload"/>
 		<label>long edge
@@ -860,7 +877,9 @@ function upload_resize_form(&$postdata, $width, $height, $filesize, $error="") {
 		<p><?= strtoupper($postdata['format_name']) ?> is lossless, so only the size changes.</p>
 <?php } ?>
 		<input type="submit" name="resize_preview" value="Show me the resized image."/>
+<?php if(!upload_resize_required($filesize)) { ?>
 		<input type="submit" name="noresize" value="Post the original." formnovalidate/>
+<?php } ?>
 		<input type="submit" name="killit" value="Cancel this upload." formnovalidate/>
 	</form>
 	<?php
@@ -937,7 +956,7 @@ function upload_resize_preview(&$postdata, $width, $height, $filesize) {
 
 	$change = round(100 * ($newsize - $filesize) / $filesize);
 	$change = $change < 0 ? "&minus;".abs($change)."%" : "+$change%";
-	$toobig = $newsize > UPLOAD_MAX_BYTES;
+	$toobig = $newsize > UPLOAD_MAX_POST_BYTES;
 	$src = "/offensive/ui/uploadPreview.php?v=".filemtime("$tmpdir/$previewname");
 
 	ob_start(); ?>
@@ -952,7 +971,7 @@ function upload_resize_preview(&$postdata, $width, $height, $filesize) {
 	<p>long edge <?= $side ?> px<?= $quality !== null ? ", quality $quality" : "" ?>.
 	The image links to its full size.</p>
 <?php if($toobig) { ?>
-	<p><strong>That's still too big to post (the limit is <?= upload_format_bytes(UPLOAD_MAX_BYTES) ?>).
+	<p><strong>That's still too big to post (the limit is <?= upload_format_bytes(UPLOAD_MAX_POST_BYTES) ?>).
 	Try a smaller size or a lower quality.</strong></p>
 <?php } ?>
 	<form id="resizeform" action="<?= $_SERVER['SCRIPT_NAME'] ?>" method="POST">
@@ -961,7 +980,9 @@ function upload_resize_preview(&$postdata, $width, $height, $filesize) {
 		<input type="submit" name="resize_use" value="Use the resized image."/>
 <?php } ?>
 		<input type="submit" name="resize_retry" value="Try different settings."/>
+<?php if(!upload_resize_required($filesize)) { ?>
 		<input type="submit" name="noresize" value="Post the original."/>
+<?php } ?>
 		<input type="submit" name="killit" value="Cancel this upload."/>
 	</form>
 	<?php
@@ -980,7 +1001,7 @@ function upload_resize_use(&$postdata, $width, $height, $filesize) {
 		                   "That preview is gone. Have another go?");
 		return true;
 	}
-	if(filesize($preview) > UPLOAD_MAX_BYTES) {
+	if(filesize($preview) > UPLOAD_MAX_POST_BYTES) {
 		upload_resize_discard($postdata);
 		upload_resize_form($postdata, $width, $height, $filesize,
 		                   "That's still too big to post. Try a smaller size or a lower quality.");
@@ -1219,6 +1240,34 @@ function upload_checkrepost(&$postdata) {
 	return true;
 }
 
+// a still image this big can only be posted through the resize tool.
+function upload_resize_required($filesize) {
+	return $filesize > UPLOAD_MAX_POST_BYTES;
+}
+
+// ping reads the frame list without decoding pixels.
+function upload_is_animated($postdata) {
+	global $tmpdir;
+	$image = new Imagick();
+	$image->pingImage("$tmpdir/{$postdata['tmpname']}");
+	$animated = image_is_animated($image);
+	$image->destroy();
+	return $animated;
+}
+
+// animated images can't be resized, so the posting limit is their upload limit.
+function upload_animated_largerthan($postdata, $bytes) {
+	global $tmpdir;
+
+	if(filesize($tmpdir."/".$postdata['tmpname']) <= $bytes) return false;
+	if(!upload_is_animated($postdata)) return false;
+
+	killUpload($postdata);
+	box("animated images can be ".upload_format_bytes($bytes)." at most, try something smaller", "no fishing stories.");
+	uploadForm();
+	return true;
+}
+
 function upload_largerthan($postdata, $bytes) {
 	global $tmpdir;
 
@@ -1230,7 +1279,7 @@ function upload_largerthan($postdata, $bytes) {
 	if($filesize <= $bytes) return false;
 
 	killUpload($postdata);
-	box("that file is too big to upload, try something else", "no fishing stories.");
+	box("that file is too big to upload (the limit is ".upload_format_bytes($bytes)."), try something else", "no fishing stories.");
 	uploadForm();
 	return true;
 }
