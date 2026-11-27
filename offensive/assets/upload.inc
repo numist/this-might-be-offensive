@@ -26,11 +26,12 @@ const UPLOAD_MAX_POST_BYTES = 8 * 1024 * 1024;
 const UPLOAD_PROMPT_MAX_SIDE = 4096;
 const UPLOAD_PROMPT_MAX_PIXELS = 16 * 1000 * 1000;
 const UPLOAD_PROMPT_MAX_BYTES = 1024 * 1024;
-// the resize tool's starting settings and its bounds. The long edge can't go
-// past the original's (no enlarging); quality applies to JPEG and WebP.
-const UPLOAD_RESIZE_DEFAULT_SIDE = 2560;
+// the resize tool's starting settings and its bounds. The setting is the short
+// edge, which can't go past the original's (no enlarging); quality applies to
+// JPEG and WebP.
+const UPLOAD_RESIZE_DEFAULT_SIDE = 1024;
 const UPLOAD_RESIZE_MIN_SIDE = 320;
-const UPLOAD_RESIZE_DEFAULT_QUALITY = 85;
+const UPLOAD_RESIZE_DEFAULT_QUALITY = 65;
 const UPLOAD_RESIZE_MIN_QUALITY = 10;
 
 
@@ -797,7 +798,7 @@ function upload_checkdims(&$postdata) {
 	return true;
 }
 
-/* The resize tool: the uploader picks a long edge (and a quality, for formats
+/* The resize tool: the uploader picks a short edge (and a quality, for formats
  * that have one), looks at the result, then uses it, tries other settings, or
  * posts the original. The preview sits in the quarantine next to the original
  * until one of those happens (the nightly quarantine sweep takes abandoned
@@ -833,14 +834,14 @@ function upload_format_bytes($bytes) {
 
 // the settings the form shows: what they last asked for, else the defaults.
 function upload_resize_settings($postdata, $width, $height) {
-	$longside = max($width, $height);
+	$shortside = min($width, $height);
 	$side = array_key_exists('resize_side', $postdata)
 	        ? $postdata['resize_side']
-	        : min(UPLOAD_RESIZE_DEFAULT_SIDE, $longside);
+	        : min(UPLOAD_RESIZE_DEFAULT_SIDE, $shortside);
 	$quality = array_key_exists('resize_quality', $postdata)
 	           ? $postdata['resize_quality']
 	           : UPLOAD_RESIZE_DEFAULT_QUALITY;
-	return array($side, $quality, min(UPLOAD_RESIZE_MIN_SIDE, $longside), $longside);
+	return array($side, $quality, min(UPLOAD_RESIZE_MIN_SIDE, $shortside), $shortside);
 }
 
 function upload_resize_form(&$postdata, $width, $height, $filesize, $error="") {
@@ -861,7 +862,7 @@ function upload_resize_form(&$postdata, $width, $height, $filesize, $error="") {
 <?php } ?>
 	<form id="resizeform" action="<?= $_SERVER['SCRIPT_NAME'] ?>" method="POST">
 		<input type="hidden" name="c" value="upload"/>
-		<label>long edge
+		<label>short edge
 			<input type="number" name="resize_side" value="<?= (int)$side ?>"
 			       min="<?= $minside ?>" max="<?= $maxside ?>" step="1" required
 			       inputmode="numeric"/> px
@@ -894,7 +895,7 @@ function upload_resize_read_settings(&$postdata, $width, $height) {
 	$side = filter_var($_POST['resize_side'] ?? "", FILTER_VALIDATE_INT,
 	                   array("options" => array("min_range" => $minside, "max_range" => $maxside)));
 	if($side === false) {
-		return "The long edge has to be a whole number of pixels from $minside to $maxside.";
+		return "The short edge has to be a whole number of pixels from $minside to $maxside.";
 	}
 	$postdata['resize_side'] = $side;
 
@@ -932,7 +933,10 @@ function upload_resize_preview(&$postdata, $width, $height, $filesize) {
 			upload_resize_form($postdata, $width, $height, $filesize, "Animated images can't be resized.");
 			return true;
 		}
-		$image->resizeImage($side, $side, imagick::FILTER_LANCZOS, 1, true);
+		// scale so the short edge is $side; the long edge follows.
+		$scale = $side / min($width, $height);
+		$image->resizeImage(max(1, (int)round($width * $scale)), max(1, (int)round($height * $scale)),
+		                    imagick::FILTER_LANCZOS, 1, false);
 		if($quality !== null) {
 			$image->setImageCompressionQuality($quality);
 		}
@@ -968,7 +972,7 @@ function upload_resize_preview(&$postdata, $width, $height, $filesize) {
 		<tr><th>original</th><td><?= $width ?> x <?= $height ?></td><td><?= upload_format_bytes($filesize) ?></td></tr>
 		<tr><th>resized</th><td><?= $newwidth ?> x <?= $newheight ?></td><td><?= upload_format_bytes($newsize) ?> (<?= $change ?>)</td></tr>
 	</table>
-	<p>long edge <?= $side ?> px<?= $quality !== null ? ", quality $quality" : "" ?>.
+	<p>short edge <?= $side ?> px<?= $quality !== null ? ", quality $quality" : "" ?>.
 	The image links to its full size.</p>
 <?php if($toobig) { ?>
 	<p><strong>That's still too big to post (the limit is <?= upload_format_bytes(UPLOAD_MAX_POST_BYTES) ?>).
