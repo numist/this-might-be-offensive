@@ -141,3 +141,47 @@
         align-items: center;
     }
 }
+
+/* uploads, unlike yearbook photos, have their titles under the thumbnails */
+.grid_thumbs:not(#yearbook) {
+    ul {
+        justify-items: stretch;
+
+        /* one per row on a phone, so the titles get the screen's width */
+        @media (width < 800px) {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .thumbcontainer {
+        height: 100%;
+
+        /* the thumbnail with its title under it, as one link. it takes up
+           the row's slack, so the counts line up across a row however many
+           lines each title wraps to */
+        > :first-child {
+            align-self: stretch;
+            flex-grow: 1;
+
+            a {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: var(--spacing-xs);
+                text-align: center;
+
+                /* two lines at most. the span's title attribute has the
+                   whole filename */
+                > span {
+                    max-width: 100%;
+                    overflow-wrap: break-word;
+                    display: -webkit-box;
+                    -webkit-box-orient: vertical;
+                    -webkit-line-clamp: 2;
+                    line-clamp: 2;
+                    overflow: hidden;
+                }
+            }
+        }
+    }
+}
