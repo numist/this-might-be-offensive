@@ -157,14 +157,14 @@
     }
 
     .thumbcontainer {
-        height: 100%;
+        position: relative;
+        /* so the counts can find the thumbnail's bottom edge: the thumbnail
+           is as wide as this box and 4:3, so it's 75cqi tall */
+        container-type: inline-size;
 
-        /* the thumbnail with its title under it, as one link. it takes up
-           the row's slack, so the counts line up across a row however many
-           lines each title wraps to */
+        /* the thumbnail with its title under it, as one link */
         > :first-child {
             align-self: stretch;
-            flex-grow: 1;
 
             a {
                 display: flex;
@@ -193,6 +193,22 @@
                     line-clamp: 2;
                     overflow: hidden;
                 }
+            }
+        }
+
+        /* the counts sit on the thumbnail's bottom edge, on the same white
+           backing as the pic page's counts on a phone (pic.css) */
+        > :last-child {
+            position: absolute;
+            top: 75cqi;
+            left: 50%;
+            translate: -50% calc(-100% - var(--spacing-sm));
+            padding: var(--spacing-xs) var(--spacing-sm);
+            background: rgb(255 255 255 / 70%);
+            border-radius: 3px;
+
+            .comments {
+                --bubble-fill: white;
             }
         }
     }
