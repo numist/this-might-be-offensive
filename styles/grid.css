@@ -146,6 +146,9 @@
 .grid_thumbs:not(#yearbook) {
     ul {
         justify-items: stretch;
+        /* two per row: the large thumbnails scale to fit the column */
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: var(--spacing-lg);
 
         /* one per row on a phone, so the titles get the screen's width */
         @media (width < 800px) {
@@ -169,6 +172,15 @@
                 align-items: center;
                 gap: var(--spacing-xs);
                 text-align: center;
+
+                /* as wide as the title's box. the large thumbnail is
+                   600x450; a small one stands in, stretched, until the
+                   large one is made */
+                > img {
+                    width: 100%;
+                    aspect-ratio: 4 / 3;
+                    object-fit: contain;
+                }
 
                 /* two lines at most. the span's title attribute has the
                    whole filename */
