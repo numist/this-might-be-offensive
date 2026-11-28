@@ -724,6 +724,89 @@ class Upload {
 	}
 	
 	/*
+	 * the images tab's thumbnails: scaled to fit the grid's column (about
+	 * 280px wide on desktop, the screen's width on a phone), so they're made
+	 * big enough for sharp screens, as JPEG (some browsers still can't show
+	 * WebP), in a file of their own so every other page that shows thumb()
+	 * keeps the small one. made the first time they're asked for, but only a
+	 * few per page view, because each one decodes the full-size upload;
+	 * thumb() stands in for the rest until a later view, so old uploads get
+	 * theirs only if someone looks.
+	 */
+	const LARGE_THUMB_WIDTH = 600;
+	const LARGE_THUMB_HEIGHT = 450;
+	const LARGE_THUMB_QUALITY = 80;
+	const LARGE_THUMBS_PER_REQUEST = 10;
+	private static $largeThumbsMade = 0;
+
+	private function largeThumbName() {
+		return "thumbs/th".$this->id()."-".self::LARGE_THUMB_WIDTH.".jpg";
+	}
+
+	public function largeThumb() {
+		if($this->type() != "image") return '';
+
+		$retname = $this->basePath().$this->largeThumbName();
+		if(file_exists($retname)) {
+			return $retname;
+		}
+
+		if(self::$largeThumbsMade >= self::LARGE_THUMBS_PER_REQUEST) {
+			return '';
+		}
+
+		$bigfile = $this->file();
+		if($bigfile == '') {
+			return '';
+		}
+		// a failure counts too, so a page of broken uploads can't stall a view
+		self::$largeThumbsMade++;
+
+		// written beside the target and renamed into place, so a request
+		// that finds the file never finds half of it
+		$tmpname = $retname.".".getmypid().".tmp";
+		try {
+			$image = new Imagick($bigfile);
+			// first frame only: an animated upload still animates on its own page
+			$image->setFirstIterator();
+			// the file keeps its EXIF Orientation tag; the thumbnail won't
+			$image->autoOrient();
+			$image->setGravity(imagick::GRAVITY_CENTER);
+			$image->cropThumbnailImage(self::LARGE_THUMB_WIDTH, self::LARGE_THUMB_HEIGHT);
+			$image->setImagePage(0, 0, 0, 0);
+			$image->stripImage();
+			// JPEG has no transparency: put a transparent PNG or GIF on white
+			$image->setImageBackgroundColor("white");
+			$image->setImageAlphaChannel(Imagick::ALPHACHANNEL_REMOVE);
+			$image->setImageFormat("jpeg");
+			$image->setImageCompressionQuality(self::LARGE_THUMB_QUALITY);
+			ensureDirExists(dirname($retname));
+			$ok = $image->writeImage("jpeg:".$tmpname) && rename($tmpname, $retname);
+			$image->destroy();
+		} catch(ImagickException $e) {
+			trigger_error("large thumbnail for ".$this->id()." failed: ".$e->getMessage(), E_USER_WARNING);
+			$ok = false;
+		}
+
+		if(!$ok) {
+			if(file_exists($tmpname)) unlink($tmpname);
+			trigger_error("large thumbnail for ".$this->id()." was not written", E_USER_WARNING);
+			return '';
+		}
+
+		return $retname;
+	}
+
+	// the large thumbnail, or the small one while there isn't a large one yet
+	public function largeThumbURL() {
+		if($this->largeThumb() == '') {
+			return $this->thumbURL();
+		}
+
+		return "/".$this->basePath(null, true).$this->largeThumbName();
+	}
+
+	/*
 	 * Comment and vote counts as icons and numbers (see .comments and friends
 	 * in styles/theme.css). The words are in .commentlabel, which is visually
 	 * hidden, and the vote icons carry their own alt text, so screen readers
