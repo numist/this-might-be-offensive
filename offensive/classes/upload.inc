@@ -726,20 +726,21 @@ class Upload {
 	/*
 	 * the images tab's thumbnails: scaled to fit the grid's column (about
 	 * 280px wide on desktop, the screen's width on a phone), so they're made
-	 * big enough for sharp screens, as WebP, in a file of their own so every
-	 * other page that shows thumb() keeps the small one. made the first time
-	 * they're asked for, but only a few per page view, because each one
-	 * decodes the full-size upload; thumb() stands in for the rest until a
-	 * later view, so old uploads get theirs only if someone looks.
+	 * big enough for sharp screens, as JPEG (some browsers still can't show
+	 * WebP), in a file of their own so every other page that shows thumb()
+	 * keeps the small one. made the first time they're asked for, but only a
+	 * few per page view, because each one decodes the full-size upload;
+	 * thumb() stands in for the rest until a later view, so old uploads get
+	 * theirs only if someone looks.
 	 */
 	const LARGE_THUMB_WIDTH = 600;
 	const LARGE_THUMB_HEIGHT = 450;
-	const LARGE_THUMB_QUALITY = 75;
+	const LARGE_THUMB_QUALITY = 80;
 	const LARGE_THUMBS_PER_REQUEST = 10;
 	private static $largeThumbsMade = 0;
 
 	private function largeThumbName() {
-		return "thumbs/th".$this->id()."-".self::LARGE_THUMB_WIDTH.".webp";
+		return "thumbs/th".$this->id()."-".self::LARGE_THUMB_WIDTH.".jpg";
 	}
 
 	public function largeThumb() {
@@ -774,10 +775,13 @@ class Upload {
 			$image->cropThumbnailImage(self::LARGE_THUMB_WIDTH, self::LARGE_THUMB_HEIGHT);
 			$image->setImagePage(0, 0, 0, 0);
 			$image->stripImage();
-			$image->setImageFormat("webp");
+			// JPEG has no transparency: put a transparent PNG or GIF on white
+			$image->setImageBackgroundColor("white");
+			$image->setImageAlphaChannel(Imagick::ALPHACHANNEL_REMOVE);
+			$image->setImageFormat("jpeg");
 			$image->setImageCompressionQuality(self::LARGE_THUMB_QUALITY);
 			ensureDirExists(dirname($retname));
-			$ok = $image->writeImage("webp:".$tmpname) && rename($tmpname, $retname);
+			$ok = $image->writeImage("jpeg:".$tmpname) && rename($tmpname, $retname);
 			$image->destroy();
 		} catch(ImagickException $e) {
 			trigger_error("large thumbnail for ".$this->id()." failed: ".$e->getMessage(), E_USER_WARNING);
