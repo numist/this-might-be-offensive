@@ -21,7 +21,7 @@ if(!defined("TMBO") || !isset($upload)) {
 						 if ($upload->is_tmbo()) echo "tmbo ";
 						 if ($upload->is_bad()) echo "bad ";
 						 ?>"
-						 src="<?= $upload->thumbURL() ?>"
+						 src="<?= $upload->largeThumbURL() ?>"
 						 alt="">
 				<span title="<?= htmlEscape($upload->filename()) ?>"><?= $upload->htmlFilename() ?></span>
 			</a>
